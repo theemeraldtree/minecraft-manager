@@ -68,19 +68,14 @@
     "json-loader": "0.5.7",
     "mv": "2.1.1",
     "react": "16.2.0",
-    "react-addons-css-transition-group": "^15.6.2",
     "react-dom": "16.2.0",
     "react-router-dom": "4.2.2",
     "react-router-page-transition": "^3.0.2",
     "style-loader": "0.17.0",
     "styled-components": "^3.2.3",
-    "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.1",
-    "stylus-relative-loader": "^3.4.0",
     "uniqid": "^4.1.1",
     "webpack": "2.5.1",
-    "webpack-dev-server": "2.4.5",
-    "winston": "^2.4.0"
+    "webpack-dev-server": "2.4.5"
   },
   "devDependencies": {
     "electron": "1.6.7",
