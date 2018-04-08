@@ -1,0 +1,89 @@
+{
+  "name": "minecraftmanager",
+  "version": "1.2.0",
+  "description": "Minecraft Manager",
+  "author": "stairman06",
+  "build": {
+    "nsis": {
+      "perMachine": true
+    },
+    "fileAssociations": [
+      {
+        "ext": "mcjprofile",
+        "name": "Minecraft Java Profile",
+        "description": "Minecraft Java Profile for Minecraft Manager"
+      }
+    ],
+    "extraResources": [
+      "resource/*"
+    ],
+    "win": {
+      "publish": {
+        "provider": "generic",
+        "url": "http://theemeraldtree.net/mcm/upd/win/"
+      }
+    },
+    "mac": {
+      "publish": {
+        "provider": "generic",
+        "url": "http://theemeraldtree.net/mcm/upd/mac/"
+      }
+    }
+  },
+  "main": "main.js",
+  "productName": "Minecraft Manager",
+  "scripts": {
+    "prod": "webpack --config webpack.build.config.js && electron --noDevServer .",
+    "dev": "webpack-dev-server --hot --host 0.0.0.0 --inline --config=./webpack.dev.config.js",
+    "build": "webpack --config webpack.build.config.js",
+    "installer": "electron-builder --prepackaged \"builds/Minecraft Manager-win32-x64\"",
+    "publish": "electron-builder publish ./ --publish always",
+    "pubMac": "electron-builder ./ --mac --publish always"
+  },
+  "dependencies": {
+    "@babel/core": "7.0.0-beta.42",
+    "@babel/preset-env": "^7.0.0-beta.42",
+    "adm-zip": "0.4.7",
+    "archiver": "^2.1.0",
+    "babel-eslint": "^8.2.2",
+    "babel-loader": "7.1.4",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-react": "6.24.1",
+    "babili-webpack-plugin": "0.0.11",
+    "cheerio": "1.0.0-rc.2",
+    "copy-dir": "0.3.0",
+    "css-loader": "0.28.1",
+    "electron-packager": "8.7.0",
+    "electron-updater": "2.16.1",
+    "eslint": "^4.15.0",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-react": "^7.7.0",
+    "extract-text-webpack-plugin": "2.1.0",
+    "file-loader": "0.11.1",
+    "follow-redirects": "^1.4.1",
+    "fs-copy-file-sync": "^1.0.1",
+    "graceful-fs": "^4.1.11",
+    "html-webpack-plugin": "2.28.0",
+    "ignore-loader": "0.1.2",
+    "json-loader": "0.5.7",
+    "mv": "2.1.1",
+    "react": "16.2.0",
+    "react-addons-css-transition-group": "^15.6.2",
+    "react-dom": "16.2.0",
+    "react-router-dom": "4.2.2",
+    "react-router-page-transition": "^3.0.2",
+    "style-loader": "0.17.0",
+    "styled-components": "^3.2.3",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1",
+    "stylus-relative-loader": "^3.4.0",
+    "uniqid": "^4.1.1",
+    "webpack": "2.5.1",
+    "webpack-dev-server": "2.4.5",
+    "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "electron": "1.6.7",
+    "electron-builder": "19.45.4"
+  }
+}

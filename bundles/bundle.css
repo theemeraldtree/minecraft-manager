@@ -1,0 +1,2067 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800);.navbar {
+  width: 78px;
+  flex: 0 0 auto;
+  box-shadow: 10px 0px 28px 0px rgba(0,0,0,0.55);
+  z-index: 300;
+}
+.navbar.theme-dark {
+  background: #363636;
+}
+.navbar >.mcm-logo {
+  background-image: url(./img/logo__3hbPd.png);
+  width: 100%;
+  height: 119px;
+  margin: 0 auto;
+  margin-top: 25px;
+  background-position: center;
+  display: inline-block;
+  position: relative;
+}
+.navbar >.button {
+  width: 68px;
+  height: 68px;
+  display: block;
+  margin: 0 auto;
+  margin-top: 29px;
+  background-size: cover;
+}
+.navbar >.update-checker {
+  position: absolute;
+  bottom: 3px;
+  text-align: center;
+  width: 75px;
+  color: #fff;
+  margin-left: 3px;
+  overflow: hidden;
+  font-size: 8pt;
+}
+.navbar >.update-info {
+  position: absolute;
+  bottom: 0;
+  width: 100vw;
+  padding-top: 20px;
+  background: #8c8c8c;
+}
+.navbar >.update-info >p {
+  color: #fff;
+  margin-top: 0;
+}
+.navbar >.update-info >.title {
+  font-size: 15pt;
+  margin-left: 20px;
+  font-weight: bolder;
+  margin-bottom: 0;
+}
+.navbar >.update-info >.widebutton {
+  display: inline-block;
+}
+.navbar >.update-info >* {
+  margin-left: 20px;
+}
+.navbar >.profiles-button {
+  background-image: url(./img/profiles__1Ql-r.png);
+}
+.navbar >.profiles-button.active {
+  background-image: url(./img/profiles-selected__1hZHj.png);
+}
+.navbar >.discover-button {
+  background-image: url(./img/discover__3nNcR.png);
+}
+.navbar >.discover-button.active {
+  background-image: url(./img/discover-selected__3FEih.png);
+}
+.transitiongroup {
+  width: 100%;
+  height: 100%;
+}
+.slide-appear {
+  transform: translateX(100%);
+}
+.slide-appear.slide-appear-active {
+  transform: translateX(0%);
+  transition: 1s ease-in;
+}
+.slide-leave {
+  position: absolute;
+  transform: translateX(0%);
+}
+.slide-leave.slide-leave-active {
+  transform: translateX(100%);
+  transition: 1s ease-in;
+}
+.persist-appear {
+  opacity: 1s;
+}
+.persist-appear.persist-appear-active {
+  opacity: 1s;
+  transition: 5s;
+}
+.button.launch {
+  background: #02ca02;
+}
+.button.launch:hover {
+  background: #019801;
+}
+.button.launch >.icon {
+  background-image: url(./img/launch__2ZayH.png);
+}
+.button.edit {
+  background: #b5b507;
+}
+.button.edit:hover {
+  background: #848405;
+}
+.button.edit >.icon {
+  background-image: url(./img/edit__1WzbO.png);
+}
+.button.share {
+  background: #044b87;
+}
+.button.share:hover {
+  background: #032f55;
+}
+.button.share >.icon {
+  background-image: url(./img/share__2kYC8.png);
+}
+.button.delete {
+  background: #690101;
+}
+.button.delete:hover {
+  background: #360101;
+}
+.button.delete >.icon {
+  background-image: url(./img/delete__3z_eU.png);
+}
+.button.install {
+  background: #047504;
+}
+.button.install:hover {
+  background: #024402;
+}
+.button.install >.icon {
+  background-image: url(./img/update__3NaJ9.png);
+}
+.button.folder {
+  background: #047504;
+}
+.button.folder:hover {
+  background: #024402;
+}
+.button.folder >.icon {
+  background-image: url(./img/folder__2VyMg.png);
+}
+.button.update {
+  background: #570169;
+}
+.button.update:hover {
+  background: #2d0136;
+}
+.button.update >.icon {
+  background-image: url(./img/update__3NaJ9.png);
+}
+.button.add {
+  background: #047504;
+}
+.button.add:hover {
+  background: #024402;
+}
+.button.add >.icon {
+  background-image: url(./img/add__1UDxR.png);
+}
+.button.color-blue {
+  background: #044b87;
+}
+.button.color-blue:hover {
+  background: #032f55;
+}
+.button.color-green {
+  background: #047504;
+}
+.button.color-green:hover {
+  background: #024402;
+}
+.button.color-red {
+  background: #690101;
+}
+.button.color-red:hover {
+  background: #360101;
+}
+.widebutton {
+  width: 231px;
+  height: 73px;
+  cursor: pointer;
+  position: relative;
+  border-radius: 4px;
+}
+.widebutton >*:not(.tooltip) {
+  transition: 150ms;
+}
+.widebutton:hover,
+.widebutton.disabled {
+  transition: 150ms;
+}
+.widebutton:hover >*:not(.tooltip),
+.widebutton.disabled >*:not(.tooltip) {
+  transition: 150ms;
+  filter: brightness(40%);
+}
+.widebutton >.text {
+  display: inline-block;
+  font-size: 25pt;
+  font-weight: bolder;
+  top: 14px;
+  position: absolute;
+  margin: 0;
+  left: 70px;
+}
+.widebutton.theme-dark >.text {
+  color: #fff;
+}
+.widebutton >.icon {
+  width: 50px;
+  height: 50px;
+  margin: 11px;
+  background-size: 50px 50px;
+  display: inline-block;
+  position: absolute;
+  left: 0;
+}
+.widebutton.color >.text {
+  left: 11px;
+}
+.widebutton.launch {
+  background: #02ca02;
+}
+.widebutton.launch:hover {
+  background: #019801;
+}
+.widebutton.launch >.icon {
+  background-image: url(./img/launch__2ZayH.png);
+}
+.widebutton.edit {
+  background: #b5b507;
+}
+.widebutton.edit:hover {
+  background: #848405;
+}
+.widebutton.edit >.icon {
+  background-image: url(./img/edit__1WzbO.png);
+}
+.widebutton.share {
+  background: #044b87;
+}
+.widebutton.share:hover {
+  background: #032f55;
+}
+.widebutton.share >.icon {
+  background-image: url(./img/share__2kYC8.png);
+}
+.widebutton.delete {
+  background: #690101;
+}
+.widebutton.delete:hover {
+  background: #360101;
+}
+.widebutton.delete >.icon {
+  background-image: url(./img/delete__3z_eU.png);
+}
+.widebutton.update {
+  background: #570169;
+}
+.widebutton.update:hover {
+  background: #2d0136;
+}
+.widebutton.update >.icon {
+  background-image: url(./img/update__3NaJ9.png);
+}
+.tooltip {
+  width: 100%;
+  height: 100%;
+  display: inline-block;
+  position: relative;
+  z-index: 100;
+}
+.tooltip:hover >.tooltip-box {
+  visibility: visible;
+  opacity: 1;
+  transition: 0.5s;
+}
+.tooltip >.tooltip-box {
+  background-color: #000;
+  color: #fff;
+  visibility: hidden;
+  border-radius: 6px;
+  padding: 10px 10px;
+  z-index: 1;
+  position: absolute;
+  width: max-content;
+  opacity: 0;
+  transition-property: opacity;
+  transition: 0.5s;
+}
+.tooltip >.tooltip-box.tooltip-right {
+  top: 50%;
+  left: 115%;
+  right: 0px;
+  transform: translateY(-50%);
+}
+.tooltip >.tooltip-box.tooltip-right::after {
+  top: 50%;
+  right: 100%;
+  margin-top: -8px;
+  border-color: transparent #000 transparent transparent;
+}
+.tooltip >.tooltip-box.tooltip-bottom {
+  top: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.tooltip >.tooltip-box.tooltip-bottom::after {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-color: transparent transparent #000 transparent;
+}
+.tooltip >.tooltip-box::after {
+  content: " ";
+  position: absolute;
+  border-width: 8px;
+  border-style: solid;
+}
+.windowbar {
+  flex: 0 1 30px;
+  height: 30px;
+  width: 100%;
+  display: block;
+  z-index: 9001;
+  -webkit-app-region: drag;
+}
+.windowbar >.title {
+  position: absolute;
+  color: #fff;
+  top: 5px;
+  left: 5px;
+  font-weight: bolder;
+  margin: 0;
+  -webkit-app-region: drag;
+  cursor: default;
+}
+.windowbar.darwin {
+  height: 23px;
+  flex: 0 1 23px;
+}
+.windowbar.darwin >.title {
+  top: 0;
+  position: initial;
+  text-align: center;
+}
+.windowbar >.top {
+  height: 1px;
+  position: absolute;
+  width: 100%;
+  -webkit-app-region: no-drag;
+}
+.windowbar >.controls {
+  float: right;
+  top: 50%;
+}
+.windowbar >.controls >.minimize {
+  background-image: url(./img/minimize__1w1d7.png);
+}
+.windowbar >.controls >.maximize {
+  background-image: url(./img/maximize__rMHp0.png);
+}
+.windowbar >.controls >.close {
+  background-image: url(./img/close__1O4IE.png);
+}
+.windowbar >.settings {
+  background-image: url(./img/settingsGear__13zAp.png);
+}
+.windowbar.darwin >.settings {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 14px;
+  width: 14px;
+  background-position: 0 50%;
+}
+.windowbar >* {
+  -webkit-app-region: no-drag;
+}
+.windowbar .button {
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  margin: 5px;
+  z-index: 20;
+  float: right;
+  background-size: cover;
+  transition: -webkit-filter 300ms;
+}
+.windowbar .button:hover {
+  -webkit-filter: brightness(0.5);
+  cursor: pointer;
+  transition: -webkit-filter 300ms;
+}
+.windowbar.theme-dark {
+  background-color: #444;
+}
+.basiccard {
+  width: 450px;
+  height: 103px;
+  transition: 150ms ease-in-out;
+  margin: 10px;
+  white-space: nowrap;
+  position: relative;
+}
+.basiccard >.img-wrapper {
+  width: 100px;
+  position: absolute;
+  display: block;
+  height: 100px;
+}
+.basiccard >.img-wrapper >.img-holder {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+.basiccard >.img-wrapper >.img-holder >.img {
+  width: 100%;
+  border-radius: 13px;
+}
+.basiccard > * {
+  display: inline-block;
+}
+.basiccard >.title {
+  position: absolute;
+  margin: 0;
+  bottom: 70px;
+  left: 115px;
+  color: #fff;
+  font-size: 20pt;
+  width: 340px;
+  margin-left: 5px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+}
+.basiccard >.subtitle {
+  position: absolute;
+  margin: 0;
+  margin-left: 5px;
+  top: 50px;
+  left: 13px;
+  color: #fff;
+  font-size: 15pt;
+  margin-left: 103px;
+}
+.basiccard >.descBox {
+  opacity: 0;
+  transition: 150ms ease-in-out;
+  position: absolute;
+  margin: 0;
+  left: 0px;
+  height: 120px;
+  color: #fff;
+  font-size: 10pt;
+  visibility: hidden;
+  z-index: 20;
+  bottom: -100px;
+  padding: 10px;
+  width: 450px;
+  white-space: normal;
+  background-color: #363636;
+  border-radius: 0px 0px 10px 10px;
+}
+.basiccard >.other {
+  display: inline-block;
+  bottom: 0;
+  left: 103px;
+  position: absolute;
+}
+.basiccard:hover {
+  transition: 300ms;
+  border-radius: 10px 10px 0px 0px;
+  box-shadow: 0px 0px 40px 8px rgba(0,0,0,0.75);
+}
+.basiccard:hover >.descBox {
+  position: absolute;
+  visibility: visible;
+  opacity: 1;
+  bottom: -140px;
+  display: inline-block;
+  transition: 150ms ease-in-out;
+  box-shadow: 0px 28px 40px 8px rgba(0,0,0,0.75);
+}
+.card {
+  background-color: #005b7f;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 20px;
+}
+.cardview {
+  margin-top: 20px;
+  margin-left: 20px;
+  overflow-y: scroll;
+  height: 100%;
+  padding-bottom: 150px;
+}
+.cardview >.card {
+  display: inline-block;
+}
+.transitiongroup {
+  width: 100%;
+  height: 100%;
+}
+.slide-appear {
+  transform: translateX(100%);
+}
+.slide-appear.slide-appear-active {
+  transform: translateX(0%);
+  transition: 1s ease-in;
+}
+.slide-leave {
+  position: absolute;
+  transform: translateX(0%);
+}
+.slide-leave.slide-leave-active {
+  transform: translateX(100%);
+  transition: 1s ease-in;
+}
+.persist-appear {
+  opacity: 1s;
+}
+.persist-appear.persist-appear-active {
+  opacity: 1s;
+  transition: 5s;
+}
+.button.launch {
+  background: #02ca02;
+}
+.button.launch:hover {
+  background: #019801;
+}
+.button.launch >.icon {
+  background-image: url(./img/launch__2ZayH.png);
+}
+.button.edit {
+  background: #b5b507;
+}
+.button.edit:hover {
+  background: #848405;
+}
+.button.edit >.icon {
+  background-image: url(./img/edit__1WzbO.png);
+}
+.button.share {
+  background: #044b87;
+}
+.button.share:hover {
+  background: #032f55;
+}
+.button.share >.icon {
+  background-image: url(./img/share__2kYC8.png);
+}
+.button.delete {
+  background: #690101;
+}
+.button.delete:hover {
+  background: #360101;
+}
+.button.delete >.icon {
+  background-image: url(./img/delete__3z_eU.png);
+}
+.button.install {
+  background: #047504;
+}
+.button.install:hover {
+  background: #024402;
+}
+.button.install >.icon {
+  background-image: url(./img/update__3NaJ9.png);
+}
+.button.folder {
+  background: #047504;
+}
+.button.folder:hover {
+  background: #024402;
+}
+.button.folder >.icon {
+  background-image: url(./img/folder__2VyMg.png);
+}
+.button.update {
+  background: #570169;
+}
+.button.update:hover {
+  background: #2d0136;
+}
+.button.update >.icon {
+  background-image: url(./img/update__3NaJ9.png);
+}
+.button.add {
+  background: #047504;
+}
+.button.add:hover {
+  background: #024402;
+}
+.button.add >.icon {
+  background-image: url(./img/add__1UDxR.png);
+}
+.button.color-blue {
+  background: #044b87;
+}
+.button.color-blue:hover {
+  background: #032f55;
+}
+.button.color-green {
+  background: #047504;
+}
+.button.color-green:hover {
+  background: #024402;
+}
+.button.color-red {
+  background: #690101;
+}
+.button.color-red:hover {
+  background: #360101;
+}
+.iconbutton {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  position: relative;
+  border-radius: 4px;
+  display: inline-block;
+}
+.iconbutton >*:not(.tooltip) {
+  transition: 150ms;
+}
+.iconbutton:hover,
+.iconbutton.disabled {
+  transition: 150ms;
+}
+.iconbutton:hover >*:not(.tooltip),
+.iconbutton.disabled >*:not(.tooltip) {
+  transition: 150ms;
+  filter: brightness(40%);
+}
+.iconbutton >.text {
+  display: inline-block;
+  font-size: 40pt;
+  font-weight: bolder;
+  top: 0;
+  position: absolute;
+  margin: 0;
+  left: 70px;
+}
+.iconbutton.theme-dark >.text {
+  color: #fff;
+}
+.iconbutton >.icon {
+  width: 23px;
+  height: 23px;
+  margin: 10px;
+  background-size: 23px 23px;
+  display: inline-block;
+  position: absolute;
+  left: 0;
+}
+.pageheader {
+  height: 90px;
+  box-shadow: 0px 10px 24px 0px rgba(0,0,0,0.55);
+  z-index: 20;
+  flex: 0 1 auto;
+  position: relative;
+}
+.pageheader.theme-dark >.title {
+  font-weight: bolder;
+  color: #fff;
+  font-size: 33pt;
+  margin: 0;
+  display: inline-block;
+  position: absolute;
+  top: 10px;
+  left: 33px;
+  user-select: none;
+}
+.pageheader.theme-dark >.title.backbutton-shown {
+  left: 140px;
+}
+.pageheader.theme-dark >.subtitle {
+  font-weight: bolder;
+  color: #fff;
+  font-size: 18pt;
+  display: inline-block;
+  position: absolute;
+  margin: 0;
+  user-select: none;
+  bottom: 7px;
+  left: 142px;
+}
+.pageheader.theme-dark >.backbutton {
+  display: inline-block;
+  margin: 28px 0px 28px 30px;
+  text-decoration: none;
+  transition: 300ms;
+}
+.pageheader.theme-dark >.backbutton:hover {
+  -webkit-filter: brightness(0.5);
+  transition: 300ms;
+}
+.pageheader.theme-dark >.backbutton > * {
+  display: inline-block;
+}
+.pageheader.theme-dark >.backbutton >.backtext {
+  color: #fff;
+  font-weight: bolder;
+  font-size: 18pt;
+  margin: 0;
+  bottom: 3px;
+  left: 8px;
+  position: relative;
+}
+.pageheader.theme-dark >.backbutton >.backicon {
+  background-image: url(./img/back__BHvIh.png);
+  width: 20px;
+  height: 23px;
+  background-size: cover;
+}
+.profilecard {
+  cursor: pointer;
+}
+.profilecard >.title {
+  width: 240px;
+}
+.profilecard >.button {
+  bottom: 10px;
+  margin-left: 5px;
+  position: absolute;
+}
+.profilecard >.button:nth-child(4) {
+  left: 115px;
+}
+.profilecard >.button:nth-child(5) {
+  left: 160px;
+}
+.profilecard >.badges {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+.profilecard >.badges >.badge {
+  position: absolute;
+}
+.profilecard >.badges >.type-label {
+  bottom: 10px;
+  right: 10px;
+  width: 50px;
+}
+.profilecard >.badges >.mcversion-label {
+  width: 90px;
+  bottom: 50px;
+  right: 10px;
+}
+.profilecard >.badges >.profileversion-label {
+  bottom: 10px;
+  right: 80px;
+}
+.badge {
+  padding: 5px;
+  border-radius: 6px;
+  width: fit-content;
+}
+.badge >.text {
+  margin: 0;
+  text-align: center;
+}
+.badge.orange {
+  background: #f26522;
+}
+.badge.orange >.text {
+  color: #fff;
+}
+.badge.green {
+  background: #047504;
+}
+.badge.green >.text {
+  color: #fff;
+}
+.badge.purple {
+  background: #570169;
+}
+.badge.purple >.text {
+  color: #fff;
+}
+.badge.red {
+  background: #690101;
+}
+.badge.red >.text {
+  color: #fff;
+}
+.badge.yellow {
+  background: #b5b507;
+}
+.badge.yellow >.text {
+  color: #fff;
+}
+.badge >.tooltip-container {
+  width: 100%;
+  position: absolute;
+  height: 100%;
+}
+.textinput {
+  margin: 10px;
+}
+.textinput >.input {
+  width: 100%;
+  height: 100%;
+}
+.textinput.size-small {
+  width: 35vw;
+  max-width: 400px;
+}
+.textinput.size-small >.input {
+  height: 25px;
+  font-size: 18pt;
+}
+.textinput.size-wide {
+  width: 35vw;
+  max-width: 400px;
+}
+.textinput.size-wide >.input {
+  height: 25px;
+  font-size: 21pt;
+}
+.textinput.size-large {
+  width: 40vw;
+  max-width: 500px;
+}
+.textinput.size-large >.input {
+  height: 20vh;
+  max-height: 300px;
+  resize: none;
+  font-size: 21pt;
+  vertical-align: text-top;
+}
+.textinput.theme-dark >.subtext {
+  color: #fff;
+  margin: 0;
+  margin-top: 5px;
+}
+.textinput.theme-dark >.error {
+  color: #f00;
+  margin: 0;
+  margin-top: 10px;
+}
+.textinput.theme-dark >.input {
+  background: #3f3f3f;
+  border: 5px solid #363636;
+  border-radius: 9px;
+  appearance: none;
+  outline: none;
+  transition: 150ms;
+  color: #fff;
+  padding: 5px;
+}
+.textinput.theme-dark >.input:focus {
+  background: #777;
+  border-color: #5b5b5b;
+}
+.textinput.theme-dark >.label {
+  color: #fff;
+}
+.textinput >.label {
+  margin: 0;
+  font-weight: bolder;
+  font-size: 12pt;
+}
+.textinput >.input {
+  margin: 0;
+}
+.transitiongroup {
+  width: 100%;
+  height: 100%;
+}
+.slide-appear {
+  transform: translateX(100%);
+}
+.slide-appear.slide-appear-active {
+  transform: translateX(0%);
+  transition: 1s ease-in;
+}
+.slide-leave {
+  position: absolute;
+  transform: translateX(0%);
+}
+.slide-leave.slide-leave-active {
+  transform: translateX(100%);
+  transition: 1s ease-in;
+}
+.persist-appear {
+  opacity: 1s;
+}
+.persist-appear.persist-appear-active {
+  opacity: 1s;
+  transition: 5s;
+}
+html,
+body,
+.app {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+* {
+  font-family: 'Open Sans', 'Segoe UI', sans-serif;
+}
+.app {
+  background: #252525;
+}
+.page {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+.main-content {
+  display: flex;
+  flex: 1 1 auto;
+}
+/* width */
+::-webkit-scrollbar {
+  width: 12px;
+}
+::-webkit-scrollbar-track {
+  opacity: 0;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: rgba(0,0,0,0.5);
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.content {
+  width: 100%;
+}
+.searchBoxHeader {
+  float: right;
+  margin-right: 40px;
+}
+a,
+img,
+p,
+div {
+  user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+.content {
+  display: flex;
+  flex-flow: column;
+}
+.error-text {
+  color: #f00;
+  margin: 0;
+  font-weight: bolder;
+}
+.profilesPage {
+  overflow-x: hidden;
+}
+.profilesPage >.main-content >.content >.pageheader >.add-button {
+  top: 23px;
+  left: 220px;
+}
+.loaderwrapper {
+  width: 100%;
+  height: 100%;
+}
+.loaderwrapper >.loader {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loaderwrapper >.loader >p {
+  color: #fff;
+  font-weight: bolder;
+  font-size: 20pt;
+}
+.popup-wrapper {
+  position: absolute;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  background-color: rgba(0,0,0,0.5);
+}
+.popup-wrapper >.popup {
+  width: 50vw;
+  z-index: 400;
+}
+.popup-wrapper >.popup >.title {
+  font-size: 30pt;
+  margin: 0;
+  margin-top: 20px;
+  text-align: center;
+  font-weight: bolder;
+}
+.popup-wrapper >.popup >.desc {
+  font-size: 20pt;
+  text-align: center;
+}
+.popup-wrapper >.popup.theme-dark {
+  border-radius: 13px;
+  background-color: #606060;
+}
+.popup-wrapper >.popup.theme-dark >.title {
+  color: #fff;
+}
+.popup-wrapper >.popup.theme-dark >.desc {
+  color: #fff;
+}
+.popup-wrapper >.popup >.action-buttons {
+  text-align: center;
+  margin: 0 auto;
+}
+.popup-wrapper >.popup >.action-buttons >.button {
+  margin-left: 10px;
+  margin-right: 10px;
+  display: inline-block;
+}
+.popup-wrapper >.popup >.more-info-link {
+  font-size: 20pt;
+  display: block;
+  padding-bottom: 10px;
+  text-align: center;
+  text-decoration: none;
+  color: #00f;
+}
+.viewprofile >.main-content {
+  overflow: hidden;
+}
+.viewprofile >.main-content >.pageheader {
+  min-width: 100%;
+}
+.viewprofile >.main-content >.loaderwrapper >.content >.profileinfo {
+  position: relative;
+  margin-top: 30px;
+  padding-top: 5px;
+  padding-left: 5px;
+  border-radius: 13px;
+  width: 80%;
+  margin-left: 70px;
+  background: #005b7f;
+}
+.viewprofile >.main-content >.loaderwrapper >.content >.profileinfo >.img-wrapper {
+  width: 120px;
+  height: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.viewprofile >.main-content >.loaderwrapper >.content >.profileinfo >.img-wrapper >.icon {
+  width: 100%;
+  border-radius: 13px;
+  display: inline-block;
+}
+.viewprofile >.main-content >.loaderwrapper >.content >.profileinfo >.desc {
+  display: inline-block;
+  position: absolute;
+  font-size: 13pt;
+  overflow: hidden;
+  height: 100%;
+  margin-left: 5px;
+}
+.viewprofile >.main-content >.loaderwrapper >.content >.profileinfo >.desc.theme-dark {
+  color: #fff;
+}
+.viewprofile >.main-content >.loaderwrapper >.content >.buttons {
+  padding: 40px 0px 0px 70px;
+}
+.viewprofile >.main-content >.loaderwrapper >.content >.buttons >.widebutton {
+  margin-top: 5px;
+}
+.viewprofile >.main-content >.loaderwrapper >.content >.buttons >.update-status {
+  margin-top: 10px;
+}
+.warningmessage {
+  border-radius: 13px;
+  width: fit-content;
+  padding: 10px;
+}
+.warningmessage >.text {
+  margin: 0;
+  font-size: 15pt;
+}
+.warningmessage.red {
+  border: 5px solid #360101;
+  background: #690101;
+}
+.warningmessage.red >.text {
+  color: #fff;
+}
+.warningmessage.green {
+  border: 5px solid #024402;
+  background: #047504;
+}
+.warningmessage.green >.text {
+  color: #fff;
+}
+.dropdown {
+  background: #3f3f3f;
+  border: 5px solid #363636;
+  border-radius: 9px;
+  appearance: none;
+  outline: none;
+  width: 200px;
+  transition: 150ms;
+  color: #fff;
+  padding: 5px;
+  font-size: 16pt;
+  display: block;
+}
+.dropdown:active,
+.dropdown:focus {
+  transition: 150ms;
+  background: #777;
+  border-color: #5b5b5b;
+  border-radius: 0px 0px 0 0;
+}
+.dropdown >option {
+  outline: none;
+  border: 0;
+  background-color: #363636;
+}
+.editbar {
+  box-shadow: 10px 0px 28px 0px rgba(0,0,0,0.55);
+  z-index: 10;
+  height: 100%;
+  display: inline-block;
+  flex-shrink: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  width: 25%;
+  max-width: 200px;
+}
+.editbar::-webkit-scrollbar {
+  display: none;
+}
+.editbar.theme-dark {
+  background: #363636;
+}
+.editbar.theme-dark >.profilename {
+  color: #fff;
+}
+.editbar.theme-dark >.button {
+  color: #fff;
+}
+.editbar >.img-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+.editbar >.img-wrapper >.icon {
+  width: 100%;
+  display: block;
+  display: inline-block;
+  position: relative;
+}
+.editbar >.profilename {
+  text-align: center;
+  font-size: 16pt;
+  padding: 0px 20px 0px 20px;
+  margin: 0;
+  font-weight: bolder;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  overflow: hidden;
+}
+.editbar >.button {
+  width: 100%;
+  height: 38px;
+  background: #444;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 38px;
+  text-decoration: none;
+  display: block;
+  margin: 0 auto;
+  margin-top: 12px;
+  font-weight: bolder;
+  font-size: 12pt;
+}
+.editbar >.button.active {
+  background: #003663;
+}
+.editpage >.main-content >.content >.edit {
+  display: flex;
+  flex-flow: row;
+  flex: 1 1 auto;
+}
+.editpage >.main-content >.content >.edit >.loaderwrapper {
+  height: initial;
+  width: initial;
+}
+.editpage >.main-content >.content >.edit >.loaderwrapper >.options {
+  height: 100%;
+}
+.editpage >.main-content >.content >.edit >.editbar {
+  height: unset;
+}
+.editsettings >.main-content >.content >.edit >.loaderwrapper {
+  width: 100%;
+}
+.editsettings >.main-content >.content >.edit >.loaderwrapper >.options {
+  height: initial;
+}
+.editsettings >.main-content >.content >.edit >.loaderwrapper >.options >.image {
+  position: relative;
+  margin: 3px;
+  margin-top: 20px;
+}
+.editsettings >.main-content >.content >.edit >.loaderwrapper >.options >.image >.img-wrapper {
+  width: 100px;
+  cursor: pointer;
+  border: 3px solid #a9a9a9;
+  border-radius: 13px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  padding: 9px;
+}
+.editsettings >.main-content >.content >.edit >.loaderwrapper >.options >.image >.img-wrapper >img {
+  width: 100%;
+  border-radius: 13px;
+}
+.editsettings >.main-content >.content >.edit >.loaderwrapper >.options >.image >.reset {
+  position: absolute;
+  top: 0;
+  left: 130px;
+  background-color: #690101;
+  border-radius: 5px;
+  padding: 5px;
+  color: #fff;
+  cursor: pointer;
+}
+.createprofile >.main-content >.content >.optionswrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.createprofile >.main-content >.content >.optionswrapper >.options {
+  background-color: #005b7f;
+  width: 50vw;
+  padding: 10px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  flex-flow: column;
+  position: relative;
+}
+.createprofile >.main-content >.content >.optionswrapper >.options >.error {
+  color: #f00;
+  position: absolute;
+  text-align: center;
+  top: 80px;
+  font-weight: bolder;
+}
+.createprofile >.main-content >.content >.optionswrapper >.options >.textinput >.label {
+  text-align: center;
+}
+.createprofile >.main-content >.content >.optionswrapper >.options >.textinput {
+  margin: 0 auto;
+  margin-top: 20px;
+}
+.createprofile >.main-content >.content >.optionswrapper >.options >.dropdown-label {
+  color: #fff;
+  margin: 0;
+  margin-top: 20px;
+  font-weight: bolder;
+  font-size: 12pt;
+}
+.createprofile >.main-content >.content >.optionswrapper >.options >.title {
+  color: #fff;
+  text-align: center;
+  font-weight: bolder;
+  font-size: 23pt;
+}
+.createprofile >.main-content >.content >.optionswrapper >.options >.create-button {
+  background-color: #047504;
+  margin-top: 20px;
+  width: 200px;
+  height: 100px;
+  text-align: center;
+  color: #fff;
+  font-size: 20pt;
+  font-weight: bold;
+  border-radius: 13px;
+  line-height: 100px;
+  cursor: pointer;
+  transition: 150ms;
+}
+.createprofile >.main-content >.content >.optionswrapper >.options >.create-button:hover {
+  transition: 150ms;
+  background-color: #024402;
+}
+.editmods >.main-content >.content >.edit {
+  display: flex;
+  flex-flow: row;
+  flex: 1 1 auto;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper {
+  width: 100%;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options {
+  width: 100%;
+  display: flex;
+  overflow: hidden;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.list-container {
+  margin-left: 20px;
+  padding-right: 25px;
+  height: 100%;
+  width: 45%;
+  max-width: 300px;
+  overflow: hidden;
+  background-color: #3d3d3d;
+  display: flex;
+  flex-flow: column;
+  position: relative;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.list-container >.textinput {
+  width: 75%;
+  display: inline-block;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.list-container >.button {
+  display: inline-block;
+  position: absolute;
+  left: 80%;
+  top: 34px;
+  z-index: 20;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.list-container >.list {
+  min-height: 300px;
+  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details {
+  width: 43%;
+  max-width: 510px;
+  height: 100%;
+  background-color: #3d3d3d;
+  margin-left: 10px;
+  padding-left: 10px;
+  padding-top: 10px;
+  position: relative;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.img-container {
+  width: 10vw;
+  border: 2px solid #a9a9a9;
+  border-radius: 13px;
+  height: 10vw;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.img-container >img {
+  border-radius: 13px;
+  width: 100%;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.title {
+  color: #fff;
+  font-size: 30pt;
+  margin: 0;
+  font-weight: bolder;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.subtitle {
+  color: #fff;
+  font-size: 20pt;
+  margin: 0;
+  font-weight: bolder;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.desc {
+  color: #fff;
+  font-weight: 10pt;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.buttons {
+  margin-top: 10px;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.buttons >.button {
+  margin-top: 10px;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.badges {
+  position: absolute;
+  bottom: 30px;
+  left: 20px;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.badges >.badge {
+  margin: 5px;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.version-selector >div >.label {
+  color: #fff;
+  margin: 0;
+  font-weight: bolder;
+  margin-top: 10px;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.version-selector >div >.dropdown {
+  width: 80%;
+}
+.editmods >.main-content >.content >.edit >.loaderwrapper >.options >.mod-details >.version-selector >.status {
+  color: #fff;
+  margin: 0;
+  font-weight: bolder;
+  font-size: 18pt;
+}
+.editmods >.main-content >.content >.edit >.editbar {
+  height: unset;
+}
+.transitiongroup {
+  width: 100%;
+  height: 100%;
+}
+.slide-appear {
+  transform: translateX(100%);
+}
+.slide-appear.slide-appear-active {
+  transform: translateX(0%);
+  transition: 1s ease-in;
+}
+.slide-leave {
+  position: absolute;
+  transform: translateX(0%);
+}
+.slide-leave.slide-leave-active {
+  transform: translateX(100%);
+  transition: 1s ease-in;
+}
+.persist-appear {
+  opacity: 1s;
+}
+.persist-appear.persist-appear-active {
+  opacity: 1s;
+  transition: 5s;
+}
+.button.launch {
+  background: #02ca02;
+}
+.button.launch:hover {
+  background: #019801;
+}
+.button.launch >.icon {
+  background-image: url(./img/launch__2ZayH.png);
+}
+.button.edit {
+  background: #b5b507;
+}
+.button.edit:hover {
+  background: #848405;
+}
+.button.edit >.icon {
+  background-image: url(./img/edit__1WzbO.png);
+}
+.button.share {
+  background: #044b87;
+}
+.button.share:hover {
+  background: #032f55;
+}
+.button.share >.icon {
+  background-image: url(./img/share__2kYC8.png);
+}
+.button.delete {
+  background: #690101;
+}
+.button.delete:hover {
+  background: #360101;
+}
+.button.delete >.icon {
+  background-image: url(./img/delete__3z_eU.png);
+}
+.button.install {
+  background: #047504;
+}
+.button.install:hover {
+  background: #024402;
+}
+.button.install >.icon {
+  background-image: url(./img/update__3NaJ9.png);
+}
+.button.folder {
+  background: #047504;
+}
+.button.folder:hover {
+  background: #024402;
+}
+.button.folder >.icon {
+  background-image: url(./img/folder__2VyMg.png);
+}
+.button.update {
+  background: #570169;
+}
+.button.update:hover {
+  background: #2d0136;
+}
+.button.update >.icon {
+  background-image: url(./img/update__3NaJ9.png);
+}
+.button.add {
+  background: #047504;
+}
+.button.add:hover {
+  background: #024402;
+}
+.button.add >.icon {
+  background-image: url(./img/add__1UDxR.png);
+}
+.button.color-blue {
+  background: #044b87;
+}
+.button.color-blue:hover {
+  background: #032f55;
+}
+.button.color-green {
+  background: #047504;
+}
+.button.color-green:hover {
+  background: #024402;
+}
+.button.color-red {
+  background: #690101;
+}
+.button.color-red:hover {
+  background: #360101;
+}
+.listbutton {
+  width: 100%;
+  height: 43px;
+  cursor: pointer;
+  position: relative;
+  border-radius: 4px;
+  background-color: #252525;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  padding-left: 6px;
+  white-space: nowrap;
+}
+.listbutton.selected {
+  background-color: #008000;
+}
+.listbutton >*:not(.tooltip) {
+  transition: 150ms;
+}
+.listbutton:hover,
+.listbutton.disabled {
+  transition: 150ms;
+}
+.listbutton:hover >*:not(.tooltip),
+.listbutton.disabled >*:not(.tooltip) {
+  transition: 150ms;
+  filter: brightness(40%);
+}
+.listbutton >.text {
+  display: inline-block;
+  font-size: 14pt;
+  font-weight: bolder;
+  margin: 0;
+  margin-top: 9px;
+  text-overflow: ellipsis;
+  width: 100%;
+  overflow: hidden;
+}
+.listbutton.theme-dark >.text {
+  color: #fff;
+}
+.modcard {
+  height: 200px;
+  cursor: pointer;
+}
+.modcard >.popup {
+  position: absolute;
+  top: 210px;
+  left: 0px;
+  z-index: 30;
+  width: 100%;
+  box-shadow: 0px 10px 26px -4px rgba(0,0,0,0.69);
+  cursor: default;
+  border-radius: 0px 0px 15px 15px;
+}
+.modcard >.popup >.title {
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+}
+.modcard >.popup >.desc {
+  color: #fff;
+  margin-left: 10px;
+  white-space: normal;
+}
+.modcard >.popup >.close-button {
+  cursor: pointer;
+  text-align: center;
+  background-color: #660a01;
+  transition: background-color 300ms;
+  border-radius: 0px 0px 15px 15px;
+  color: #fff;
+}
+.modcard >.popup >.close-button:hover {
+  transition: background-color 300ms;
+  background-color: #470700;
+}
+.modcard >.popup.popup-error {
+  background-color: #771202;
+}
+.modcard:hover {
+  border-radius: 10px;
+}
+.modcard >.title {
+  position: absolute;
+  top: 10px;
+  left: 120px;
+}
+.modcard >.img-container {
+  width: 103px;
+  height: 103px;
+  position: absolute;
+  border-radius: 13px;
+  display: flex;
+  left: 5px;
+  flex-direction: column;
+  justify-content: center;
+  border: 3px solid #282828;
+}
+.modcard >.img-container >.img {
+  width: 100%;
+  border-radius: 10px;
+}
+.modcard >.buttons {
+  position: absolute;
+  bottom: 10px;
+  left: 5px;
+}
+.modcard >.buttons >.loading {
+  color: #079e0f;
+  font-weight: bolder;
+  font-size: 20pt;
+  margin: 0;
+  margin-left: 8px;
+}
+.modcard >.buttons >.button {
+  margin-left: 10px;
+}
+.modcard >.desc {
+  color: #c6c6c6;
+  position: absolute;
+  top: 30px;
+  left: 120px;
+  width: 340px;
+  white-space: normal;
+  font-size: 15pt;
+  height: 130px;
+  overflow: hidden;
+}
+.modcard >.badges {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 10px;
+}
+.addmods >.main-content >.content >.edit {
+  display: flex;
+  flex-flow: row;
+  flex: 1 1 auto;
+}
+.addmods >.main-content >.content >.edit >.loaderwrapper {
+  width: 100%;
+}
+.addmods >.main-content >.content >.edit >.loaderwrapper >.options {
+  width: 100%;
+  display: flex;
+  overflow: hidden;
+}
+.addmods >.main-content >.content >.edit >.loaderwrapper >.options >.cardview {
+  padding-bottom: 0;
+  padding-top: 0;
+  margin-top: 0;
+}
+.addmods >.main-content >.content >.edit >.loaderwrapper >.options >.cardview >.status {
+  color: #fff;
+  margin: 0;
+  margin-top: 10px;
+  font-weight: bolder;
+  margin-left: 10px;
+  font-size: 30pt;
+  left: 20px;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper {
+  width: 100%;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options {
+  width: 100%;
+  display: flex;
+  flex-flow: column;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.modinfo {
+  position: relative;
+  padding: 5px;
+  margin-top: 30px;
+  border-radius: 13px;
+  width: 70vw;
+  margin-left: 70px;
+  background: #005b7f;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.modinfo >.icon-wrapper-holder {
+  display: inline-block;
+  height: 118px;
+  width: 118px;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.modinfo >.icon-wrapper-holder >.icon-wrapper {
+  height: 118px;
+  width: 118px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.modinfo >.icon-wrapper-holder >.icon-wrapper >.icon {
+  width: 100%;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.modinfo >.modname {
+  display: inline-block;
+  width: 80%;
+  position: absolute;
+  font-size: 33pt;
+  margin-left: 10px;
+  font-weight: bolder;
+  line-height: 118px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.modinfo >.modname.theme-dark {
+  color: #fff;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.modinfo >.mcversions {
+  color: #fff;
+  display: inline-block;
+  position: absolute;
+  font-size: 13pt;
+  margin-left: 10px;
+  line-height: 190px;
+  width: 55vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.curse-label {
+  color: #fff;
+  margin: 0;
+  font-weight: bolder;
+  margin-top: 30px;
+  font-size: 20pt;
+  margin-left: 70px;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.curse-desc {
+  margin-left: 65px;
+  background-color: #fff;
+  width: 70vw;
+  border-radius: 13px;
+  padding: 10px 10px 0px 10px;
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: column;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.curse-desc >.content {
+  margin-left: 10px;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.curse-desc >.content hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #f0f0f0;
+  margin: 1em 0;
+  padding: 0;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.curse-desc >.content h2 {
+  font-size: 18px;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.curse-desc >.content p {
+  margin-bottom: 12px;
+  font-weight: normal;
+  font-size: 13px;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.curse-desc >.content ul {
+  list-style: square;
+  padding-left: 30px;
+  margin-bottom: 10px;
+}
+.viewmod >.main-content >.content >.edit >.loaderwrapper >.options >.curse-desc >.content img {
+  max-width: 100%;
+  display: inline-block;
+  height: inherit;
+  vertical-align: middle;
+}
+.comingsoon >.main-content >.content >.edit >.loaderwrapper >.options {
+  overflow: hidden;
+}
+.comingsoon >.main-content >.content >.edit >.loaderwrapper >.options >p {
+  margin: 10px;
+}
+.comingsoon >.main-content >.content >.edit >.loaderwrapper >.options >.title {
+  color: #fff;
+  font-size: 50pt;
+  font-weight: bolder;
+}
+.comingsoon >.main-content >.content >.edit >.loaderwrapper >.options >.coming-soon {
+  color: #fff;
+  font-style: italic;
+  font-size: 40pt;
+}
+.welcome-page {
+  text-align: center;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+.welcome-page >.windowbar {
+  position: fixed;
+}
+.welcome-page >.content {
+  margin-top: 30px;
+  text-align: center;
+}
+.welcome-page >.content >.logo {
+  margin-top: 20px;
+  text-align: center;
+  width: 250px;
+  margin: 0 auto;
+}
+.welcome-page >.content >.title {
+  margin: 0;
+  color: #fff;
+  text-align: center;
+  font-weight: bolder;
+  font-size: 40pt;
+}
+.welcome-page >.content >.desc {
+  color: #fff;
+  font-size: 20pt;
+}
+.welcome-page >.content >.select-dir {
+  margin: 0 auto;
+  position: relative;
+  text-align: center;
+}
+.welcome-page >.content >.select-dir >.textinput {
+  margin: 0 auto;
+  margin-left: 2px;
+  display: inline-block;
+  width: 80vw;
+  margin-right: 20px;
+}
+.welcome-page >.content >.select-dir >.textinput >input {
+  border-radius: 9px 0px 0px 9px;
+}
+.welcome-page >.content >.select-dir >.select-dir-button {
+  display: inline-block;
+  width: 50px;
+  height: 45px;
+  position: absolute;
+  background-color: #a9a9a9;
+  border-radius: 0px 9px 9px 0px;
+  background-image: url(./img/threeDots__3Ei4T.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 40px 10px;
+  cursor: pointer;
+  transition: 150ms;
+}
+.welcome-page >.content >.select-dir >.select-dir-button:hover {
+  transition: 150ms;
+  background-color: #8f8f8f;
+}
+.welcome-page >.content >.select-dir >.info {
+  color: #c9c9c9;
+}
+.welcome-page >.content >.select-dir >.info >a {
+  color: #00f;
+  text-decoration: none;
+}
+.welcome-page >.content >.go {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+  padding-bottom: 50px;
+}
+.welcome-page >.content >.go >.button >.text {
+  text-align: center;
+  width: 100%;
+  left: 0px;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options {
+  height: initial;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >* {
+  margin-top: 10px;
+  margin-left: 10px;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.mcversion-label {
+  color: #fff;
+  margin: 0;
+  font-weight: bolder;
+  font-size: 12pt;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.profile-version {
+  position: relative;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.profile-version >.error-text {
+  position: absolute;
+  left: 0;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.profile-version >.textinput {
+  display: inline-block;
+  margin-left: 0;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.profile-version >.change-profile-version-button {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #02ca02;
+  color: #fff;
+  font-weight: bolder;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: 150ms;
+  display: inline-block;
+  position: absolute;
+  top: 34px;
+  margin-left: 20px;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.profile-version >.change-profile-version-button:hover {
+  transition: 150ms;
+  background-color: #019801;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.profile-version >.epoch-date {
+  color: #fff;
+  margin: 0;
+  font-weight: bolder;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.versioncard {
+  background-color: #005b7f;
+  border-radius: 13px;
+  padding-left: 10px;
+  padding-top: 10px;
+  margin-top: 30px;
+  padding-bottom: 10px;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.versioncard >.title {
+  color: #fff;
+  margin: 0;
+  font-weight: bolder;
+  font-size: 20pt;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.forge {
+  height: 120px;
+  position: relative;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.forge >div >.button {
+  width: 280px;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.forge >.processing {
+  height: 100%;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.forge >.processing >p {
+  font-weight: bolder;
+  margin: 0;
+  position: absolute;
+  bottom: 10px;
+  font-size: 20pt;
+  color: #d3d3d3;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.curse >.packversion >div >.label {
+  color: #fff;
+  font-weight: bolder;
+  margin: 0;
+}
+.editversions >.main-content >.content >.edit >.loaderwrapper >.options >.curse >.packversion >.status {
+  color: #fff;
+  margin: 0;
+  font-weight: bolder;
+  font-size: 20pt;
+}
+.settings-page >.main-content {
+  height: 100vh;
+}
+.settings-page >.main-content >.content >.settings {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding-bottom: 100px;
+}
+.settings-page >.main-content >.content >.settings >.mcm-version {
+  margin-top: 30px;
+  text-align: center;
+}
+.settings-page >.main-content >.content >.settings >.mcm-version >.mcm-title {
+  color: #fff;
+  font-size: 25pt;
+  margin: 0;
+  font-weight: bolder;
+}
+.settings-page >.main-content >.content >.settings >.mcm-version >.logo {
+  margin-top: 20px;
+  text-align: center;
+  width: 250px;
+  margin: 0 auto;
+}
+.settings-page >.main-content >.content >.settings >.mcm-version >.version {
+  margin: 0;
+  color: #fff;
+  text-align: center;
+  font-size: 20pt;
+}
+.settings-page >.main-content >.content >.settings >.mcm-version >.care {
+  color: #fff;
+  margin: 0;
+}
+.settings-page >.main-content >.content >.settings >.setting {
+  margin: 10px;
+  margin-top: 80px;
+  background-color: #8e8e8e;
+  padding: 10px;
+  border-radius: 13px;
+}
+.editadvanced >.main-content >.content >.edit >.loaderwrapper >.options {
+  overflow: hidden;
+}
+.editadvanced >.main-content >.content >.edit >.loaderwrapper >.options >.open-folder {
+  margin: 15px;
+}
+.editadvanced >.main-content >.content >.edit >.loaderwrapper >.options >.open-folder >.button {
+  width: 300px;
+}
