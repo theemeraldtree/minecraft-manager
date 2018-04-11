@@ -3,12 +3,12 @@ import path from 'path'
 import UserSettings from './userSettings';
 import fs from 'fs';
 import rimraf from 'rimraf';
-const os = window.require("os");
+const os = window.require('os');
 const copyfilesync = require('fs-copy-file-sync');
 const process = require('process');
 const FileUtils = {
     getMCFolder()  {
-        return UserSettings.readOption("minecraftHome");
+        return UserSettings.readOption('minecraftHome');
     },
     isSetup() {
         console.log('NO?');
@@ -38,31 +38,14 @@ const FileUtils = {
         return new Promise((resolve) => {     
             copyfilesync(src, target);   
             resolve();
-            // var rd = fs.createReadStream(src);
-            // rd.on("error", function(err) {
-            //     done(err);
-            // });
-            // var wr = fs.createWriteStream(target);
-            // wr.on("error", function(err) {
-            //     done(err);
-            // });
-            // wr.on("close", function() {
-            //     done();
-            // });
-            // rd.pipe(wr);
-        
-            // function done() {
-            //     resolve();
-            // }
         })
-
     },
     mkdir(dir) {
         // making directory without exception if exists
         try {
             fs.mkdirSync(dir);
         } catch(e) {
-            if(e.code != "EEXIST") {
+            if(e.code != 'EEXIST') {
                 throw e;
             }
         }
@@ -82,7 +65,7 @@ const FileUtils = {
                 var filename = path.join(dir, list[i]);
                 var stat = fs.lstatSync(filename);
                 
-                if(filename == "." || filename == "..") {
+                if(filename == '.' || filename == '..') {
                     // pass these files
                 } else if(stat.isDirectory()) {
                     // rmdir recursively
@@ -94,26 +77,45 @@ const FileUtils = {
             }
             fs.rmdirSync(dir);
         } else {
-            console.warn("warn: " + dir + " not exists");
+            console.warn('warn: ' + dir + ' not exists');
         }
+    },
+    copyFileAsync(src, target) {
+        return new Promise((resolve) => {
+            var rd = fs.createReadStream(src);
+            rd.on('error', function() {
+                resolve();
+            });
+            var wr = fs.createWriteStream(target);
+            wr.on('error', function() {
+                resolve();
+            });
+            wr.on('close', function() {
+                resolve();
+            });
+            rd.pipe(wr);
+        })
     },
     copyDir(src, dest) {
         this.mkdir(dest);
         var files = fs.readdirSync(src);
         for(var i = 0; i < files.length; i++) {
-            var current = fs.lstatSync(path.join(src, files[i]));
+            console.log(`Reading file ${i}`);
+            var current = fs.statSync(path.join(src, files[i]));
             if(current.isDirectory()) {
                 this.copyDir(path.join(src, files[i]), path.join(dest, files[i]));
             } else if(current.isSymbolicLink()) {
                 var symlink = fs.readlinkSync(path.join(src, files[i]));
                 fs.symlinkSync(symlink, path.join(dest, files[i]));
             } else {
-                this.copyFile(path.join(src, files[i]), path.join(dest, files[i]));
+                this.copyFileAsync(path.join(src, files[i]), path.join(dest, files[i]));
             }
         }
     },
     copy(src, dest) {
+        console.log('Attempting lstatSync for ' + src);
         var current = fs.lstatSync(src);
+        console.log(`Lstat data gained: ${current}`);
         if(current.isDirectory()) {
             this.copyDir(src, dest);
         }else{

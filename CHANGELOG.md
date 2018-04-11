@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 - (2018-07-11)
+---
+### Bugfixes:
+- FileUtils now copies file asynchronously
+    - Installing, updating, and changing curse pack versions work again!
+
 ## 1.2.0 - (2018-07-04)
 ---
 ### Added:
