@@ -29,10 +29,10 @@ const Data = {
         return name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9]/g, "-").replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>{}[\]\\/]/gi, '-').toLowerCase()
     },
     getMCMVersion() {
-        return 'MCM-R1.2.0'
+        return 'MCM-R1.2.1'
     },
     getMCMDate() {
-        return '2018-07-04'
+        return '2018-07-11'
     },
     createVersionName(name) {
         return name.replace(/[^a-zA-Z ]/g, '');
