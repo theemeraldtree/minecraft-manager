@@ -3,15 +3,27 @@
     "version": "2.0.0",
     "license": "GPL-3.0",
     "main": "main.js",
+    "author": "stairman06",
+    "description": "Minecraft Manager",
     "homepage": "https://github.com/stairman06/minecraft-manager",
-    "repository": "github:stairman06/minecraft-manager",     
+    "repository": "github:stairman06/minecraft-manager",
+    "build": {
+        "productName": "Minecraft Manager",
+        "appId": "net.theemeraldtree.minecraftmanager",
+        "win": {
+            "target": "nsis"
+        },
+        "nsis": {
+            "perMachine": "true",
+            "oneClick": "false"
+        }
+    },
     "dependencies": {
         "@babel/core": "^7.2.2",
         "@babel/preset-env": "^7.2.3",
         "@babel/preset-react": "^7.0.0",
         "babel-eslint": "^10.0.1",
         "babel-loader": "^8.0.5",
-        "electron": "^4.0.1",
         "eslint": "^5.12.1",
         "eslint-loader": "^2.1.1",
         "eslint-plugin-react": "^7.12.4",
@@ -23,9 +35,14 @@
         "webpack-dev-server": "^3.1.14"
     },
     "devDependencies": {
+        "electron": "^4.0.1",
+        "electron-builder": "^20.38.5",
         "webpack-cli": "^3.2.1"
     },
     "scripts": {
-        "dev": "webpack-dev-server --hot --inline"
+        "dev": "webpack-dev-server --hot --inline",
+        "compile": "webpack",
+        "build": "electron-builder ./",
+        "package": "npm run compile && npm run build"
     }
 }
