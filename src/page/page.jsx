@@ -19,7 +19,9 @@ const Content = styled.div`
 `
 
 const ContentSide = styled.div`
+    display: flex;
     flex: 1 1 auto;
+    flex-flow: column;
 `
 
 const Page = ({children}) => (

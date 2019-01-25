@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 const BG = styled.div`
-    height: 60px;
+    min-height: 60px;
     background-color: #262626;
     display: flex;
     align-items: center;
