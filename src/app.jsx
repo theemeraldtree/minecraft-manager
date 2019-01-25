@@ -1,7 +1,13 @@
 import React from 'react';
+
+import { HashRouter as Router, Route } from 'react-router-dom';
+import HomePage from './page/home/homePage';
+
 const App = () => (
     <div>
-        <h1>Minecraft Manager</h1>
+        <Router>
+            <Route exact path='/' component={HomePage} />
+        </Router>
     </div>
 );
 
