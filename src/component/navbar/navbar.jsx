@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 const BG = styled.div`
     width: 100px;
+    min-width: 100px;
     height: 100%;
     background-color: #373737;
     flex: 0 1 auto;
