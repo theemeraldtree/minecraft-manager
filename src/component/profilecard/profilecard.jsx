@@ -45,7 +45,7 @@ const Title = styled.p`
 const Buttons = styled.div`
     display: flex;
     flex-flow: row;
-    bottom: 7px;
+    bottom: 3px;
     position: absolute;
 `
 
@@ -56,8 +56,9 @@ const LaunchButton = styled(Button)`
 
 const EditButton = styled(Button)`
     padding: 6px 0 6px 0;
-    width: 31px;
-    margin-left: 5px;
+    width: 40px;
+    margin-left: 3px;
+    text-align: center;
 `
 
 const ProfileCard = () => (
@@ -66,7 +67,7 @@ const ProfileCard = () => (
         <Title>Minecraft Manager is great!!</Title>
         <Buttons>
             <LaunchButton color='green'>launch</LaunchButton>
-            <EditButton color='yellow' />
+            <EditButton color='yellow'>edit</EditButton>
         </Buttons>
     </BG>
 )
