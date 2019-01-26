@@ -10,7 +10,7 @@ let dev = require('process').execPath.includes('electron');
 let mainWindow;
 
 function createWindow() {
-    mainWindow = new BrowserWindow({width: 600, height: 800, frame: false});
+    mainWindow = new BrowserWindow({width: 600, height: 800, frame: false, webPreferences: {webSecurity: false}});
 
     mainWindow.openDevTools();
     let index;
