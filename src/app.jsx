@@ -6,7 +6,9 @@ import HomePage from './page/home/homePage';
 const App = () => (
     <div>
         <Router>
-            <Route exact path='/' component={HomePage} />
+            <div>
+                <Route exact path='/' component={HomePage} />
+            </div>
         </Router>
     </div>
 );
