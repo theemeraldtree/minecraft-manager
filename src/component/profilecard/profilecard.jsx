@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import logo from './logo.png';
 import Button from '../button/button';
 const BG = styled.div`
     width:120px;
@@ -20,7 +19,7 @@ const BG = styled.div`
 `
 
 const Image = styled.div`
-    background-image: url('${logo}');
+    background-image: url('${props =>  props.src}');
     width: 100%;
     height: 80px;
     background-size: contain;
@@ -63,7 +62,7 @@ const EditButton = styled(Button)`
 
 const ProfileCard = ({profile}) => (
     <BG>
-        <Image />
+        <Image src={profile.iconpath} />
         <Title>{profile.name}</Title>
         <Buttons>
             <LaunchButton color='green'>launch</LaunchButton>
