@@ -5,6 +5,7 @@ import SearchBox from '../../component/searchbox/searchbox';
 import Button from '../../component/button/button';
 import ProfileCard from '../../component/profilecard/profilecard';
 import styled from 'styled-components';
+import ProfilesManager from '../../manager/profilesManager';
 
 const CardGrid = styled.div`
     overflow-y: scroll;
@@ -19,6 +20,7 @@ const HomePage = () => (
             <Button color='purple'>import</Button>
             <Button color='green'>create</Button>
         </Header>
+        {ProfilesManager.getProfiles()}
         <CardGrid>
             <ProfileCard />
             <ProfileCard />

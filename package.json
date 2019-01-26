@@ -7,8 +7,8 @@
     "description": "Minecraft Manager",
     "homepage": "https://github.com/stairman06/minecraft-manager",
     "repository": "github:stairman06/minecraft-manager",
+    "productName": "Minecraft Manager",
     "build": {
-        "productName": "Minecraft Manager",
         "appId": "net.theemeraldtree.minecraftmanager",
         "win": {
             "target": "nsis"
