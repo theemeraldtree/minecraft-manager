@@ -4,7 +4,7 @@ const process = require('process');
 
 module.exports = {
     context: __dirname + '/src',
-    entry: './index.js',
+    entry: ['babel-polyfill', './index.js'],
     mode: 'none',
     resolve: {
         extensions: ['.js', '.jsx'],

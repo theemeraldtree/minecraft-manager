@@ -61,10 +61,10 @@ const EditButton = styled(Button)`
     text-align: center;
 `
 
-const ProfileCard = () => (
+const ProfileCard = ({profile}) => (
     <BG>
         <Image />
-        <Title>Minecraft Manager is great!!</Title>
+        <Title>{profile.name}</Title>
         <Buttons>
             <LaunchButton color='green'>launch</LaunchButton>
             <EditButton color='yellow'>edit</EditButton>

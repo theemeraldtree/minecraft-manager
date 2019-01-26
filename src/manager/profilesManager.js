@@ -7,14 +7,17 @@ const fs = require('fs');
 const ProfilesManager = {
     loadedProfiles: [],
     getProfiles: function() {
-        fs.readdir(Global.PROFILES_PATH, (err, files) => {
-            files.forEach((file) => {
-                this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
+        return new Promise(resolve => {
+            fs.readdir(Global.PROFILES_PATH, async (err, files) => {
+                files.forEach(async (file) => {
+                    await this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
+                    resolve();
+                })
             })
         })
     },
 
-    processProfileFolder: function(location) {
+    processProfileFolder: async function(location) {
         let profilePath = path.join(location, '/profile.json')
         if(fs.existsSync(profilePath)) {
             let rawOMAF = JSON.parse(fs.readFileSync(profilePath));
