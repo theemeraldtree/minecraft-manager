@@ -29,12 +29,15 @@ export default class ProfileGrid extends Component {
         console.log("ok");
         let profilesComponents = [];
         for(let profile of ProfilesManager.loadedProfiles) {
-            profilesComponents.push(<ProfileCard key={profile.id} profile={profile} />);
+            if(profile.name.toLowerCase().includes(this.props.searchTerm)) {
+                profilesComponents.push(<ProfileCard key={profile.id} profile={profile} />);
+            }
         }
         this.setState({
             profiles: profilesComponents
         })
     }
+
     render() {
         return (
             <BG>
