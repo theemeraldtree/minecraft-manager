@@ -27,6 +27,17 @@ const ProfilesManager = {
         }else{
             LogManager.log('SEVERE', `Error: Profile at path ${location} DOES NOT CONTAIN a profile.json file! The profile is probably improperly imported or created! Fix this now, as furthur imports of this profile will not work!`)
         }
+    },
+
+
+    getProfileFromID: function(id) {
+        for(let profile of this.loadedProfiles) {
+            if(profile.id === id) {
+                return profile;
+            }
+        }
+        
+        throw `Profile with ID: ${id} not found`
     }
 }
 

@@ -10,8 +10,14 @@ const Button = styled.div`
     ${props => props.color === 'green' && `
         background-color: #15950C;
     `}
-    ${props => props.color == 'yellow' && `
+    ${props => props.color === 'yellow' && `
         background-color: #D4B107;
+    `}
+    ${props => props.color === 'blue' && `
+        background-color: #185F95;
+    `}
+    ${props => props.color === 'red' && `
+        background-color: #951818;
     `}
     cursor: pointer;
     transition: 300ms;

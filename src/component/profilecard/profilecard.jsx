@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
+import { withRouter } from 'react-router-dom';
 const BG = styled.div`
     width:120px;
     height: 190px;
@@ -60,8 +61,8 @@ const EditButton = styled(Button)`
     text-align: center;
 `
 
-const ProfileCard = ({profile}) => (
-    <BG>
+const ProfileCard = ({profile, history}) => (
+    <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
         <Image src={profile.iconpath} />
         <Title>{profile.name}</Title>
         <Buttons>
@@ -71,4 +72,4 @@ const ProfileCard = ({profile}) => (
     </BG>
 )
 
-export default ProfileCard;
+export default withRouter(ProfileCard);

@@ -26,7 +26,6 @@ export default class ProfileGrid extends Component {
     }
 
     generateProfiles = () => {
-        console.log("ok");
         let profilesComponents = [];
         for(let profile of ProfilesManager.loadedProfiles) {
             if(profile.name.toLowerCase().includes(this.props.searchTerm)) {
