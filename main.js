@@ -1,7 +1,6 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, shell } = require('electron');
 const url = require('url');
 const path = require('path');
-
 // Security warning IS DISABLED because we're loading from localhost.
 // this is only disabled so it doesn't clog the console in dev mode
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
@@ -33,6 +32,22 @@ function createWindow() {
     mainWindow.once('ready-to-show', () => {
         mainWindow.show();
     });
+
+    mainWindow.webContents.on('will-navigate', (event, url) => {
+        navigation(event, url)
+    })
+
+    mainWindow.webContents.on('new-window', (event, url) => {
+        navigation(event, url);
+    })
 }
+
+function navigation(event, url) {
+    if(url.substring(0, 22) !== 'http://localhost:8080/') {
+        event.preventDefault();
+        shell.openExternal(url);
+    }
+}
+
 
 app.on('ready', createWindow);
