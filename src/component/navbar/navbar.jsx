@@ -17,8 +17,9 @@ const Link = styled(NavLink)`
     color: white;
     text-decoration: none;
     font-size: 15pt;
+    font-weight: 100;
     &.active {
-        font-weight: bolder;
+        font-weight: 900;
     }
     margin-bottom: 15px;
 `

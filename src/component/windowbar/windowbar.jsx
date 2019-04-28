@@ -21,6 +21,7 @@ const Title = styled.p`
     left: 5px;
     font-weight: thin;
     margin: 0;
+    width: 150px;
     -webkit-app-region: drag;
     cursor: default;
     ${os.platform() === 'darwin' && css`
