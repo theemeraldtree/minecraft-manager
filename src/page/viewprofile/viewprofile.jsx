@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Page from '../page';
+import { withRouter } from 'react-router-dom';
 import Header from '../../component/header/header';
 import ProfilesManager from '../../manager/profilesManager';
 import styled from 'styled-components';
@@ -72,7 +73,7 @@ const Description = styled.div`
     background-color: #717171;
     margin: 10px;
 `
-export default class ViewProfilePage extends Component {
+class ViewProfilePage extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -86,6 +87,10 @@ export default class ViewProfilePage extends Component {
         return {
             profile: ProfilesManager.getProfileFromID(props.match.params.id)
         }
+    }
+
+    editprofile = () => {
+        this.props.history.push(`/edit/general/${this.state.profile.id}`)
     }
     render() {
         let { profile } = this.state;
@@ -103,7 +108,7 @@ export default class ViewProfilePage extends Component {
                 <MiddlePanel>
                     <ButtonGroup>
                         <CustomButton color='green'>launch</CustomButton>
-                        <CustomButton color='yellow'>edit</CustomButton>
+                        <CustomButton onClick={this.editprofile} color='yellow'>edit</CustomButton>
                         <CustomButton color='purple'>update</CustomButton>
                         <CustomButton color='blue'>share</CustomButton>
                         <CustomButton color='red'>delete</CustomButton>
@@ -119,3 +124,5 @@ export default class ViewProfilePage extends Component {
         )
     }
 }
+
+export default withRouter(ViewProfilePage)
