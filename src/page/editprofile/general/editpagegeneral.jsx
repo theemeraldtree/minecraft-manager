@@ -5,13 +5,10 @@ import ProfilesManager from '../../../manager/profilesManager';
 import EditContainer from '../components/editcontainer';
 import Button from '../../../component/button/button';
 import styled from 'styled-components';
-import TextInputLabelled from '../../../component/textinputlabelled/textinputlabelled';
+import TextInput from '../../../component/textinput/textinput';
 import TextBox from '../../../component/textbox/textbox';
-
-const FlexDiv = styled.div`
-    display: flex;
-    align-items: center;
-`
+import Detail from '../components/detail';
+import InputContainer from '../components/inputcontainer';
 const DescContainer = styled.div`
     margin-top: 40px;
 `
@@ -19,10 +16,6 @@ const LongDesc = styled(TextBox)`
     height: 400px;
     width: 70%;
     max-width: 500px;
-`
-const Detail = styled.p`
-    margin: 0;
-    margin-top: 3px;
 `
 export default class EditPageGeneral extends Component {
     constructor(props) {
@@ -46,10 +39,11 @@ export default class EditPageGeneral extends Component {
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
                 <EditContainer profile={profile}>
-                    <FlexDiv>
-                        <TextInputLabelled title='Profile Name' placeholder="Enter a name" />
+                    <Detail>profile name</Detail>
+                    <InputContainer>
+                        <TextInput placeholder="Enter a name" />
                         <Button color='green'>change</Button>
-                    </FlexDiv>
+                    </InputContainer>
                     <Detail>internal id: PLACEHOLDER</Detail>
                     <Detail>version-safe name: PLACEHOLDER</Detail>
 
@@ -64,7 +58,7 @@ export default class EditPageGeneral extends Component {
                     </DescContainer>
                 </EditContainer>
             </Page>
-        )
+        )   
     }
 
 }

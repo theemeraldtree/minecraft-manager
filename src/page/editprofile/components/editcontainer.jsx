@@ -9,7 +9,7 @@ const BG = styled.div`
 const CC = styled.div`
     margin-left: 130px;
     color: white;
-    padding-top: 40px;
+    padding-top: 10px;
     overflow: scroll;
     flex: 1 1 auto;
 `
