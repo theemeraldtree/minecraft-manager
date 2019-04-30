@@ -28,6 +28,7 @@ const Sidebar = ({profile}) => (
         <Item to={`/edit/general/${profile.id}`} activeClassName='active'>general</Item>
         <Item to={`/edit/versions/${profile.id}`}  activeClassName='active'>versions</Item>
         <Item to={`/edit/mods/${profile.id}`}  activeClassName='active'>mods</Item>
+        <Item to={`/edit/advanced/${profile.id}`}  activeClassName='active'>advanced</Item>
     </BG>
 )
 
