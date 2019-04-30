@@ -5,7 +5,7 @@ import HomePage from './page/home/homePage';
 import ViewProfilePage from './page/viewprofile/viewprofile';
 import EditPageGeneral from './page/editprofile/general/editpagegeneral';
 import EditPageVersions from './page/editprofile/versions/editpageversions';
-
+import EditPageMods from './page/editprofile/mods/editpagemods';
 const App = () => (
     <div>
         <Router>
@@ -14,6 +14,7 @@ const App = () => (
                 <Route path='/profile/:id' component={ViewProfilePage} />
                 <Route path='/edit/general/:id' component={EditPageGeneral} />
                 <Route path='/edit/versions/:id' component={EditPageVersions} />
+                <Route path='/edit/mods/:id' component={EditPageMods} />
             </div>
         </Router>
     </div>
