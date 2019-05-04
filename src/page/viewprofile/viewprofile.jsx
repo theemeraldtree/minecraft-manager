@@ -33,6 +33,7 @@ const ProfileHeader = styled.div`
 `
 
 const PHSide = styled.div`
+    margin-left: 20px;
     display: inline-block;
     position: relative;
 `

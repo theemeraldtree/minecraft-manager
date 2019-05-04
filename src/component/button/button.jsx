@@ -21,8 +21,17 @@ const Button = styled.div`
     `}
     cursor: pointer;
     transition: 300ms;
+    ${props => props.disabled && `
+        filter: brightness(0.65);
+    `}
     &:hover {
-        filter: brightness(0.75);
+        ${props => !props.disabled && `
+            filter: brightness(0.75);
+        `}
+        ${props => props.disabled && `
+            cursor: not-allowed;
+        `}
+        
     }
 `
 

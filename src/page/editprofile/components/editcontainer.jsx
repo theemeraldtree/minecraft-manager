@@ -12,6 +12,7 @@ const CC = styled.div`
     padding-top: 10px;
     overflow: scroll;
     flex: 1 1 auto;
+    margin-bottom: -17px;
 `
 const EditContainer = ({children, profile}) => (
     <BG>

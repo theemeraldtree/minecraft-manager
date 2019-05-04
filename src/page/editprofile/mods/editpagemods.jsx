@@ -29,6 +29,10 @@ const List = styled.div`
     margin-top: 10px;
 `
 
+const Search = styled(TextInput)`
+    width: 100%;
+`
+
 const SearchContainer = styled(InputContainer)`
     margin-top: 10px;
     flex: 0 1 auto;
@@ -58,7 +62,7 @@ export default class EditPageMods extends Component {
                     <Wrapper>
                         <Container>
                             <SearchContainer>
-                                <TextInput placeholder='Search' />
+                                <Search placeholder='Search' />
                                 <Button color='green'>add</Button>
                             </SearchContainer>
                             <List>
