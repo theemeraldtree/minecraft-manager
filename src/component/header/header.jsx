@@ -13,7 +13,7 @@ const Title = styled.p`
     margin: 0;
     margin-left: 10px;
     font-size: 32pt;
-    font-weight: 100;
+    font-weight: 300;
 `
 
 const Backlink = styled(Link)`

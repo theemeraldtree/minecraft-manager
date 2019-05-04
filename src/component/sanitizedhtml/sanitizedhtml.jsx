@@ -8,11 +8,11 @@ const Styling = styled.div`
     color: white;
   }
 
-
   iframe {
     border: 0;  
   }
 
+  word-break: break-word;
   padding: 10px;
 `
 const SanitizedHTML = ({html}) => (

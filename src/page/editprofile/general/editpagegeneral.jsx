@@ -20,41 +20,65 @@ const LongDesc = styled(TextBox)`
 export default class EditPageGeneral extends Component {
     constructor(props) {
         super(props);
+        let profile = ProfilesManager.getProfileFromID(props.match.params.id);
         this.state = {
-            profile: {
-                name: 'Loading'
-            }
+            profile: profile,
+            nameValue: profile.name,
+            nameDisabled: true
         }
     }
 
     static getDerivedStateFromProps(props) {
+        let profile = ProfilesManager.getProfileFromID(props.match.params.id);
         return {
-            profile: ProfilesManager.getProfileFromID(props.match.params.id)
+            profile: profile
         }
     }
+
+
     
+    nameChange = (e) => {
+        let newName = e.target.value;
+        let namedisable = true;
+        if(newName != this.state.profile.name) {
+            namedisable = false;
+        }
+        this.setState({
+            nameValue: e.target.value,
+            nameDisabled: namedisable
+        });
+    }
+
+    blurbChange = (e) => {
+        this.state.profile.changeBlurb(e.target.value);
+    }
+
+    descChange = (e) => {
+        this.state.profile.changeDescription(e.target.value);
+    }
+
     render() {
-        let { profile } = this.state;
+        let { profile, nameValue, nameDisabled } = this.state;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
                 <EditContainer profile={profile}>
                     <Detail>profile name</Detail>
                     <InputContainer>
-                        <TextInput placeholder="Enter a name" />
-                        <Button color='green'>change</Button>
+                        <TextInput value={nameValue} onChange={this.nameChange} placeholder="Enter a name" />
+                        <Button disabled={nameDisabled} color='green'>change</Button>
                     </InputContainer>
-                    <Detail>internal id: PLACEHOLDER</Detail>
+                    <Detail>internal id: {profile.id}</Detail>
                     <Detail>version-safe name: PLACEHOLDER</Detail>
 
                     <DescContainer>
                         <Detail>short description</Detail>
-                        <TextBox placeholder="Enter a short description" />
+                        <TextBox defaultValue={profile.blurb} onChange={this.blurbChange} placeholder="Enter a short description" />
                     </DescContainer>
 
                     <DescContainer>
                         <Detail>long description</Detail>
-                        <LongDesc placeholder="Enter a long description" />
+                        <LongDesc defaultValue={profile.description} onChange={this.descChange} placeholder="Enter a long description" />
                     </DescContainer>
                 </EditContainer>
             </Page>
