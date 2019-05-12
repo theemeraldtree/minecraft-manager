@@ -6,6 +6,7 @@ import ProfilesManager from '../../manager/profilesManager';
 import styled from 'styled-components';
 import Button from '../../component/button/button';
 import SanitizedHTML from '../../component/sanitizedhtml/sanitizedhtml'
+import LauncherManager from '../../manager/launcherManager';
 const Image = styled.img`
     min-width: 150px;
     height: 150px;
@@ -93,6 +94,11 @@ class ViewProfilePage extends Component {
     editprofile = () => {
         this.props.history.push(`/edit/general/${this.state.profile.id}`)
     }
+
+    launchProfile = () => {
+        LauncherManager.openLauncher();
+    }
+
     render() {
         let { profile } = this.state;
         return (
@@ -108,7 +114,7 @@ class ViewProfilePage extends Component {
                 
                 <MiddlePanel>
                     <ButtonGroup>
-                        <CustomButton color='green'>launch</CustomButton>
+                        <CustomButton onClick={this.launchProfile} color='green'>launch</CustomButton>
                         <CustomButton onClick={this.editprofile} color='yellow'>edit</CustomButton>
                         <CustomButton color='purple'>update</CustomButton>
                         <CustomButton color='blue'>share</CustomButton>
