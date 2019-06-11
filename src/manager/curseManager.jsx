@@ -3,6 +3,7 @@ import MinecraftVersionManager from './minecraftVersionManager';
 import Mod from '../util/mod';
 import Data from '../util/data';
 import CurseModpack from '../util/curseModpack';
+import Curse from '../host/curse/Curse';
 const fs = require('fs');
 const path = require('path');
 const https = require('follow-redirects').https;
@@ -71,6 +72,7 @@ class CurseManager {
                                     out = new Mod({id: Data.createId(name), icon: img, description: desc, name: name, type: 'curse', curseID: id});
                                 }else if(type === 'modpack') {
                                     out = new CurseModpack({id: Data.createId(name), icon: img, description: desc, name: name, curseID: id})
+                                    out.isFTB = this.getIsPackFTB(out.curseID);
                                 }
                                 res.push(out);                               
                             }
@@ -123,7 +125,9 @@ class CurseManager {
 
     getLatestCurseFile = (mod, mcver) => {
         return new Promise((resolve, reject) => {
-            https.get(`https://minecraft.curseforge.com/projects/${mod.curseID}/files?filter-game-version=2020709689:${this.getCurseVersionId(mcver)}`, (resp) => {
+            https.get(`https://minecraft.curseforge.com/projects/${mod.ids.curse}/files?filter-game-version=2020709689:${this.getCurseVersionId(mcver)}`, (resp) => {
+                console.log(mcver);
+                console.log(mod.ids.curse);
                 let bodyChunks = [];
                 resp.on('data', (chunk) => {
                     bodyChunks.push(chunk);
@@ -151,9 +155,9 @@ class CurseManager {
         return new Promise((resolve) => {
             let url;
             if(mod.isFTB) {
-                url = `https://www.feed-the-beast.com/projects/${mod.curseID}/files/${file}`
+                url = `https://www.feed-the-beast.com/projects/${mod.ids.curse}/files/${file}`
             }else{
-                url = `https://minecraft.curseforge.com/projects/${mod.curseID}/files/${file}`
+                url = `https://minecraft.curseforge.com/projects/${mod.ids.curse}/files/${file}`
             }
             https.get(url, (resp) => {
                 let bodyChunks = [];
@@ -168,7 +172,7 @@ class CurseManager {
                     const date = page('.standard-datetime').toArray();
                     let info = {};
                     info['date-epoch'] = date[0].attribs['data-epoch'];
-                    info['fileName'] = page('.details-header').toArray()[0].children[3].children[0].data.replace(/\.[^/.]+$/, "");
+                    info['fileName'] = page('.details-header').toArray()[0].children[3].children[0].data.replace(/\.[^/.]+$/, '');
                     resolve(info);
                 })
             })
@@ -192,7 +196,7 @@ class CurseManager {
     }
     downloadDependencies = (mod, profile) => {
         return new Promise((resolve) => {
-            https.get(`https://minecraft.curseforge.com/projects/${mod.curseID}/relations/dependencies?filter-related-dependencies=3`, (resp) => {
+            https.get(`https://minecraft.curseforge.com/projects/${mod.ids.curse}/relations/dependencies?filter-related-dependencies=3`, (resp) => {
                 var bodyChunks = [];
                 resp.on('data', (chunk) => {
                     bodyChunks.push(chunk);
@@ -200,16 +204,16 @@ class CurseManager {
                 resp.on('end', () => {
                     var body = Buffer.concat(bodyChunks);
                     var page = cheerio.load(body);
-                    var list = page(".project-list-item").toArray();
+                    var list = page('.project-list-item').toArray();
                     if(list.length == 0) {
                         resolve();
                     }else{
                         for(var i = 0; i < list.length;i++) {
-                            if(list[i].name === "li") {
+                            if(list[i].name === 'li') {
                                 var link = list[i].children[1].children[1];
                                 var urlFull = link.attribs.href;
         
-                                if(urlFull.substring(0, 10) == "/projects/") {                        
+                                if(urlFull.substring(0, 10) == '/projects/') {                        
                                     var id = urlFull.substring(10);
                                             
                                     let img = list[i].children[1].children[1].children[1].attribs.src;
@@ -223,11 +227,11 @@ class CurseManager {
                                     
                                     let desc = list[i].children[3].children[5].children[1].children[0].data;
                                     let modName = list[i].children[3].children[1].children[1].children[1].children[0].data;
-                                    let newMod = new Mod({icon: img, type: 'curse', description: desc, name: modName, id: id, curseID: id})
-    
+                                    let newMod = new Mod({icon: img, type: 'curse', description: desc, name: modName, id: id, ids: {curse: id}});
+
                                     profile.installMod(newMod, () => {
 
-                                    }, {"ignore-invalid-mcversion": true}).then(() => {
+                                    }, {'ignore-invalid-mcversion': true}).then(() => {
                                         if(i === list.length) {
                                             resolve();
                                         }
@@ -255,7 +259,7 @@ class CurseManager {
     }
     downloadModFileToLocation = (mod, file, loc) => {
         return new Promise((resolve) => {
-            this.downloadCurseFile(`https://minecraft.curseforge.com/projects/${mod.curseID}/files/${file}/download`, loc, () => {
+            this.downloadCurseFile(`https://minecraft.curseforge.com/projects/${mod.ids.curse}/files/${file}/download`, loc, () => {
                 resolve();
             });
         })
@@ -263,7 +267,7 @@ class CurseManager {
     getDetailedModInfo = (mod, doMCVersions) => {
         let curseID;
         if(mod instanceof Object) {
-            curseID = mod.curseID;
+            curseID = mod.ids.curse;
         }else{
             curseID = mod;
         }
@@ -272,7 +276,7 @@ class CurseManager {
             https.get(`https://minecraft.curseforge.com/projects/${curseID}`, (resp) => {
                 let isFTB = resp.responseUrl.substring(12, 26) === 'feed-the-beast';
                 var bodyChunks = [];
-                resp.on("data", (chunk) => {
+                resp.on('data', (chunk) => {
                     bodyChunks.push(chunk);
                 });
     
@@ -283,7 +287,7 @@ class CurseManager {
                     var possibleVersions = [];
                     // Find the possible versions
     
-                    var n = page(".project-description");
+                    var n = page('.project-description');
 
                     let details = page('.project-details-container').toArray()[0];
                     let detailedInfo = {};
@@ -328,7 +332,7 @@ class CurseManager {
                                 resp.on('end', () => {
                                     var body = Buffer.concat(bodyChunks);
                                     var page = cheerio.load(body);
-                                    var list = page(".project-file-list-item").toArray();
+                                    var list = page('.project-file-list-item').toArray();
         
                                     if(list.length !== 0) {
                                         possibleVersions[mcVersions.indexOf(ver)] = ver;
@@ -338,7 +342,7 @@ class CurseManager {
                                     
                                     if(completed === mcVersions.length) {
                                         possibleVersions = possibleVersions.filter(n => n);
-                                        detailedInfo["mcVersions"] = possibleVersions;
+                                        detailedInfo['mcVersions'] = possibleVersions;
                                         resolve(detailedInfo);
                                     }
                                 });
@@ -354,26 +358,32 @@ class CurseManager {
 
     getCurseVersionId = (ver) => {
         var versions = {
-            "1.12.2": "6756",
-            "1.12.1": "6711",
-            "1.12": "6580",
-            "1.11.2": "6452",
-            "1.11": "6317",
-            "1.10.2": "6170",
-            "1.9.4": "6084",
-            "1.9": "5946",            
-            "1.8.9": "5806",
-            "1.8.8": "5703",
-            "1.8": "4455",
-            "1.7.10": "4449"
+            '1.12.2': '6756',
+            '1.12.1': '6711',
+            '1.12': '6580',
+            '1.11.2': '6452',
+            '1.11': '6317',
+            '1.10.2': '6170',
+            '1.9.4': '6084',
+            '1.9': '5946',            
+            '1.8.9': '5806',
+            '1.8.8': '5703',
+            '1.8': '4455',
+            '1.7.10': '4449',
+            '1.7.2': '361',
+            '1.6.4': '326',
+            '1.5.2': '312',
+            '1.4.7': '272',
+            '1.1': '186',
+            '1.0': '180'
         }
 
         return versions[ver];
     }
 
-    getModSearchResults = (search) => {
+    getModSearchResults = (term) => {
        return new Promise((resolve) => {
-           this.scrapeCurseModList(`https://www.curseforge.com/minecraft/mc-mods/search?search=${search}`, 'mod').then((res) => {
+           Curse.search('mod', term).then((res) => {
                resolve(res);
            })
        }) 
@@ -491,7 +501,7 @@ class CurseManager {
     }
     getModFiles = (mod, mcver) => {
         return new Promise((resolve) => {
-            this.scrapeModFiles(`https://minecraft.curseforge.com/projects/${mod.curseID}/files?filter-game-version=2020709689:${this.getCurseVersionId(mcver)}`, (res) => {
+            this.scrapeModFiles(`https://minecraft.curseforge.com/projects/${mod.ids.curse}/files?filter-game-version=2020709689:${this.getCurseVersionId(mcver)}`, (res) => {
                 console.log(res);
                 resolve(res);
             }, []);
@@ -660,13 +670,13 @@ class CurseManager {
     getModpackLatestFile = (pack) => {
         return new Promise((resolve, reject) => {
             let curseID = pack.curseID;
-            console.log(pack.isFTB);
             let url;
             if(pack.isFTB) {
                 url = `https://www.feed-the-beast.com/projects/${curseID}/files`
             }else{
                 url = `https://minecraft.curseforge.com/projects/${curseID}/files`;
             }
+            console.log(pack);
             https.get(url, (resp) => {
                 let bodyChunks = [];
                 resp.on('data', (chunk) => {

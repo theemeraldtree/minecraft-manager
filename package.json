@@ -1,6 +1,6 @@
 {
   "name": "minecraftmanager",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Minecraft Manager",
   "author": "stairman06",
   "build": {
@@ -71,6 +71,7 @@
     "react-dom": "16.2.0",
     "react-router-dom": "4.2.2",
     "react-router-page-transition": "^3.0.2",
+    "request": "^2.87.0",
     "style-loader": "0.17.0",
     "styled-components": "^3.2.3",
     "uniqid": "^4.1.1",

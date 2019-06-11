@@ -35,7 +35,10 @@ const Data = {
         return '2018-07-11'
     },
     createVersionName(name) {
-        return name.replace(/[^a-zA-Z ]/g, '');
+        return name.replace(/[^a-zA-Z]/g, '');
+    },
+    getMCMIcon() {
+        return path.join(FileUtils.getAppPath(), `/resource/mcm-icon.png`);
     }
 }
 
