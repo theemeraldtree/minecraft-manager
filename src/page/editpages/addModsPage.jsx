@@ -6,7 +6,6 @@ import PageHeader from '../../component/pageheader/pageheader';
 import Loader from '../../component/loader/loader';
 import Profile from '../../util/profile';
 import CardView from '../../component/cardview/cardview';
-import ModCard from '../../component/cards/modcard/modcard';
 import TextInput from '../../component/textinput/textinput';
 import ProfileManager from '../../manager/profileManager';
 import CurseManager from '../../manager/curseManager';
@@ -17,6 +16,7 @@ import Page, { Options, Main, Content } from '../page';
 import Mod from '../../util/mod';
 import IconButton from '../../component/button/iconbutton/iconbutton';
 import fs from 'fs';
+import AssetCard from '../../component/cards/assetcard/assetcard';
 const { dialog } = require('electron').remote;
 const path = require('path');
 const StatusText = styled.p`
@@ -92,7 +92,7 @@ class AddModsPage extends Component {
         console.log(res);
         let list = [];
         for(let mod of res) {
-            list.push(<ModCard cardClick={this.modClick} profile={this.state.profile} mod={mod} />);
+            list.push(<AssetCard cardClick={this.modClick} profile={this.state.profile} asset={mod} />);
         }
 
         this.setState({
@@ -141,8 +141,8 @@ class AddModsPage extends Component {
     }
 
     modClick = (mod) => {
-        console.log(`/profiles/viewmod/${mod.curseID}/${this.state.profile.id}/${this.state.searchTerm}`);
-        this.props.history.push(`/profiles/viewmod/${mod.curseID}/${this.state.profile.id}/${this.state.searchTerm}`);
+        console.log(`/profiles/viewmod/${mod.ids.curse}/${this.state.profile.id}/${this.state.searchTerm}`);
+        this.props.history.push(`/profiles/viewmod/${mod.ids.curse}/${this.state.profile.id}/${this.state.searchTerm}`);
     }
     addFile = () => {
         let file = dialog.showOpenDialog({properties: ['openFile'], filters:[{name: 'JAR Files', extensions: ['jar']}]})[0];

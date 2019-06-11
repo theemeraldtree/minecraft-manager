@@ -18,6 +18,7 @@ class ProfileManager {
             return new Promise((resolve) =>  {
                 fs.readdir(path.join(FileUtils.getAppPath(), '/profiles'), (err, files) => {
                     files.forEach((file) => {
+                        console.log(`Loading profile at path ${file}`);
                         if(fs.lstatSync(path.join(FileUtils.getAppPath(), '/profiles/', file)).isDirectory()) {
                             if(file !== '__MAXOSX' && file !== '__MACOS') {
                                 toLoad++;

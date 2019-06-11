@@ -234,7 +234,10 @@ export default class Profile {
         return new Promise((resolve) => {
             statusUpdate('Copying folder...');
             let tempPath = path.join(FileUtils.getAppPath(), `/temp/profileexport-${this.id}/`);
-            FileUtils.copy(path.join(FileUtils.getAppPath(), `/profiles/${this.id}`), tempPath);
+            if(fs.existsSync(tempPath)) {
+                FileUtils.rmdir(tempPath);
+            }
+            FileUtils.copyDirSync(path.join(FileUtils.getAppPath(), `/profiles/${this.id}`), tempPath);
             statusUpdate('Removing mods...');
             for(let mod of this.mods) {
                 if(mod.type === 'curse') {
@@ -254,7 +257,8 @@ export default class Profile {
                     }
                 });
                 statusUpdate('Modifying data...');
-                let json = JSON.parse(fs.readFileSync(path.join(tempPath, `/profile.json`)));
+                console.log(fs.readFileSync(path.join(tempPath, `/profile.json`)));
+                let json = JSON.parse(fs.readFileSync(path.join(FileUtils.getAppPath(), `/profiles/${this.id}/profile.json`)));
                 delete json['icon'];
                 fs.writeFileSync(path.join(tempPath, `/profile.json`), JSON.stringify(json));
                 statusUpdate('Creating package...');
@@ -354,7 +358,7 @@ export default class Profile {
             }
     
             this.save();
-            fs.unlink(path.join(FileUtils.getAppPath(), `/profiles/${this.id}/files/mods/${mod.filename}`), () => {
+            fs.unlink(path.join(FileUtils.getAppPath(), `/profiles/${this.id}/files/mods/${mod.file}`), () => {
                 resolve();
             });
         })
@@ -384,7 +388,7 @@ export default class Profile {
     changeModVersion = (mod, version, versionName, update) => {
         return new Promise((resolve) => {
             update('Removing old files...');
-            fs.unlink(path.join(FileUtils.getAppPath(), `/profiles/${this.id}/files/mods/${mod.filename}`), () => {
+            fs.unlink(path.join(FileUtils.getAppPath(), `/profiles/${this.id}/files/mods/${mod.file}`), () => {
                 update('Changing internal version...');
                 for(let modi of this.mods) {
                     if(modi.id === mod.id) {
@@ -500,5 +504,17 @@ export default class Profile {
         if(this.modInstallFinish === this.modsToInstall) {
             resolve();
         }
+    }
+    
+    installAsset = (asset, update) => {
+        return new Promise((resolve, reject) => {
+            if(asset instanceof Mod) {
+                this.installMod(asset, update).then((res) => {
+                    resolve(res);
+                }).catch((res) => {
+                    reject(res);
+                })
+            }
+        })
     }
 }

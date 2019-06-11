@@ -7,8 +7,8 @@ const fs = require('fs');
 class MinecraftVersionManager {
     constructor() {
         if(fs.existsSync(FileUtils.getAppPath())) {
-            this.versionFolder = path.join(FileUtils.getMCFolder(), "/versions");
-            this.libraryFolder = path.join(FileUtils.getMCFolder(), "/libraries");
+            this.versionFolder = path.join(FileUtils.getMCFolder(), '/versions');
+            this.libraryFolder = path.join(FileUtils.getMCFolder(), '/libraries');
         }
     }
     
@@ -18,13 +18,13 @@ class MinecraftVersionManager {
         }
         
         // DOWNLOAD THE UNIVERSAL FORGE VERSION AND PLACE IT HERE
-        this.downloadForge(mcVer, forgeVer, path.join(p, "/profiles-" + id + ".jar"), () => {
+        this.downloadForge(mcVer, forgeVer, path.join(p, '/profiles-' + id + '.jar'), () => {
             callback();
         })
     }
     downloadForge(mcVer, forgeVer, targetPath, callback) {
         let fileUrl;
-        if(mcVer.substring(0,3) == "1.8" || mcVer.substring(0,3) == "1.7") {
+        if(mcVer.substring(0,3) == '1.8' || mcVer.substring(0,3) == '1.7') {
             fileUrl = `http://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeVer}-${mcVer}/forge-${forgeVer}-${mcVer}-universal.jar`;   
         }else{
             fileUrl = `http://files.minecraftforge.net/maven/net/minecraftforge/forge/${forgeVer}/forge-${forgeVer}-universal.jar`;            
@@ -40,7 +40,7 @@ class MinecraftVersionManager {
         });
     }
     getForgeVersion(mcVer, callback) {
-        http.get("http://files.minecraftforge.net/maven/net/minecraftforge/forge/json", (resp) => {
+        http.get('http://files.minecraftforge.net/maven/net/minecraftforge/forge/json', (resp) => {
             var bodyChunks = []; 
             resp.on('data', function(chunk) {
               // You can process streamed parts here...
@@ -51,8 +51,8 @@ class MinecraftVersionManager {
               var obj = JSON.parse(body);
 
 
-              console.log("FORGE VER: " + mcVer + "-" + obj.number[obj.promos[mcVer + "-latest"]].version);
-              callback(mcVer + "-" + obj.number[obj.promos[mcVer + "-latest"]].version);
+              console.log('FORGE VER: ' + mcVer + '-' + obj.number[obj.promos[mcVer + '-latest']].version);
+              callback(mcVer + '-' + obj.number[obj.promos[mcVer + '-latest']].version);
             });           
         })
     }
@@ -83,27 +83,80 @@ class MinecraftVersionManager {
         })
     }
     getVersions() {
-        return ["1.12.2", "1.12.1", "1.12", "1.11.2", "1.11", "1.10.2", "1.9.4", "1.9", "1.8.9", "1.8.8", "1.8", "1.7.10"];
+        return [
+            '1.12.2', 
+            '1.12.1', 
+            '1.12', 
+            '1.11.2',
+            '1.11.1',
+            '1.11', 
+            '1.10.2',
+            '1.10.1',
+            '1.10', 
+            '1.9.4',
+            '1.9.3',
+            '1.9.2',
+            '1.9.1', 
+            '1.9', 
+            '1.8.9', 
+            '1.8.8',
+            '1.8.7',
+            '1.8.6',
+            '1.8.5',
+            '1.8.4',
+            '1.8.3',
+            '1.8.2',
+            '1.8.1', 
+            '1.8', 
+            '1.7.10',
+            '1.7.9',
+            '1.7.8',
+            '1.7.7',
+            '1.7.6',
+            '1.7.5',
+            '1.7.4',
+            '1.7.2',
+            '1.6.4',
+            '1.6.2',
+            '1.6.1',
+            '1.5.2',
+            '1.5.1',
+            '1.5',
+            '1.4.7',
+            '1.4.6',
+            '1.4.5',
+            '1.4.4',
+            '1.4.2',
+            '1.3.2',
+            '1.3.1',
+            '1.2.5',
+            '1.2.4',
+            '1.2.3',
+            '1.2.2',
+            '1.2.1',
+            '1.1',
+            '1.0'
+        ];
     }
     createVersion(mcVer, name, id, callback) {
         let obj;
-        if(mcVer != "1.7.10") {
+        if(mcVer != '1.7.10') {
             obj = defVerison;            
         }else{
             obj = version1710;
         }
-        obj["id"] = name;
-        obj["inheritsFrom"] = mcVer;
-        obj["jar"] = mcVer;
-        obj.libraries[0].name = "minecraftmanager:profiles:" + id;
+        obj['id'] = name;
+        obj['inheritsFrom'] = mcVer;
+        obj['jar'] = mcVer;
+        obj.libraries[0].name = 'minecraftmanager:profiles:' + id;
 
-        if(!fs.existsSync(path.join(this.versionFolder, "/" + id))) {
-            fs.mkdirSync(path.join(this.versionFolder, "/" + id));
+        if(!fs.existsSync(path.join(this.versionFolder, '/' + id))) {
+            fs.mkdirSync(path.join(this.versionFolder, '/' + id));
         }
 
         var str = JSON.stringify(obj);
 
-        fs.writeFile(path.join(this.versionFolder, "/" + id + "/" + id + ".json",), str, () => {
+        fs.writeFile(path.join(this.versionFolder, '/' + id + '/' + id + '.json',), str, () => {
             callback();
         });
     }
