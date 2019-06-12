@@ -79,14 +79,14 @@ const Details = styled.div`
     overflow: hidden;
 `
 
-const ModCard = ({mod, onClick, showDelete, showInstall, disableHover, installed, installClick, deleteClick, showBlurb}) => (
+const AssetCard = ({asset, onClick, showDelete, showInstall, disableHover, installed, installClick, deleteClick, showBlurb}) => (
     <>
-        <ContextMenuTrigger id={`mod${mod.id}`}>
-            <BG disableHover={disableHover} data-cachedid={mod.cachedID} onClick={onClick}>
-                <Image src={mod.iconpath} />
+        <ContextMenuTrigger id={`asset${asset.id}`}>
+            <BG disableHover={disableHover} data-cachedid={asset.cachedID} onClick={onClick}>
+                <Image src={asset.iconpath} />
                 <Details>
-                    <Title>{mod.name}</Title>
-                    <Version buttonShown={showInstall || showDelete}>{!showBlurb && 'versionname'}{showBlurb && mod.blurb}</Version>
+                    <Title>{asset.name}</Title>
+                    <Version buttonShown={showInstall || showDelete}>{!showBlurb && 'versionname'}{showBlurb && asset.blurb}</Version>
                 </Details>
                 <Buttons>
                     {showDelete && 
@@ -103,7 +103,7 @@ const ModCard = ({mod, onClick, showDelete, showInstall, disableHover, installed
                 </Buttons>
             </BG>
         </ContextMenuTrigger>
-        <ContextMenu id={`mod${mod.id}`}>
+        <ContextMenu id={`asset${asset.id}`}>
             <MenuItem>Install</MenuItem>
             <MenuItem>Share</MenuItem>
             <MenuItem>Details</MenuItem>
@@ -111,4 +111,4 @@ const ModCard = ({mod, onClick, showDelete, showInstall, disableHover, installed
     </>
 )
 
-export default ModCard;
+export default AssetCard;

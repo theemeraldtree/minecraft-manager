@@ -4,13 +4,12 @@ import Page from '../../page';
 import Header from '../../../component/header/header';
 import ProfilesManager from '../../../manager/profilesManager';
 import EditContainer from '../components/editcontainer';
-import InputContainer from '../components/inputcontainer';
 import TextInput from '../../../component/textinput/textinput';
 import Button from '../../../component/button/button';
-import ModCard from '../../../component/modcard/modcard';
-import Curse from '../../../host/curse/curse';
 import logo from '../../../img/logo-sm.png';
-import SanitizedHTML from '../../../component/sanitizedhtml/sanitizedhtml';
+import DiscoverList from '../../../component/discoverlist/discoverlist';
+import InputContainer from '../components/inputcontainer';
+import AssetCard from '../../../component/assetcard/assetcard';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -24,6 +23,7 @@ const Container = styled.div`
     flex-flow: column;
     height: 100%;
 `
+
 const List = styled.div`
     flex: 1 1 auto;
     overflow-y: scroll;
@@ -35,52 +35,25 @@ const Search = styled(TextInput)`
     width: 100%;
 `
 
-const LoadingText = styled.div`
-    font-size: 23pt;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-`
 const SearchContainer = styled(InputContainer)`
     margin-top: 10px;
     flex-shrink: 0;
     background-color: #717171;
 `
 
-const Description = styled.div`
-    overflow: scroll;
-    background-color: #717171;
-    margin-top: 10px;
-    margin-bottom: 10px;
-`
 
-const HeaderButtons = styled.div`
-    margin-top: 5px;
-`
-
-const HB = styled(Button)`
-    background-color: #717171;
-    ${props => props.active && `
-        border-bottom: 2px solid #08b20b;
-    `}
-    ${props => !props.active && `
-        border-bottom: 2px solid #717171;
-    `}
-    margin-right: 3px;
-`
 export default class EditPageMods extends Component {
     constructor(props) {
         super(props);
         this.state = {
             modList: [],
             searchTerm: '',
+            liveSearchTerm: '',
+            displayState: 'modsList',
+            listState: 'browseAssets',
             profile: {
                 name: 'Loading'
             },
-            previousState: '',
-            displayState: 'modsList',
-            previewState: 'description'
         }
     }
 
@@ -89,203 +62,80 @@ export default class EditPageMods extends Component {
             profile: ProfilesManager.getProfileFromID(props.match.params.id)
         }
     }
-    
-    browseMods = () => {
-        this.setState({
-            displayState: 'browseMods'
-        })
-
-        Curse.getPopular('mods').then((res) => {
-            this.renderMods(res);
-        })
-    }
-
-    renderMods = (mods) => {
-        console.log(mods);
-        let newModList = [];
-        let { displayState } = this.state;
-        if(mods.length >= 1) {
-            for(let mod of mods) {
-                newModList.push(<ModCard key={mod.id} onClick={this.showMod} showInstall={displayState === 'browseMods'} showBlurb={displayState === 'browseMods'} mod={mod} />);
-            }
-        }else{
-            newModList.push(<LoadingText key='none'>No Mods Found</LoadingText>);
-        }
-
-        this.setState({
-            modList: newModList
-        });
-    }
-
-    showMod = (e) => {
-        let { displayState } = this.state;
-        if(displayState === 'browseMods') {
-            let mod = Curse.cachedItems[e.currentTarget.dataset.cachedid];
-            this.setState({
-                previousState: 'browseMods',
-                displayState: 'viewMod',
-                previewState: 'description',
-                activeMod: mod,
-                loadedDetailedInfo: false
-            }, () => {
-                this.showDescription();
-            });
-        }
-    }
 
     goBack = () => {
-        let { displayState, previousState } = this.state;
-        let newState;
-        switch(displayState) {
-            case 'browseMods':
-                newState = 'modsList';
-                break;
-            case 'viewMod':
-                newState = previousState;
-                break;
-            default:
-                break;
+        let { listState } = this.state;
+        if(listState === 'browseAssets') {
+            this.setState({
+                displayState: 'modsList',
+                liveSearchTerm: ''
+            });
+        }else{
+           let newState;
+           if(listState === 'viewAsset') {
+               newState = 'browseAssets';
+           }
+           this.setState({
+               listState: newState
+           })
         }
+    }
 
+    browseMods = () => {
         this.setState({
-            displayState: newState
+            displayState: 'addMods',
+            liveSearchTerm: ''
         })
     }
 
-    browseSearch = (e) => {
-        let term = e.target.value;
-        let { displayState } = this.state;
+    listStateChange = (state) => {
         this.setState({
-            searchTerm: term
+            listState: state
+        })
+    }
+
+    searchChange = (e) => {
+        let term = e.target.value;
+        this.setState({
+            liveSearchTerm: term
         });
         if(e.key === 'Enter') {
             this.setState({
-                modList: []
-            });
-            if(displayState === 'browseMods') {
-                if(term.trim() !== '') { 
-                    Curse.search(term, 'mods').then((res) => {
-                        this.renderMods(res);
-                    });
-                }else{
-                    this.browseMods();
-                }
-            }
-        }
-    }
-
-    showDescription = () => {
-        Curse.getInfo(this.state.activeMod).then((res) => {
-            this.setState({
-                activeMod: res,
-                loadedDetailedInfo: true
+                searchTerm: term
             })
-        })
-    }
-    showDependencies = () => {
-        let newMod = Object.assign({}, this.state.activeMod);
-        newMod.dependencies = [];
-        Curse.getDependencies(this.state.activeMod).then((res) => {
-            newMod.dependencies = res;
-
-            let newDependList = [];
-            if(res.length >= 1) {
-                for(let mod of res) {
-                    newDependList.push(<ModCard showInstall={true} disableHover key={mod.id} showBlurb={true} mod={mod} />);
-                }
-            }else{
-                newDependList.push(<LoadingText key='none'>No Dependencies</LoadingText>);
-            }
-    
-            this.setState({
-                activeMod: newMod,
-                modDependencies: newDependList,
-                loadedDetailedInfo: true
-            });
-        });
-    }
-    previewStateSwitch = (e) => {
-        let newState = e.currentTarget.dataset.state;
-
-        this.setState({
-            previewState: newState,
-            loadedDetailedInfo: false
-        });
-        if(newState === 'description') {
-            this.showDescription();
-        }else if(newState === 'dependencies') {
-            this.showDependencies();
         }
     }
 
     render() {
-        let { profile, displayState, activeMod, modList, loadedDetailedInfo, searchTerm, previewState } = this.state;
+        let { profile, displayState, liveSearchTerm, searchTerm, listState } = this.state;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
                 <EditContainer profile={profile}>
                     <Wrapper>
                         <Container>
-                            { displayState === 'modsList' && <>
                                 <SearchContainer>
-                                    <Search placeholder='Search' />
-                                    <Button onClick={this.browseMods} color='green'>add</Button>
+                                    {displayState !== 'modsList' && <Button onClick={this.goBack} color='red'>back</Button>}
+                                    {listState !== 'viewAsset' && <>
+                                        <Search value={liveSearchTerm} onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='Search' />
+                                        <Button onClick={this.browseMods} color='green'>add</Button>
+                                    </>}
                                 </SearchContainer>
+                                { displayState === 'modsList' && <>
                                 <List>
-                                    <ModCard onClick={this.showMod} showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
                                 </List>
-                            </>}
-                            {displayState === 'browseMods' && <>
-                                <SearchContainer>
-                                    <Button onClick={this.goBack} color='red'>back</Button>
-                                    <Search value={searchTerm} onChange={this.browseSearch} onKeyPress={this.browseSearch} placeholder='Search for mods' />
-                                    <Button color='green'>more</Button>
-                                </SearchContainer>
-                                {modList.length !== 0 && 
-                                    <List>
-                                        {modList}
-                                    </List>
-                                }
-                                {modList.length === 0 && <LoadingText>loading...</LoadingText>}
-                            </>}
-                            {displayState === 'viewMod' && <>
-                                <SearchContainer>
-                                    <Button onClick={this.goBack} color='red'>back</Button>
-                                </SearchContainer>
-                                <ModCard disableHover showInstall installed={false} mod={activeMod} showBlurb />
-                                <HeaderButtons>
-                                    <HB active={previewState === 'description'} onClick={this.previewStateSwitch} data-state='description'>Description</HB>
-                                    <HB active={previewState === 'dependencies'} onClick={this.previewStateSwitch} data-state='dependencies'>Dependencies</HB>
-                                </HeaderButtons>
-                                {loadedDetailedInfo && <>
-
-                                    {previewState === 'description' && 
-                                        <Description>
-                                            <SanitizedHTML html={activeMod.description} />
-                                        </Description>
-                                    }
-
-                                    {previewState === 'versions' &&
-                                        <h1>versions</h1>
-                                    }
-
-                                    {previewState === 'dependencies' &&
-                                        <List>
-                                            {this.state.modDependencies}
-                                        </List>
-                                    }
                                 </>}
-
-                                {!loadedDetailedInfo && <LoadingText>loading...</LoadingText>}
-                            </>}
+                                {displayState === 'addMods' && <DiscoverList type='mods' searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
                         </Container>
                     </Wrapper>
                 </EditContainer>

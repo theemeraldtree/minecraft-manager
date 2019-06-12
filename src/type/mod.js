@@ -1,7 +1,9 @@
 function Mod(rawOMAF) {
     Object.assign(this, rawOMAF);
 
-    this.hosts = {};
+    if(!this.hosts) {
+        this.hosts = {};
+    }
 }
 
 export default Mod;

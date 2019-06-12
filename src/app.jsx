@@ -8,11 +8,13 @@ import EditPageGeneral from './page/editprofile/general/editpagegeneral';
 import EditPageVersions from './page/editprofile/versions/editpageversions';
 import EditPageMods from './page/editprofile/mods/editpagemods';
 import EditPageAdvanced from './page/editprofile/advanced/editpageadvanced';
+import DiscoverPage from './page/discover/discover';
 const App = () => (
     <div>
         <Router>
             <div>
                 <Route exact path='/' component={HomePage} />
+                <Route path='/discover' component={DiscoverPage} />
                 <Route path='/settings' component={SettingsPage} />
                 <Route path='/profile/:id' component={ViewProfilePage} />
                 <Route path='/edit/general/:id' component={EditPageGeneral} />

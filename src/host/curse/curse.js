@@ -1,10 +1,12 @@
 import HTTPRequest from "../httprequest";
 import Mod from "../../type/mod";
+import Profile from "../../type/profile";
 
 let Curse = {
     popularCache: {},
     cachedItems: {},
     getCurseListItems(url) {
+        console.log(url);
         return new Promise((resolve) => {
             if(url.substring(0, 22) === 'https://curseforge.com') {
                 HTTPRequest.cheerioRequest(url).then((page) => {
@@ -27,13 +29,15 @@ let Curse = {
                             let type;
                             if(url.indexOf('mc-mods') !== -1) {
                                 type = 'mod';
-                            }else{
-                                type = 'unknown';
+                            }else if(url.indexOf('modpacks') !== -1) {
+                                type = 'modpack';
                             }
         
                             let res;
                             if(type === 'mod') {
                                 res = this.createMod(name, blurb, url, icon, id);
+                            }else if(type === 'modpack') {
+                                res = this.createModpack(name, blurb, url, icon, id);
                             }
     
                             results.push(res);
@@ -54,9 +58,12 @@ let Curse = {
 
                         // testing if the item is a mod by using the categories
                         let res;
-                        console.log(details);
-                        if(details.children[7].children[1].children[1].children[1].attribs.href.indexOf('mc-mods') !== -1) {
+
+                        let categoryURL = details.children[7].children[1].children[1].children[1].attribs.href
+                        if(categoryURL.indexOf('mc-mods') !== -1) {
                             res = this.createMod(name, blurb, url, icon, id);
+                        }else if(categoryURL.indexOf('modpacks') !== -1) {
+                            res = this.createModpack(name, blurb, url, icon, id);
                         }
 
                         results.push(res);
@@ -74,10 +81,25 @@ let Curse = {
         mod.iconpath = icon;
         mod.hosts.curse = {};
         mod.hosts.curse.id = id;
+        mod.id = id;
         let cachedID = `mod-curse-${id}`;
         mod.cachedID = cachedID;
         this.cachedItems[cachedID] = mod;
         return mod;
+    },
+    createModpack(name, blurb, url, icon, id) {
+        let modpack = new Profile();
+        modpack.name = name;
+        modpack.blurb = blurb;
+        modpack.url = url;
+        modpack.iconpath = icon;
+        modpack.id = id;
+        modpack.hosts.curse = {};
+        modpack.hosts.curse.id = id;
+        let cachedID = `modpack-curse-${id}`;
+        modpack.cachedID = cachedID;
+        this.cachedItems[cachedID] = modpack;
+        return modpack;
     },
     getCurseType(type) {
         if(type === 'mods') {
@@ -134,7 +156,13 @@ let Curse = {
     getDependencies(obj) {
         return new Promise((resolve) => {
             if(!this.cachedItems[obj.cachedID].dependencies) {
-                this.getCurseListItems(`https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/relations/dependencies?filter-related-dependencies=3`).then((res) => {
+                let url;
+                if(obj instanceof Mod) {
+                    url = `https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/relations/dependencies?filter-related-dependencies=3`
+                }else if(obj instanceof Profile) {
+                    url = `https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/relations/dependencies?filter-related-dependencies=6`
+                }
+                this.getCurseListItems(url).then((res) => {
                     this.cachedItems[obj.cachedID].dependencies = res;
                     resolve(res);
                 });
