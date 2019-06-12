@@ -5,7 +5,7 @@ let HTTPRequest = {
     httpGet(url) {
         return new Promise((resolve, reject) => {
 
-            // Minecraft Manager explicity mentions itself during an HTTP request. If you are the owner of a site we sue (such as Curse)
+            // Minecraft Manager explicity mentions itself during an HTTP request. 
             request.get(url, {
                 url: url,
                 headers: {
