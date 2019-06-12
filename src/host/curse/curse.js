@@ -2,6 +2,7 @@ import HTTPRequest from "../httprequest";
 import Mod from "../../type/mod";
 
 let Curse = {
+    popularCache: {},
     getCurseListItems(url) {
         return new Promise((resolve) => {
             console.log(url);
@@ -47,18 +48,33 @@ let Curse = {
             })
         })
     },
-    getPopular(type) {
-        let cursetype;
+    getCurseType(type) {
         if(type === 'mods') {
-            cursetype = 'mc-mods';
+            return 'mc-mods'
         }else{
-            cursetype = type;
+            return type;
         }
+    },
+    search(term, type) {
         return new Promise((resolve) => {
-            this.getCurseListItems(`https://curseforge.com/minecraft/${cursetype}`).then((result) => {
-                resolve(result);
+            this.getCurseListItems(`https://curseforge.com/minecraft/${this.getCurseType(type)}/search?search=${term.split(' ').join('+')}`).then((res) => {
+                resolve(res);
             })
         })
+    },
+    getPopular(type) {
+        if(!this.popularCache[type]) {
+            return new Promise((resolve) => {
+                this.getCurseListItems(`https://curseforge.com/minecraft/${this.getCurseType(type)}`).then((result) => {
+                    resolve(result);
+                    this.popularCache[type] = result;
+                })
+            })
+        }else{
+            return new Promise((resolve) => {
+                resolve(this.popularCache[type]);
+            })
+        }
     }
 }
 
