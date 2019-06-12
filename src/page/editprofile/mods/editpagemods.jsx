@@ -10,6 +10,7 @@ import Button from '../../../component/button/button';
 import ModCard from '../../../component/modcard/modcard';
 import Curse from '../../../host/curse/curse';
 import logo from '../../../img/logo-sm.png';
+import SanitizedHTML from '../../../component/sanitizedhtml/sanitizedhtml';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -44,16 +45,42 @@ const LoadingText = styled.div`
 const SearchContainer = styled(InputContainer)`
     margin-top: 10px;
     flex-shrink: 0;
+    background-color: #717171;
+`
+
+const Description = styled.div`
+    overflow: scroll;
+    background-color: #717171;
+    margin-top: 10px;
+    margin-bottom: 10px;
+`
+
+const HeaderButtons = styled.div`
+    margin-top: 5px;
+`
+
+const HB = styled(Button)`
+    background-color: #717171;
+    ${props => props.active && `
+        border-bottom: 2px solid #08b20b;
+    `}
+    ${props => !props.active && `
+        border-bottom: 2px solid #717171;
+    `}
+    margin-right: 3px;
 `
 export default class EditPageMods extends Component {
     constructor(props) {
         super(props);
         this.state = {
             modList: [],
+            searchTerm: '',
             profile: {
                 name: 'Loading'
             },
-            displayState: 'modsList'
+            previousState: '',
+            displayState: 'modsList',
+            previewState: 'description'
         }
     }
 
@@ -79,10 +106,10 @@ export default class EditPageMods extends Component {
         let { displayState } = this.state;
         if(mods.length >= 1) {
             for(let mod of mods) {
-                newModList.push(<ModCard showInstall={displayState === 'browseMods'} showDescription={displayState === 'browseMods'} mod={mod} />);
+                newModList.push(<ModCard key={mod.id} onClick={this.showMod} showInstall={displayState === 'browseMods'} showBlurb={displayState === 'browseMods'} mod={mod} />);
             }
         }else{
-            newModList.push(<LoadingText>No Mods Found</LoadingText>);
+            newModList.push(<LoadingText key='none'>No Mods Found</LoadingText>);
         }
 
         this.setState({
@@ -90,12 +117,31 @@ export default class EditPageMods extends Component {
         });
     }
 
-    goBack = () => {
+    showMod = (e) => {
         let { displayState } = this.state;
+        if(displayState === 'browseMods') {
+            let mod = Curse.cachedItems[e.currentTarget.dataset.cachedid];
+            this.setState({
+                previousState: 'browseMods',
+                displayState: 'viewMod',
+                previewState: 'description',
+                activeMod: mod,
+                loadedDetailedInfo: false
+            }, () => {
+                this.showDescription();
+            });
+        }
+    }
+
+    goBack = () => {
+        let { displayState, previousState } = this.state;
         let newState;
         switch(displayState) {
             case 'browseMods':
-                newState = 'modsList'
+                newState = 'modsList';
+                break;
+            case 'viewMod':
+                newState = previousState;
                 break;
             default:
                 break;
@@ -109,9 +155,11 @@ export default class EditPageMods extends Component {
     browseSearch = (e) => {
         let term = e.target.value;
         let { displayState } = this.state;
+        this.setState({
+            searchTerm: term
+        });
         if(e.key === 'Enter') {
             this.setState({
-                searchTerm: term,
                 modList: []
             });
             if(displayState === 'browseMods') {
@@ -126,8 +174,52 @@ export default class EditPageMods extends Component {
         }
     }
 
+    showDescription = () => {
+        Curse.getInfo(this.state.activeMod).then((res) => {
+            this.setState({
+                activeMod: res,
+                loadedDetailedInfo: true
+            })
+        })
+    }
+    showDependencies = () => {
+        let newMod = Object.assign({}, this.state.activeMod);
+        newMod.dependencies = [];
+        Curse.getDependencies(this.state.activeMod).then((res) => {
+            newMod.dependencies = res;
+
+            let newDependList = [];
+            if(res.length >= 1) {
+                for(let mod of res) {
+                    newDependList.push(<ModCard showInstall={true} disableHover key={mod.id} showBlurb={true} mod={mod} />);
+                }
+            }else{
+                newDependList.push(<LoadingText key='none'>No Dependencies</LoadingText>);
+            }
+    
+            this.setState({
+                activeMod: newMod,
+                modDependencies: newDependList,
+                loadedDetailedInfo: true
+            });
+        });
+    }
+    previewStateSwitch = (e) => {
+        let newState = e.currentTarget.dataset.state;
+
+        this.setState({
+            previewState: newState,
+            loadedDetailedInfo: false
+        });
+        if(newState === 'description') {
+            this.showDescription();
+        }else if(newState === 'dependencies') {
+            this.showDependencies();
+        }
+    }
+
     render() {
-        let { profile, displayState } = this.state;
+        let { profile, displayState, activeMod, modList, loadedDetailedInfo, searchTerm, previewState } = this.state;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
@@ -140,7 +232,7 @@ export default class EditPageMods extends Component {
                                     <Button onClick={this.browseMods} color='green'>add</Button>
                                 </SearchContainer>
                                 <List>
-                                    <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    <ModCard onClick={this.showMod} showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
                                     <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
                                     <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
                                     <ModCard showDelete mod={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
@@ -154,15 +246,45 @@ export default class EditPageMods extends Component {
                             {displayState === 'browseMods' && <>
                                 <SearchContainer>
                                     <Button onClick={this.goBack} color='red'>back</Button>
-                                    <Search onKeyPress={this.browseSearch} placeholder='Search for mods' />
+                                    <Search value={searchTerm} onChange={this.browseSearch} onKeyPress={this.browseSearch} placeholder='Search for mods' />
                                     <Button color='green'>more</Button>
                                 </SearchContainer>
-                                {this.state.modList.length !== 0 && 
+                                {modList.length !== 0 && 
                                     <List>
-                                        {this.state.modList}
+                                        {modList}
                                     </List>
                                 }
-                                {this.state.modList.length === 0 && <LoadingText>loading...</LoadingText>}
+                                {modList.length === 0 && <LoadingText>loading...</LoadingText>}
+                            </>}
+                            {displayState === 'viewMod' && <>
+                                <SearchContainer>
+                                    <Button onClick={this.goBack} color='red'>back</Button>
+                                </SearchContainer>
+                                <ModCard disableHover showInstall installed={false} mod={activeMod} showBlurb />
+                                <HeaderButtons>
+                                    <HB active={previewState === 'description'} onClick={this.previewStateSwitch} data-state='description'>Description</HB>
+                                    <HB active={previewState === 'dependencies'} onClick={this.previewStateSwitch} data-state='dependencies'>Dependencies</HB>
+                                </HeaderButtons>
+                                {loadedDetailedInfo && <>
+
+                                    {previewState === 'description' && 
+                                        <Description>
+                                            <SanitizedHTML html={activeMod.description} />
+                                        </Description>
+                                    }
+
+                                    {previewState === 'versions' &&
+                                        <h1>versions</h1>
+                                    }
+
+                                    {previewState === 'dependencies' &&
+                                        <List>
+                                            {this.state.modDependencies}
+                                        </List>
+                                    }
+                                </>}
+
+                                {!loadedDetailedInfo && <LoadingText>loading...</LoadingText>}
                             </>}
                         </Container>
                     </Wrapper>

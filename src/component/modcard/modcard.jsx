@@ -8,14 +8,16 @@ const BG = styled.div`
     height: 90px;
     background-color: #717171;
     display: inline-flex;
-    cursor: pointer;
     user-select: none;
     transition: 150ms;
     position: relative;
     overflow: hidden;
-    &:hover {
-        background-color: #5b5b5b;
-    }
+    ${props => !props.disableHover && `
+        cursor: pointer;
+        &:hover {
+            background-color: #5b5b5b;
+        }
+    `}
 `
 
 const Image = styled.div`
@@ -57,6 +59,9 @@ const Version = styled.p`
     margin: 5px;
     margin-top: 0;
     user-select: none;
+    ${props => props.buttonShown && `
+        margin-right: 80px;
+    `}
 `
 
 const Buttons = styled.div`
@@ -74,14 +79,14 @@ const Details = styled.div`
     overflow: hidden;
 `
 
-const ModCard = ({mod, onClick, showDelete, showInstall, installed, installClick, deleteClick, showDescription}) => (
+const ModCard = ({mod, onClick, showDelete, showInstall, disableHover, installed, installClick, deleteClick, showBlurb}) => (
     <>
         <ContextMenuTrigger id={`mod${mod.id}`}>
-            <BG onClick={onClick}>
+            <BG disableHover={disableHover} data-cachedid={mod.cachedID} onClick={onClick}>
                 <Image src={mod.iconpath} />
                 <Details>
                     <Title>{mod.name}</Title>
-                    <Version>{!showDescription && 'versionname'}{showDescription && mod.description}</Version>
+                    <Version buttonShown={showInstall || showDelete}>{!showBlurb && 'versionname'}{showBlurb && mod.blurb}</Version>
                 </Details>
                 <Buttons>
                     {showDelete && 

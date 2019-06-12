@@ -43,9 +43,20 @@ function createWindow() {
 }
 
 function navigation(event, url) {
-    if(url.substring(0, 22) !== 'http://localhost:8080/') {
+    if(url.substring(0, 22) !== 'http://localhost:8080/' || url.substring(21, 29) === '/linkout') {
+        let finalUrl = url;
+
+
+        // Handle Curse's "You're leaving CurseForge" feature
+        // we redirect straight to the page
+        if(url.substring(21, 29) === '/linkout') {
+
+            // Curse encodes the URI's twice for some reason
+            finalUrl = decodeURIComponent(decodeURI(url.substring(40)));
+        }
+
         event.preventDefault();
-        shell.openExternal(url);
+        shell.openExternal(finalUrl);
     }
 }
 
