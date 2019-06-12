@@ -43,7 +43,7 @@ const LoadingText = styled.div`
 `
 const SearchContainer = styled(InputContainer)`
     margin-top: 10px;
-    flex: 0 1 auto;
+    flex-shrink: 0;
 `
 export default class EditPageMods extends Component {
     constructor(props) {
@@ -69,15 +69,25 @@ export default class EditPageMods extends Component {
         })
 
         Curse.getPopular('mods').then((res) => {
-            let newModList = [];
-            for(let mod of res) {
-                newModList.push(<ModCard showInstall showDescription mod={mod} />);
-            }
-
-            this.setState({
-                modList: newModList
-            });
+            this.renderMods(res);
         })
+    }
+
+    renderMods = (mods) => {
+        console.log(mods);
+        let newModList = [];
+        let { displayState } = this.state;
+        if(mods.length >= 1) {
+            for(let mod of mods) {
+                newModList.push(<ModCard showInstall={displayState === 'browseMods'} showDescription={displayState === 'browseMods'} mod={mod} />);
+            }
+        }else{
+            newModList.push(<LoadingText>No Mods Found</LoadingText>);
+        }
+
+        this.setState({
+            modList: newModList
+        });
     }
 
     goBack = () => {
@@ -94,6 +104,26 @@ export default class EditPageMods extends Component {
         this.setState({
             displayState: newState
         })
+    }
+
+    browseSearch = (e) => {
+        let term = e.target.value;
+        let { displayState } = this.state;
+        if(e.key === 'Enter') {
+            this.setState({
+                searchTerm: term,
+                modList: []
+            });
+            if(displayState === 'browseMods') {
+                if(term.trim() !== '') { 
+                    Curse.search(term, 'mods').then((res) => {
+                        this.renderMods(res);
+                    });
+                }else{
+                    this.browseMods();
+                }
+            }
+        }
     }
 
     render() {
@@ -124,7 +154,7 @@ export default class EditPageMods extends Component {
                             {displayState === 'browseMods' && <>
                                 <SearchContainer>
                                     <Button onClick={this.goBack} color='red'>back</Button>
-                                    <Search placeholder='Search for mods' />
+                                    <Search onKeyPress={this.browseSearch} placeholder='Search for mods' />
                                     <Button color='green'>more</Button>
                                 </SearchContainer>
                                 {this.state.modList.length !== 0 && 
