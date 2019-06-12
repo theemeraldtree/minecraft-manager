@@ -1,16 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 const BG = styled.div`
     margin-top: 5px;
     width:100%;
-    height: 100px;
+    height: 90px;
     background-color: #717171;
     display: inline-flex;
     cursor: pointer;
     user-select: none;
     transition: 150ms;
     position: relative;
+    overflow: hidden;
     &:hover {
         background-color: #5b5b5b;
     }
@@ -22,8 +24,9 @@ const Image = styled.div`
     height: 80px;
     background-size: contain;
     background-repeat: no-repeat;
-    margin-top: 5px;
     background-position: center;
+    flex-shrink: 0;
+    margin: 5px;
 `
 
 const Title = styled.p`
@@ -38,6 +41,8 @@ const Title = styled.p`
     margin: 5px 2px;
     margin-bottom: 0;
     user-select: none;
+    display: inline-block;
+    white-space: nowrap;
 `
 
 const Version = styled.p`
@@ -63,25 +68,42 @@ const Buttons = styled.div`
 `
 
 const Details = styled.div`
-    height: 100px;
     display: flex;
     justify-content: center;
     flex-flow: column;
+    overflow: hidden;
 `
 
-const ModCard = ({mod, onClick, showDelete, deleteClick}) => (
-    <BG onClick={onClick}>
-        <Image src={mod.iconpath} />
-        <Details>
-            <Title>{mod.name}</Title>
-            <Version>versionname</Version>
-        </Details>
-        <Buttons>
-            {showDelete && 
-            <Button onClick={deleteClick} color='red'>delete</Button>
-            }
-        </Buttons>
-    </BG>
+const ModCard = ({mod, onClick, showDelete, showInstall, installed, installClick, deleteClick, showDescription}) => (
+    <>
+        <ContextMenuTrigger id={`mod${mod.id}`}>
+            <BG onClick={onClick}>
+                <Image src={mod.iconpath} />
+                <Details>
+                    <Title>{mod.name}</Title>
+                    <Version>{!showDescription && 'versionname'}{showDescription && mod.description}</Version>
+                </Details>
+                <Buttons>
+                    {showDelete && 
+                    <Button onClick={deleteClick} color='red'>delete</Button>
+                    }
+
+                    {showInstall && installed &&
+                    <Button disabled color='green'>installed</Button>
+                    }
+
+                    {showInstall && !installed &&
+                    <Button color='green' onClick={installClick}>install</Button>
+                    }
+                </Buttons>
+            </BG>
+        </ContextMenuTrigger>
+        <ContextMenu id={`mod${mod.id}`}>
+            <MenuItem>Install</MenuItem>
+            <MenuItem>Share</MenuItem>
+            <MenuItem>Details</MenuItem>
+        </ContextMenu>
+    </>
 )
 
 export default ModCard;

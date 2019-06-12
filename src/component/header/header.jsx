@@ -16,7 +16,7 @@ const Title = styled.p`
     font-weight: 300;
 `
 
-const Backlink = styled(Link)`
+const BackButton = styled.div`
     color: white;
     font-weight: 900;
     text-decoration: none;
@@ -24,8 +24,13 @@ const Backlink = styled(Link)`
     margin-left: 10px;
     margin-right: 12px;
     transition: 300ms;
+    cursor: pointer;
     &:hover {
         opacity: 0.7;
+    }
+    & a {
+        text-decoration: none;
+        color: white;
     }
 `
 
@@ -35,9 +40,10 @@ const Items = styled.div`
     padding-right: 10px;
 `
 
-const Header = ({title, backlink, children}) => (
+const Header = ({title, backlink, children, showBackButton}) => (
     <BG>
-        {backlink && <Backlink to={backlink}>back</Backlink>}
+        {showBackButton && <BackButton onClick={window.history.back}>back</BackButton>}
+        {backlink && <BackButton><Link to={backlink}>back</Link></BackButton>}
         <Title>{title}</Title>
         <Items>
             {children}

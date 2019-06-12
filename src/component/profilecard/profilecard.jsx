@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
 import { withRouter } from 'react-router-dom';
+import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 const BG = styled.div`
     width:120px;
     height: 190px;
@@ -61,15 +62,33 @@ const EditButton = styled(Button)`
     text-align: center;
 `
 
+const Wrapper = styled.div`
+    .react-contextmenu-wrapper {
+        display: inline-flex;
+    }
+    display: inline-flex;
+`
 const ProfileCard = ({profile, history}) => (
-    <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
-        <Image src={profile.iconpath} />
-        <Title>{profile.name}</Title>
-        <Buttons>
-            <LaunchButton color='green'>launch</LaunchButton>
-            <EditButton color='yellow'>edit</EditButton>
-        </Buttons>
-    </BG>
+    <Wrapper>
+        <ContextMenuTrigger id={`profilecard${profile.id}`}>
+            <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
+                <Image src={profile.iconpath} />
+                <Title>{profile.name}</Title>
+                <Buttons>
+                    <LaunchButton color='green' onClick={(e) => {e.stopPropagation();profile.launch();}}>launch</LaunchButton>
+                    <EditButton color='yellow' onClick={(e) => {e.stopPropagation();history.push(`/edit/general/${profile.id}`);}}>edit</EditButton>
+                </Buttons>
+            </BG>
+        </ContextMenuTrigger>
+        <ContextMenu id={`profilecard${profile.id}`}>
+            <MenuItem onClick={profile.launch}>Launch</MenuItem>
+            <MenuItem onClick={() => {history.push(`/edit/general/${profile.id}`)}}>Edit</MenuItem>
+            <MenuItem>Update</MenuItem>
+            <MenuItem>Share</MenuItem>
+            <MenuItem divider />
+            <MenuItem>Delete</MenuItem>
+        </ContextMenu>
+    </Wrapper>
 )
 
 export default withRouter(ProfileCard);

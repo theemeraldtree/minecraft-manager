@@ -16,12 +16,14 @@ const Content = styled.div`
     display: flex;
     position: relative;
     height: 100%;
+    overflow-x: hidden;
 `
 
 const ContentSide = styled.div`
     display: flex;
     flex: 1 1 auto;
     flex-flow: column;
+    overflow-x: hidden;
 `
 
 const Page = ({children}) => (

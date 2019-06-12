@@ -31,7 +31,7 @@ const Links = styled.div`
 const Navbar = () => (
     <BG>
         <Links>
-            <Link to='/' activeClassName='active'>profiles</Link>
+            <Link exact to='/' activeClassName='active'>profiles</Link>
             <Link to='/discover' activeClassName='active'>discover</Link>
         </Links>
     </BG>
