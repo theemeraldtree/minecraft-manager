@@ -5,16 +5,23 @@ const Title = styled.p`
     margin: 0;
     position: absolute;
     bottom: 44px;
-    width: 150px;
+    width: 100%;
+    color: white;
+    font-weight: bolder;
 `;
+const Input = styled(TextInput)`
+    max-width: 500px;
+    width: 100%;
+`
 const Container = styled.div`
     position: relative;
     height: 100%;
+    margin-top: 10px;
 `
 const TextInputLabelled = ({title, placeholder, value, onClick, onchange}) => (
     <Container>
         <Title>{title}</Title>
-        <TextInput placeholder={placeholder} value={value} onClick={onClick} onchange={onchange} />
+        <Input placeholder={placeholder} value={value} onClick={onClick} onchange={onchange} />
     </Container>
 )
 

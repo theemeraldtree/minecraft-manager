@@ -37,6 +37,39 @@
         ::-webkit-scrollbar-corner {
           opacity: 0;
         }
+
+        .react-contextmenu {
+          background-color: #282828;
+          border: 1px solid rgba(0,0,0,.15);
+          min-width: 150px;
+          color: white;
+          outline: none;
+          z-index: 999;
+      }
+
+      .react-contextmenu-item {
+          color: white;
+          cursor: pointer;
+          padding: 5px 10px;
+          outline: none;
+      }
+
+      .react-contextmenu-item:hover {
+        background-color: #6b6b6b;
+      }
+
+      .react-contextmenu-item--divider {
+        border-top: 2px solid grey;
+        margin-top: 7px;
+        cursor: inherit;
+      }
+      .react-contextmenu-item--divider:hover {
+          background-color: transparent;
+      }
+
+      .react-contextmenu-wrapper {
+        width: 100%;
+      }
     </style>
   </head>
   <body>

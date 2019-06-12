@@ -7,7 +7,7 @@ import Button from '../../../component/button/button';
 import styled from 'styled-components';
 import TextInput from '../../../component/textinput/textinput';
 import TextBox from '../../../component/textbox/textbox';
-import Detail from '../components/detail';
+import Detail from '../../../component/detail/detail';
 import InputContainer from '../components/inputcontainer';
 const DescContainer = styled.div`
     margin-top: 40px;

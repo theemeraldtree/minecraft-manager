@@ -1,4 +1,5 @@
 import Global from "../util/global";
+import LauncherManager from '../manager/launcherManager';
 const path = require('path');
 const fs = require('fs');
 
@@ -26,6 +27,10 @@ Profile.prototype.save = function() {
 Profile.prototype.changeBlurb = function(newval) {
     this.blurb = newval;
     this.save();
+}
+
+Profile.prototype.launch = function() {
+    LauncherManager.openLauncher();
 }
 
 Profile.prototype.changeDescription = function(newval) {

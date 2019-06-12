@@ -5,7 +5,7 @@ import Header from '../../../component/header/header';
 import ProfilesManager from '../../../manager/profilesManager';
 import EditContainer from '../components/editcontainer';
 import Dropdown from '../../../component/dropdown/dropdown';
-import Detail from '../components/detail';
+import Detail from '../../../component/detail/detail';
 import OptionBreak from '../components/optionbreak';
 import InputContainer from '../components/inputcontainer';
 import TextInput from '../../../component/textinput/textinput';

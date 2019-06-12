@@ -53,7 +53,7 @@ export default withRouter(
 class ActionButtons extends Component {
 
     openSettings = () => {
-        //this.props.history.push('/settings');
+        this.props.history.push('/settings');
     }
 
     close = () => {
