@@ -40,9 +40,10 @@ const Items = styled.div`
     padding-right: 10px;
 `
 
-const Header = ({title, backlink, children, showBackButton}) => (
+const Header = ({title, backlink, backClick, children, showBackButton}) => (
     <BG>
-        {showBackButton && <BackButton onClick={window.history.back}>back</BackButton>}
+        {showBackButton && backClick && <BackButton onClick={backClick}>back</BackButton>}
+        {showBackButton && !backClick && <BackButton onClick={window.history.back}>back</BackButton>}
         {backlink && <BackButton><Link to={backlink}>back</Link></BackButton>}
         <Title>{title}</Title>
         <Items>

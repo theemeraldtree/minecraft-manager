@@ -9,6 +9,9 @@ function Profile(rawOMAF) {
     this.local = ['folderpath', 'iconpath'];
     this.folderpath = path.join(Global.PROFILES_PATH + `/${this.id}`).replace("\\","/");
     this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
+    if(!this.hosts) {
+        this.hosts = {};
+    }
 }
 
 Profile.prototype.toJSON = function() {
