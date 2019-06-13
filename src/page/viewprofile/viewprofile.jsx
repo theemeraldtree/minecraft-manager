@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import Button from '../../component/button/button';
 import SanitizedHTML from '../../component/sanitizedhtml/sanitizedhtml'
 import LauncherManager from '../../manager/launcherManager';
+import Confirmation from '../../component/confirmation/confirmation';
 const Image = styled.img`
     min-width: 150px;
     height: 150px;
@@ -81,7 +82,8 @@ class ViewProfilePage extends Component {
         this.state = {
             profile: {
                 name: 'Loading'
-            }
+            },
+            showDelete: false
         }
     }
 
@@ -99,10 +101,28 @@ class ViewProfilePage extends Component {
         LauncherManager.openLauncher();
     }
 
+    deleteClick = () => {
+        this.setState({
+            showDelete: true
+        })
+    }
+    cancelDelete = () => {
+        this.setState({
+            showDelete: false
+        })
+    }
+
+    confirmDelete = () => {
+        ProfilesManager.deleteProfile(this.state.profile).then(() => {
+            this.props.history.push(`/`);
+        })    
+    }
+
     render() {
-        let { profile } = this.state;
+        let { profile, showDelete } = this.state;
         return (
             <Page>
+                {showDelete && <Confirmation cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />}
                 <Header title='profile' backlink='/' />
                 <ProfileHeader>
                     <Image src={profile.iconpath} />
@@ -118,7 +138,7 @@ class ViewProfilePage extends Component {
                         <CustomButton onClick={this.editprofile} color='yellow'>edit</CustomButton>
                         <CustomButton color='purple'>update</CustomButton>
                         <CustomButton color='blue'>share</CustomButton>
-                        <CustomButton color='red'>delete</CustomButton>
+                        <CustomButton onClick={this.deleteClick} color='red'>delete</CustomButton>
                     </ButtonGroup>
                     <Specs>
                         <p>internal id: {profile.id}</p>

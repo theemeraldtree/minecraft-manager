@@ -24,11 +24,20 @@ Profile.prototype.toJSON = function() {
 }
 
 Profile.prototype.save = function() {
-    fs.writeFileSync(path.join(this.folderpath, 'profile.json'), this.toJSON());
+    return new Promise((resolve) => {
+        fs.writeFile(path.join(this.folderpath, 'profile.json'), this.toJSON(), () => {
+            resolve();
+        });
+    })
 }
 
 Profile.prototype.changeBlurb = function(newval) {
     this.blurb = newval;
+    this.save();
+}
+
+Profile.prototype.changeMCVersion = function(newver) {
+    this.minecraftversion = newver;
     this.save();
 }
 

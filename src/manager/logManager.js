@@ -2,7 +2,7 @@ let LogManager = {
     log: (severity, message) => {
         switch(severity) {
             case 'SEVERE':
-                console.exception(`[MCM-LOG] !! ERROR SEVERE !! ERROR READS: ${message}`);
+                console.error(`[MCM-LOG] !! ERROR SEVERE !! ERROR READS: ${message}`);
                 break;
             case 'ERROR':
                 console.error(`[MCM-LOG] ! ERROR ${message}`);

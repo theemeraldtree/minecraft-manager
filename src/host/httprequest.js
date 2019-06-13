@@ -1,6 +1,6 @@
 const request = require('request');
 const cheerio = require('cheerio');
-
+const fs = require('fs');
 let HTTPRequest = {
     httpGet(url) {
         return new Promise((resolve, reject) => {
@@ -30,7 +30,29 @@ let HTTPRequest = {
                 reject(err);
             })
         })
-    }    
+    },
+
+    download(url, dest) {
+        return new Promise((resolve, reject) => {
+            let ws = fs.createWriteStream(dest);
+            let req = request(url, {
+                url: url,
+                headers: {
+                    'User-Agent': 'Minecraft-Manager'
+                }
+            });
+            req.on('response', (res) => {
+                res.pipe(fs.createWriteStream(dest));
+                ws.on('finish', () => {
+                    resolve();
+                    fs.close(ws);
+                })
+            })
+            req.on('error', () => {
+                reject();
+            })
+        })
+    }
 }
 
 export default HTTPRequest;

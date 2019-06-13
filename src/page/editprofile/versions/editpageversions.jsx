@@ -10,6 +10,8 @@ import OptionBreak from '../components/optionbreak';
 import InputContainer from '../components/inputcontainer';
 import TextInput from '../../../component/textinput/textinput';
 import Button from '../../../component/button/button';
+import CustomDropdown from '../../../component/customdropdown/customdropdown';
+import Global from '../../../util/global';
 const CustomVersions = styled.div`
     background-color: #505050;
     width: 350px;
@@ -31,6 +33,10 @@ export default class EditPageVersions extends Component {
         }
     }
     
+    mcverChange = (version) => {
+        this.state.profile.changeMCVersion(version);
+    }
+
     render() {
         let { profile } = this.state;
         return (
@@ -38,10 +44,7 @@ export default class EditPageVersions extends Component {
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
                 <EditContainer profile={profile}>
                     <Detail>minecraft version</Detail>
-                    <Dropdown>
-                        <option>PLACEHOLDER</option>
-                        <option>PLACEHOLDER</option>
-                    </Dropdown>
+                    <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} defaultValue={profile.minecraftversion} />
                     <OptionBreak />
                     <Detail>profile version</Detail>
                     <InputContainer>
