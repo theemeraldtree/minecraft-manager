@@ -1,7 +1,9 @@
 import HTTPRequest from "../httprequest";
 import Mod from "../../type/mod";
 import Profile from "../../type/profile";
-
+import curseversions from './curseversions.json';
+import DownloadsManager from "../../manager/downloadsManager";
+import Global from "../../util/global";
 let Curse = {
     popularCache: {},
     cachedItems: {},
@@ -18,10 +20,10 @@ let Curse = {
                             let data = el.children[1];
                             let details = data.children[3];
                             let name = details.children[1].children[1].children[0].data.trim();
-                            let url = details.children[1].attribs.href;
+                            let url = `https://www.curseforge.com${details.children[1].attribs.href}`;
                             let blurb = details.children[5].children[1].attribs.title.trim();
                             let icon = data.children[1].children[1].children[1].children[1].attribs.src;
-                            let id = url.split('/')[3];
+                            let id = url.split('/')[5];
     
     
                                                     
@@ -80,7 +82,7 @@ let Curse = {
         mod.iconpath = icon;
         mod.hosts.curse = {};
         mod.hosts.curse.id = id;
-        mod.id = id;
+        mod.id = Global.createID(name);
         let cachedID = `mod-curse-${id}`;
         mod.cachedID = cachedID;
         this.cachedItems[cachedID] = mod;
@@ -168,6 +170,51 @@ let Curse = {
             }else{
                 resolve(this.cachedItems[obj.cachedID]);
             }
+        })
+    },
+
+    getCurseVersionForMCVersion(mcver) {
+        return curseversions[mcver];
+    },
+
+    getVersionsForMCVersion(obj, mcversion) {
+        return new Promise((resolve) => {
+            if(!this.cachedItems[obj.cachedID].versions) {
+                let url;
+                if(obj instanceof Mod) {
+                    url = `https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/files?filter-game-version=2020709689%3A${this.getCurseVersionForMCVersion(mcversion)}`
+                }
+
+                let list = [];
+                HTTPRequest.cheerioRequest(url).then((page) => {
+                    page('.project-file-list-item').each((i, el) => {
+                        let name = el.children[3].children[1].children[3].children[1].children[0].data;
+                        let downloadLink = `https://minecraft.curseforge.com${el.children[3].children[1].children[1].children[1].attribs.href}`;
+
+                        list.push({name: name, downloadLink: downloadLink});
+                    })
+                    this.cachedItems[obj.cachedID].versions = list;
+                    resolve(list);
+                })
+            }else{
+                resolve(this.cachedItems[obj.cachedID].versions);
+            }
+        })
+    },
+    installMod(profile, mod, modpack) {
+        return new Promise((resolve) => {
+            this.getDependencies(mod).then(() => {
+                this.getVersionsForMCVersion(mod, profile.minecraftversion).then((versions) => {
+                    mod.version = versions[0].name;
+                    mod.minecraftversion = profile.minecraftversion;
+                    console.log(versions[0]);
+                    DownloadsManager.startModDownload(profile, mod, versions[0].downloadLink, modpack).then(() => {
+                        mod.jar = `${Global.createID(mod.name)}.jar`;
+                        profile.addMod(mod);
+                        resolve();
+                    });
+                })
+            });
         })
     }
 }

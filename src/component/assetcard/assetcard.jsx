@@ -77,16 +77,17 @@ const Details = styled.div`
     justify-content: center;
     flex-flow: column;
     overflow: hidden;
+    margin-left: 5px;
 `
 
-const AssetCard = ({asset, onClick, showDelete, showInstall, disableHover, installed, installClick, deleteClick, showBlurb}) => (
+const AssetCard = ({asset, onClick, showDelete, progressState, showInstall, disableHover, installed, installClick, deleteClick, showBlurb}) => (
     <>
         <ContextMenuTrigger id={`asset${asset.id}`}>
-            <BG disableHover={disableHover} data-cachedid={asset.cachedID} onClick={onClick}>
-                <Image src={asset.iconpath} />
+            <BG disableHover={disableHover} data-cachedid={asset.cachedID} data-assetid={asset.id} onClick={onClick}>
+                {asset.icon || asset.iconpath && <Image src={asset.iconpath} />}
                 <Details>
                     <Title>{asset.name}</Title>
-                    <Version buttonShown={showInstall || showDelete}>{!showBlurb && 'versionname'}{showBlurb && asset.blurb}</Version>
+                    <Version buttonShown={showInstall || showDelete}>{!showBlurb && asset.version}{showBlurb && asset.blurb}</Version>
                 </Details>
                 <Buttons>
                     {showDelete && 
@@ -97,9 +98,11 @@ const AssetCard = ({asset, onClick, showDelete, showInstall, disableHover, insta
                     <Button disabled color='green'>installed</Button>
                     }
 
-                    {showInstall && !installed &&
+                    {showInstall && !installed && progressState !== 'installing' &&
                     <Button color='green' onClick={installClick}>install</Button>
                     }
+
+                    {progressState === 'installing' && !installed && showInstall && <Button color='green' disabled>installing</Button>}
                 </Buttons>
             </BG>
         </ContextMenuTrigger>

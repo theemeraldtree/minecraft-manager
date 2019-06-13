@@ -33,13 +33,19 @@ export default class Confirmation extends Component {
         return (
             <Overlay>
                 <DelConfirm>
-                    <h1>are you sure?</h1>
+                    <h1>{this.props.questionText}</h1>
                     <DelButtons>
-                        <Button onClick={cancelDelete} color='green'>cancel</Button>
-                        <Button onClick={confirmDelete} color='red'>delete</Button>
+                        <Button onClick={cancelDelete} color='green'>{this.props.cancelText}</Button>
+                        <Button onClick={confirmDelete} color='red'>{this.props.confirmText}</Button>
                     </DelButtons>
                 </DelConfirm>
             </Overlay>
         )
     }
+}
+
+Confirmation.defaultProps = {
+    questionText: 'are you sure?',
+    cancelText: 'cancel',
+    confirmText: 'confirm'
 }

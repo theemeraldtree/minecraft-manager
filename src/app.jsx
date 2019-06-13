@@ -10,7 +10,8 @@ import EditPageMods from './page/editprofile/mods/editpagemods';
 import EditPageAdvanced from './page/editprofile/advanced/editpageadvanced';
 import DiscoverPage from './page/discover/discover';
 const App = () => (
-    <div>
+    <div>            
+        {localStorage.setItem('showDownloads', false)}
         <Router>
             <div>
                 <Route exact path='/' component={HomePage} />

@@ -1,5 +1,7 @@
 import HTTPRequest from "../host/httprequest";
 import Download from "../type/download";
+import path from 'path';
+import Global from '../util/global';
 
 const DownloadsManager = {
     activeDownloads: [],
@@ -12,14 +14,26 @@ const DownloadsManager = {
                 this.downloadUpdate();
             }
             HTTPRequest.download(file, path, (progress) => {
-                this.downloadUpdate();
-                download.setProgress(`${progress}%`);
-                download.setProgressPercent(progress)
+                this.handleDownloadProgress(download, progress);
             }).then(() => {
                 this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
                 this.downloadUpdate();
                 resolve();
             });
+        })
+    },
+    handleDownloadProgress: function(download, progress) {
+        this.downloadUpdate();
+        download.setProgress(`${progress}%`);
+        download.setProgressPercent(progress)
+    },
+    startModDownload: function(profile, mod, url, modpack) {
+        return new Promise((resolve) => {
+            if(modpack === false) {
+                this.startFileDownload(`${mod.name} to ${profile.name}`, url, path.join(profile.modsPath, `/${Global.createID(mod.name)}.jar`)).then(() => {
+                    resolve();
+                })
+            }
         })
     },
     downloadUpdate: function() {
