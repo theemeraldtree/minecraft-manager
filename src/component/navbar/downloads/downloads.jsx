@@ -56,11 +56,17 @@ export default class Downloads extends Component {
         }
         DownloadsManager.registerDownloadsViewer((downloads) => {
             let list = [];
-            for(let download of downloads) {
-                list.push(<DownloadItem key={download.name} download={download} />);
+            if(downloads.length >= 1) {
+                for(let download of downloads) {
+                    list.push(<DownloadItem key={download.name} download={download} />);
+                    this.setState({
+                        downloadsList: list
+                    });
+                }
+            }else{
                 this.setState({
-                    downloadsList: list
-                });
+                    downloadsList: []
+                })
             }
         });
     }
