@@ -8,7 +8,9 @@ function Profile(rawOMAF) {
 
     this.local = ['folderpath', 'iconpath'];
     this.folderpath = path.join(Global.PROFILES_PATH + `/${this.id}`).replace("\\","/");
+    this.gameDir = path.join(this.folderpath, '/files');
     this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
+    this.forgeVersion = '1.12.2-14.23.5.2838'
     if(!this.hosts) {
         this.hosts = {};
     }
@@ -42,11 +44,33 @@ Profile.prototype.changeMCVersion = function(newver) {
 }
 
 Profile.prototype.launch = function() {
+    LauncherManager.setMostRecentProfile(this);
     LauncherManager.openLauncher();
 }
 
 Profile.prototype.changeDescription = function(newval) {
     this.description = newval;
+    this.save();
+}
+
+Profile.prototype.setVersion = function(newver) {
+    this.launcherVersion = newver;
+    this.save();
+}
+
+Profile.prototype.setForgeVersion = function(newver) {
+    this.forgeVersion = newver;
+    this.save();
+}
+
+Profile.prototype.setForgeInstalled = function(installed) {
+    this.forgeInstalled = installed;
+    this.save();
+}
+
+Profile.prototype.removeForge = function() {
+    this.setForgeInstalled(false);
+    delete this.forgeVersion;
     this.save();
 }
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
+import Downloads from './downloads/downloads';
 const BG = styled.div`
     width: 100px;
     min-width: 100px;
@@ -34,6 +35,7 @@ const Navbar = () => (
             <Link exact to='/' activeClassName='active'>profiles</Link>
             <Link to='/discover' activeClassName='active'>discover</Link>
         </Links>
+        <Downloads />
     </BG>
 )
 
