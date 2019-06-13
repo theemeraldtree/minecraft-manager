@@ -32,8 +32,10 @@ let HTTPRequest = {
         })
     },
 
-    download(url, dest) {
+    download(url, dest, onProgress) {
         return new Promise((resolve, reject) => {
+            let progressData = 0;
+            let contentLength = 0;
             let ws = fs.createWriteStream(dest);
             let req = request(url, {
                 url: url,
@@ -41,14 +43,22 @@ let HTTPRequest = {
                     'User-Agent': 'Minecraft-Manager'
                 }
             });
+            req.on('data', (data) => {
+                if(onProgress) {
+                    progressData += data.length;
+                    onProgress(Math.trunc((progressData / contentLength) * 100));
+                }
+            })
             req.on('response', (res) => {
-                res.pipe(fs.createWriteStream(dest));
+                contentLength = res.headers['content-length'];
+                res.pipe(ws);
                 ws.on('finish', () => {
                     resolve();
-                    fs.close(ws);
+                    ws.end();
                 })
             })
             req.on('error', () => {
+                ws.end();
                 reject();
             })
         })

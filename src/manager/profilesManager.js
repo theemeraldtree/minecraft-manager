@@ -2,6 +2,8 @@ import Global from "../util/global";
 import LogManager from "./logManager";
 import Profile from "../type/profile";
 import LauncherManager from "./launcherManager";
+import LibrariesManager from "./librariesManager";
+import VersionsManager from "./versionsManager";
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -53,6 +55,7 @@ const ProfilesManager = {
                 minecraftversion: mcversion,
                 icon: 'icon.png'
             });
+            LauncherManager.createProfile(profile);
             profile.save().then(() => {
                 this.loadedProfiles = [];
                 this.getProfiles().then(() => {
@@ -66,10 +69,14 @@ const ProfilesManager = {
         return new Promise((resolve) => {
             LauncherManager.deleteProfile(profile);
             rimraf(profile.folderpath, () => {
-                this.loadedProfiles = [];
-                this.getProfiles().then(() => {
-                    resolve();
-                })
+                LibrariesManager.deleteLibrary(profile).then(() => {
+                    VersionsManager.deleteVersion(profile).then(() => {
+                        this.loadedProfiles = [];
+                        this.getProfiles().then(() => {
+                            resolve();
+                        });
+                    });
+                });
             });
         })
     }
