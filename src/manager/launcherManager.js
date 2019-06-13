@@ -15,7 +15,7 @@ const LauncherManager = {
         }
         fs.writeFileSync(this.LAUNCHER_PROFILES, JSON.stringify(obj));
     },
-    deleteProfile: (profile) => {
+    deleteProfile: function (profile) {
         let obj = JSON.parse(fs.readFileSync(this.LAUNCHER_PROFILES));
         delete obj.profiles[`mcm-${profile.id}`];
         fs.writeFileSync(this.LAUNCHER_PROFILES, JSON.stringify(obj));

@@ -68,7 +68,7 @@ const Wrapper = styled.div`
     }
     display: inline-flex;
 `
-const ProfileCard = ({profile, history}) => (
+const ProfileCard = ({profile, history, showDeletion}) => (
     <Wrapper>
         <ContextMenuTrigger id={`profilecard${profile.id}`}>
             <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
@@ -86,7 +86,7 @@ const ProfileCard = ({profile, history}) => (
             <MenuItem>Update</MenuItem>
             <MenuItem>Share</MenuItem>
             <MenuItem divider />
-            <MenuItem>Delete</MenuItem>
+            <MenuItem onClick={() => {showDeletion(profile)}}>Delete</MenuItem>
         </ContextMenu>
     </Wrapper>
 )

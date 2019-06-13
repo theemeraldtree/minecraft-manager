@@ -1,8 +1,10 @@
 import Global from "../util/global";
 import LogManager from "./logManager";
 import Profile from "../type/profile";
+import LauncherManager from "./launcherManager";
 const path = require('path');
 const fs = require('fs');
+const rimraf = require('rimraf');
 
 const ProfilesManager = {
     loadedProfiles: [],
@@ -38,6 +40,38 @@ const ProfilesManager = {
         }
         
         throw `Profile with ID: ${id} not found`
+    },
+
+    createProfile: function(name, mcversion) {
+        let id = Global.createID(name);
+        return new Promise(resolve => {
+            fs.mkdirSync(path.join(Global.PROFILES_PATH, id));
+            fs.copyFileSync(path.join(Global.getResourcesPath(), '/logo-sm.png'), path.join(Global.PROFILES_PATH, id, '/icon.png'));
+            let profile = new Profile({
+                id: id,
+                name: name,
+                minecraftversion: mcversion,
+                icon: 'icon.png'
+            });
+            profile.save().then(() => {
+                this.loadedProfiles = [];
+                this.getProfiles().then(() => {
+                    resolve();
+                })
+            });
+        });
+    },
+
+    deleteProfile: function(profile) {
+        return new Promise((resolve) => {
+            LauncherManager.deleteProfile(profile);
+            rimraf(profile.folderpath, () => {
+                this.loadedProfiles = [];
+                this.getProfiles().then(() => {
+                    resolve();
+                })
+            });
+        })
     }
 }
 

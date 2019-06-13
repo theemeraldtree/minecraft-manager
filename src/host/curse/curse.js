@@ -6,7 +6,6 @@ let Curse = {
     popularCache: {},
     cachedItems: {},
     getCurseListItems(url) {
-        console.log(url);
         return new Promise((resolve) => {
             if(url.substring(0, 22) === 'https://curseforge.com') {
                 HTTPRequest.cheerioRequest(url).then((page) => {

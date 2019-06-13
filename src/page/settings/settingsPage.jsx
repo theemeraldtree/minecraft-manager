@@ -29,7 +29,7 @@ const AboutTop = styled.div`
         margin: 5px;
         font-size: 17pt;
     }
-    background-color: grey;s
+    background-color: grey;
 `
 
 const AboutBottom = styled.div`

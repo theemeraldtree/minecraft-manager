@@ -53,7 +53,6 @@ export default class DiscoverList extends Component {
     }
 
     browseAssets = () => {
-        console.log('BROWSING ITEMS');
         this.setState({
             displayState: 'browseAssets'
         })
