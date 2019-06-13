@@ -76,21 +76,29 @@ export default class DiscoverList extends Component {
         if(prevProps.searchTerm !== this.props.searchTerm) {
             this.renderSearch();
         }
+        if(prevProps.progressState !== this.props.progressState) {
+            this.updateProgressStates();
+        }
     }
 
+    updateProgressStates = () => {
+        this.renderAssets(this.state.assets);
+    }
     renderAssets = (assets) => {
         let newAssetsList = [];
         let { displayState } = this.state;
+        let progressState = this.props.progressState;
         if(assets.length >= 1) {
             for(let asset of assets) {
-                newAssetsList.push(<AssetCard key={asset.id} onClick={this.showAsset} showInstall={displayState === 'browseAssets'} showBlurb={displayState === 'browseAssets'} asset={asset} />);
+                newAssetsList.push(<AssetCard key={asset.id} installed={progressState[asset.id] === 'installed'} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall={displayState === 'browseAssets'} showBlurb={displayState === 'browseAssets'} asset={asset} />);
             }
         }else{
             newAssetsList.push(<LoadingText key='none'>No Results</LoadingText>);
         }
 
         this.setState({
-            assetsList: newAssetsList
+            assetsList: newAssetsList,
+            assets: assets
         });
     }
 
@@ -195,7 +203,7 @@ export default class DiscoverList extends Component {
 
     render() {
         let { displayState, previewState, loadedDetailedInfo, activeAsset, assetsList } = this.state;
-        let { type } = this.props;
+        let { type, progressState, installClick } = this.props;
         return (
             <>
                 {displayState === 'browseAssets' && <>
@@ -207,7 +215,7 @@ export default class DiscoverList extends Component {
                     {assetsList.length === 0 && <LoadingText>loading...</LoadingText>}
                 </>}
                 {displayState === 'viewAsset' && <>
-                    <AssetCard disableHover showInstall installed={false} asset={activeAsset} showBlurb />
+                    <AssetCard progressState={progressState[activeAsset.id]} installed={progressState[activeAsset.id] === 'installed'} disableHover showInstall installClick={installClick} asset={activeAsset} showBlurb />
                     <HeaderButtons>
                         <HB active={previewState === 'description'} onClick={this.previewStateSwitch} data-state='description'>Description</HB>
                         {type === 'mods' && <HB active={previewState === 'dependencies'} onClick={this.previewStateSwitch} data-state='dependencies'>Dependencies</HB>}

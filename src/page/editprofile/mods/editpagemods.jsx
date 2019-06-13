@@ -6,10 +6,10 @@ import ProfilesManager from '../../../manager/profilesManager';
 import EditContainer from '../components/editcontainer';
 import TextInput from '../../../component/textinput/textinput';
 import Button from '../../../component/button/button';
-import logo from '../../../img/logo-sm.png';
 import DiscoverList from '../../../component/discoverlist/discoverlist';
 import InputContainer from '../components/inputcontainer';
 import AssetCard from '../../../component/assetcard/assetcard';
+import Curse from '../../../host/curse/curse';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -46,11 +46,12 @@ export default class EditPageMods extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            modList: [],
+            modsList: [],
             searchTerm: '',
             liveSearchTerm: '',
             displayState: 'modsList',
             listState: 'browseAssets',
+            progressState: {},
             profile: {
                 name: 'Loading'
             },
@@ -61,6 +62,28 @@ export default class EditPageMods extends Component {
         return {
             profile: ProfilesManager.getProfileFromID(props.match.params.id)
         }
+    }
+
+    componentDidMount() {
+        this.reloadModsList();
+    }
+
+    reloadModsList() {
+        let { profile } = this.state;
+        let newList = [];
+        console.log(profile.mods);
+        let ps = Object.assign({}, this.state.progressState);
+        for(let mod of profile.mods) {
+            ps[mod.id] = 'installed';
+            newList.push(<AssetCard key={mod.id} asset={mod} showDelete deleteClick={this.deleteClick} />);
+        }
+
+        console.log(newList);
+
+        this.setState({
+            modsList: newList,
+            progressState: ps
+        })
     }
 
     goBack = () => {
@@ -106,8 +129,33 @@ export default class EditPageMods extends Component {
         }
     }
 
+    installClick = (e) => {
+        e.stopPropagation();
+        let cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
+        let mod = Curse.cachedItems[cachedID];
+        let id = mod.id;
+        let ps = Object.assign({}, this.state.progressState);
+        ps[id] = 'installing';
+        this.setState({
+            progressState: ps
+        }, () => {
+            Curse.installMod(this.state.profile, mod, false).then(() => {
+                console.log('done');
+                this.reloadModsList();
+            });
+        });
+    }
+
+    deleteClick = (e) => {
+        let mod = this.state.profile.getModFromID(e.currentTarget.parentElement.parentElement.dataset.assetid);
+        console.log(mod);
+        this.state.profile.deleteMod(mod).then(() => {
+            this.reloadModsList();
+        })
+    }
+
     render() {
-        let { profile, displayState, liveSearchTerm, searchTerm, listState } = this.state;
+        let { profile, displayState, liveSearchTerm, searchTerm, listState, progressState, modsList } = this.state;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
@@ -123,19 +171,10 @@ export default class EditPageMods extends Component {
                                 </SearchContainer>
                                 { displayState === 'modsList' && <>
                                 <List>
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
-                                    <AssetCard showDelete asset={{iconpath: logo, name: 'TESTMOD', version: 'TESTVER'}} />
+                                    {modsList}
                                 </List>
                                 </>}
-                                {displayState === 'addMods' && <DiscoverList type='mods' searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
+                                {displayState === 'addMods' && <DiscoverList progressState={progressState} type='mods' installClick={this.installClick} searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
                         </Container>
                     </Wrapper>
                 </EditContainer>

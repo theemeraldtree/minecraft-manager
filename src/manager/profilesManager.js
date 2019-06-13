@@ -48,6 +48,8 @@ const ProfilesManager = {
         let id = Global.createID(name);
         return new Promise(resolve => {
             fs.mkdirSync(path.join(Global.PROFILES_PATH, id));
+            fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/files'));
+            fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/files/mods'));
             fs.copyFileSync(path.join(Global.getResourcesPath(), '/logo-sm.png'), path.join(Global.PROFILES_PATH, id, '/icon.png'));
             let profile = new Profile({
                 id: id,
