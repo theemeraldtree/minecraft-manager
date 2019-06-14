@@ -1,5 +1,6 @@
 const { app, BrowserWindow, shell } = require('electron');
 const url = require('url');
+const fs = require('fs');
 const path = require('path');
 // Security warning IS DISABLED because we're loading from localhost.
 // this is only disabled so it doesn't clog the console in dev mode
@@ -11,7 +12,10 @@ let mainWindow;
 function createWindow() {
     mainWindow = new BrowserWindow({width: 600, height: 800, frame: false, webPreferences: {webSecurity: false}});
 
-    mainWindow.openDevTools();
+    if(fs.existsSync(path.join(app.getPath('userData'), '.devtools')) || dev) {
+        mainWindow.openDevTools();
+    }
+
     let index;
     if(dev && process.argv.indexOf('--noDevServer') === -1) {
         index = url.format({
