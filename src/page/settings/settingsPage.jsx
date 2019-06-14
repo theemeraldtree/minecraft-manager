@@ -7,8 +7,9 @@ import logo from '../../img/logo-sm.png';
 import Detail from '../../component/detail/detail';
 import TextInput from '../../component/textinput/textinput';
 import InputHolder from '../../component/inputholder/inputholder';
-import path from 'path';
-const { app } = require('electron').remote;
+import Global from '../../util/global';
+import SettingsManager from '../../manager/settingsManager';
+import os from 'os';
 const { dialog }  = require('electron').remote;
 const About = styled.div`
     max-width: 600px;
@@ -57,15 +58,71 @@ const Logo = styled.div`
     background-size: contain;
     background-repeat: no-repeat;
 `
+
+const WarningMSG = styled.p`
+    color: red;
+`
 export default class SettingsPage extends Component {
-    
+    constructor(props) {
+        super(props);
+        this.state = {
+            mcHome: SettingsManager.MC_HOME,
+            dedicatedRam: SettingsManager.currentSettings.dedicatedRam,
+            ramChangeDisabled: true
+        }
+    }
     chooseHomeDirectory = () => {
-        dialog.showOpenDialog({
+        let p = dialog.showOpenDialog({
             title: 'Choose your Minecraft Home Directory',
-            defaultPath: path.join(app.getPath('appData')),
+            defaultPath: Global.getDefaultMinecraftPath(),
             buttonLabel: 'Select Directory',
             properties: ['openDirectory', 'showHiddenFiles']
+        });
+        SettingsManager.setHomeDirectory(p[0]);
+        this.setState({
+            mcHome: p[0]
         })
+    }
+
+    ramAmountChange = (e) => {
+        let newAmount = e.target.value;
+        let oldAmount = SettingsManager.currentSettings.dedicatedRam.toString();
+
+        if(/^[0-9\b]+$/.test(newAmount) || newAmount === '') {
+            this.setState({
+                ramChangeDisabled: true,
+                dedicatedRam: newAmount
+            })
+
+            let intAmount = parseInt(newAmount);
+            if(intAmount >= Math.ceil(os.totalmem() / 1000000000)) {
+                this.setState({
+                    warningMessage: 'That is equal to or higher than your available RAM! Please set it lower!'
+                })
+            }else if(newAmount === '') {
+                this.setState({
+                    warningMessage: 'Please enter a value'
+                })
+            }else if(intAmount === 0) {
+                this.setState({
+                    warningMessage: 'You need to provide SOME amount of RAM!'
+                })
+            }else{
+                this.setState({
+                    ramChangeDisabled: newAmount === oldAmount,
+                    warningMessage: ''
+                })
+            }
+        }
+    }
+
+    changeRAM = () => {
+        if(!this.state.ramChangeDisabled) {
+            SettingsManager.setDedicatedRam(this.state.dedicatedRam);
+            this.setState({
+                ramChangeDisabled: true
+            })
+        }
     }
 
     render() {
@@ -88,16 +145,17 @@ export default class SettingsPage extends Component {
                     <InputHolder>
                         <Detail>MINECRAFT HOME DIRECTORY</Detail>
                         <div>
-                            <TextInput />
+                            <TextInput disabled value={this.state.mcHome} />
                             <Button onClick={this.chooseHomeDirectory} color='green'>choose</Button>
                         </div>
                     </InputHolder>
                     <InputHolder>
                         <Detail>DEDICATED RAM</Detail>
                         <div>
-                            <TextInput />
-                            <Button onClick={this.changeRAM} color='green'>change</Button>
+                            <TextInput onChange={this.ramAmountChange} value={this.state.dedicatedRam} />
+                            <Button disabled={this.state.ramChangeDisabled} onClick={this.changeRAM} color='green'>change</Button>
                         </div>
+                        <WarningMSG>{this.state.warningMessage}</WarningMSG>
                     </InputHolder>
                 </Settings>
             </Page>
