@@ -12,6 +12,7 @@ import Button from '../../../component/button/button';
 import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import Global from '../../../util/global';
 import ForgeManager from '../../../manager/forgeManager';
+import Confirmation from '../../../component/confirmation/confirmation';
 const CustomVersions = styled.div`
     background-color: #505050;
     width: 350px;
@@ -23,7 +24,8 @@ export default class EditPageVersions extends Component {
         this.state = {
             profile: {
                 name: 'Loading'
-            }
+            },
+            mcverValue: ''
         }
     }
 
@@ -33,8 +35,41 @@ export default class EditPageVersions extends Component {
         }
     }
     
-    mcverChange = (version) => {
-        this.state.profile.changeMCVersion(version);
+    componentDidMount() {
+        this.setState({
+            mcverValue: this.state.profile.minecraftversion
+        })
+    }
+
+    mcverChange = (version, e) => {
+        let { profile } = this.state;
+        if(!profile.forgeInstalled) {
+            this.setState({
+                mcverValue: version
+            })
+            this.state.profile.changeMCVersion(version);
+        }else{
+            e.stopPropagation();
+            this.setState({
+                versionChangeWarning: true,
+                newVersion: version
+            })
+        }
+    }
+
+    cancelVersionChange = () => {
+        this.setState({
+            versionChangeWarning: false
+        })
+    }
+
+    confirmVersionChange = () => {
+        this.state.profile.changeMCVersion(this.state.newVersion);
+        this.uninstallForge();
+        this.setState({
+            versionChangeWarning: false,
+            mcverValue: this.state.newVersion
+        })
     }
 
     downloadForge = () => {
@@ -65,13 +100,13 @@ export default class EditPageVersions extends Component {
         })
     }
     render() {
-        let { profile, forgeIsInstalling, forgeIsUninstalling } = this.state;
+        let { profile, forgeIsInstalling, forgeIsUninstalling, mcverValue } = this.state;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
                 <EditContainer profile={profile}>
                     <Detail>minecraft version</Detail>
-                    <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} defaultValue={profile.minecraftversion} />
+                    <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} value={mcverValue} />
                     <OptionBreak />
                     <Detail>profile version</Detail>
                     <InputContainer>
@@ -92,6 +127,8 @@ export default class EditPageVersions extends Component {
                         <Button onClick={this.uninstallForge} color='red'>uninstall forge</Button>
                         </>}
                     </CustomVersions>
+
+                    {this.state.versionChangeWarning && <Confirmation confirmDelete={this.confirmVersionChange} cancelDelete={this.cancelVersionChange} questionText='Changing your Minecraft version will remove Forge and all your mods. Are you sure?' cancelText="Don't change" confirmText='Yes, change it' />}
                 </EditContainer>
             </Page>
         )   

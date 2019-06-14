@@ -10,6 +10,7 @@ import DiscoverList from '../../../component/discoverlist/discoverlist';
 import InputContainer from '../components/inputcontainer';
 import AssetCard from '../../../component/assetcard/assetcard';
 import Curse from '../../../host/curse/curse';
+import Confirmation from '../../../component/confirmation/confirmation';
 
 const Wrapper = styled.div`
     height: 100%;
@@ -142,6 +143,16 @@ export default class EditPageMods extends Component {
             Curse.installMod(this.state.profile, mod, false).then(() => {
                 console.log('done');
                 this.reloadModsList();
+            }).catch((err) => {
+                if(err === 'invalidVersion') {
+                    let ps = Object.assign({}, this.state.progressState);
+                    ps[id] = 'notavailable';
+                    this.setState({
+                        invalidVersion: true,
+                        errorMod: mod,
+                        progressState: ps
+                    })
+                }
             });
         });
     }
@@ -155,7 +166,7 @@ export default class EditPageMods extends Component {
     }
 
     render() {
-        let { profile, displayState, liveSearchTerm, searchTerm, listState, progressState, modsList } = this.state;
+        let { profile, displayState, liveSearchTerm, searchTerm, listState, progressState, modsList, errorMod } = this.state;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
@@ -175,6 +186,7 @@ export default class EditPageMods extends Component {
                                 </List>
                                 </>}
                                 {displayState === 'addMods' && <DiscoverList progressState={progressState} type='mods' installClick={this.installClick} searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
+                                {this.state.invalidVersion && <Confirmation questionText={`There is no Minecraft ${profile.minecraftversion} version of ${errorMod.name}.`} hideConfirm cancelText='Ok' cancelDelete={() => {this.setState({invalidVersion: false})}} /> } 
                         </Container>
                     </Wrapper>
                 </EditContainer>

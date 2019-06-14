@@ -3,6 +3,7 @@ import LauncherManager from '../manager/launcherManager';
 import Mod from "./mod";
 const path = require('path');
 const fs = require('fs');
+const rimraf = require('rimraf');
 
 function Profile(rawOMAF) {
     Object.assign(this, rawOMAF);
@@ -49,7 +50,16 @@ Profile.prototype.changeBlurb = function(newval) {
     this.save();
 }
 
+Profile.prototype.removeAllMods = function() {
+    this.mods = [];
+    rimraf.sync(this.modsPath);
+    fs.mkdirSync(this.modsPath)
+    this.save();
+}
 Profile.prototype.changeMCVersion = function(newver) {
+    if(this.forgeInstalled) {
+        this.removeAllMods();
+    }
     this.minecraftversion = newver;
     this.save();
 }

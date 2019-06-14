@@ -20,11 +20,25 @@ export default class CustomDropdown extends Component {
         })
     }
 
+    componentDidUpdate(prevProps) {
+        if(this.props.value !== prevProps.value) {
+            this.setState({
+                value: this.props.value
+            })
+        }
+    }
+
     dropdownChange = (e) => {
-        this.props.onChange(e.target.value);
-        this.setState({
-            value: e.target.value
-        })
+        this.props.onChange(e.target.value, e);
+        if(!this.props.value) {
+            this.setState({
+                value: e.target.value
+            })
+        }else{
+            this.setState({
+                value: this.props.value
+            })
+        }
     }
 
     render() {
