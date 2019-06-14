@@ -9,9 +9,11 @@ import EditPageVersions from './page/editprofile/versions/editpageversions';
 import EditPageMods from './page/editprofile/mods/editpagemods';
 import EditPageAdvanced from './page/editprofile/advanced/editpageadvanced';
 import DiscoverPage from './page/discover/discover';
+import SettingsManager from './manager/settingsManager';
 const App = () => (
     <div>            
         {localStorage.setItem('showDownloads', false)}
+        {SettingsManager.loadSettings()}
         <Router>
             <div>
                 <Route exact path='/' component={HomePage} />

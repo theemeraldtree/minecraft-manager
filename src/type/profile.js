@@ -23,6 +23,10 @@ function Profile(rawOMAF) {
     }
     this.mods = newList;
 
+    if(!this.description) {
+        this.description = 'No description found'
+    }
+    
     if(!this.hosts) {
         this.hosts = {};
     }

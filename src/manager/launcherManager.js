@@ -3,10 +3,13 @@ import Global from '../util/global';
 import fs from 'fs';
 import os from 'os';
 import exec from 'child_process';
+import ProfilesManager from './profilesManager';
 const LauncherManager = {
-    LAUNCHER_PROFILES: path.join(Global.MC_PATH, 'launcher_profiles.json'),
+    getLauncherProfiles: function() {
+        return path.join(Global.getMCPath(), '/launcher_profiles.json');
+    },
     createProfile: function (profile) {
-        let obj = JSON.parse(fs.readFileSync(this.LAUNCHER_PROFILES));
+        let obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
         obj.profiles[`mcm-${profile.id}`] = {
             name: profile.name,
             type: "custom",
@@ -14,38 +17,46 @@ const LauncherManager = {
             lastVersionId: profile.minecraftversion,
             lastUsed: new Date().toISOString()
         }
-        fs.writeFileSync(this.LAUNCHER_PROFILES, JSON.stringify(obj));
+        fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
     },
     deleteProfile: function (profile) {
-        let obj = JSON.parse(fs.readFileSync(this.LAUNCHER_PROFILES));
+        let obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
         delete obj.profiles[`mcm-${profile.id}`];
-        fs.writeFileSync(this.LAUNCHER_PROFILES, JSON.stringify(obj));
+        fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
     },
     renameProfile: function(profile, newID) {
-        let obj = JSON.parse(fs.readFileSync(this.LAUNCHER_PROFILES));
+        let obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
         let oldID = `mcm-${profile.id}`;
         let oldData = obj.profiles[oldID];
         obj.profiles[`mcm-${newID}`] = oldData;
         delete obj.profiles[oldID];
-        fs.writeFileSync(this.LAUNCHER_PROFILES, JSON.stringify(obj));
+        fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
     },
     setProfileData: function(profile, tag, val) {
         let id = `mcm-${profile.id}`;
-        let obj = JSON.parse(fs.readFileSync(this.LAUNCHER_PROFILES));
+        let obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
         obj.profiles[id][tag] = val;
-        fs.writeFileSync(this.LAUNCHER_PROFILES, JSON.stringify(obj));
+        fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
     },
     setMostRecentProfile: function (profile) {
         let date = new Date();
         let iso = date.toISOString();
         this.setProfileData(profile, 'lastUsed', iso);
     },
-    openLauncher: () => {
+    openLauncher: function() {
         let launcherPath = Global.getLauncherPath();
         if(os.platform() === 'win32') {
             exec.exec(`"${launcherPath}"`);
         }else if(os.platform() === 'darwin') {
             exec.exec(`open -a ${launcherPath}`);
+        }
+    },
+    setLaunchArguments: function(profile, args) {
+        this.setProfileData(profile, 'javaArgs', args);
+    },
+    setDedicatedRam: function(amount) {
+        for(let profile of ProfilesManager.loadedProfiles) {
+            this.setLaunchArguments(profile, `-Xmx${amount}G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M`)
         }
     }
 }
