@@ -15,13 +15,13 @@
             "clientreq": true,
             "name": "com.typesafe:config:1.2.1",
             "serverreq": true,
-            "url": "http://files.minecraftforge.net/maven/"
+            "url": "http://repo.maven.apache.org/maven2/"
         },
         {
             "clientreq": true,
             "name": "org.ow2.asm:asm-all:5.2",
             "serverreq": true,
-            "url": "http://files.minecraftforge.net/maven/"
+            "url": "http://repo.maven.apache.org/maven2/"
         },
         {
             "clientreq": false,

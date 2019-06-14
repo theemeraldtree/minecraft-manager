@@ -244,3 +244,7 @@ export default class DiscoverList extends Component {
         )
     }
 }
+
+DiscoverList.defaultProps = {
+    progressState: {}
+}
