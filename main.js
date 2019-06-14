@@ -39,8 +39,10 @@ function createWindow() {
 
     mainWindow.webContents.on('new-window', (event, url) => {
         navigation(event, url);
-    })
+    });
+
 }
+
 
 function navigation(event, url) {
     if(url.substring(0, 22) !== 'http://localhost:8080/' || url.substring(21, 29) === '/linkout') {

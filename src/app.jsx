@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { HashRouter as Router, Route } from 'react-router-dom';
+import { HashRouter as Router, Route, Redirect } from 'react-router-dom';
 import HomePage from './page/home/homePage';
 import SettingsPage from './page/settings/settingsPage';
 import ViewProfilePage from './page/viewprofile/viewprofile';
@@ -10,15 +10,20 @@ import EditPageMods from './page/editprofile/mods/editpagemods';
 import EditPageAdvanced from './page/editprofile/advanced/editpageadvanced';
 import DiscoverPage from './page/discover/discover';
 import SettingsManager from './manager/settingsManager';
+import fs from 'fs';
+import Global from './util/global';
+import WelcomePage from './page/welcome/welcome';
 const App = () => (
     <div>            
         {localStorage.setItem('showDownloads', false)}
         {SettingsManager.loadSettings()}
         <Router>
             <div>
+                {!fs.existsSync(Global.PROFILES_PATH) && <Redirect to='/welcome' />}
                 <Route exact path='/' component={HomePage} />
                 <Route path='/discover' component={DiscoverPage} />
                 <Route path='/settings' component={SettingsPage} />
+                <Route path='/welcome' component={WelcomePage} />
                 <Route path='/profile/:id' component={ViewProfilePage} />
                 <Route path='/edit/general/:id' component={EditPageGeneral} />
                 <Route path='/edit/versions/:id' component={EditPageVersions} />
