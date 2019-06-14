@@ -10,9 +10,6 @@
     "productName": "Minecraft Manager",
     "build": {
         "appId": "net.theemeraldtree.minecraftmanager",
-        "win": {
-            "target": "nsis"
-        },
         "extraResources": [
             "resources/*"
         ],

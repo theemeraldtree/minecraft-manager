@@ -26,11 +26,11 @@ const ContentSide = styled.div`
     overflow-x: hidden;
 `
 
-const Page = ({children}) => (
+const Page = ({children, noNavbar}) => (
     <BG>
         <WindowBar />
         <Content>
-            <Navbar />
+            {!noNavbar && <Navbar />}
             <ContentSide>
                 {children}
             </ContentSide>

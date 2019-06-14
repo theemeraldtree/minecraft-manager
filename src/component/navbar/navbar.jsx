@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
 import Downloads from './downloads/downloads';
+import UpdateManager from '../../manager/updateManager';
 const BG = styled.div`
     width: 100px;
     min-width: 100px;

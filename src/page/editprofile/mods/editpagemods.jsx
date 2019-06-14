@@ -73,7 +73,7 @@ export default class EditPageMods extends Component {
         let { profile } = this.state;
         let newList = [];
         console.log(profile.mods);
-        let ps = Object.assign({}, this.state.progressState);
+        let ps = {};
         for(let mod of profile.mods) {
             ps[mod.id] = 'installed';
             newList.push(<AssetCard key={mod.id} asset={mod} showDelete deleteClick={this.deleteClick} />);
@@ -106,10 +106,11 @@ export default class EditPageMods extends Component {
     }
 
     browseMods = () => {
+        this.reloadModsList();
         this.setState({
             displayState: 'addMods',
             liveSearchTerm: ''
-        })
+        });
     }
 
     listStateChange = (state) => {

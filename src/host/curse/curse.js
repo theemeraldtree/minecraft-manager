@@ -203,7 +203,12 @@ let Curse = {
     },
     installMod(profile, mod, modpack) {
         return new Promise((resolve, reject) => {
-            this.getDependencies(mod).then(() => {
+            this.getDependencies(mod).then((dependencies) => {
+                if(dependencies.length >= 1) {
+                    for(let depend of dependencies) {
+                        this.installMod(profile, depend, modpack);
+                    }
+                }
                 this.getVersionsForMCVersion(mod, profile.minecraftversion).then((versions) => {
                     if(versions.length !== 0) {
                         mod.version = versions[0].name;
