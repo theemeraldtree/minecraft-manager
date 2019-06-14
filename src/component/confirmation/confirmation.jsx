@@ -5,14 +5,15 @@ import Button from '../button/button';
 
 const DelConfirm = styled.div`
     width: 100%;
-    height: 100%;
+    height: fit-content;
     max-width: 350px;
-    max-height: 100px;
+    max-height: 200px;
     margin: 10px;
     background-color: #444444;
     color: white;
     position: relative;
     padding: 10px;
+    padding-bottom: 70px;
     h1 {
         margin: 0;
     }
@@ -36,7 +37,7 @@ export default class Confirmation extends Component {
                     <h1>{this.props.questionText}</h1>
                     <DelButtons>
                         <Button onClick={cancelDelete} color='green'>{this.props.cancelText}</Button>
-                        <Button onClick={confirmDelete} color='red'>{this.props.confirmText}</Button>
+                        {!this.props.hideConfirm && <Button onClick={confirmDelete} color='red'>{this.props.confirmText}</Button>}
                     </DelButtons>
                 </DelConfirm>
             </Overlay>

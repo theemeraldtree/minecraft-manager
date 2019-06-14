@@ -1,6 +1,7 @@
 import VersionsManager from "./versionsManager";
 import LibrariesManager from "./librariesManager";
 import HTTPRequest from "../host/httprequest";
+import LauncherManager from "./launcherManager";
 
 const ForgeManager = {
     setupForge: (profile) => {
@@ -16,6 +17,7 @@ const ForgeManager = {
         return new Promise((resolve) => {
             LibrariesManager.deleteLibrary(profile).then(() => {
                 VersionsManager.deleteVersion(profile).then(() => {
+                    LauncherManager.setProfileData(profile, 'lastVersionId', profile.minecraftversion);
                     profile.removeForge();
                     resolve();
                 })

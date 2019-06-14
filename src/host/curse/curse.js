@@ -179,7 +179,7 @@ let Curse = {
 
     getVersionsForMCVersion(obj, mcversion) {
         return new Promise((resolve) => {
-            if(!this.cachedItems[obj.cachedID].versions) {
+            if(!this.cachedItems[obj.cachedID].versions || obj.minecraftversion !== mcversion) {
                 let url;
                 if(obj instanceof Mod) {
                     url = `https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/files?filter-game-version=2020709689%3A${this.getCurseVersionForMCVersion(mcversion)}`
@@ -202,17 +202,21 @@ let Curse = {
         })
     },
     installMod(profile, mod, modpack) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             this.getDependencies(mod).then(() => {
                 this.getVersionsForMCVersion(mod, profile.minecraftversion).then((versions) => {
-                    mod.version = versions[0].name;
-                    mod.minecraftversion = profile.minecraftversion;
-                    console.log(versions[0]);
-                    DownloadsManager.startModDownload(profile, mod, versions[0].downloadLink, modpack).then(() => {
-                        mod.jar = `${Global.createID(mod.name)}.jar`;
-                        profile.addMod(mod);
-                        resolve();
-                    });
+                    if(versions.length !== 0) {
+                        mod.version = versions[0].name;
+                        mod.minecraftversion = profile.minecraftversion;
+                        console.log(versions[0]);
+                        DownloadsManager.startModDownload(profile, mod, versions[0].downloadLink, modpack).then(() => {
+                            mod.jar = `${Global.createID(mod.name)}.jar`;
+                            profile.addMod(mod);
+                            resolve();
+                        });
+                    }else{
+                        reject('invalidVersion');
+                    }
                 })
             });
         })

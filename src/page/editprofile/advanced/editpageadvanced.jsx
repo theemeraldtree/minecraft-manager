@@ -4,6 +4,7 @@ import Header from '../../../component/header/header';
 import ProfilesManager from '../../../manager/profilesManager';
 import EditContainer from '../components/editcontainer'; 
 import Button from '../../../component/button/button';
+import { shell } from 'electron';
 export default class EditPageAdvanced extends Component {
     constructor(props) {
         super(props);
@@ -12,6 +13,11 @@ export default class EditPageAdvanced extends Component {
                 name: 'Loading'
             }
         }
+    }
+
+    viewProfileFolder = () => {
+        let { profile } = this.state;
+        shell.openItem(profile.gameDir);
     }
 
     static getDerivedStateFromProps(props) {
@@ -26,7 +32,7 @@ export default class EditPageAdvanced extends Component {
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
                 <EditContainer profile={profile}>
-                    <Button color='red'>View Profile Folder</Button>
+                    <Button onClick={this.viewProfileFolder} color='red'>View Profile Folder</Button>
                 </EditContainer>
             </Page>
         )   
