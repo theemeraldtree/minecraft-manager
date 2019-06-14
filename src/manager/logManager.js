@@ -1,6 +1,6 @@
 let LogManager = {
     log: (severity, message) => {
-        switch(severity) {
+        switch(severity.toUpperCase()) {
             case 'SEVERE':
                 console.error(`[MCM-LOG] !! ERROR SEVERE !! ERROR READS: ${message}`);
                 break;

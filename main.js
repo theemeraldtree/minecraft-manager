@@ -1,6 +1,5 @@
 const { app, BrowserWindow, shell } = require('electron');
 const url = require('url');
-const fs = require('fs');
 const path = require('path');
 // Security warning IS DISABLED because we're loading from localhost.
 // this is only disabled so it doesn't clog the console in dev mode
@@ -10,9 +9,9 @@ let dev = require('process').execPath.includes('electron');
 let mainWindow;
 
 function createWindow() {
-    mainWindow = new BrowserWindow({width: 600, height: 800, frame: false, webPreferences: {webSecurity: false}});
+    mainWindow = new BrowserWindow({width: 800, height: 800, frame: false, backgroundColor: '#444444', webPreferences: {webSecurity: false}});
 
-    if(fs.existsSync(path.join(app.getPath('userData'), '.devtools')) || dev) {
+    if(dev) {
         mainWindow.openDevTools();
     }
 
@@ -66,5 +65,10 @@ function navigation(event, url) {
     }
 }
 
+app.on('window-all-closed', function() {
+    if(process.platform !== 'darwin') {
+        app.quit();
+    }
+});
 
 app.on('ready', createWindow);

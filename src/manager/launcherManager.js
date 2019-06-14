@@ -4,7 +4,9 @@ import fs from 'fs';
 import os from 'os';
 import exec from 'child_process';
 import ProfilesManager from './profilesManager';
+import SettingsManager from './settingsManager';
 const LauncherManager = {
+    DEFAULT_JAVA_ARGS: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M',
     getLauncherProfiles: function() {
         return path.join(Global.getMCPath(), '/launcher_profiles.json');
     },
@@ -15,7 +17,8 @@ const LauncherManager = {
             type: "custom",
             gameDir: path.join(profile.gameDir),
             lastVersionId: profile.minecraftversion,
-            lastUsed: new Date().toISOString()
+            lastUsed: new Date().toISOString(),
+            javaArgs: `-Xmx${SettingsManager.currentSettings.dedicatedRam}G ${this.DEFAULT_JAVA_ARGS}`
         }
         fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
     },
@@ -56,7 +59,7 @@ const LauncherManager = {
     },
     setDedicatedRam: function(amount) {
         for(let profile of ProfilesManager.loadedProfiles) {
-            this.setLaunchArguments(profile, `-Xmx${amount}G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M`)
+            this.setLaunchArguments(profile, `-Xmx${amount}G ${this.DEFAULT_JAVA_ARGS}`)
         }
     }
 }

@@ -23,6 +23,10 @@ const SettingsManager = {
         this.MC_HOME = homeDir;
         this.save();
     },
+    setMCExe: function(exe) {
+        this.currentSettings.mcExe = exe;
+        this.save();
+    },
     setDedicatedRam: function(amount) {
         LauncherManager.setDedicatedRam(amount);
         this.currentSettings.dedicatedRam = amount;
@@ -31,7 +35,8 @@ const SettingsManager = {
     createSettings: function() {
         let obj = {
             homeDirectory: '',
-            dedicatedRam: 2
+            dedicatedRam: 2,
+            mcExe: ''
         }
 
         fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(obj));
