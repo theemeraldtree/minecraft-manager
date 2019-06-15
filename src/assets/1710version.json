@@ -102,6 +102,10 @@
             "serverreq": true
         },
         {
+			"name": "com.google.guava:guava:17.0",
+			"serverreq": true
+		},
+        {
             "name": "org.apache.maven:maven-artifact:3.5.3",
             "url": "http://files.minecraftforge.net/maven/",
             "serverreq": true,
@@ -111,7 +115,7 @@
     "logging": {},
     "mainClass": "net.minecraft.launchwrapper.Launch",
     "assets": "1.7.10",
-    "minecraftArguments": "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --tweakClass net.minecraftforge.fml.common.launcher.FMLTweaker --userProperties ${user_properties} --versionType Forge",
+    "minecraftArguments": "--username ${auth_player_name} --version ${version_name} --gameDir ${game_directory} --assetsDir ${assets_root} --assetIndex ${assets_index_name} --uuid ${auth_uuid} --accessToken ${auth_access_token} --userType ${user_type} --tweakClass cpw.mods.fml.common.launcher.FMLTweaker --userProperties ${user_properties} --versionType Forge",
     "releaseTime": "1960-01-01T00:00:00-0700",
     "time": "2017-09-26T00:03:00+0000",
     "type": "release"

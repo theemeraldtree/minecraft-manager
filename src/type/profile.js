@@ -93,6 +93,15 @@ Profile.prototype.setForgeInstalled = function(installed) {
     this.save();
 }
 
+Profile.prototype.setHostId = function(host, id) {
+    if(!this.hosts[host]) {
+        this.hosts[host] = {}
+    }
+
+    this.hosts[host].id = id;
+    this.save();
+}
+
 Profile.prototype.removeForge = function() {
     this.setForgeInstalled(false);
     delete this.forgeVersion;
@@ -100,8 +109,10 @@ Profile.prototype.removeForge = function() {
 }
 
 Profile.prototype.addMod = function(mod) {
-    this.mods.push(mod.cleanObject());
-    this.save();
+    if(!this.getModFromID(mod)) {
+        this.mods.push(mod.cleanObject());
+        this.save();
+    }
 }
 
 Profile.prototype.getModFromID = function(id) {

@@ -67,6 +67,7 @@ export default class SettingsPage extends Component {
         super(props);
         this.state = {
             mcHome: SettingsManager.MC_HOME,
+            mcExe: SettingsManager.currentSettings.mcExe,
             dedicatedRam: SettingsManager.currentSettings.dedicatedRam,
             ramChangeDisabled: true
         }
@@ -81,6 +82,25 @@ export default class SettingsPage extends Component {
         SettingsManager.setHomeDirectory(p[0]);
         this.setState({
             mcHome: p[0]
+        })
+    }
+
+    chooseMCExe = () => {
+        let properties;
+        if(os.platform() === 'win32') {
+            properties = ['openFile', 'showHiddenFiles']
+        }else if(os.platform() === 'darwin') {
+            properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory']
+        }
+        let p = dialog.showOpenDialog({
+            title: 'Choose your Minecraft Executable',
+            defaultPath: Global.getDefaultMCExePath(),
+            buttonLabel: 'Select File',
+            properties: properties
+        });
+        SettingsManager.setHomeDirectory(p[0]);
+        this.setState({
+            mcExe: p[0]
         })
     }
 
@@ -148,6 +168,13 @@ export default class SettingsPage extends Component {
                         <div>
                             <TextInput disabled value={this.state.mcHome} />
                             <Button onClick={this.chooseHomeDirectory} color='green'>choose</Button>
+                        </div>
+                    </InputHolder>
+                    <InputHolder>
+                        <Detail>MINECRAFT EXECUTABLE</Detail>
+                        <div>
+                            <TextInput disabled value={this.state.mcExe} />
+                            <Button onClick={this.chooseMCExe} color='green'>choose</Button>
                         </div>
                     </InputHolder>
                     <InputHolder>

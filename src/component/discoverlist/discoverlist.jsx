@@ -88,12 +88,14 @@ export default class DiscoverList extends Component {
         let newAssetsList = [];
         let { displayState } = this.state;
         let progressState = this.props.progressState;
-        if(assets.length >= 1) {
-            for(let asset of assets) {
-                newAssetsList.push(<AssetCard key={asset.id} installed={progressState[asset.id] === 'installed'} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall={displayState === 'browseAssets'} showBlurb={displayState === 'browseAssets'} asset={asset} />);
+        if(assets) {
+            if(assets.length >= 1) {
+                for(let asset of assets) {
+                    newAssetsList.push(<AssetCard key={asset.id} installed={progressState[asset.id] === 'installed'} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall={displayState === 'browseAssets'} showBlurb={displayState === 'browseAssets'} asset={asset} />);
+                }
+            }else{
+                newAssetsList.push(<LoadingText key='none'>No Results</LoadingText>);
             }
-        }else{
-            newAssetsList.push(<LoadingText key='none'>No Results</LoadingText>);
         }
 
         this.setState({

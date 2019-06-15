@@ -6,8 +6,8 @@ import Global from '../util/global';
 const DownloadsManager = {
     activeDownloads: [],
     downloadUpdateFunc: null,
-    startFileDownload: function(downloadName, file, path) {
-        return new Promise((resolve) => {
+    startFileDownload: function(downloadName, file, path, tries) {
+        return new Promise((resolve, reject) => {
             let download = new Download(downloadName, file, path);
             this.activeDownloads.push(download);
             if(this.onDownload) {
@@ -19,13 +19,46 @@ const DownloadsManager = {
                 this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
                 this.downloadUpdate();
                 resolve();
-            });
+            }).catch(() => {
+                if(tries === 3) {
+                    reject('try-limit');
+                }else{
+                    this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
+                    this.startFileDownload(downloadName, file, path, tries++).then((res) => {
+                        resolve(res);
+                    }).catch(() => {
+                        if(tries++ >= 3) {
+                            reject();
+                        }
+                    })
+                }
+            })
         })
     },
+    removeDownload: function(downloadName) {
+        for(let download of this.activeDownloads) {
+            if(download.name === downloadName) {
+                this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
+            }
+        }
+    },
+    createProgressiveDownload: function(downloadName) {
+        return new Promise((resolve) => {
+            let download = new Download(downloadName, 'None', 'None');
+            this.activeDownloads.push(download);
+            resolve(download);
+        })
+    },
+    setDownloadProgress: function(downloadName, progress) {
+        const download = this.activeDownloads.find((item) => (
+            downloadName === item.name
+        ));
+        this.handleDownloadProgress(download, progress);
+    },
     handleDownloadProgress: function(download, progress) {
-        this.downloadUpdate();
         download.setProgress(`${progress}%`);
-        download.setProgressPercent(progress)
+        download.setProgressPercent(progress);
+        this.downloadUpdate();
     },
     startModDownload: function(profile, mod, url, modpack) {
         return new Promise((resolve) => {
