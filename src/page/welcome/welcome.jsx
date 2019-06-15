@@ -11,6 +11,7 @@ import { withRouter } from 'react-router-dom';
 import fs from 'fs';
 import path from 'path';
 import LibrariesManager from '../../manager/librariesManager';
+import os from 'os';
 const { dialog }  = require('electron').remote;
 const Title = styled.p`
     color: white;
@@ -72,11 +73,17 @@ export default withRouter(class WelcomePage extends Component {
     }
 
     chooseMCExe = () => {
+        let properties;
+        if(os.platform() === 'win32') {
+            properties = ['openFile', 'showHiddenFiles']
+        }else if(os.platform() === 'darwin') {
+            properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory']
+        }
         let p = dialog.showOpenDialog({
             title: 'Choose your Minecraft Executable',
             defaultPath: Global.getDefaultMCExePath(),
             buttonLabel: 'Select File',
-            properties: ['showHiddenFiles']
+            properties: properties
         });
         this.setState({
             mcExe: p[0]

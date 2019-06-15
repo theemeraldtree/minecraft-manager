@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import os from 'os';
 import ActionButtons from './action-buttons';
 
@@ -12,6 +12,13 @@ const Wrapper = styled.div`
     z-index: 1000;
     display: block;
     user-select: none;
+    ${os.platform() === 'darwin' && `
+        height: 23px;
+        flex: 0 1 23px;
+        display: flex;
+        justify-content: center;   
+        align-items: center;
+    `}
 `
 
 const Title = styled.p`
@@ -24,7 +31,7 @@ const Title = styled.p`
     width: 150px;
     -webkit-app-region: drag;
     cursor: default;
-    ${os.platform() === 'darwin' && css`
+    ${os.platform() === 'darwin' && `
         text-align: center;
         top: 0;
         position: initial;

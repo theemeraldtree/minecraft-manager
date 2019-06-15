@@ -41,6 +41,13 @@ const Global = {
             }else{
                 return app.getPath('appData');
             }
+        }else if(os.platform() === 'darwin') {
+            let mc = path.join(app.getPath('appData'), 'minecraft');
+            if(fs.existsSync(mc)) {
+                return mc;
+            }else{
+                return app.getPath('appData');
+            }
         }
         return '/';
     },
@@ -52,6 +59,8 @@ const Global = {
             }else{
                 return path.join('C:\\Program Files (x86)');
             }
+        }else if(os.platform() === 'darwin') {
+            return path.join('/Applications/');
         }
     },
     getMCPath: () => {
