@@ -16,7 +16,14 @@ const LibrariesManager = {
                 fs.mkdir(path.join(this.getMCMLibraries(), `/mcm-${profile.id}`), () => {
                     let jarPath = path.join(this.getMCMLibraries(), `/mcm-${profile.id}/profiles-mcm-${profile.id}.jar`);
                     fs.writeFile(jarPath, 'Minecraft Manager - Downloading...', () => {
-                        DownloadsManager.startFileDownload(`Minecraft Forge ${profile.forgeVersion} for ${profile.name}`, `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.forgeVersion}/forge-${profile.forgeVersion}-universal.jar`, jarPath).then(() => {
+                        const mcversion = profile.minecraftversion;
+                        let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.forgeVersion}/forge-${profile.forgeVersion}-universal.jar`;
+                        if(mcversion === '1.7.10') {
+                            downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.forgeVersion}-1.7.10/forge-${profile.forgeVersion}-1.7.10-universal.jar`
+                        }else if(mcversion === '1.8.9' || mcversion === '1.8.8' || mcversion === '1.8') {
+                            downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.forgeVersion}-${mcversion}/forge-${profile.forgeVersion}-${mcversion}-universal.jar`
+                        }
+                        DownloadsManager.startFileDownload(`Minecraft Forge ${profile.forgeVersion} for ${profile.name}`, downloadURL, jarPath).then(() => {
                             resolve();
                         });
                     });

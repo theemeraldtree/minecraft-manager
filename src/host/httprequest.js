@@ -10,7 +10,8 @@ let HTTPRequest = {
                 url: url,
                 headers: {
                     'User-Agent': 'Minecraft-Manager'
-                }
+                },
+                followAllRedirects: true
             }, (error, response, body) => {
                 resolve(body, response);
             }).on('error', (err) => {
@@ -19,15 +20,20 @@ let HTTPRequest = {
         });
     },
 
-    cheerioRequest(url) {
+    cheerioRequest(url, tries) {
         return new Promise((resolve, reject) => {
             this.httpGet(url).then((response) => {
                 if(response == undefined) {
                     this.cheerioRequest(url);
                 }
-                resolve(cheerio.load(response.replace(/\s\s+/g, ' ')));
+
+                if(response) {
+                    resolve(cheerio.load(response.replace(/\s\s+/g, ' ')));
+                }else{
+                    reject('response-not-found', tries);
+                }
             }).catch((err) => {
-                reject(err);
+                reject(err, tries);
             })
         })
     },
@@ -41,7 +47,8 @@ let HTTPRequest = {
                 url: url,
                 headers: {
                     'User-Agent': 'Minecraft-Manager'
-                }
+                },
+                followAllRedirects: true
             });
             req.on('data', (data) => {
                 if(onProgress) {
@@ -54,7 +61,6 @@ let HTTPRequest = {
                 res.pipe(ws);
                 ws.on('finish', () => {
                     resolve();
-                    ws.end();
                 })
             })
             req.on('error', () => {

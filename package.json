@@ -23,6 +23,7 @@
         "@babel/plugin-proposal-class-properties": "^7.3.0",
         "@babel/preset-env": "^7.2.3",
         "@babel/preset-react": "^7.0.0",
+        "adm-zip": "^0.4.13",
         "babel-eslint": "^10.0.1",
         "babel-loader": "^8.0.5",
         "babel-polyfill": "^6.26.0",

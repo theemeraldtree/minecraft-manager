@@ -11,9 +11,10 @@ const rimraf = require('rimraf');
 const ProfilesManager = {
     loadedProfiles: [],
     getProfiles: function() {
+        this.loadedProfiles = [];
         LogManager.log('info', '[ProfilesManager] Getting profiles...');
         return new Promise(resolve => {
-            fs.readdir(Global.PROFILES_PATH, async (err, files) => {
+            fs.readdir(Global.PROFILES_PATH, (err, files) => {
                 if(files.length >= 1) {
                     files.forEach(async (file) => {
                         await this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
@@ -68,7 +69,7 @@ const ProfilesManager = {
             profile.save().then(() => {
                 this.loadedProfiles = [];
                 this.getProfiles().then(() => {
-                    resolve();
+                    resolve(profile);
                 })
             });
         });

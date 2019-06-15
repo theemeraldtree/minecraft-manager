@@ -11,7 +11,11 @@ import InputContainer from '../components/inputcontainer';
 import AssetCard from '../../../component/assetcard/assetcard';
 import Curse from '../../../host/curse/curse';
 import Confirmation from '../../../component/confirmation/confirmation';
-
+import Mod from '../../../type/mod';
+import path from 'path';
+import fs from 'fs';
+import Global from '../../../util/global';
+const { dialog } = require('electron').remote;
 const Wrapper = styled.div`
     height: 100%;
     overflow: hidden;
@@ -34,6 +38,7 @@ const List = styled.div`
 
 const Search = styled(TextInput)`
     width: 100%;
+    flex-shrink: 9999;
 `
 
 const SearchContainer = styled(InputContainer)`
@@ -72,14 +77,11 @@ export default class EditPageMods extends Component {
     reloadModsList() {
         let { profile } = this.state;
         let newList = [];
-        console.log(profile.mods);
         let ps = {};
         for(let mod of profile.mods) {
             ps[mod.id] = 'installed';
             newList.push(<AssetCard key={mod.id} asset={mod} showDelete deleteClick={this.deleteClick} />);
         }
-
-        console.log(newList);
 
         this.setState({
             modsList: newList,
@@ -142,7 +144,6 @@ export default class EditPageMods extends Component {
             progressState: ps
         }, () => {
             Curse.installMod(this.state.profile, mod, false).then(() => {
-                console.log('done');
                 this.reloadModsList();
             }).catch((err) => {
                 if(err === 'invalidVersion') {
@@ -160,10 +161,29 @@ export default class EditPageMods extends Component {
 
     deleteClick = (e) => {
         let mod = this.state.profile.getModFromID(e.currentTarget.parentElement.parentElement.dataset.assetid);
-        console.log(mod);
         this.state.profile.deleteMod(mod).then(() => {
             this.reloadModsList();
         })
+    }
+
+    addFromFile = () => {
+        let p = dialog.showOpenDialog({
+            title: 'Choose your mod jar file',
+            buttonLabel: 'Choose Mod',
+            properties: ['openFile']
+        });
+        let { profile } = this.state;
+        let pth = p[0];
+        let filename = path.basename(pth);
+        let mod = new Mod({
+            name: filename,
+            id: Global.createID(name),
+            minecraftversion: profile.minecraftversion,
+            jar: filename
+        });
+        fs.copyFileSync(pth, path.join(profile.modsPath, filename));
+        profile.addMod(mod);
+        this.reloadModsList();
     }
 
     render() {
@@ -178,7 +198,8 @@ export default class EditPageMods extends Component {
                                     {displayState !== 'modsList' && <Button onClick={this.goBack} color='red'>back</Button>}
                                     {listState !== 'viewAsset' && <>
                                         <Search value={liveSearchTerm} onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='Search' />
-                                        <Button onClick={this.browseMods} color='green'>add</Button>
+                                        {displayState === 'modsList' && <Button onClick={this.browseMods} color='green'>add</Button>}
+                                        {displayState === 'addMods' && <Button onClick={this.addFromFile} color='green'>from file</Button>}
                                     </>}
                                 </SearchContainer>
                                 { displayState === 'modsList' && <>
