@@ -41,6 +41,7 @@ const DownloadsManager = {
                 this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
             }
         }
+        this.downloadUpdate();
     },
     createProgressiveDownload: function(downloadName) {
         return new Promise((resolve) => {

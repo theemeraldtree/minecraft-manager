@@ -68,8 +68,22 @@ const Wrapper = styled.div`
     }
     display: inline-flex;
 `
+
+const StateOverlay = styled.div`
+    width: 120px;
+    height: 190px;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    z-index: 2;
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+`
 const ProfileCard = ({profile, history, showDeletion}) => (
     <Wrapper>
+        {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
         <ContextMenuTrigger id={`profilecard${profile.id}`}>
             <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
                 <Image src={`${profile.iconpath}#${new Date().getTime()}`} />

@@ -8,6 +8,7 @@ import Button from '../../component/button/button';
 import SanitizedHTML from '../../component/sanitizedhtml/sanitizedhtml'
 import LauncherManager from '../../manager/launcherManager';
 import Confirmation from '../../component/confirmation/confirmation';
+import ShareOverlay from '../../component/shareoverlay/shareoverlay';
 const Image = styled.img`
     min-width: 150px;
     height: 150px;
@@ -83,7 +84,8 @@ class ViewProfilePage extends Component {
             profile: {
                 name: 'Loading'
             },
-            showDelete: false
+            showDelete: false,
+            showShareOverlay: false
         }
     }
 
@@ -118,6 +120,18 @@ class ViewProfilePage extends Component {
         })    
     }
 
+    showShare = () => {
+        this.setState({
+            showShareOverlay: true
+        })
+    }
+
+    hideShare = () => {
+        this.setState({
+            showShareOverlay: false
+        })
+    }
+
     render() {
         let { profile, showDelete } = this.state;
         return (
@@ -137,7 +151,7 @@ class ViewProfilePage extends Component {
                         <CustomButton onClick={this.launchProfile} color='green'>launch</CustomButton>
                         <CustomButton onClick={this.editprofile} color='yellow'>edit</CustomButton>
                         <CustomButton color='purple'>update</CustomButton>
-                        <CustomButton color='blue'>share</CustomButton>
+                        <CustomButton onClick={this.showShare} color='blue'>share</CustomButton>
                         <CustomButton onClick={this.deleteClick} color='red'>delete</CustomButton>
                     </ButtonGroup>
                     <Specs>
@@ -147,6 +161,7 @@ class ViewProfilePage extends Component {
                 <Description>
                     <SanitizedHTML html={profile.description} />
                 </Description>
+                {this.state.showShareOverlay && <ShareOverlay cancelClick={this.hideShare} profile={profile} />}
             </Page>
         )
     }

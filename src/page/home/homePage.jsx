@@ -11,7 +11,7 @@ import ProfilesManager from '../../manager/profilesManager';
 import Overlay from '../../component/overlay/overlay';
 import CustomDropdown from '../../component/customdropdown/customdropdown';
 import Global from '../../util/global';
-
+import ImportOverlay from '../../component/importoverlay/importoverlay';
 const CreateBG = styled.div`
     max-width: 600px;
     max-height: 400px;
@@ -45,7 +45,8 @@ export default class HomePage extends Component {
             searchTerm: '',
             showCreate: false,
             createName: '',
-            mcVersion: Global.MC_VERSIONS[0]
+            mcVersion: Global.MC_VERSIONS[0],
+            showImport: false
         }
     }
 
@@ -87,16 +88,28 @@ export default class HomePage extends Component {
         })
     }
     
+    importClick = () => {
+        this.setState({
+            showImport: true
+        })
+    }
+
+    importCancel = () => {
+        this.setState({
+            showImport: false
+        })
+    }
     render() {
-        let { searchTerm, showCreate } = this.state;
+        let { searchTerm, showCreate, showImport } = this.state;
         return (
-            <Page>
+            <Page>              
                 <Header title='profiles'>
                     <SearchBox onChange={this.searchChange} placeholder='search' />
-                    <Button color='purple'>import</Button>
+                    <Button onClick={this.importClick} color='purple'>import</Button>
                     <Button onClick={this.showCreate} color='green'>create</Button>
                 </Header>
                 <ProfileGrid searchTerm={searchTerm} />
+                {showImport && <ImportOverlay cancelClick={this.importCancel} />}
                 {showCreate && 
                 <Overlay>
                     <CreateBG>

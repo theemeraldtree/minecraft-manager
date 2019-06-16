@@ -48,8 +48,18 @@ const VersionsManager = {
     },
     deleteVersion: function(profile) {
         return new Promise((resolve) => {
-            if(fs.existsSync(path.join(this.getVersionsPath(), profile.launcherVersion))) {
-                rimraf(path.join(this.getVersionsPath(), profile.launcherVersion), () => {
+            if(profile.launcherVersion) {
+                if(fs.existsSync(path.join(this.getVersionsPath(), profile.launcherVersion))) {
+                    rimraf(path.join(this.getVersionsPath(), profile.launcherVersion), () => {
+                        if(fs.existsSync(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`))) {
+                            rimraf(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`), () => {
+                                resolve();
+                            })
+                        }else{
+                            resolve();
+                        }
+                    })
+                }else{
                     if(fs.existsSync(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`))) {
                         rimraf(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`), () => {
                             resolve();
@@ -57,15 +67,9 @@ const VersionsManager = {
                     }else{
                         resolve();
                     }
-                })
-            }else{
-                if(fs.existsSync(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`))) {
-                    rimraf(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`), () => {
-                        resolve();
-                    })
-                }else{
-                    resolve();
                 }
+            }else{
+                resolve();
             }
         })
     }
