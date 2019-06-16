@@ -147,7 +147,6 @@ let Curse = {
                 // minecraft.curseforge.com is used instead of regular curseforge because it provides more data in one page
                 HTTPRequest.cheerioRequest(`https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}`).then((page) => {
                     obj.description = page('.project-description').html();
-
                     obj.name = page('.project-title')[0].children[1].children[1].children[0].data;
                     let authors = page('.project-members').toArray()[0].children;
                     let finalAuthorsList = [];
@@ -155,6 +154,18 @@ let Curse = {
                         if(!author.data) {
                             finalAuthorsList.push(author.children[3].children[1].children[1].children[0].children[0].data);
                         } 
+                    }
+
+                    obj.hosts.curse.iconURL = page('.e-avatar64')[0].attribs.href;
+
+                    if(obj instanceof Profile) {
+                        console.log('yep, is profile');
+                        const checker = page('.nav-support-permissions')[0];
+                        if(checker) {
+                            obj.hosts.curse.isFTB = true;
+                        }else{
+                            obj.hosts.curse.isFTB = false;
+                        }
                     }
 
                     obj.authors = finalAuthorsList;
@@ -185,7 +196,7 @@ let Curse = {
             if(!this.cachedItems[obj.cachedID].detailedInfo) {
                 HTTPRequest.cheerioRequest(`https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/files/${file}`).then((page) => {
                     obj.name = page('.project-title')[0].children[1].children[1].children[0].data;
-            
+                    
                     obj.version = page('.details-header')[0].children[3].data;
                     obj.detailedInfo = true;
                     resolve(obj);
@@ -311,19 +322,6 @@ let Curse = {
             }
         })
     },
-    getIsPackFTB(pack) {
-        return new Promise((resolve) => {
-            HTTPRequest.cheerioRequest(`https://minecraft.curseforge.com/projects/${pack.hosts.curse.id}`).then((page) => {
-                const checker = page('.nav-support-permissions')[0];
-                console.log(checker);
-                if(checker) {
-                    resolve(true);
-                }else{
-                    resolve(false);
-                }
-            })
-        });
-    },
     downloadModList(profile, list, callback, onUpdate, concurrent) {
         if(concurrent !== 0 && concurrent !== undefined) {
             for(let i = 0; i < concurrent - 1; i++) {
@@ -356,9 +354,9 @@ let Curse = {
             }
             let infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`);
 
-            this.getIsPackFTB(modpack).then((isFTB) => {
-                const infoURL = isFTB ? `https://www.feed-the-beast.com/projects/${modpack.hosts.curse.id}/files/latest` : `https://minecraft.curseforge.com/projects/${modpack.hosts.curse.id}/files/latest`
-                console.log(infoURL);
+            this.getInfo(modpack).then((modpack) => {
+                console.log('past info get');
+                const infoURL = modpack.hosts.curse.isFTB ? `https://www.feed-the-beast.com/projects/${modpack.hosts.curse.id}/files/latest` : `https://minecraft.curseforge.com/projects/${modpack.hosts.curse.id}/files/latest`
                 DownloadsManager.startFileDownload(`Info for ${modpack.name}`, infoURL, infoDownload).then(() => {
                     let zip = new admzip(infoDownload);
     
@@ -368,7 +366,7 @@ let Curse = {
                     let manifest = JSON.parse(fs.readFileSync(path.join(extractPath, 'manifest.json')));
     
                     ProfilesManager.createProfile(manifest.name, manifest.minecraft.version).then((profile) => {
-                        profile.setHostId('curse', modpack.hosts.curse.id);
+                        profile.hosts = modpack.hosts;
                         profile.setVersion(manifest.version);
                         profile.changeMCVersion(manifest.minecraft.version);
                         profile.setForgeInstalled(true);
@@ -409,14 +407,12 @@ let Curse = {
                                     }
     
                                     ForgeManager.setupForge(profile).then(() => {
-                                        rimraf.sync(extractPath);
-                                        profile.hosts = {
-                                            curse: {
-                                                id: modpack.hosts.curse.id
-                                            }
-                                        };
-                                        profile.save();
-                                        resolve();
+                                        DownloadsManager.startFileDownload(`Icon for ${profile.name}`, modpack.hosts.curse.iconURL, path.join(profile.folderpath, '/icon.png')).then(() => {
+                                            rimraf.sync(extractPath);
+                                            profile.hosts = modpack.hosts;
+                                            profile.save();
+                                            resolve();
+                                        })
                                     })
                                 }
                             }, () => {

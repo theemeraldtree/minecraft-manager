@@ -9,6 +9,7 @@ import TextInput from '../../../component/textinput/textinput';
 import TextBox from '../../../component/textbox/textbox';
 import Detail from '../../../component/detail/detail';
 import InputContainer from '../components/inputcontainer';
+const { dialog } = require('electron').remote;
 const DescContainer = styled.div`
     margin-top: 40px;
 `
@@ -17,6 +18,35 @@ const LongDesc = styled(TextBox)`
     width: 70%;
     max-width: 500px;
 `
+const IconWrapper = styled.div`
+    width: 80px;
+    height: 80px;
+    background-color: #717171;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-flow: column;
+    position: relative;
+    div {
+        width: 60px;
+        text-align: center;
+        position: absolute;
+        bottom: 0;
+    }
+`
+
+const ResetIconButton = styled(Button)`
+    width: 57px;
+    text-align: center;
+`
+const Icon = styled.img`
+    width: auto;
+    height: auto;
+    max-width: 80px;
+    max-height: 80px;
+    flex-shrink: 0;
+`;
 export default class EditPageGeneral extends Component {
     constructor(props) {
         super(props);
@@ -31,7 +61,8 @@ export default class EditPageGeneral extends Component {
     static getDerivedStateFromProps(props) {
         let profile = ProfilesManager.getProfileFromID(props.match.params.id);
         return {
-            profile: profile
+            profile: profile,
+            iconsrc: profile.iconpath
         }
     }
 
@@ -57,12 +88,39 @@ export default class EditPageGeneral extends Component {
         this.state.profile.changeDescription(e.target.value);
     }
 
+    changeIcon = () => {
+        let p = dialog.showOpenDialog({
+            title: 'Select your image file',
+            buttonLabel: 'Choose image',
+            filters:[{name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif']}],
+            properties: ['openFile']
+        });
+
+        const img = p[0];
+        if(img) {
+            this.state.profile.changeIcon(img);
+            this.forceUpdate();
+            ProfilesManager.updateProfile(this.state.profile);
+        }
+    }
+
+    resetIcon = () => {
+        this.state.profile.resetIcon();
+        this.forceUpdate();
+        ProfilesManager.updateProfile(this.state.profile);
+    }
+
     render() {
         let { profile, nameValue, nameDisabled } = this.state;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
                 <EditContainer profile={profile}>
+                    <Detail>profile icon</Detail>
+                    <IconWrapper onClick={this.changeIcon}>
+                        <Icon src={`${profile.iconpath}#${new Date().getTime()}`} />
+                    </IconWrapper>
+                    <ResetIconButton onClick={this.resetIcon} color='green'>reset</ResetIconButton>
                     <Detail>profile name</Detail>
                     <InputContainer>
                         <TextInput value={nameValue} onChange={this.nameChange} placeholder="Enter a name" />

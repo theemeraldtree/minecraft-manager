@@ -72,7 +72,7 @@ const ProfileCard = ({profile, history, showDeletion}) => (
     <Wrapper>
         <ContextMenuTrigger id={`profilecard${profile.id}`}>
             <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
-                <Image src={profile.iconpath} />
+                <Image src={`${profile.iconpath}#${new Date().getTime()}`} />
                 <Title>{profile.name}</Title>
                 <Buttons>
                     <LaunchButton color='green' onClick={(e) => {e.stopPropagation();profile.launch();}}>launch</LaunchButton>

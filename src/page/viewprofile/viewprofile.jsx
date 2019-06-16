@@ -125,7 +125,7 @@ class ViewProfilePage extends Component {
                 {showDelete && <Confirmation cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />}
                 <Header title='profile' backlink='/' />
                 <ProfileHeader>
-                    <Image src={profile.iconpath} />
+                    <Image src={`${profile.iconpath}#${new Date().getTime()}`} />
                     <PHSide>
                         <Title>{profile.name}</Title>
                         <Blurb>{profile.blurb}</Blurb>
