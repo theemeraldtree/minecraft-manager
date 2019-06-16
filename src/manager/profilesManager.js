@@ -26,7 +26,10 @@ const ProfilesManager = {
             })
         })
     },
-
+    updateProfile: function(newProfile) {
+        const oldProfile = this.loadedProfiles.findIndex(item => (item.id === newProfile.id));
+        this.loadedProfiles[oldProfile] = newProfile;
+    },
     processProfileFolder: async function(location) {
         LogManager.log('info', `[ProfilesManager] Processing profile folder at ${location}`);
         let profilePath = path.join(location, '/profile.json')

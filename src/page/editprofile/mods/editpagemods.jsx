@@ -80,7 +80,13 @@ export default class EditPageMods extends Component {
         let ps = {};
         for(let mod of profile.mods) {
             ps[mod.id] = 'installed';
-            newList.push(<AssetCard key={mod.id} asset={mod} showDelete deleteClick={this.deleteClick} />);
+            if(this.state.displayState === 'modsList') {
+                if(mod.name.toLowerCase().includes(this.state.liveSearchTerm.toLowerCase())) {
+                    newList.push(<AssetCard key={mod.id} asset={mod} showDelete deleteClick={this.deleteClick} />);
+                }
+            }else{
+                newList.push(<AssetCard key={mod.id} asset={mod} showDelete deleteClick={this.deleteClick} />);
+            }
         }
 
         this.setState({
@@ -125,6 +131,8 @@ export default class EditPageMods extends Component {
         let term = e.target.value;
         this.setState({
             liveSearchTerm: term
+        }, () => {
+            this.reloadModsList();
         });
         if(e.key === 'Enter') {
             this.setState({

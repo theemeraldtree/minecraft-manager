@@ -14,7 +14,6 @@ function Profile(rawOMAF) {
     this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
     this.forgeVersion = '1.12.2-14.23.5.2838';
     this.modsPath = path.join(this.gameDir, `/mods/`);
-
     let newList = [];
     if(this.mods) {
         for(let item of this.mods) {
@@ -133,4 +132,23 @@ Profile.prototype.deleteMod = function(mod) {
         })
     })
 }
+
+Profile.prototype.changeIcon = function(img) {
+    fs.unlinkSync(this.iconpath);
+
+    const newPath = path.join(this.folderpath, `icon${path.extname(img)}`);
+    fs.copyFileSync(img, newPath);
+    this.icon = `icon${path.extname(img)}`;
+    this.iconpath = newPath.replace(/\\/g,"/");
+    this.save();
+}
+
+Profile.prototype.resetIcon = function() {
+    fs.unlinkSync(this.iconpath);
+    fs.copyFileSync(path.join(Global.getResourcesPath(), '/logo-sm.png'), path.join(this.folderpath, '/icon.png'));
+    this.icon = 'icon.png';
+    this.iconpath = path.join(this.folderpath, 'icon.png').replace(/\\/g,"/");
+    this.save();
+}
+
 export default Profile;
