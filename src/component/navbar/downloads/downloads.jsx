@@ -12,12 +12,13 @@ const DownloadsButton = styled.div`
     bottom: 0;
     margin: 25px;
     cursor: pointer;
+    z-index: 999;
 `
 const DownloadsOverlay = styled.div`
     width: 350px;
     height: 350px;
     background-color: #1D1D1D;
-    z-index: 20;
+    z-index: 9999;
     cursor: default;
     position: absolute;
     left: 90px;

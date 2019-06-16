@@ -1,6 +1,7 @@
 import Global from "../util/global";
 import LauncherManager from '../manager/launcherManager';
 import Mod from "./mod";
+const archiver = require('archiver');
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -8,12 +9,13 @@ const rimraf = require('rimraf');
 function Profile(rawOMAF) {
     Object.assign(this, rawOMAF);
 
-    this.local = ['folderpath', 'iconpath', 'modsPath'];
+    this.local = ['folderpath', 'iconpath', 'modsPath', 'state'];
     this.folderpath = path.join(Global.PROFILES_PATH + `/${this.id}`).replace("\\","/");
     this.gameDir = path.join(this.folderpath, '/files');
     this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
     this.forgeVersion = '1.12.2-14.23.5.2838';
     this.modsPath = path.join(this.gameDir, `/mods/`);
+    this.state = '';
     let newList = [];
     if(this.mods) {
         for(let item of this.mods) {
@@ -151,4 +153,50 @@ Profile.prototype.resetIcon = function() {
     this.save();
 }
 
+Profile.prototype.setCurrentState = function(state) {
+    this.state = state;
+}
+
+Profile.prototype.export = function(output, exportFolders, exportProgress) {
+    return new Promise((resolve) => {
+        const tempPath = path.join(Global.MCM_TEMP, `/profileexport-${this.id}/`);
+        const filesPath = path.join(tempPath, '/files');
+        exportProgress('Preparing...');
+        Global.copyDirSync(this.folderpath, tempPath);
+    
+        exportProgress('Removing Online Mods...');
+        for(const mod of this.mods) {
+            if(mod.hosts) { 
+                if(mod.hosts.curse) {
+                    fs.unlinkSync(path.join(filesPath, `/mods/${mod.jar}`));
+                }
+            }
+        }
+    
+        exportProgress('Removing non-chosen folders...');
+        fs.readdir(path.join(tempPath, '/files'), (err, files) => {
+            files.forEach(file => {
+                if(!exportFolders.includes(file)) {
+                    if(file !== 'mods') {
+                        rimraf.sync(path.join(filesPath, file));
+                    }
+                }
+            });
+    
+            exportProgress('Creating archive...');
+            const archive = archiver('zip');
+    
+            archive.pipe(fs.createWriteStream(output));
+            archive.directory(tempPath, false);
+            archive.finalize();
+    
+            archive.on('finish', () => {
+                exportProgress('Cleaning up...');
+                rimraf.sync(tempPath);
+                exportProgress('Done');
+                resolve();
+            })
+        })
+    })
+}
 export default Profile;

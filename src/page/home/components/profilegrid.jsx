@@ -18,9 +18,14 @@ export default class ProfileGrid extends Component {
     }
 
     componentDidMount = () => {
+        ProfilesManager.registerReloadListener(this.generateProfiles);
         this.generateProfiles();
     }
 
+    componentWillUnmount = () => {
+        ProfilesManager.unregisterReloadListener(this.generateProfiles);
+    }
+    
     componentDidUpdate = (prevProps) => {
         if(this.props !== prevProps) {
             this.generateProfiles();

@@ -13,6 +13,13 @@
         "extraResources": [
             "resources/*"
         ],
+        "fileAssociations": [
+            {
+                "ext": "mcjprofile",
+                "name": "Minecraft Java Profile (OMAF)",
+                "description": "Minecraft Java Profile for OMAF"
+            }
+        ],
         "nsis": {
             "perMachine": "true",
             "oneClick": "false"
@@ -24,6 +31,7 @@
         "@babel/preset-env": "^7.2.3",
         "@babel/preset-react": "^7.0.0",
         "adm-zip": "^0.4.13",
+        "archiver": "^3.0.0",
         "babel-eslint": "^10.0.1",
         "babel-loader": "^8.0.5",
         "babel-polyfill": "^6.26.0",

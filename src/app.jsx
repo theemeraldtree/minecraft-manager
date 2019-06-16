@@ -16,6 +16,7 @@ import WelcomePage from './page/welcome/welcome';
 const App = () => (
     <div>            
         {localStorage.setItem('showDownloads', false)}
+        {localStorage.setItem('importDone', false)}
         {SettingsManager.loadSettings()}
         <Router>
             <div>

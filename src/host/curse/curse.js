@@ -295,6 +295,10 @@ let Curse = {
                         if(versions.length !== 0) {
                             mod.version = versions[0].name;
                             mod.minecraftversion = profile.minecraftversion;
+
+                            const downloadLink = versions[0].downloadLink;
+                            const fileID = downloadLink.split('/')[6];
+                            mod.hosts.curse.fileID = fileID;
                             DownloadsManager.startModDownload(profile, mod, versions[0].downloadLink, modpack).then(() => {
                                 mod.jar = `${Global.createID(mod.name)}.jar`;
                                 profile.addMod(mod);
@@ -339,7 +343,9 @@ let Curse = {
             }else{
                 this.concurrentDownloads.push(item);
                 this.installModVersion(profile, item, item.hosts.curse.fileID, false).then((modres) => {
-                    profile.addMod(modres);
+                    if(!profile.mods.find(item => (item.id === modres.id))) {
+                        profile.addMod(modres);
+                    }
                     onUpdate(list.length);
                     list.shift();
                     this.downloadModList(profile, list, callback, onUpdate)
