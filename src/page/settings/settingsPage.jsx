@@ -155,7 +155,7 @@ export default class SettingsPage extends Component {
                         <h1>About Minecraft Manager</h1>
                     </AboutTop>
                     <AboutBottom>
-                        <h2>Minecraft Manager Version 2.0.0 (beta 4)</h2>
+                        <h2>Minecraft Manager Version 2.0.0 (beta 4 patch 1)</h2>
                         <h2>released 6/16/2019</h2>
                         <h3>Minecraft Manager is made possible thanks to <a href="https://electronjs.org/">Electron, </a> <a href="https://reactjs.org/">React, </a> and other projects</h3>
                         <h3><a href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project</a> created by stairman06</h3>
