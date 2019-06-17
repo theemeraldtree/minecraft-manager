@@ -159,7 +159,6 @@ let Curse = {
                     obj.hosts.curse.iconURL = page('.e-avatar64')[0].attribs.href;
 
                     if(obj instanceof Profile) {
-                        console.log('yep, is profile');
                         const checker = page('.nav-support-permissions')[0];
                         if(checker) {
                             obj.hosts.curse.isFTB = true;
@@ -290,7 +289,7 @@ let Curse = {
                     }
                 }
 
-                HTTPRequest.cheerioRequest(`https://minecraft.curseforge.com/projects/${mod.hosts.curse.id}/files`).then((page) => {
+                HTTPRequest.cheerioRequest(`https://minecraft.curseforge.com/projects/${mod.hosts.curse.id}/files?filter-game-version=2020709689%3A${Curse.getCurseVersionForMCVersion(profile.minecraftversion)}`).then((page) => {
                     this.getVersionsForMCVersion(mod, profile.minecraftversion, page).then((versions) => {
                         if(versions.length !== 0) {
                             mod.version = versions[0].name;
@@ -361,7 +360,6 @@ let Curse = {
             let infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`);
 
             this.getInfo(modpack).then((modpack) => {
-                console.log('past info get');
                 const infoURL = modpack.hosts.curse.isFTB ? `https://www.feed-the-beast.com/projects/${modpack.hosts.curse.id}/files/latest` : `https://minecraft.curseforge.com/projects/${modpack.hosts.curse.id}/files/latest`
                 DownloadsManager.startFileDownload(`Info for ${modpack.name}`, infoURL, infoDownload).then(() => {
                     let zip = new admzip(infoDownload);
@@ -400,7 +398,6 @@ let Curse = {
                                     DownloadsManager.removeDownload(download.name);
                                     let overridesFolder = path.join(extractPath, '/overrides');
                                     if(fs.existsSync(overridesFolder)) {
-                                        console.log('overrides folder exists');
                                         fs.readdirSync(overridesFolder).forEach((file) => {
                                             if(file === 'mods') {
                                                 fs.readdirSync(path.join(overridesFolder, file)).forEach((f) => {

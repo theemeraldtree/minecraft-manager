@@ -131,7 +131,6 @@ export default class ShareOverlay extends Component {
                 }
             ]
         });
-        console.log(p);
         if(p) {
             profile.export(p, exportFolders, progress => {
                 this.setState({
