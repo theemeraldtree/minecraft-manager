@@ -1,4 +1,5 @@
 import SettingsManager from '../manager/settingsManager';
+import ProfilesManager from '../manager/profilesManager';
 
 const remote = require('electron').remote;
 const app = remote.app;
@@ -79,6 +80,25 @@ const Global = {
         }else{
             fs.linkSync(src, dest);
         }
+    },
+    checkMigration: function() {
+        ProfilesManager.getProfiles().then(() => {
+            for(let profile of ProfilesManager.loadedProfiles) {
+                
+                // From beta 4.1 and earlier there was no info about the OMAF format version
+                if(!profile.omafVersion) {
+                    profile.omafVersion = '0.1';
+                    
+                    if(profile.hosts.curse) {
+                        profile.hosts.curse.fullyInstalled = true;
+                    }
+
+                    profile.save()
+                }
+            }
+
+            ProfilesManager.updateReloadListeners();
+        })
     }
 }
 

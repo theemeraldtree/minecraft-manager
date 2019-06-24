@@ -5,6 +5,8 @@ import ProfilesManager from "./manager/profilesManager";
 import fs from 'fs';
 import Global from "./util/global";
 import LogManager from "./manager/logManager";
+import path from 'path';
+import SettingsManager from "./manager/settingsManager";
 const { remote, shell } = require('electron');
 const { dialog } = require('electron').remote;
 const request = require('request');
@@ -23,6 +25,19 @@ async function load() {
       remote.getCurrentWindow().webContents.toggleDevTools();
     }
   });
+
+  SettingsManager.loadSettings();
+  // Check for directories - we need to make sure everything exists
+  if(!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
+    fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
+  }
+
+  if(!fs.existsSync(Global.getMCPath(), '/libraries/minecraftmanager/profiles')) {
+    fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
+  }
+
+  // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
+  Global.checkMigration();
 
   // We're on a Mac, which means auto update doesn't work.
   // Here, we manually check for updates and inform the user a new version is available

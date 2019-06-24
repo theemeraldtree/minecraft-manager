@@ -2,19 +2,19 @@ let LogManager = {
     log: (severity, message) => {
         switch(severity.toUpperCase()) {
             case 'SEVERE':
-                console.error(`[MCM-LOG] !! ERROR SEVERE !! ERROR READS: ${message}`);
+                console.error(`!! ERROR SEVERE !! ${message}`);
                 break;
             case 'ERROR':
-                console.error(`[MCM-LOG] ! ERROR ${message}`);
+                console.error(`! ERROR ${message}`);
                 break;
             case 'WARN':
-                console.warn(`[MCM-LOG] WARN ${message}`);
+                console.warn(`WARN ${message}`);
                 break;
             case 'INFO':
-                console.info(`[MCM-LOG] Info: ${message}`);
+                console.info(`INFO ${message}`);
                 break;
             default:
-                console.error(`[MCM-LOG] !!! ERROR MISSING SEVERITY !!! ${message}`);
+                console.error(`!!! ERROR MISSING SEVERITY !!! ${message}`);
                 break;
         }
     }
