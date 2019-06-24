@@ -67,22 +67,26 @@ const Wrapper = styled.div`
         display: inline-flex;
     }
     display: inline-flex;
+    position: relative;
 `
 
 const StateOverlay = styled.div`
     width: 120px;
     height: 190px;
-    background-color: rgba(0, 0, 0, 0.7);
     position: absolute;
+    background-color: rgba(0, 0, 0, 0.7);
     z-index: 2;
     margin: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
+    text-align: center;
+    flex-flow: column;
 `
 const ProfileCard = ({profile, history, showDeletion}) => (
     <Wrapper>
+        {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && <StateOverlay><b>ERROR</b>   <br />Unfinished Curse Profile Install</StateOverlay>}
         {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
         <ContextMenuTrigger id={`profilecard${profile.id}`}>
             <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>

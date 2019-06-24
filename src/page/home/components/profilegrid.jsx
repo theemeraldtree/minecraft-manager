@@ -33,8 +33,10 @@ export default class ProfileGrid extends Component {
     }
 
     generateProfiles = () => {
+        console.log('GENERATING PROFILES');
         let profilesComponents = [];
         for(let profile of ProfilesManager.loadedProfiles) {
+            console.log(profile);
             if(profile.name.toLowerCase().includes(this.props.searchTerm)) {
                 profilesComponents.push(<ProfileCard showDeletion={this.showDeletion} key={profile.id} profile={profile} />);
             }

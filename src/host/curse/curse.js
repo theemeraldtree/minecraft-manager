@@ -159,7 +159,8 @@ let Curse = {
                     obj.hosts.curse.iconURL = page('.e-avatar64')[0].attribs.href;
 
                     if(obj instanceof Profile) {
-                        const checker = page('.nav-support-permissions')[0];
+                        const checker = page('#nav-support-streamers')[0];
+                        console.log(checker);
                         if(checker) {
                             obj.hosts.curse.isFTB = true;
                         }else{
@@ -359,8 +360,10 @@ let Curse = {
             }
             let infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`);
 
+            ProfilesManager.profilesBeingInstalled.push(modpack.id);
             this.getInfo(modpack).then((modpack) => {
                 const infoURL = modpack.hosts.curse.isFTB ? `https://www.feed-the-beast.com/projects/${modpack.hosts.curse.id}/files/latest` : `https://minecraft.curseforge.com/projects/${modpack.hosts.curse.id}/files/latest`
+                console.log(infoURL);
                 DownloadsManager.startFileDownload(`Info for ${modpack.name}`, infoURL, infoDownload).then(() => {
                     let zip = new admzip(infoDownload);
     
@@ -369,13 +372,19 @@ let Curse = {
                     fs.unlinkSync(infoDownload);
                     let manifest = JSON.parse(fs.readFileSync(path.join(extractPath, 'manifest.json')));
     
-                    ProfilesManager.createProfile(manifest.name, manifest.minecraft.version).then((profile) => {
+                    ProfilesManager.createProfile(modpack.name, manifest.minecraft.version).then((profile) => {
                         profile.hosts = modpack.hosts;
+                        profile.hosts.curse.fullyInstalled = false;
                         profile.setVersion(manifest.version);
                         profile.changeMCVersion(manifest.minecraft.version);
                         profile.setForgeInstalled(true);
                         profile.setForgeVersion(`${manifest.minecraft.version}-${manifest.minecraft.modLoaders[0].id.substring(6)}`);
-    
+                        
+                        profile.save();
+                        profile.setCurrentState('installing');
+
+                        ProfilesManager.updateProfile(profile);
+
                         const list = manifest.files.map((file) => {
                             const mod = new Mod({
                                 hosts: {
@@ -412,8 +421,9 @@ let Curse = {
                                     ForgeManager.setupForge(profile).then(() => {
                                         DownloadsManager.startFileDownload(`Icon for ${profile.name}`, modpack.hosts.curse.iconURL, path.join(profile.folderpath, '/icon.png')).then(() => {
                                             rimraf.sync(extractPath);
-                                            profile.hosts = modpack.hosts;
+                                            profile.hosts.curse.fullyInstalled = true;
                                             profile.save();
+                                            ProfilesManager.loadedProfiles.slice(ProfilesManager.indexOf(modpack.id), 1);
                                             resolve();
                                         })
                                     })

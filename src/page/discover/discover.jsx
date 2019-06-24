@@ -57,6 +57,10 @@ export default class DiscoverPage extends Component {
             }
         }
 
+        for(let profile of ProfilesManager.profilesBeingInstalled) {
+            ps[profile] = 'installing';
+        }
+
         this.setState({
             progressState: ps
         })
