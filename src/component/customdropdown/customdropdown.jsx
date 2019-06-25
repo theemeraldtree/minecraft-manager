@@ -10,9 +10,17 @@ export default class CustomDropdown extends Component {
     }
 
     componentDidMount() {
+        this.renderDropdown();
+    }
+
+    renderDropdown() {
         let finalArr = [];
         for(let item of this.props.items) {
-            finalArr.push(<option key={item} value={item}>{item}</option>)
+            if(item instanceof Object) {
+                finalArr.push(<option key={item.id} value={item.id}>{item.name}</option>)
+            }else{
+                finalArr.push(<option key={item} value={item}>{item}</option>)
+            }
         }
         this.setState({
             items: finalArr,
@@ -25,6 +33,9 @@ export default class CustomDropdown extends Component {
             this.setState({
                 value: this.props.value
             })
+        }
+        if(this.props.items !== prevProps.items) {
+            this.renderDropdown();
         }
     }
 

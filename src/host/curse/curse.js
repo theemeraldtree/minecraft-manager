@@ -159,8 +159,7 @@ let Curse = {
                     obj.hosts.curse.iconURL = page('.e-avatar64')[0].attribs.href;
 
                     if(obj instanceof Profile) {
-                        const checker = page('#nav-support-streamers')[0];
-                        console.log(checker);
+                        const checker = page('#nav-streamers')[0];
                         if(checker) {
                             obj.hosts.curse.isFTB = true;
                         }else{
@@ -244,11 +243,26 @@ let Curse = {
         return curseversions[mcver];
     },
 
-    getVersionsFromPage(page) {
+    getVersionsFromURL(url, type) {
+        return new Promise((resolve) => {
+            HTTPRequest.cheerioRequest(url).then(page => {
+                this.getVersionsFromPage(page, type).then(versions => {
+                    resolve(versions);
+                });
+            })
+        })
+    },
+    getVersionsFromPage(page, type) {
         let list = [];
         return new Promise((resolve) => {
             page('.project-file-list-item').each((i, el) => {
-                let name = el.children[3].children[1].children[3].children[1].children[0].data;
+
+                let name;
+                if(type === 'modpack') {
+                    name = el.children[3].children[1].children[1].children[1].children[0].data;
+                }else if(type === 'mod') {
+                    name = el.children[3].children[1].children[3].children[1].children[0].data;
+                }
                 let downloadLink = `https://minecraft.curseforge.com${el.children[3].children[1].children[1].children[1].attribs.href}`;
 
                 list.push({name: name, downloadLink: downloadLink});
@@ -375,7 +389,7 @@ let Curse = {
                     ProfilesManager.createProfile(modpack.name, manifest.minecraft.version).then((profile) => {
                         profile.hosts = modpack.hosts;
                         profile.hosts.curse.fullyInstalled = false;
-                        profile.setVersion(manifest.version);
+                        profile.setProfileVersion(manifest.version);
                         profile.changeMCVersion(manifest.minecraft.version);
                         profile.setForgeInstalled(true);
                         profile.setForgeVersion(`${manifest.minecraft.version}-${manifest.minecraft.modLoaders[0].id.substring(6)}`);
