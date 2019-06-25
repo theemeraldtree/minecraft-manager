@@ -33,6 +33,11 @@ function Profile(rawOMAF) {
     }
 }
 
+Profile.prototype.setProfileVersion = function(newVer) {
+    this.version = newVer;
+    this.save();
+}
+
 Profile.prototype.toJSON = function() {
     let copy = Object.assign({}, this);
     for(let i of this.local) {

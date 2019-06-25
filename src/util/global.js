@@ -94,6 +94,13 @@ const Global = {
                     }
 
                     profile.save()
+                }else{
+                    if(profile.omafVersion === '0.1') {
+                        profile.omafVersion = '0.1.1';
+
+                        profile.version = 'unknown';
+                        profile.save();
+                    }
                 }
             }
 

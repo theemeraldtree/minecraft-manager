@@ -13,6 +13,7 @@ import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import Global from '../../../util/global';
 import ForgeManager from '../../../manager/forgeManager';
 import Confirmation from '../../../component/confirmation/confirmation';
+import Curse from '../../../host/curse/curse';
 const CustomVersions = styled.div`
     background-color: #505050;
     width: 350px;
@@ -25,7 +26,10 @@ export default class EditPageVersions extends Component {
             profile: {
                 name: 'Loading'
             },
-            mcverValue: ''
+            mcverValue: '',
+            hostVersionValues: [
+                'Loading'
+            ]
         }
     }
 
@@ -39,6 +43,34 @@ export default class EditPageVersions extends Component {
         this.setState({
             mcverValue: this.state.profile.minecraftversion
         })
+        
+        const { profile } = this.state;
+        if(profile.hosts) {
+            if(profile.hosts.curse) {
+                Curse.getVersionsFromItem(profile, 'modpack').then((versions) => {
+                    const nameArray = [];
+                    versions[0].latest = true;
+                    for(let ver of versions) {
+                        let name = ver.name;
+                        if(ver.latest) {
+                            name += ' (latest)';
+                        }else if(profile.version === ver.name) {
+                            name += ' (current)';
+                        }
+
+                        nameArray.push({
+                            id: ver.name,
+                            name: name
+                        })
+                    }
+                    console.log(nameArray);
+                    this.setState({
+                        hostVersionValues: nameArray,
+                        hostVersions: versions
+                    })
+                })
+            }
+        }
     }
 
     mcverChange = (version, e) => {
@@ -55,6 +87,11 @@ export default class EditPageVersions extends Component {
                 newVersion: version
             })
         }
+    }
+
+    curseVerChange = (version) => {
+        let { profile } = this.state;
+        Curse.changeProfileVersion(profile, version);
     }
 
     cancelVersionChange = () => {
@@ -100,7 +137,7 @@ export default class EditPageVersions extends Component {
         })
     }
     render() {
-        let { profile, forgeIsInstalling, forgeIsUninstalling, mcverValue } = this.state;
+        let { profile, forgeIsInstalling, forgeIsUninstalling, mcverValue, hostVersionValues } = this.state;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
@@ -109,10 +146,16 @@ export default class EditPageVersions extends Component {
                     <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} value={mcverValue} />
                     <OptionBreak />
                     <Detail>profile version</Detail>
+                    {!profile.hosts.curse && 
                     <InputContainer>
                         <TextInput placeholder='Enter a version' />
                         <Button color='green'>change</Button>
-                    </InputContainer>
+                    </InputContainer>}
+                    {profile.hosts.curse && 
+                    <div>
+                        <CustomDropdown items={hostVersionValues} />
+                        <Detail>Because this is a modpack from an online source, you can only change the version to those available online</Detail>
+                    </div>}
                     <OptionBreak />
                     <Detail>custom versions</Detail>
                     <CustomVersions>
