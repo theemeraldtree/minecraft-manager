@@ -63,7 +63,6 @@ export default class EditPageVersions extends Component {
                             name: name
                         })
                     }
-                    console.log(nameArray);
                     this.setState({
                         hostVersionValues: nameArray,
                         hostVersions: versions

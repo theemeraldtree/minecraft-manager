@@ -37,11 +37,9 @@ let Curse = {
             let results = [];
             if(type === 'curseforge') {
                 page('.project-listing-row').each((i, el) => {
-                    console.log(el);
                     // This code is sloppy only because parsing some scraped HTML isn't neat and tidy
                     let data = el.children[1];
                     let details = el.children[3];
-                    console.log(details);
                     let name = details.children[1].children[1].children[1].children[0].data.trim();
                     let url = `https://www.curseforge.com${details.children[1].children[1].attribs.href}`;
                     let blurb = details.children[5].children[0].data.trim();
@@ -97,7 +95,13 @@ let Curse = {
         return modpack;
     },
     getCurseType(type) {
-        return type === 'mods' ? 'mc-mods' : type;
+        if(type === 'modpack') {
+            return 'modpacks'
+        }else if(type === 'mods') {
+            return 'mc-mods';
+        }else {
+            return type;
+        }
     },
     search(term, type) {
         return new Promise((resolve) => {
@@ -168,13 +172,9 @@ let Curse = {
                 if(obj instanceof Mod) {
                     type = 'mc-mods';
                 }
-                console.log('gettin file info');
-                console.log(`https://curseforge.com/minecraft/${type}/${obj.hosts.curse.id}/files/${file}`);
                 HTTPRequest.cheerioRequest(`https://curseforge.com/minecraft/${type}/${obj.hosts.curse.id}/files/${file}`).then((page) => {
                     obj.name = page('.font-bold')[0].children[0].data.trim();   
-                    console.log('done wit name');
                     obj.version = page('.text-primary-500')[2].data;
-                    console.log('done wit version');
                     obj.detailedInfo = true;
                     resolve(obj);
                 }).catch((err) => {
@@ -233,8 +233,6 @@ let Curse = {
     getVersionsFromPage(page, type) {
         let list = [];
         return new Promise((resolve) => {
-            console.log(page.html());
-            console.log(page('.listing-project-file'));
             for(let el of page('.listing-project-file')[0].children[3].children) {
                 if(el.data !== ' ') {
                     let name;
@@ -260,8 +258,6 @@ let Curse = {
                     type = 'mod';
                     url = `https://www.curseforge.com/minecraft/mc-mods/${obj.hosts.curse.id}/files/all?filter-game-version=2020709689%3A${this.getCurseVersionForMCVersion(mcversion)}`
                 }
-
-                console.log(url);
 
                 const callback = (list) => {
                     this.cachedItems[obj.cachedID].versions = list;
@@ -293,8 +289,6 @@ let Curse = {
                     this.getVersionsForMCVersion(mod, profile.minecraftversion, page).then((versions) => {
                         if(versions.length !== 0) {
                             mod.version = versions[0].name;
-                            console.log(mod.version);
-                            console.log(versions[0].name);
                             mod.minecraftversion = profile.minecraftversion;
                             
                             const downloadLink = versions[0].downloadLink;
@@ -368,7 +362,6 @@ let Curse = {
 
             ProfilesManager.profilesBeingInstalled.push(modpack.id);
             this.getInfo(modpack).then((modpack) => {
-                console.log(modpack.latestVersion);
                 DownloadsManager.startFileDownload(`Info for ${modpack.name}`, modpack.latestVersion.downloadLink, infoDownload).then(() => {
                     let zip = new admzip(infoDownload);
     
@@ -428,7 +421,6 @@ let Curse = {
                                             rimraf.sync(extractPath);
                                             profile.hosts.curse.fullyInstalled = true;
                                             profile.save();
-                                            console.log(modpack.id);
                                             ProfilesManager.profilesBeingInstalled.splice(ProfilesManager.profilesBeingInstalled.indexOf(modpack.id), 1);
                                             resolve();
                                         })
@@ -447,7 +439,8 @@ let Curse = {
     },
     getVersionsFromItem(item, type) {
         return new Promise((resolve) => {
-            this.getVersionsFromURL(`https://minecraft.curseforge.com/projects/${item.hosts.curse.id}/files?page=1`, type).then(versions => {
+            console.log(`https://curseforge.com/minecraft/${type}/${item.hosts.curse.id}/files`);
+            this.getVersionsFromURL(`https://curseforge.com/minecraft/${this.getCurseType(type)}/${item.hosts.curse.id}/files`, type).then(versions => {
                 resolve(versions);
             })
         })

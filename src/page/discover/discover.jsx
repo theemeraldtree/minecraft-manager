@@ -48,8 +48,6 @@ export default class DiscoverPage extends Component {
     }
 
     updateProgressStates = () => {
-        console.log('updating!!');
-        console.log(ProfilesManager.profilesBeingInstalled);
         let ps = {};
         for(let profile of ProfilesManager.loadedProfiles) {
             if(profile.hosts) {
