@@ -13,6 +13,16 @@ Mod.prototype.cleanObject = function() {
     for(let i of this.local) {
         copy[i] = undefined;
     }
+
+    if(this.dependencies) {
+        for(let depend of this.dependencies) {
+            for(let i of this.local) {
+                depend[i] = undefined;
+            }
+
+            depend.local = undefined;
+        }
+    }
     copy.local = undefined;
     return copy;
 }

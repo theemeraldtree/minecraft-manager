@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Button from '../button/button';
 import { withRouter } from 'react-router-dom';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
+import Global from '../../util/global';
 const BG = styled.div`
     width:120px;
     height: 190px;
@@ -90,7 +91,7 @@ const ProfileCard = ({profile, history, showDeletion}) => (
         {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
         <ContextMenuTrigger id={`profilecard${profile.id}`}>
             <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
-                <Image src={`${profile.iconpath}#${new Date().getTime()}`} />
+                <Image src={`${profile.iconpath}#${Global.cacheUpdateTime}`} />
                 <Title>{profile.name}</Title>
                 <Buttons>
                     <LaunchButton color='green' onClick={(e) => {e.stopPropagation();profile.launch();}}>launch</LaunchButton>

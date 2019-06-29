@@ -36,16 +36,17 @@ let Curse = {
         return new Promise((resolve) => {
             let results = [];
             if(type === 'curseforge') {
-                page('.project-list-item').each((i, el) => {
+                page('.project-listing-row').each((i, el) => {
+                    console.log(el);
                     // This code is sloppy only because parsing some scraped HTML isn't neat and tidy
                     let data = el.children[1];
-                    let details = data.children[3];
-                    let name = details.children[1].children[1].children[0].data.trim();
-                    let url = `https://www.curseforge.com${details.children[1].attribs.href}`;
-                    let blurb = details.children[5].children[1].attribs.title.trim();
+                    let details = el.children[3];
+                    console.log(details);
+                    let name = details.children[1].children[1].children[1].children[0].data.trim();
+                    let url = `https://www.curseforge.com${details.children[1].children[1].attribs.href}`;
+                    let blurb = details.children[5].children[0].data.trim();
                     let icon = data.children[1].children[1].children[1].children[1].attribs.src;
                     let id = url.split('/')[5];
-
                                             
                     let type;
                     if(url.indexOf('mc-mods') !== -1) {
@@ -63,28 +64,6 @@ let Curse = {
 
                     results.push(res);
                 });
-                resolve(results);
-            }else if(type ==='minecraftcurseforge') {
-                page('.project-list-item').each((i, el) => {
-                    let details = el.children[3];
-                    let name = details.children[1].children[1].children[1].children[0].data.trim();
-                    let url = details.children[1].children[1].children[1].attribs.href;
-                    let blurb = details.children[5].children[1].children[0].data.trim();
-                    let icon = el.children[1].children[1].children[1].attribs.src;
-                    let id = url.split('/')[4];
-                
-                    // testing if the item is a mod by using the categories
-                    let res;
-                
-                    let categoryURL = details.children[7].children[1].children[1].children[1].attribs.href
-                    if(categoryURL.indexOf('mc-mods') !== -1) {
-                        res = this.createMod(name, blurb, url, icon, id);
-                    }else if(categoryURL.indexOf('modpacks') !== -1) {
-                        res = this.createModpack(name, blurb, url, icon, id);
-                    }
-                
-                    results.push(res);
-                })
                 resolve(results);
             }
         })
@@ -144,31 +123,23 @@ let Curse = {
     getInfo(obj, tries) {
         return new Promise((resolve, reject) => {
             if(!this.cachedItems[obj.cachedID].detailedInfo) {
-                // minecraft.curseforge.com is used instead of regular curseforge because it provides more data in one page
-                HTTPRequest.cheerioRequest(`https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}`).then((page) => {
-                    obj.description = page('.project-description').html();
-                    obj.name = page('.project-title')[0].children[1].children[1].children[0].data;
-                    let authors = page('.project-members').toArray()[0].children;
-                    let finalAuthorsList = [];
-                    for(let author of authors) {
-                        if(!author.data) {
-                            finalAuthorsList.push(author.children[3].children[1].children[1].children[0].children[0].data);
-                        } 
-                    }
-
-                    obj.hosts.curse.iconURL = page('.e-avatar64')[0].attribs.href;
-
-                    if(obj instanceof Profile) {
-                        const checker = page('#nav-streamers')[0];
-                        if(checker) {
-                            obj.hosts.curse.isFTB = true;
-                        }else{
-                            obj.hosts.curse.isFTB = false;
-                        }
-                    }
-
-                    obj.authors = finalAuthorsList;
+                let type;
+                if(obj instanceof Mod) {
+                    type = 'mc-mods';
+                }else if(obj instanceof Profile) {
+                    type = 'modpacks';
+                }
+                HTTPRequest.cheerioRequest(`https://curseforge.com/minecraft/${type}/${obj.hosts.curse.id}`).then((page) => {
+                    obj.description = page('.project-detail__content').html();
+                    obj.name = page('.font-bold')[0].children[0].data.trim();   
+                    obj.hosts.curse.iconURL = page('.project-avatar')[0].children[1].children[1].attribs.src;
                     obj.detailedInfo = true;
+
+                    let latestVerEl = page('.p-1')[0];
+                    obj.latestVersion = {
+                        name: latestVerEl.children[3].children[1].children[0].data,
+                        downloadLink: `https://curseforge.com/minecraft/${type}/${obj.hosts.curse.id}/download/${latestVerEl.children[3].children[1].attribs.href.split('/')[5]}/file`
+                    };
                     resolve(obj);
                 }).catch((err) => {
                     if(err === 'response-not-found') {
@@ -193,10 +164,17 @@ let Curse = {
     getFileInfo(obj, file, tries) {
         return new Promise((resolve, reject) => {
             if(!this.cachedItems[obj.cachedID].detailedInfo) {
-                HTTPRequest.cheerioRequest(`https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/files/${file}`).then((page) => {
-                    obj.name = page('.project-title')[0].children[1].children[1].children[0].data;
-                    
-                    obj.version = page('.details-header')[0].children[3].data;
+                let type;
+                if(obj instanceof Mod) {
+                    type = 'mc-mods';
+                }
+                console.log('gettin file info');
+                console.log(`https://curseforge.com/minecraft/${type}/${obj.hosts.curse.id}/files/${file}`);
+                HTTPRequest.cheerioRequest(`https://curseforge.com/minecraft/${type}/${obj.hosts.curse.id}/files/${file}`).then((page) => {
+                    obj.name = page('.font-bold')[0].children[0].data.trim();   
+                    console.log('done wit name');
+                    obj.version = page('.text-primary-500')[2].data;
+                    console.log('done wit version');
                     obj.detailedInfo = true;
                     resolve(obj);
                 }).catch((err) => {
@@ -225,9 +203,9 @@ let Curse = {
                 LogManager.log('info', `[Curse] Getting dependencies for ${obj.name}`);
                 let url;
                 if(obj instanceof Mod) {
-                    url = `https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/relations/dependencies?filter-related-dependencies=3`
+                    url = `https://curseforge.com/minecraft/mc-mods/${obj.hosts.curse.id}/relations/dependencies?filter-related-dependencies=3`
                 }else if(obj instanceof Profile) {
-                    url = `https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/relations/dependencies?filter-related-dependencies=6`
+                    url = `https://curseforge.com/minecraft/modpacks/${obj.hosts.curse.id}/relations/dependencies?filter-related-dependencies=6`
                 }
                 this.getCurseListItems(url).then((res) => {
                     this.cachedItems[obj.cachedID].dependencies = res;
@@ -255,18 +233,21 @@ let Curse = {
     getVersionsFromPage(page, type) {
         let list = [];
         return new Promise((resolve) => {
-            page('.project-file-list-item').each((i, el) => {
+            console.log(page.html());
+            console.log(page('.listing-project-file'));
+            for(let el of page('.listing-project-file')[0].children[3].children) {
+                if(el.data !== ' ') {
+                    let name;
+                    if(type === 'modpack') {
+                        name = el.children[3].children[1].children[0].data;
+                    }else if(type === 'mod') {
+                        name = el.children[3].children[1].children[0].data;
+                    }
+                    let downloadLink = `https://www.curseforge.com${el.children[13].children[1].children[1].attribs.href}/file`;
 
-                let name;
-                if(type === 'modpack') {
-                    name = el.children[3].children[1].children[1].children[1].children[0].data;
-                }else if(type === 'mod') {
-                    name = el.children[3].children[1].children[3].children[1].children[0].data;
+                    list.push({name: name, downloadLink: downloadLink});
                 }
-                let downloadLink = `https://minecraft.curseforge.com${el.children[3].children[1].children[1].children[1].attribs.href}`;
-
-                list.push({name: name, downloadLink: downloadLink});
-            })
+            }
             resolve(list);
         })
     },
@@ -274,9 +255,13 @@ let Curse = {
         return new Promise((resolve) => {
             if(!this.cachedItems[obj.cachedID].versions || obj.minecraftversion !== mcversion) {
                 let url;
+                let type;
                 if(obj instanceof Mod) {
-                    url = `https://minecraft.curseforge.com/projects/${obj.hosts.curse.id}/files?filter-game-version=2020709689%3A${this.getCurseVersionForMCVersion(mcversion)}`
+                    type = 'mod';
+                    url = `https://www.curseforge.com/minecraft/mc-mods/${obj.hosts.curse.id}/files/all?filter-game-version=2020709689%3A${this.getCurseVersionForMCVersion(mcversion)}`
                 }
+
+                console.log(url);
 
                 const callback = (list) => {
                     this.cachedItems[obj.cachedID].versions = list;
@@ -285,10 +270,10 @@ let Curse = {
 
                 if(!page) {    
                     HTTPRequest.cheerioRequest(url).then((pg) => {
-                        this.getVersionsFromPage(pg).then(callback);
+                        this.getVersionsFromPage(pg, type).then(callback);
                     })
                 }else{
-                    this.getVersionsFromPage(page).then(callback);
+                    this.getVersionsFromPage(page, type).then(callback);
                 }
             }else{
                 resolve(this.cachedItems[obj.cachedID].versions);
@@ -304,15 +289,18 @@ let Curse = {
                     }
                 }
 
-                HTTPRequest.cheerioRequest(`https://minecraft.curseforge.com/projects/${mod.hosts.curse.id}/files?filter-game-version=2020709689%3A${Curse.getCurseVersionForMCVersion(profile.minecraftversion)}`).then((page) => {
+                HTTPRequest.cheerioRequest(`https://curseforge.com/minecraft/mc-mods/${mod.hosts.curse.id}/files/all?filter-game-version=2020709689%3A${Curse.getCurseVersionForMCVersion(profile.minecraftversion)}`).then((page) => {
                     this.getVersionsForMCVersion(mod, profile.minecraftversion, page).then((versions) => {
                         if(versions.length !== 0) {
                             mod.version = versions[0].name;
+                            console.log(mod.version);
+                            console.log(versions[0].name);
                             mod.minecraftversion = profile.minecraftversion;
-
+                            
                             const downloadLink = versions[0].downloadLink;
-                            const fileID = downloadLink.split('/')[6];
+                            const fileID = downloadLink.split('/')[7];
                             mod.hosts.curse.fileID = fileID;
+                            mod.hosts.curse.downloadLink = downloadLink;
                             DownloadsManager.startModDownload(profile, mod, versions[0].downloadLink, modpack).then(() => {
                                 mod.jar = `${Global.createID(mod.name)}.jar`;
                                 profile.addMod(mod);
@@ -331,7 +319,7 @@ let Curse = {
         return new Promise((resolve) => {
             if(!dependencies) {
                 this.getFileInfo(mod, version).then((mod) => {
-                    DownloadsManager.startModDownload(profile, mod, `https://minecraft.curseforge.com/projects/${mod.hosts.curse.id}/files/${version}/download`, false).then(() => {
+                    DownloadsManager.startModDownload(profile, mod, `https://curseforge.com/minecraft/mc-mods/${mod.hosts.curse.id}/download/${version}/file`, false).then(() => {
                         mod.jar = `${Global.createID(mod.name)}.jar`;
                         mod.id = `${Global.createID(mod.name)}`;
                         resolve(mod);
@@ -356,13 +344,17 @@ let Curse = {
                 this.downloadModList(profile, list2, callback, onUpdate);
             }else{
                 this.concurrentDownloads.push(item);
-                this.installModVersion(profile, item, item.hosts.curse.fileID, false).then((modres) => {
-                    if(!profile.mods.find(item => (item.id === modres.id))) {
-                        profile.addMod(modres);
-                    }
-                    onUpdate(list.length);
-                    list.shift();
-                    this.downloadModList(profile, list, callback, onUpdate)
+                HTTPRequest.cheerioRequest(`https://curseforge.com/projects/${item.hosts.curse.id}`).then((page) => {
+                    const curseRealID = page('.project-avatar')[0].children[1].attribs.href.split('/')[3];
+                    item.hosts.curse.id = curseRealID;
+                    this.installModVersion(profile, item, item.hosts.curse.fileID, false).then((modres) => {
+                        if(!profile.mods.find(item => (item.id === modres.id))) {
+                            profile.addMod(modres);
+                        }
+                        onUpdate(list.length);
+                        list.shift();
+                        this.downloadModList(profile, list, callback, onUpdate)
+                    })
                 })
             }
         }
@@ -376,9 +368,8 @@ let Curse = {
 
             ProfilesManager.profilesBeingInstalled.push(modpack.id);
             this.getInfo(modpack).then((modpack) => {
-                const infoURL = modpack.hosts.curse.isFTB ? `https://www.feed-the-beast.com/projects/${modpack.hosts.curse.id}/files/latest` : `https://minecraft.curseforge.com/projects/${modpack.hosts.curse.id}/files/latest`
-                console.log(infoURL);
-                DownloadsManager.startFileDownload(`Info for ${modpack.name}`, infoURL, infoDownload).then(() => {
+                console.log(modpack.latestVersion);
+                DownloadsManager.startFileDownload(`Info for ${modpack.name}`, modpack.latestVersion.downloadLink, infoDownload).then(() => {
                     let zip = new admzip(infoDownload);
     
                     let extractPath = path.join(Global.MCM_TEMP, `${modpack.id}-install/`);
@@ -437,7 +428,8 @@ let Curse = {
                                             rimraf.sync(extractPath);
                                             profile.hosts.curse.fullyInstalled = true;
                                             profile.save();
-                                            ProfilesManager.loadedProfiles.slice(ProfilesManager.indexOf(modpack.id), 1);
+                                            console.log(modpack.id);
+                                            ProfilesManager.profilesBeingInstalled.splice(ProfilesManager.profilesBeingInstalled.indexOf(modpack.id), 1);
                                             resolve();
                                         })
                                     })
@@ -451,6 +443,13 @@ let Curse = {
                 })
             })
             
+        })
+    },
+    getVersionsFromItem(item, type) {
+        return new Promise((resolve) => {
+            this.getVersionsFromURL(`https://minecraft.curseforge.com/projects/${item.hosts.curse.id}/files?page=1`, type).then(versions => {
+                resolve(versions);
+            })
         })
     }
 }
