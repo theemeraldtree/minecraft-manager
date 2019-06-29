@@ -18,7 +18,6 @@ export default class ProfileGrid extends Component {
     }
 
     componentDidMount = () => {
-        console.log('comp mount!!');
         ProfilesManager.registerReloadListener(this.generateProfiles);
         this.generateProfiles();
     }
@@ -28,18 +27,14 @@ export default class ProfileGrid extends Component {
     }
     
     componentDidUpdate = (prevProps) => {
-        console.log(this.props);
-        console.log(prevProps);
         if(this.props.searchTerm !== prevProps.searchTerm) {
             this.generateProfiles();
         }
     }
 
     generateProfiles = () => {
-        console.log('GENERATING PROFILES');
         let profilesComponents = [];
         for(let profile of ProfilesManager.loadedProfiles) {
-            console.log(profile);
             if(profile.name.toLowerCase().includes(this.props.searchTerm)) {
                 profilesComponents.push(<ProfileCard showDeletion={this.showDeletion} key={profile.id} profile={profile} />);
             }
