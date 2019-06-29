@@ -16,6 +16,7 @@ const ProfilesManager = {
     reloadListeners: [],
     profilesBeingInstalled: [],
     getProfiles: function() {
+        console.log('GETTING PROFILES!!!!!');
         this.loadedProfiles = [];
         LogManager.log('info', '[ProfilesManager] Getting profiles...');
         return new Promise(resolve => {
@@ -27,6 +28,7 @@ const ProfilesManager = {
                         resolve();
                     })
                 }else{
+                    LogManager.log('info', '[ProfilesManager] done getting profiles');
                     this.updateReloadListeners();
                     resolve();
                 }
@@ -34,6 +36,7 @@ const ProfilesManager = {
         })
     },
     updateReloadListeners: function() {
+        Global.updateCache();
         for(let listener of this.reloadListeners) {
             listener();
         }
@@ -151,6 +154,7 @@ const ProfilesManager = {
 
 
     getProfileFromID: function(id) {
+        console.log("GET PROFILE FROM ID");
         for(let profile of this.loadedProfiles) {
             if(profile.id === id) {
                 return profile;

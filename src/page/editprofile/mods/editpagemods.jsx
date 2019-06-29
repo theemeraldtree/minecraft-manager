@@ -129,14 +129,17 @@ export default class EditPageMods extends Component {
 
     searchChange = (e) => {
         let term = e.target.value;
-        this.setState({
-            liveSearchTerm: term
-        }, () => {
-            this.reloadModsList();
-        });
+        if(this.state.displayState === 'modsList') {
+            this.setState({
+                liveSearchTerm: term
+            }, () => {
+                this.reloadModsList();
+            });
+        }
         if(e.key === 'Enter') {
             this.setState({
-                searchTerm: term
+                searchTerm: term,
+                listState: 'browseAssets'
             })
         }
     }
@@ -204,8 +207,9 @@ export default class EditPageMods extends Component {
                         <Container>
                                 <SearchContainer>
                                     {displayState !== 'modsList' && <Button onClick={this.goBack} color='red'>back</Button>}
+                                    {displayState !== 'modsList' && <Search onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='Search' />}
                                     {listState !== 'viewAsset' && <>
-                                        <Search value={liveSearchTerm} onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='Search' />
+                                        {displayState === 'modsList' && <Search value={liveSearchTerm} onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='Search' />}
                                         {displayState === 'modsList' && <Button onClick={this.browseMods} color='green'>add</Button>}
                                         {displayState === 'addMods' && <Button onClick={this.addFromFile} color='green'>from file</Button>}
                                     </>}

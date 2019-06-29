@@ -9,6 +9,7 @@ import TextInput from '../../../component/textinput/textinput';
 import TextBox from '../../../component/textbox/textbox';
 import Detail from '../../../component/detail/detail';
 import InputContainer from '../components/inputcontainer';
+import Global from '../../../util/global';
 const { dialog } = require('electron').remote;
 const DescContainer = styled.div`
     margin-top: 40px;
@@ -101,6 +102,7 @@ export default class EditPageGeneral extends Component {
             this.state.profile.changeIcon(img);
             this.forceUpdate();
             ProfilesManager.updateProfile(this.state.profile);
+            Global.updateCache();
         }
     }
 
