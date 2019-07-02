@@ -69,18 +69,22 @@ export default class DiscoverPage extends Component {
     installClick = (e) => {
         e.stopPropagation();
         let cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
-        let modpack = Curse.cachedItems[cachedID];
+        let modpack = Curse.cached.assets[cachedID];
         let id = modpack.id;
         let ps = Object.assign({}, this.state.progressState);
         ps[id] = 'installing';
         this.setState({
             progressState: ps
-        }, () => {
-            Curse.installModpack(modpack).then(() => {
-                ProfilesManager.getProfiles().then(() => {
-                    this.updateProgressStates();
-                });
-            });
+        }, async () => {
+            await Curse.installModpack(modpack);
+            ProfilesManager.getProfiles().then(() => {
+                this.updateProgressStates();
+            })
+            // Curse.installModpack(modpack).then(() => {
+            //     ProfilesManager.getProfiles().then(() => {
+            //         this.updateProgressStates();
+            //     });
+            // });
         })
     }
 
@@ -91,7 +95,7 @@ export default class DiscoverPage extends Component {
                 <Header showBackButton={listState !== 'browseAssets'} backClick={this.backClick} title='discover'>
                     {listState === 'browseAssets' && <SearchBox value={this.state.searchValue} onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='search' />}
                 </Header>
-                <DiscoverList progressState={progressState} stateChange={this.listStateChange} state={listState} type='modpacks' installClick={this.installClick} searchTerm={this.state.searchTerm} />
+                <DiscoverList progressState={progressState} stateChange={this.listStateChange} state={listState} type='profile' installClick={this.installClick} searchTerm={this.state.searchTerm} />
             </Page>
         )
     }

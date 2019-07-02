@@ -75,9 +75,17 @@ export default class EditPageMods extends Component {
     }
 
     reloadModsList() {
-        let { profile } = this.state;
+        let { profile, progressState } = this.state;
         let newList = [];
         let ps = {};
+        for(let key of Object.keys(progressState)) {
+            if(progressState[key] === 'notavailable') {
+                ps[key] = 'notavailable';
+            }else if(progressState[key] === 'installing') {
+                ps[key] = 'installing';
+            }
+        }
+
         for(let mod of profile.mods) {
             ps[mod.id] = 'installed';
             if(this.state.displayState === 'modsList') {
@@ -147,17 +155,18 @@ export default class EditPageMods extends Component {
     installClick = (e) => {
         e.stopPropagation();
         let cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
-        let mod = Curse.cachedItems[cachedID];
+        let mod = Curse.cached.assets[cachedID];
         let id = mod.id;
         let ps = Object.assign({}, this.state.progressState);
         ps[id] = 'installing';
         this.setState({
             progressState: ps
-        }, () => {
-            Curse.installMod(this.state.profile, mod, false).then(() => {
+        }, async () => {
+            try {
+                await Curse.installModToProfile(this.state.profile, mod);
                 this.reloadModsList();
-            }).catch((err) => {
-                if(err === 'invalidVersion') {
+            }catch(err) {
+                if(err === 'no-version-available') {
                     let ps = Object.assign({}, this.state.progressState);
                     ps[id] = 'notavailable';
                     this.setState({
@@ -166,7 +175,7 @@ export default class EditPageMods extends Component {
                         progressState: ps
                     })
                 }
-            });
+            }
         });
     }
 
@@ -219,7 +228,7 @@ export default class EditPageMods extends Component {
                                     {modsList}
                                 </List>
                                 </>}
-                                {displayState === 'addMods' && <DiscoverList progressState={progressState} type='mods' installClick={this.installClick} searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
+                                {displayState === 'addMods' && <DiscoverList progressState={progressState} type='mod' installClick={this.installClick} searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
                                 {this.state.invalidVersion && <Confirmation questionText={`There is no Minecraft ${profile.minecraftversion} version of ${errorMod.name}.`} hideConfirm cancelText='Ok' cancelDelete={() => {this.setState({invalidVersion: false})}} /> } 
                         </Container>
                     </Wrapper>

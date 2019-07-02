@@ -12,6 +12,7 @@ import Overlay from '../../component/overlay/overlay';
 import CustomDropdown from '../../component/customdropdown/customdropdown';
 import Global from '../../util/global';
 import ImportOverlay from '../../component/importoverlay/importoverlay';
+import Curse from '../../host/curse/curse';
 const CreateBG = styled.div`
     max-width: 600px;
     max-height: 400px;
@@ -50,6 +51,10 @@ export default class HomePage extends Component {
         }
     }
 
+    componentDidMount() {
+        Curse.getPopularAssets();
+    }
+    
     searchChange = (e) => {
         this.setState({
             searchTerm: e.target.value.toLowerCase()

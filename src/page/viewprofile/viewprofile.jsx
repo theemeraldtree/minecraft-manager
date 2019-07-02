@@ -6,7 +6,6 @@ import ProfilesManager from '../../manager/profilesManager';
 import styled from 'styled-components';
 import Button from '../../component/button/button';
 import SanitizedHTML from '../../component/sanitizedhtml/sanitizedhtml'
-import LauncherManager from '../../manager/launcherManager';
 import Confirmation from '../../component/confirmation/confirmation';
 import ShareOverlay from '../../component/shareoverlay/shareoverlay';
 const Image = styled.img`
@@ -100,7 +99,7 @@ class ViewProfilePage extends Component {
     }
 
     launchProfile = () => {
-        LauncherManager.openLauncher();
+        this.state.profile.launch();
     }
 
     deleteClick = () => {
@@ -156,6 +155,8 @@ class ViewProfilePage extends Component {
                     </ButtonGroup>
                     <Specs>
                         <p>internal id: {profile.id}</p>
+                        <p>version safe name: {profile.safename}</p>
+                        <p>version timestamp: {profile.versionTimestamp}</p>
                     </Specs>
                 </MiddlePanel>
                 <Description>

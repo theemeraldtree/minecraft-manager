@@ -47,6 +47,8 @@ const DownloadsManager = {
         return new Promise((resolve) => {
             let download = new Download(downloadName, 'None', 'None');
             this.activeDownloads.push(download);
+
+            this.downloadUpdate();
             resolve(download);
         })
     },

@@ -1,4 +1,5 @@
 const request = require('request');
+const req = require('request-promise');
 const cheerio = require('cheerio');
 const fs = require('fs');
 let HTTPRequest = {
@@ -68,6 +69,31 @@ let HTTPRequest = {
                 reject();
             })
         })
+    },
+
+    async get(url, qs) {
+        return await req({
+            uri: url,
+            method: 'GET',
+            qs: qs,
+            headers: {
+                'User-Agent': 'MinecraftManagerClient'
+            }
+        })
+    },
+
+    async post(url, body) {
+        let res = await req({
+            uri: url,
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: {
+                'content-type': 'application/json',
+                'User-Agent': 'MinecraftManagerClient'
+            }
+        })
+
+        return res;
     }
 }
 

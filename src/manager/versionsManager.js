@@ -10,7 +10,7 @@ const VersionsManager = {
         return path.join(Global.getMCPath(), '/versions')
     },
     createVersion: function(profile) {
-        let versionname = `${profile.name} [Minecraft Manager]`;
+        let versionname = `${profile.safename} [Minecraft Manager]`;
         fs.mkdirSync(path.join(this.getVersionsPath(), versionname));
         let obj = defaultVersion;
         if(this.checkIs1710OrLower(profile)) {
@@ -51,8 +51,8 @@ const VersionsManager = {
             if(profile.launcherVersion) {
                 if(fs.existsSync(path.join(this.getVersionsPath(), profile.launcherVersion))) {
                     rimraf(path.join(this.getVersionsPath(), profile.launcherVersion), () => {
-                        if(fs.existsSync(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`))) {
-                            rimraf(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`), () => {
+                        if(fs.existsSync(path.join(this.getVersionsPath(), `${profile.safename} [Minecraft Manager]`))) {
+                            rimraf(path.join(this.getVersionsPath(), `${profile.safename} [Minecraft Manager]`), () => {
                                 resolve();
                             })
                         }else{
@@ -60,8 +60,8 @@ const VersionsManager = {
                         }
                     })
                 }else{
-                    if(fs.existsSync(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`))) {
-                        rimraf(path.join(this.getVersionsPath(), `${profile.name} [Minecraft Manager]`), () => {
+                    if(fs.existsSync(path.join(this.getVersionsPath(), `${profile.safename} [Minecraft Manager]`))) {
+                        rimraf(path.join(this.getVersionsPath(), `${profile.safename} [Minecraft Manager]`), () => {
                             resolve();
                         })
                     }else{

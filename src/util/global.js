@@ -1,5 +1,7 @@
 import SettingsManager from '../manager/settingsManager';
 import ProfilesManager from '../manager/profilesManager';
+import Mod from '../type/mod';
+import Profile from '../type/profile';
 
 const remote = require('electron').remote;
 const app = remote.app;
@@ -21,6 +23,9 @@ const Global = {
         newname = newname.replace('/', '');
         return newname;
     },
+    createSafeName: (name) => {
+        return name.replace(/[\W_]+/g, ' ');
+    },
     getResourcesPath: () => {
         let dev = false;
         if ( process.defaultApp || /[\\/]electron-prebuilt[\\/]/.test(process.execPath) || /[\\/]electron[\\/]/.test(process.execPath) ) {
@@ -34,6 +39,13 @@ const Global = {
             }else{
                 return null;
             }
+        }
+    },
+    getTypeString: (obj) => {
+        if(obj instanceof Mod) {
+            return 'mod';
+        }else if(obj instanceof Profile) {
+            return 'profile';
         }
     },
     getDefaultMinecraftPath: () => {
@@ -93,12 +105,33 @@ const Global = {
                     profile.hosts.curse.fullyInstalled = true;
                 }
 
-                profile.save()
+                profile.save();
             }else{
                 if(profile.omafVersion === '0.1') {
                     profile.omafVersion = '0.1.1';
 
                     profile.version = 'unknown';
+                    profile.save();
+                }else if(profile.omafVersion === '0.1.1') {
+                    profile.omafVersion = '0.1.2';
+                    if(profile.hosts.curse) {
+                        profile.hosts.curse.slug = profile.hosts.curse.id;
+                        profile.hosts.curse.id = 'unknown';
+                    }
+
+                    if(profile.mods) {
+                        for(let mod of profile.mods) {
+                            if(mod.hosts) {
+                                if(mod.hosts.curse) {
+                                    mod.hosts.curse.slug = mod.hosts.curse.id;
+                                    mod.hosts.curse.id = 'unknown';
+                                }
+                            }
+                        }
+                    }
+
+                    profile.addIconToLauncher();
+
                     profile.save();
                 }
             }

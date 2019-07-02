@@ -80,23 +80,6 @@ const ProfilesManager = {
                 const profile = this.getProfileFromID(obj.id);
                 profile.setCurrentState('importing...');
     
-                LogManager.log('info', `[ProfilesManager] (ProfileImport) Starting mod download for ${profile.id}`)
-                stateChange('Downloading mods...');
-                let curseModsToDownload = [];
-                for(let mod of profile.mods) {
-                    if(mod.hosts) {
-                        if(mod.hosts.curse) {
-                            LogManager.log('info', `[ProfilesManager] (ProfileImport) Adding mod to download queue ${mod.id}`);
-                            mod.cachedID = `profile-import-${mod.id}`;
-                            mod.detailedInfo = false;
-                            Curse.cachedItems[mod.cachedID] = mod;
-                            curseModsToDownload.push(mod);
-                        }
-                    }
-                }
-    
-                const concurrent = curseModsToDownload.length >=5 ? 5 : 0;
-    
                 const importComplete = () => {
                     profile.setCurrentState('');
 
@@ -108,32 +91,61 @@ const ProfilesManager = {
 
                     LogManager.log('info', `[ProfilesManager] (ProfileImport) Completed import for ${profile.id}`);
                     stateChange('Done');
+
+                    profile.addIconToLauncher();
                     resolve();
                 }
-                LogManager.log('info', `[ProfilesManager] (ProfileImport) Creating progressive download for ${profile.id}`);
-                DownloadsManager.createProgressiveDownload(`Mods from ${profile.name}`).then((download) => {
-                    let numberDownloaded = 0;
-                    Curse.downloadModList(profile, curseModsToDownload.slice(), () => {
-                        if(numberDownloaded === curseModsToDownload.length) {
-                            stateChange('Creating launcher profile...');
-                            DownloadsManager.removeDownload(download.name);
-                            LogManager.log('info', `[ProfilesManager] (ProfileImport) Creating launcher profile for ${profile.id}`);
-                            LauncherManager.createProfile(profile);
-                            if(profile.forgeInstalled) {
-                                LogManager.log('info', `[ProfilesManager] (ProfileImport) Installing Forge for ${profile.id}`);
-                                stateChange('Installing forge...');
-                                ForgeManager.setupForge(profile).then(() => {
-                                    importComplete();
-                                });
-                            }else{
-                                importComplete();
+
+                if(profile.mods) {
+                    LogManager.log('info', `[ProfilesManager] (ProfileImport) Starting mod download for ${profile.id}`)
+                    stateChange('Downloading mods...');
+                    let curseModsToDownload = [];
+                    for(let mod of profile.mods) {
+                        if(mod.hosts) {
+                            if(mod.hosts.curse) {
+                                LogManager.log('info', `[ProfilesManager] (ProfileImport) Adding mod to download queue ${mod.id}`);
+                                mod.cachedID = `profile-import-${mod.id}`;
+                                mod.detailedInfo = false;
+                                Curse.cached.assets[mod.cachedID] = mod;
+                                curseModsToDownload.push(mod);
                             }
                         }
-                    }, () => {
-                        numberDownloaded++;
-                        DownloadsManager.setDownloadProgress(download.name, Math.ceil((numberDownloaded/curseModsToDownload.length) * 100));
-                    }, concurrent)
-                })
+                    }
+        
+        
+
+                    LogManager.log('info', `[ProfilesManager] (ProfileImport) Creating progressive download for ${profile.id}`);
+                    DownloadsManager.createProgressiveDownload(`Mods from ${profile.name}`).then((download) => {
+                        let numberDownloaded = 0;
+
+                        const concurrent = curseModsToDownload.length >=5 ? 5 : 0;
+                        Curse.downloadModList(profile, curseModsToDownload.slice(), () => {
+                            if(numberDownloaded === curseModsToDownload.length) {
+                                DownloadsManager.removeDownload(download.name);
+                                stateChange('Creating launcher profile...');
+                                LogManager.log('info', `[ProfilesManager] (ProfileImport) Creating launcher profile for ${profile.id}`);
+                                LauncherManager.createProfile(profile);
+                                if(profile.forgeInstalled) {
+                                    LogManager.log('info', `[ProfilesManager] (ProfileImport) Installing Forge for ${profile.id}`);
+                                    stateChange('Installing forge...');
+                                    ForgeManager.setupForge(profile).then(() => {
+                                        importComplete();
+                                    });
+                                }else{
+                                    importComplete();
+                                }
+                            }
+                        }, () => {
+                            numberDownloaded++;
+                            DownloadsManager.setDownloadProgress(download.name, Math.ceil((numberDownloaded/curseModsToDownload.length) * 100));
+                        }, concurrent)
+                    })
+                }else{
+                    stateChange('Creating launcher profile...');
+                    LogManager.log('info', `[ProfilesManager] (ProfileImport) Creating launcher profile for ${profile.id}`);
+                    LauncherManager.createProfile(profile);
+                    importComplete();
+                }
             });
         })
     },
@@ -172,7 +184,6 @@ const ProfilesManager = {
             fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/files/mods'));
 
             LogManager.log('info', `[ProfilesManager] Copying default logo to profile`);
-            fs.copyFileSync(path.join(Global.getResourcesPath(), '/logo-sm.png'), path.join(Global.PROFILES_PATH, id, '/icon.png'));
             let profile = new Profile({
                 id: id,
                 name: name,
@@ -180,6 +191,9 @@ const ProfilesManager = {
                 icon: 'icon.png',
                 omafVersion: '0.1'
             });
+
+            profile.resetIcon();
+            
             LogManager.log('info', `[ProfilesManager] (CreateProfile) Creating launcher profile`);
             LauncherManager.createProfile(profile);
 

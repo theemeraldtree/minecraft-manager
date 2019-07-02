@@ -1,6 +1,7 @@
 import Global from "../util/global";
 import LauncherManager from '../manager/launcherManager';
 import Mod from "./mod";
+import jimp from 'jimp';
 const archiver = require('archiver');
 const path = require('path');
 const fs = require('fs');
@@ -9,7 +10,9 @@ const rimraf = require('rimraf');
 function Profile(rawOMAF) {
     Object.assign(this, rawOMAF);
 
-    this.local = ['folderpath', 'iconpath', 'modsPath', 'state'];
+    this.local = ['safename', 'versionname', 'folderpath', 'iconpath', 'modsPath', 'state', 'downloadTemp'];
+    this.safename = Global.createSafeName(this.name);
+    this.versionname = `${this.safename} [Minecraft Manager]`;
     this.folderpath = path.join(Global.PROFILES_PATH + `/${this.id}`).replace("\\","/");
     this.gameDir = path.join(this.folderpath, '/files');
     this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
@@ -30,6 +33,11 @@ function Profile(rawOMAF) {
     
     if(!this.hosts) {
         this.hosts = {};
+    }
+
+    if(!this.omafVersion) {
+        Global.checkMigration();
+        this.omafVersion = '0.1.1';
     }
 }
 
@@ -75,6 +83,8 @@ Profile.prototype.changeMCVersion = function(newver) {
 }
 
 Profile.prototype.launch = function() {
+    console.log('launchign!');
+    console.log(this);
     LauncherManager.setMostRecentProfile(this);
     LauncherManager.openLauncher();
 }
@@ -140,9 +150,31 @@ Profile.prototype.deleteMod = function(mod) {
     })
 }
 
-Profile.prototype.changeIcon = function(img) {
-    fs.unlinkSync(this.iconpath);
+Profile.prototype.addIconToLauncher = function() {
+    jimp.read(this.iconpath).then(jmp => {
+        return jmp
+            .contain(128, 128)
+            .getBase64(jimp.MIME_PNG, (err, res) => {
+                if(!err) {
+                    LauncherManager.setProfileData(this, 'icon', res)
+                }
+            })
+    })
+}
 
+Profile.prototype.changeIcon = function(img) {
+    if(fs.existsSync(this.iconpath)) {
+        fs.unlinkSync(this.iconpath);
+    }
+    jimp.read(img).then(jmp => {
+        return jmp
+            .contain(128, 128)
+            .getBase64(jimp.MIME_PNG, (err, res) => {
+                if(!err) {
+                    LauncherManager.setProfileData(this, 'icon', res)
+                }
+            })
+    })
     const newPath = path.join(this.folderpath, `icon${path.extname(img)}`);
     fs.copyFileSync(img, newPath);
     this.icon = `icon${path.extname(img)}`;
@@ -151,11 +183,7 @@ Profile.prototype.changeIcon = function(img) {
 }
 
 Profile.prototype.resetIcon = function() {
-    fs.unlinkSync(this.iconpath);
-    fs.copyFileSync(path.join(Global.getResourcesPath(), '/logo-sm.png'), path.join(this.folderpath, '/icon.png'));
-    this.icon = 'icon.png';
-    this.iconpath = path.join(this.folderpath, 'icon.png').replace(/\\/g,"/");
-    this.save();
+    this.changeIcon(path.join(Global.getResourcesPath(), '/logo-sm.png'));
 }
 
 Profile.prototype.setCurrentState = function(state) {
@@ -165,6 +193,9 @@ Profile.prototype.setCurrentState = function(state) {
 Profile.prototype.export = function(output, exportFolders, exportProgress) {
     return new Promise((resolve) => {
         const tempPath = path.join(Global.MCM_TEMP, `/profileexport-${this.id}/`);
+        if(fs.existsSync(tempPath)) {
+            rimraf.sync(tempPath);
+        }
         const filesPath = path.join(tempPath, '/files');
         exportProgress('Preparing...');
         Global.copyDirSync(this.folderpath, tempPath);
@@ -177,11 +208,13 @@ Profile.prototype.export = function(output, exportFolders, exportProgress) {
                 }
             }
         }
+
+        console.log(exportFolders);
     
         exportProgress('Removing non-chosen folders...');
         fs.readdir(path.join(tempPath, '/files'), (err, files) => {
             files.forEach(file => {
-                if(!exportFolders.includes(file)) {
+                if(!exportFolders[file]) {
                     if(file !== 'mods') {
                         rimraf.sync(path.join(filesPath, file));
                     }

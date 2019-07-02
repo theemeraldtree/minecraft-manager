@@ -36,7 +36,7 @@ const Title = styled.p`
     font-weight: bolder;
     font-size: 22pt;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -52,7 +52,7 @@ const Version = styled.p`
     font-weight: bolder;
     font-size: 13pt;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -85,6 +85,7 @@ const AssetCard = ({asset, onClick, showDelete, progressState, showInstall, disa
         <ContextMenuTrigger id={`asset${asset.id}`}>
             <BG disableHover={disableHover} data-cachedid={asset.cachedID} data-assetid={asset.id} onClick={onClick}>
                 {asset.icon || asset.iconpath && <Image src={asset.iconpath} />}
+                {asset.iconURL && !asset.iconpath && !asset.icon && <Image src={asset.iconURL} />}
                 <Details>
                     <Title>{asset.name}</Title>
                     <Version buttonShown={showInstall || showDelete}>{!showBlurb && asset.version}{showBlurb && asset.blurb}</Version>
