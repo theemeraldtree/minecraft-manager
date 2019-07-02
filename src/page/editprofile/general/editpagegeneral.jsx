@@ -129,7 +129,7 @@ export default class EditPageGeneral extends Component {
                         <Button disabled={nameDisabled} color='green'>change</Button>
                     </InputContainer>
                     <Detail>internal id: {profile.id}</Detail>
-                    <Detail>version-safe name: PLACEHOLDER</Detail>
+                    <Detail>version-safe name: {profile.safename}</Detail>
 
                     <DescContainer>
                         <Detail>short description</Detail>

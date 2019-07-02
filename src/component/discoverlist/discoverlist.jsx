@@ -52,14 +52,12 @@ export default class DiscoverList extends Component {
         }
     }
 
-    browseAssets = () => {
+    browseAssets = async () => {
         this.setState({
             displayState: 'browseAssets'
         })
 
-        Curse.getPopular(this.props.type).then((res) => {
-            this.renderAssets(res);
-        })
+        this.renderAssets(await Curse.getPopularAssets(this.props.type));
     }
 
     static getDerivedStateFromProps(props) {
@@ -107,14 +105,14 @@ export default class DiscoverList extends Component {
     showAsset = (e) => {
         let { displayState } = this.state;
         if(displayState === 'browseAssets') {
-            let mod = Curse.cachedItems[e.currentTarget.dataset.cachedid];
+            let mod = Curse.cached.assets[e.currentTarget.dataset.cachedid];
+            console.log(mod);
             this.props.stateChange('viewAsset');
             this.setState({
                 previousState: 'browseAssets',
                 displayState: 'viewAsset',
                 previewState: 'description',
-                activeAsset: mod,
-                loadedDetailedInfo: false
+                activeAsset: mod
             }, () => {
                 this.showDescription();
             });
@@ -140,35 +138,35 @@ export default class DiscoverList extends Component {
         })
     }
 
-    showDescription = () => {
-        Curse.getInfo(this.state.activeAsset).then((res) => {
-            this.setState({
-                activeAsset: res,
-                loadedDetailedInfo: true
-            })
+    showDescription = async () => {
+        const newAsset = await Curse.addDescription(this.state.activeAsset);
+        this.setState({
+            activeAsset: newAsset,
+            description: true
         })
     }
 
-    showDependencies = () => {
+    showDependencies = async () => {
         let newAsset = Object.assign({}, this.state.activeAsset);
-        newAsset.dependencies = [];
-        Curse.getDependencies(this.state.activeAsset).then((res) => {
-            newAsset.dependencies = res;
+        this.setState({
+            assetDependencies: [<LoadingText key='loading'>loading...</LoadingText>]
+        });
+        const res = await Curse.getDependencies(this.state.activeAsset);
+        console.log(res);
+        newAsset.dependencies = res;
 
-            let newDependList = [];
-            if(res.length >= 1) {
-                for(let asset of res) {
-                    newDependList.push(<AssetCard showInstall={true} disableHover key={asset.id} showBlurb={true} asset={asset} />);
-                }
-            }else{
-                newDependList.push(<LoadingText key='none2'>No Dependencies</LoadingText>);
+        let newDependList = [];
+        if(res.length >= 1) {
+            for(let asset of res) {
+                newDependList.push(<AssetCard showInstall={true} disableHover key={asset.id} showBlurb={true} asset={asset} />);
             }
-    
-            this.setState({
-                activeAsset: newAsset,
-                assetDependencies: newDependList,
-                loadedDetailedInfo: true
-            });
+        }else{
+            newDependList.push(<LoadingText key='none2'>No Dependencies</LoadingText>);
+        }
+
+        this.setState({
+            activeAsset: newAsset,
+            assetDependencies: newDependList,
         });
     }
 
@@ -176,8 +174,7 @@ export default class DiscoverList extends Component {
         let newState = e.currentTarget.dataset.state;
 
         this.setState({
-            previewState: newState,
-            loadedDetailedInfo: false
+            previewState: newState
         });
         if(newState === 'description') {
             this.showDescription();
@@ -204,7 +201,7 @@ export default class DiscoverList extends Component {
     }
 
     render() {
-        let { displayState, previewState, loadedDetailedInfo, activeAsset, assetsList } = this.state;
+        let { displayState, previewState, description, activeAsset, assetsList } = this.state;
         let { type, progressState, installClick } = this.props;
         return (
             <>
@@ -220,15 +217,17 @@ export default class DiscoverList extends Component {
                     <AssetCard progressState={progressState[activeAsset.id]} installed={progressState[activeAsset.id] === 'installed'} disableHover showInstall installClick={installClick} asset={activeAsset} showBlurb />
                     <HeaderButtons>
                         <HB active={previewState === 'description'} onClick={this.previewStateSwitch} data-state='description'>Description</HB>
-                        {type === 'mods' && <HB active={previewState === 'dependencies'} onClick={this.previewStateSwitch} data-state='dependencies'>Dependencies</HB>}
+                        {type === 'mod' && <HB active={previewState === 'dependencies'} onClick={this.previewStateSwitch} data-state='dependencies'>Dependencies</HB>}
                     </HeaderButtons>
-                    {loadedDetailedInfo && <>
 
-                        {previewState === 'description' && 
-                            <Description>
+                        {previewState === 'description' && <>
+                            {description && <Description>
                                 <SanitizedHTML html={activeAsset.description} />
-                            </Description>
+                            </Description>}
+                            {!description && <LoadingText>loading...</LoadingText>}
+                            </>
                         }
+
 
                         {previewState === 'versions' &&
                             <h1>versions</h1>
@@ -240,9 +239,7 @@ export default class DiscoverList extends Component {
                             </List>
                         }
                     </>}
-                    {!loadedDetailedInfo && <LoadingText>loading...</LoadingText>}
-                </>}
-            </>
+                </>
         )
     }
 }

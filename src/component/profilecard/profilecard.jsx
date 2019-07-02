@@ -100,7 +100,7 @@ const ProfileCard = ({profile, history, showDeletion}) => (
             </BG>
         </ContextMenuTrigger>
         <ContextMenu id={`profilecard${profile.id}`}>
-            <MenuItem onClick={profile.launch}>Launch</MenuItem>
+            <MenuItem onClick={() => {profile.launch()}}>Launch</MenuItem>
             <MenuItem onClick={() => {history.push(`/edit/general/${profile.id}`)}}>Edit</MenuItem>
             <MenuItem>Update</MenuItem>
             <MenuItem>Share</MenuItem>
