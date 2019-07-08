@@ -30,6 +30,8 @@ export default class CustomDropdown extends Component {
 
     componentDidUpdate(prevProps) {
         if(this.props.value !== prevProps.value) {
+            console.log('!! NEW VALUE !!');
+            console.log(this.props.value);
             this.setState({
                 value: this.props.value
             })
@@ -54,7 +56,7 @@ export default class CustomDropdown extends Component {
 
     render() {
         return (
-            <Dropdown onChange={this.dropdownChange} value={this.state.value}>
+            <Dropdown onChange={this.dropdownChange} value={this.props.value}>
                 {this.state.items}
             </Dropdown>
         )

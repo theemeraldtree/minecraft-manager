@@ -54,6 +54,12 @@ const ProfilesManager = {
         this.loadedProfiles[oldProfile] = newProfile;
         this.updateReloadListeners();
     },
+    createBackup: function(profile) {
+        if(!fs.existsSync(Global.BACKUPS_DIR)) {
+            fs.mkdirSync(Global.BACKUPS_DIR);
+        }
+        Global.copyDirSync(profile.gameDir, path.join(Global.BACKUPS_DIR, `${profile.id}-${new Date().getTime()}`));
+    },
     importProfile: function(profilePath, stateChange) {
         return new Promise((resolve) => {
             const zip = new admzip(profilePath);
@@ -189,7 +195,7 @@ const ProfilesManager = {
                 name: name,
                 minecraftversion: mcversion,
                 icon: 'icon.png',
-                omafVersion: '0.1'
+                omafVersion: '0.1.2'
             });
 
             profile.resetIcon();

@@ -68,7 +68,6 @@ let Curse = {
             finalList.push(obj);
         }
 
-        console.log(finalList);
         return finalList;
     },
 
@@ -139,8 +138,6 @@ let Curse = {
     async getFullAsset(asset, type) {
         const info = await this.getInfo(asset);
         
-        console.log('THE INFO IS');
-        console.log(info);
         let obj;
         if(type === 'mod') {
             obj = new Mod(this.createObjectFromInfo(info));
@@ -152,18 +149,22 @@ let Curse = {
     },
 
     async getInfo(asset) {
-        if(!this.cached.assets[asset.cachedID]) {
-            return JSON.parse(await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}`));
-        }
+        return JSON.parse(await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}`));
     },
 
     async addDescription(asset) {
-        if(!this.cached.assets[asset.cachedID].description) {
-            asset.description = await this.getDescription(asset);
-            this.cached.assets[asset.cachedID] = asset;
-            return asset;
+        if(this.cached.assets[asset.cachedID]) {
+            if(!this.cached.assets[asset.cachedID].description) {
+                asset.description = await this.getDescription(asset);
+                this.cached.assets[asset.cachedID] = asset;
+                return asset;
+            }else{
+                return this.cached.assets[asset.cachedID];
+            }
         }else{
-            return this.cached.assets[asset.cachedID];
+            asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
+            this.cached.assets[asset.cachedID] = {};
+            return await this.addDescription(asset);
         }
     },
 
@@ -188,8 +189,6 @@ let Curse = {
             index: 0
         })
 
-        console.log(result);
-
         return this.readCurseAssetList(JSON.parse(result));
     },
 
@@ -212,9 +211,7 @@ let Curse = {
     async addFileInfo(asset, fileID) {
         const info = await this.getFileInfo(asset, fileID);
 
-        console.log(info);
-        asset.version = info.displayName;
-        asset.versionTimestamp = new Date(info.fileDate).getTime();
+        asset.version = this.parseCurseVersion(info);
         asset.hosts.curse.fileID = fileID;
         asset.hosts.curse.fileName = info.fileName;
         asset.downloadTemp = info.downloadUrl;
@@ -239,32 +236,60 @@ let Curse = {
         return asset;
     },
 
+    async getFileChangelog(asset, fileID) {
+        return await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/file/${fileID}/changelog`);
+    },
+
     async getFileInfo(asset, fileID) {
         return JSON.parse(await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/file/${fileID}`));
     },
 
     async getDependencies(asset) {
-        if(!this.cached.assets[asset.cachedID].dependencies) {
-            let newAsset = await this.addFileInfo(asset, asset.hosts.curse.latestFileID);
-            console.log(newAsset);
-            let final = [];
-            for(let depend of newAsset.dependencies) {
-                final.push(await this.getFullAsset(depend, 'unknown'));
+        if(this.cached.assets[asset.cachedID]) {
+            if(!this.cached.assets[asset.cachedID].dependencies) {
+                let newAsset;
+                if(!asset.installed) {
+                    newAsset = await this.addFileInfo(asset, asset.hosts.curse.latestFileID);
+                }else{
+                    newAsset = await this.addFileInfo(asset, asset.hosts.curse.fileID);
+                }
+                let final = [];
+                for(let depend of newAsset.dependencies) {
+                    final.push(await this.getFullAsset(depend, 'unknown'));
+                }
+                this.cached.assets[asset.cachedID].dependencies = final;
+                return final;
+            }else{
+                const dependList = this.cached.assets[asset.cachedID].dependencies;
+                if(dependList.length >= 1) {
+                    if(!dependList[0].name) {
+                        this.cached.assets[asset.cachedID].dependencies = undefined;
+                        return await this.getDependencies(asset);
+                    }
+                }
+                return this.cached.assets[asset.cachedID].dependencies;
             }
-            this.cached.assets[asset.cachedID].dependencies = final;
-            return final;
         }else{
-            return this.cached.assets[asset.cachedID].dependencies;
+            const newID = `curse-cached-${Global.createID(asset.name)}`;
+            this.cached.assets[newID] = asset;
+            asset.cachedID = newID;
+            return await this.getDependencies(asset)
         }
     },
 
+    // async getDependenciesFull(asset) {
+    //     const dependencies = await this.getDependencies(asset);
+    //     let final = [];
+    //     for(let depend of dependencies) {
+    //         final.push(await this.getFullAsset(dep))
+    //     }
+    // }
     async installDependencies(profile, asset) {
         if(asset.dependencies) {
             for(let depend of asset.dependencies) {
                 if(depend.hosts.curse.fileID) {
                     this.installModVersion(profile, depend, depend.hosts.curse.fileID);
                 }else{
-                    console.log(depend);
                     this.installModToProfile(profile, depend);
                 }
             }
@@ -272,11 +297,10 @@ let Curse = {
     },
 
     async getLatestVersionForMCVersion(asset, mcversion) {
-        console.log(asset);
         if(asset.hosts.curse.localValues && asset.hosts.curse.localValues.gameVerLatestFiles) { 
             for(let ver of asset.hosts.curse.localValues.gameVerLatestFiles) {
-                console.log(ver);
                 if(ver.gameVersion === mcversion) {
+                    console.log(ver);
                     return ver;
                 }
             }
@@ -345,57 +369,112 @@ let Curse = {
         }
 
         if(list.length === 0) {
-            console.log('done installing!');
             callback();
         }else{
             const item = Object.assign({}, list[0]);
             if(this.concurrentDownloads.includes(item.cachedID)) {
                 const list2 = list.slice();
                 list2.shift();
-                console.log(list2);
                 this.downloadModList(profile, list2, callback, onUpdate);
             }else{
                 this.concurrentDownloads.push(item.cachedID);
-                console.log(item);
-                console.log('starting installing!');
-                await this.installModVersionToProfile(profile, item, false);
-                console.log('done installing!');
-                this.cached.assets[item.cachedID] = item;
+                const mod = await this.installModVersionToProfile(profile, item, false);
+                this.cached.assets[item.cachedID] = mod;
                 onUpdate();
-                console.log('before list shift');
                 list.shift();
-                console.log(`after list shift`)
-                console.log(list);
                 this.downloadModList(profile, list, callback, onUpdate);
             }
         }
     },
 
-    async installModpack(mp) {
+    parseCurseVersion(ver) {
+        const cacheID = `versioncache-curse-${new Date(ver.fileDate).getTime()}`
+        const obj = {
+            displayName: ver.displayName,
+            timestamp: new Date(ver.fileDate).getTime(),
+            minecraftversions: ver.gameVersion,
+            cachedID: cacheID,
+            hosts: {
+                curse: {
+                    fileID: ver.id
+                }
+            }
+        }
+        Global.cached.versions[cacheID] = obj;
+        
+        return obj;
+    },
+
+    async getVersionsFromAsset(asset) {
+        console.log(this.cached.assets[asset.cachedID]);
+        if(this.cached.assets[asset.cachedID]) {
+            if(!this.cached.assets[asset.cachedID].hosts.curse.versionCache) {
+                const results = JSON.parse(await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/files`));
+                let sorted = results.sort((a, b) => {return new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime()})
+                const final = sorted.map(ver => ver = this.parseCurseVersion(ver));
+                this.cached.assets[asset.cachedID].hosts.curse.versionCache = final;
+                return final;
+            }else{
+                return this.cached.assets[asset.cachedID].hosts.curse.versionCache;
+            }
+        }else{
+            const cachedID = `curse-cached-${Global.createID(asset.name)}`;
+            this.cached.assets[cachedID] = asset;
+            return await this.getVersionsFromAsset(asset);
+        }
+    },
+
+    async cacheAllAssetInfo(asset) {
+        if(!this.cached.assets[asset.cachedID]) {
+            this.cached.assets[asset.cachedID] = asset;
+        }
+        let cachedAsset = this.cached.assets[asset.cachedID];
+
+        if(cachedAsset !== asset) {
+            this.cached.assets[asset.cachedID] = asset;
+        }
+
+        if(!cachedAsset.description) {
+            let newModpack = await this.addDescription(cachedAsset);
+            this.cached.assets[asset.cachedID] = newModpack;
+        }
+    },
+
+    async checkForAssetUpdates(asset) {
+        const versions = await this.getVersionsFromAsset(asset);
+        let newver;
+        for(let ver of versions.reverse()) {
+            if(new Date(ver.fileDate).getTime() > asset.versionTimestamp) {
+                newver = ver;
+            }
+        }
+        return newver;
+    },
+
+    async installModpackVersion(mp, version) {
         return new Promise(async (resolve) => {
             if(!fs.existsSync(Global.MCM_TEMP)) {
                 fs.mkdirSync(Global.MCM_TEMP);
             }
 
+            const versions = await this.getVersionsFromAsset(mp);
+          
+            await this.cacheAllAssetInfo(mp);
+
             let cachedAsset = this.cached.assets[mp.cachedID];
 
-            if(cachedAsset !== mp) {
-                this.cached.assets[mp.cachedID] = mp;
-            }
-
-            if(!cachedAsset.description) {
-                let newModpack = await this.addDescription(cachedAsset);
-                this.cached.assets[mp.cachedID] = newModpack;
-            }
-
-            if(!cachedAsset.hosts.curse.fileID) {
-                const newModpack = await this.addFileInfo(cachedAsset, mp.hosts.curse.latestFileID);
-                this.cached.assets[mp.cachedID] = newModpack;
+            let downloadUrl, verObj;
+            for(let ver of versions) {
+                if(ver.id === parseInt(version)) {
+                    downloadUrl = ver.downloadUrl;
+                    verObj = ver;
+                }
             }
 
             const modpack = cachedAsset;
-            const infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`)
-            DownloadsManager.startFileDownload(`Info for ${modpack.name}`, modpack.downloadTemp, infoDownload).then(async () => {
+            const infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`);
+
+            DownloadsManager.startFileDownload(`Info for ${modpack.name}`, downloadUrl, infoDownload).then(async () => {
                 const zip = new admzip(infoDownload);
 
                 const extractPath = path.join(Global.MCM_TEMP, `${modpack.id}-install/`);
@@ -405,12 +484,14 @@ let Curse = {
                 const manifest = JSON.parse(fs.readFileSync(path.join(extractPath, `manifest.json`)));
                 ProfilesManager.createProfile(modpack.name, manifest.minecraft.version).then((profile) => {
                     profile.hosts = modpack.hosts;
+                    profile.iconURL = modpack.iconURL;
                     profile.blurb = modpack.blurb;
                     profile.description = modpack.description;
-                    profile.version = modpack.version;
-                    profile.versionTimestamp = modpack.versionTimestamp;
+                    profile.versionTimestamp = new Date(verObj.fileDate).getTime();
                     profile.hosts.curse.fullyInstalled = false;
-                    profile.setProfileVersion(modpack.version);
+                    profile.hosts.curse.fileID = verObj.id;
+                    profile.hosts.curse.fileName = verObj.fileName;
+                    profile.setProfileVersion(verObj.displayName);
                     profile.changeMCVersion(manifest.minecraft.version);
                     profile.setForgeInstalled(true);
                     profile.setForgeVersion(`${manifest.minecraft.version}-${manifest.minecraft.modLoaders[0].id.substring(6)}`);
@@ -439,6 +520,7 @@ let Curse = {
                         this.downloadModList(profile, list, () => {
                             if(numberDownloaded === manifest.files.length) {
                                 DownloadsManager.removeDownload(download.name);
+                                this.concurrentDownloads = [];
                                 const overridesFolder = path.join(extractPath, `/overrides`);
                                 if(fs.existsSync(overridesFolder)) {
                                     fs.readdirSync(overridesFolder).forEach(file => {
@@ -459,7 +541,7 @@ let Curse = {
                                         profile.save();
                                         profile.addIconToLauncher();
                                         ProfilesManager.profilesBeingInstalled.splice(ProfilesManager.profilesBeingInstalled.indexOf(modpack.id), 1);
-                                        resolve();
+                                        resolve(profile);
                                     })
                                 })
                             }
@@ -470,6 +552,26 @@ let Curse = {
                     })
                 })
             })
+        })
+    },
+
+    async installModpack(mp) {
+        return new Promise(async (resolve) => {
+            if(!fs.existsSync(Global.MCM_TEMP)) {
+                fs.mkdirSync(Global.MCM_TEMP);
+            }
+
+            let cachedAsset = this.cached.assets[mp.cachedID];
+
+            if(!cachedAsset.hosts.curse.fileID) {
+                const newModpack = await this.addFileInfo(cachedAsset, mp.hosts.curse.latestFileID);
+                this.cached.assets[mp.cachedID] = newModpack;
+            }
+
+            const modpack = cachedAsset;
+            
+            await this.installModpackVersion(modpack, modpack.hosts.curse.latestFileID);
+            resolve();
         })
     }
 }

@@ -8,6 +8,7 @@ import Button from '../../component/button/button';
 import SanitizedHTML from '../../component/sanitizedhtml/sanitizedhtml'
 import Confirmation from '../../component/confirmation/confirmation';
 import ShareOverlay from '../../component/shareoverlay/shareoverlay';
+import UpdateOverlay from '../../component/updateoverlay/updateoverlay';
 const Image = styled.img`
     min-width: 150px;
     height: 150px;
@@ -131,6 +132,18 @@ class ViewProfilePage extends Component {
         })
     }
 
+    showUpdate = () => {
+        this.setState({
+            showUpdateOverlay: true
+        })
+    }
+
+    hideUpdate = () => {
+        this.setState({
+            showUpdateOverlay: false
+        })
+    }
+
     render() {
         let { profile, showDelete } = this.state;
         return (
@@ -149,7 +162,7 @@ class ViewProfilePage extends Component {
                     <ButtonGroup>
                         <CustomButton onClick={this.launchProfile} color='green'>launch</CustomButton>
                         <CustomButton onClick={this.editprofile} color='yellow'>edit</CustomButton>
-                        <CustomButton color='purple'>update</CustomButton>
+                        <CustomButton onClick={this.showUpdate} color='purple'>update</CustomButton>
                         <CustomButton onClick={this.showShare} color='blue'>share</CustomButton>
                         <CustomButton onClick={this.deleteClick} color='red'>delete</CustomButton>
                     </ButtonGroup>
@@ -163,6 +176,7 @@ class ViewProfilePage extends Component {
                     <SanitizedHTML html={profile.description} />
                 </Description>
                 {this.state.showShareOverlay && <ShareOverlay cancelClick={this.hideShare} profile={profile} />}
+                {this.state.showUpdateOverlay && <UpdateOverlay cancelClick={this.hideUpdate} profile={profile} />}
             </Page>
         )
     }

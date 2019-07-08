@@ -95,7 +95,7 @@ export default class DiscoverPage extends Component {
                 <Header showBackButton={listState !== 'browseAssets'} backClick={this.backClick} title='discover'>
                     {listState === 'browseAssets' && <SearchBox value={this.state.searchValue} onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='search' />}
                 </Header>
-                <DiscoverList progressState={progressState} stateChange={this.listStateChange} state={listState} type='profile' installClick={this.installClick} searchTerm={this.state.searchTerm} />
+                <DiscoverList mcVerFilter='All' versionState={{}} progressState={progressState} stateChange={this.listStateChange} state={listState} type='profile' installClick={this.installClick} searchTerm={this.state.searchTerm} />
             </Page>
         )
     }

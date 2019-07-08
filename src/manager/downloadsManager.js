@@ -2,37 +2,42 @@ import HTTPRequest from "../host/httprequest";
 import Download from "../type/download";
 import path from 'path';
 import Global from '../util/global';
+import LogManager from "./logManager";
 
 const DownloadsManager = {
     activeDownloads: [],
     downloadUpdateFunc: null,
     startFileDownload: function(downloadName, file, path, tries) {
         return new Promise((resolve, reject) => {
-            let download = new Download(downloadName, file, path);
-            this.activeDownloads.push(download);
-            if(this.onDownload) {
-                this.downloadUpdate();
-            }
-            HTTPRequest.download(file, path, (progress) => {
-                this.handleDownloadProgress(download, progress);
-            }).then(() => {
-                this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
-                this.downloadUpdate();
-                resolve();
-            }).catch(() => {
-                if(tries === 3) {
-                    reject('try-limit');
-                }else{
-                    this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
-                    this.startFileDownload(downloadName, file, path, tries++).then((res) => {
-                        resolve(res);
-                    }).catch(() => {
-                        if(tries++ >= 3) {
-                            reject();
-                        }
-                    })
+            if(file) {
+                let download = new Download(downloadName, file, path);
+                this.activeDownloads.push(download);
+                if(this.onDownload) {
+                    this.downloadUpdate();
                 }
-            })
+                HTTPRequest.download(file, path, (progress) => {
+                    this.handleDownloadProgress(download, progress);
+                }).then(() => {
+                    this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
+                    this.downloadUpdate();
+                    resolve();
+                }).catch(() => {
+                    if(tries === 3) {
+                        reject('try-limit');
+                    }else{
+                        this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
+                        this.startFileDownload(downloadName, file, path, tries++).then((res) => {
+                            resolve(res);
+                        }).catch(() => {
+                            if(tries++ >= 3) {
+                                reject();
+                            }
+                        })
+                    }
+                })
+            }else{
+                LogManager.log('severe', '[DownloadsManager] [StartFileDownload] Missing file download path!');
+            }
         })
     },
     removeDownload: function(downloadName) {

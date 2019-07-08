@@ -13,10 +13,28 @@ import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import Global from '../../../util/global';
 import ForgeManager from '../../../manager/forgeManager';
 import Confirmation from '../../../component/confirmation/confirmation';
+import Curse from '../../../host/curse/curse';
+import Overlay from '../../../component/overlay/overlay';
 const CustomVersions = styled.div`
     background-color: #505050;
     width: 350px;
     padding: 10px;
+`
+const BG = styled.div`
+    width: 100%;
+    height: fit-content;
+    max-width: 600px;
+    max-height: 500px;
+    background-color: #444444;
+    padding: 10px;
+    color: white;
+    display: flex;
+    flex-flow: column;
+`
+const Title = styled.p`
+    margin: 0;
+    font-weight: 200;
+    font-size: 21pt;
 `
 export default class EditPageVersions extends Component {
     constructor(props) {
@@ -25,7 +43,11 @@ export default class EditPageVersions extends Component {
             profile: {
                 name: 'Loading'
             },
-            mcverValue: ''
+            mcverValue: '',
+            curseVerValue: '',
+            updateOverlay: false,
+            updateOverlayText: 'Getting things ready...',
+            updateConfirm: false
         }
     }
 
@@ -35,10 +57,12 @@ export default class EditPageVersions extends Component {
         }
     }
     
-    componentDidMount() {
+    async componentDidMount() {
         this.setState({
             mcverValue: this.state.profile.minecraftversion
-        })
+        });
+
+        this.reloadCurseVersionsList();
     }
 
     mcverChange = (version, e) => {
@@ -99,20 +123,109 @@ export default class EditPageVersions extends Component {
             });
         })
     }
+
+    curseVersionChange = (e) => {
+        this.setState({
+            versionToChangeTo: e,
+            updateConfirm: true
+        })
+    }
+
+    reloadCurseVersionsList = async () => {
+        const { profile } = this.state;
+        if(profile.hosts) {
+            if(profile.hosts.curse) {
+                const versions = await Curse.getVersionsFromAsset(profile);
+                let nameArray = [];
+                versions[0].latest = true;
+                for(let ver of versions) {
+                    let name = ver.displayName;
+                    if(ver.latest) {
+                        name += ' (latest)';
+                    }
+                    if(profile.version === ver.displayName) {
+                        name += ' (current)';
+                    }
+
+                    nameArray.push({
+                        id: ver.id,
+                        name: name
+                    })
+                }
+
+                this.setState({
+                    hostVersionValues: nameArray,
+                    curseVerValue: profile.hosts.curse.fileID
+                })
+            }
+        }
+    }
+
+    confirmCurseVerChange = async () => {
+        const{ profile, versionToChangeTo } = this.state;
+        this.setState({
+            updateConfirm: false,
+            updateOverlay: true
+        })
+        profile.changeCurseVersion(versionToChangeTo, (updtext) => {
+            this.setState({
+                updateOverlayText: updtext
+            })
+        }).then((newprofile) => {
+            this.setState({
+                profile: newprofile,
+                updateConfirm: false,
+                updateOverlay: false
+            }, () => {
+                this.reloadCurseVersionsList();
+            });
+        })
+    }
+
+    cancelCurseVerChange = () => {
+        this.setState({
+            updateConfirm: false
+        })
+    }
+
     render() {
-        let { profile, forgeIsInstalling, forgeIsUninstalling, mcverValue } = this.state;
+        let { profile, forgeIsInstalling, forgeIsUninstalling, mcverValue, curseVerValue, hostVersionValues } = this.state;
         return (
             <Page>
-                <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
+                {this.state.updateConfirm && <Overlay>
+                    <BG>
+                        <Title>are you sure?</Title>
+                        <p>Updating or changing a profile's version will modify the current files. A backup will be created of the current files. If you've modified files or added mods, you will need to move them over from the backup. <b>The saves folder and options.txt are automatically moved.</b></p>
+                        
+                        <InputContainer>
+                            <Button onClick={this.cancelCurseVerChange} color='red'>cancel</Button>
+                            <Button onClick={this.confirmCurseVerChange} color='green'>I understand, continue</Button>
+                        </InputContainer>
+                    </BG>
+                </Overlay>}
+
+                {!this.state.updateOverlay && <Header title='edit profile' backlink={`/profile/${profile.id}`}/>}
+                {this.state.updateOverlay && <Header title='edit profile' backlink={`'/`}/>}
                 <EditContainer profile={profile}>
+                    {this.state.updateOverlay && <Overlay>
+                        <BG>
+                            <Title>{this.state.updateOverlayText}</Title>
+                        </BG>
+                    </Overlay>}
                     <Detail>minecraft version</Detail>
                     <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} value={mcverValue} />
                     <OptionBreak />
                     <Detail>profile version</Detail>
+                    {!profile.hosts.curse &&
                     <InputContainer>
                         <TextInput placeholder='Enter a version' />
                         <Button color='green'>change</Button>
-                    </InputContainer>
+                    </InputContainer>}
+                    {profile.hosts.curse && <>
+                    <Detail>because this is from an online source, you can only choose versions available online</Detail>
+                    {hostVersionValues && <CustomDropdown value={curseVerValue} onChange={this.curseVersionChange} items={hostVersionValues} />}
+                    </>}
+
                     <Detail>version timestamp: {profile.versionTimestamp}</Detail>
                     <OptionBreak />
                     <Detail>custom versions</Detail>
