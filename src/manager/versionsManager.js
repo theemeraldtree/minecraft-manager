@@ -11,7 +11,9 @@ const VersionsManager = {
     },
     createVersion: function(profile) {
         let versionname = `${profile.safename} [Minecraft Manager]`;
-        fs.mkdirSync(path.join(this.getVersionsPath(), versionname));
+        if(!fs.existsSync(path.join(this.getVersionsPath(), versionname))) {
+            fs.mkdirSync(path.join(this.getVersionsPath(), versionname));
+        }
         let obj = defaultVersion;
         if(this.checkIs1710OrLower(profile)) {
             obj = version1710;

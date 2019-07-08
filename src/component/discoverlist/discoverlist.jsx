@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import Curse from '../../host/curse/curse';
 import styled from 'styled-components';
-import Button from '../button/button';
 import AssetCard from '../assetcard/assetcard';
-import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
+import AssetInfo from '../assetinfo/assetinfo';
 
 const LoadingText = styled.div`
     font-size: 23pt;
@@ -12,28 +11,6 @@ const LoadingText = styled.div`
     align-items: center;
     height: 100%;
     color: white;
-`
-
-const Description = styled.div`
-    overflow: scroll;
-    background-color: #717171;
-    margin-top: 10px;
-    margin-bottom: 10px;
-`
-
-const HeaderButtons = styled.div`
-    margin-top: 5px;
-`
-
-const HB = styled(Button)`
-    background-color: #717171;
-    ${props => props.active && `
-        border-bottom: 2px solid #08b20b;
-    `}
-    ${props => !props.active && `
-        border-bottom: 2px solid #717171;
-    `}
-    margin-right: 3px;
 `
 
 const List = styled.div`
@@ -83,18 +60,21 @@ export default class DiscoverList extends Component {
         this.renderAssets(this.state.assets);
     }
     renderAssets = (assets) => {
+        console.log('re rendering assets');
         let newAssetsList = [];
-        let { displayState } = this.state;
         let progressState = this.props.progressState;
         if(assets) {
             if(assets.length >= 1) {
                 for(let asset of assets) {
-                    newAssetsList.push(<AssetCard key={asset.id} installed={progressState[asset.id] === 'installed'} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall={displayState === 'browseAssets'} showBlurb={displayState === 'browseAssets'} asset={asset} />);
+                    console.log(asset);
+                    newAssetsList.push(<AssetCard key={asset.id} installed={progressState[asset.id] === 'installed'} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall showBlurb asset={asset} />);
                 }
             }else{
                 newAssetsList.push(<LoadingText key='none'>No Results</LoadingText>);
             }
         }
+
+        console.log(newAssetsList);
 
         this.setState({
             assetsList: newAssetsList,
@@ -113,8 +93,6 @@ export default class DiscoverList extends Component {
                 displayState: 'viewAsset',
                 previewState: 'description',
                 activeAsset: mod
-            }, () => {
-                this.showDescription();
             });
         }
     }
@@ -201,8 +179,8 @@ export default class DiscoverList extends Component {
     }
 
     render() {
-        let { displayState, previewState, description, activeAsset, assetsList } = this.state;
-        let { type, progressState, installClick } = this.props;
+        let { displayState, assetsList, activeAsset } = this.state;
+        let { type, progressState, installClick, versionInstall, mcVerFilter, forceVersionFilter, versionState } = this.props;
         return (
             <>
                 {displayState === 'browseAssets' && <>
@@ -213,33 +191,8 @@ export default class DiscoverList extends Component {
                     }
                     {assetsList.length === 0 && <LoadingText>loading...</LoadingText>}
                 </>}
-                {displayState === 'viewAsset' && <>
-                    <AssetCard progressState={progressState[activeAsset.id]} installed={progressState[activeAsset.id] === 'installed'} disableHover showInstall installClick={installClick} asset={activeAsset} showBlurb />
-                    <HeaderButtons>
-                        <HB active={previewState === 'description'} onClick={this.previewStateSwitch} data-state='description'>Description</HB>
-                        {type === 'mod' && <HB active={previewState === 'dependencies'} onClick={this.previewStateSwitch} data-state='dependencies'>Dependencies</HB>}
-                    </HeaderButtons>
-
-                        {previewState === 'description' && <>
-                            {description && <Description>
-                                <SanitizedHTML html={activeAsset.description} />
-                            </Description>}
-                            {!description && <LoadingText>loading...</LoadingText>}
-                            </>
-                        }
-
-
-                        {previewState === 'versions' &&
-                            <h1>versions</h1>
-                        }
-
-                        {previewState === 'dependencies' &&
-                            <List>
-                                {this.state.assetDependencies}
-                            </List>
-                        }
-                    </>}
-                </>
+                {displayState === 'viewAsset' && <AssetInfo versionInstall={versionInstall} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} progressState={progressState[activeAsset.id]} asset={activeAsset} installClick={installClick} type={type} />}
+            </>
         )
     }
 }

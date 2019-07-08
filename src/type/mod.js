@@ -5,7 +5,7 @@ function Mod(rawOMAF) {
         this.hosts = {};
     }
 
-    this.local = ['detailedInfo', 'cachedID', 'iconpath', 'versions', 'downloadTemp']
+    this.local = ['installed', 'detailedInfo', 'cachedID', 'iconpath', 'versions', 'downloadTemp']
 }
 
 Mod.prototype.cleanObject = function() {
@@ -29,6 +29,8 @@ Mod.prototype.cleanObject = function() {
             if(this.hosts.curse.localValues) {
                 copy.hosts.curse.localValues = undefined;
             }
+            
+            copy.hosts.curse.versionCache = undefined;
         }
     }
     copy.local = undefined;

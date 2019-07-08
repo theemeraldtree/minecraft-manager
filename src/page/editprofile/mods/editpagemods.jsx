@@ -15,6 +15,7 @@ import Mod from '../../../type/mod';
 import path from 'path';
 import fs from 'fs';
 import Global from '../../../util/global';
+import AssetInfo from '../../../component/assetinfo/assetinfo';
 const { dialog } = require('electron').remote;
 const Wrapper = styled.div`
     height: 100%;
@@ -58,6 +59,7 @@ export default class EditPageMods extends Component {
             displayState: 'modsList',
             listState: 'browseAssets',
             progressState: {},
+            versionState: {},
             profile: {
                 name: 'Loading'
             },
@@ -90,16 +92,25 @@ export default class EditPageMods extends Component {
             ps[mod.id] = 'installed';
             if(this.state.displayState === 'modsList') {
                 if(mod.name.toLowerCase().includes(this.state.liveSearchTerm.toLowerCase())) {
-                    newList.push(<AssetCard key={mod.id} asset={mod} showDelete deleteClick={this.deleteClick} />);
+                    newList.push(<AssetCard key={mod.id} asset={mod} showDelete onClick={this.showInfoClick} deleteClick={this.deleteClick} />);
                 }
             }else{
-                newList.push(<AssetCard key={mod.id} asset={mod} showDelete deleteClick={this.deleteClick} />);
+                newList.push(<AssetCard key={mod.id} asset={mod} showDelete onClick={this.showInfoClick} deleteClick={this.deleteClick} />);
             }
         }
 
         this.setState({
             modsList: newList,
             progressState: ps
+        })
+    }
+
+    showInfoClick = (e) => {
+        let mod = this.state.profile.getModFromID(e.currentTarget.dataset.assetid);
+        console.log(mod);
+        this.setState({
+            displayState: 'modInfo',
+            activeMod: mod
         })
     }
 
@@ -180,6 +191,7 @@ export default class EditPageMods extends Component {
     }
 
     deleteClick = (e) => {
+        e.stopPropagation();
         let mod = this.state.profile.getModFromID(e.currentTarget.parentElement.parentElement.dataset.assetid);
         this.state.profile.deleteMod(mod).then(() => {
             this.reloadModsList();
@@ -206,8 +218,38 @@ export default class EditPageMods extends Component {
         this.reloadModsList();
     }
 
+    versionInstall = (version, mod) => {
+        console.log(version);
+        const { profile } = this.state;
+        profile.deleteMod(mod).then(() => {
+            const verCopy = Object.assign({}, this.state.versionState);
+            verCopy[version.displayName] = 'installing';
+            if(mod.version) {
+                verCopy[mod.version.displayName] = 'force-not-installed';
+            }
+            this.setState({
+                disableVersionInstall: true,
+                versionState: verCopy
+            })
+            const newMod = Object.assign({}, mod);
+            newMod.version = version;
+            newMod.hosts.curse.fileID = version.hosts.curse.fileID;
+            Curse.installModVersionToProfile(profile, newMod, true).then(() => {
+                const verCop = Object.assign({}, this.state.versionState);
+                verCop[version.displayName] = 'installed-done';
+                this.setState({
+                    activeMod: newMod,
+                    versionState: verCop,
+                    disableVersionInstall: false
+                })
+
+                this.reloadModsList();
+            })
+        })
+    }
+
     render() {
-        let { profile, displayState, liveSearchTerm, searchTerm, listState, progressState, modsList, errorMod } = this.state;
+        let { profile, disableVersionInstall, versionState, displayState, liveSearchTerm, searchTerm, listState, progressState, modsList, errorMod, activeMod } = this.state;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
@@ -216,7 +258,7 @@ export default class EditPageMods extends Component {
                         <Container>
                                 <SearchContainer>
                                     {displayState !== 'modsList' && <Button onClick={this.goBack} color='red'>back</Button>}
-                                    {displayState !== 'modsList' && <Search onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='Search' />}
+                                    {displayState !== 'modsList' && displayState !== 'modInfo' && <Search onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='Search' />}
                                     {listState !== 'viewAsset' && <>
                                         {displayState === 'modsList' && <Search value={liveSearchTerm} onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='Search' />}
                                         {displayState === 'modsList' && <Button onClick={this.browseMods} color='green'>add</Button>}
@@ -228,7 +270,10 @@ export default class EditPageMods extends Component {
                                     {modsList}
                                 </List>
                                 </>}
-                                {displayState === 'addMods' && <DiscoverList progressState={progressState} type='mod' installClick={this.installClick} searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
+                                { displayState === 'modInfo' && <>
+                                    <AssetInfo versionState={versionState} disableVersionInstall={disableVersionInstall} versionState={versionState} versionInstall={this.versionInstall} forceVersionFilter mcVerFilter={profile.minecraftversion} asset={activeMod} displayState={progressState} type='mod' localAsset />
+                                </>}
+                                {displayState === 'addMods' && <DiscoverList versionInstall={this.versionInstall} versionState={versionState} forceVersionFilter mcVerFilter={profile.minecraftversion} progressState={progressState} type='mod' installClick={this.installClick} searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
                                 {this.state.invalidVersion && <Confirmation questionText={`There is no Minecraft ${profile.minecraftversion} version of ${errorMod.name}.`} hideConfirm cancelText='Ok' cancelDelete={() => {this.setState({invalidVersion: false})}} /> } 
                         </Container>
                     </Wrapper>

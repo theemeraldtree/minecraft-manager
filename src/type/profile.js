@@ -2,6 +2,8 @@ import Global from "../util/global";
 import LauncherManager from '../manager/launcherManager';
 import Mod from "./mod";
 import jimp from 'jimp';
+import ProfilesManager from "../manager/profilesManager";
+import Curse from "../host/curse/curse";
 const archiver = require('archiver');
 const path = require('path');
 const fs = require('fs');
@@ -10,7 +12,7 @@ const rimraf = require('rimraf');
 function Profile(rawOMAF) {
     Object.assign(this, rawOMAF);
 
-    this.local = ['safename', 'versionname', 'folderpath', 'iconpath', 'modsPath', 'state', 'downloadTemp'];
+    this.local = ['installed', 'safename', 'versionname', 'folderpath', 'iconpath', 'modsPath', 'state', 'downloadTemp'];
     this.safename = Global.createSafeName(this.name);
     this.versionname = `${this.safename} [Minecraft Manager]`;
     this.folderpath = path.join(Global.PROFILES_PATH + `/${this.id}`).replace("\\","/");
@@ -19,10 +21,13 @@ function Profile(rawOMAF) {
     this.forgeVersion = '1.12.2-14.23.5.2838';
     this.modsPath = path.join(this.gameDir, `/mods/`);
     this.state = '';
+    this.installed = true;
     let newList = [];
     if(this.mods) {
         for(let item of this.mods) {
-            newList.push(new Mod(item));
+            let modItem = Object.assign({}, item);
+            modItem.installed = true;
+            newList.push(new Mod(modItem));
         }
     }
     this.mods = newList;
@@ -36,8 +41,8 @@ function Profile(rawOMAF) {
     }
 
     if(!this.omafVersion) {
+        this.omafVersion = '0.1.2';
         Global.checkMigration();
-        this.omafVersion = '0.1.1';
     }
 }
 
@@ -77,6 +82,10 @@ Profile.prototype.removeAllMods = function() {
 Profile.prototype.changeMCVersion = function(newver) {
     if(this.forgeInstalled) {
         this.removeAllMods();
+    }
+
+    if(!this.forgeInstalled) {
+        LauncherManager.setProfileData(this, 'lastVersionId', newver);
     }
     this.minecraftversion = newver;
     this.save();
@@ -236,5 +245,30 @@ Profile.prototype.export = function(output, exportFolders, exportProgress) {
             })
         })
     })
+}
+
+Profile.prototype.changeCurseVersion = function(versionToChangeTo, onUpdate) {
+    return new Promise((resolve) => {
+        onUpdate('Creating backup...');
+        ProfilesManager.createBackup(this);
+        onUpdate('Moving old folder...');
+        const oldpath = path.join(Global.PROFILES_PATH, `/${this.id}-update-${new Date().getTime()}`);
+        const oldgamedir = path.join(oldpath, '/files');
+        fs.rename(this.folderpath, oldpath, async () => {
+            onUpdate('Installing modpack...');
+            const newprofile = await Curse.installModpackVersion(this, versionToChangeTo);
+            if(fs.existsSync(path.join(oldgamedir, `/saves`))) {
+                Global.copyDirSync(path.join(oldgamedir, `/saves`), path.join(this.gameDir, `/saves`));
+            }
+    
+            if(fs.existsSync(path.join(oldgamedir, '/options.txt'))) {
+                fs.copyFileSync(path.join(oldgamedir, '/options.txt'), path.join(this.gameDir, '/options.txt'));
+            }
+    
+            rimraf.sync(oldpath);
+            resolve(newprofile);
+        });
+    })
+
 }
 export default Profile;

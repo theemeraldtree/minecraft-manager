@@ -15,7 +15,7 @@ const Styling = styled.div`
 
   a {
     text-decoration: none;
-    color: #003ea8;
+    color: #42b3f5;
   }
 
   iframe {
@@ -24,9 +24,19 @@ const Styling = styled.div`
 
   word-break: break-word;
   padding: 10px;
+
+  ${props => props.small && `
+    h1 {
+      font-size: 16pt;
+    }
+
+    p {
+      font-size: 11pt;
+    }
+  `} 
 `
-const SanitizedHTML = ({html}) => (
-    <Styling dangerouslySetInnerHTML={{__html: sanitizeHTML(html, {
+const SanitizedHTML = ({html, small}) => (
+    <Styling small={small} dangerouslySetInnerHTML={{__html: sanitizeHTML(html, {
         allowedTags: [ 'b', 'i', 'em', 'strong', 'a', 'iframe', 'h1', 'p', 'img', 'span', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'li'],
         allowedAttributes: {
           '*': [ 'style' ],

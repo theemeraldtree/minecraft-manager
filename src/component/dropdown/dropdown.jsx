@@ -8,6 +8,7 @@ const Dropdown = styled.select`
     padding-left: 3px;
     font-size: 12pt;
     width: 220px;
+    flex-shrink: 0;
     -webkit-user-select: none;
     -webkit-appearance: menulist-button;
 `
