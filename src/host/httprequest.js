@@ -83,7 +83,7 @@ let HTTPRequest = {
     },
 
     async post(url, body) {
-        let res = await req({
+        return req({
             uri: url,
             method: 'POST',
             body: JSON.stringify(body),
@@ -93,7 +93,6 @@ let HTTPRequest = {
             }
         })
 
-        return res;
     }
 }
 

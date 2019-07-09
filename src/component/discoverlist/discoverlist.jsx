@@ -25,7 +25,8 @@ export default class DiscoverList extends Component {
         super(props);
         this.state = {
             displayState: '',
-            assetsList: []
+            assetsList: [],
+            listRef: undefined
         }
     }
 
@@ -85,6 +86,10 @@ export default class DiscoverList extends Component {
     showAsset = (e) => {
         let { displayState } = this.state;
         if(displayState === 'browseAssets') {
+            let scrollPos = undefined;
+            if(this.listRef) {
+                scrollPos = this.listRef.current.scrollTop;
+            }
             let mod = Curse.cached.assets[e.currentTarget.dataset.cachedid];
             console.log(mod);
             this.props.stateChange('viewAsset');
@@ -92,7 +97,8 @@ export default class DiscoverList extends Component {
                 previousState: 'browseAssets',
                 displayState: 'viewAsset',
                 previewState: 'description',
-                activeAsset: mod
+                activeAsset: mod, 
+                scrollPos: scrollPos
             });
         }
     }
@@ -102,6 +108,10 @@ export default class DiscoverList extends Component {
         let newState;
         switch(displayState) {
             case 'browseAssets':
+                
+                if(this.state.scrollPos) {
+                    this.listRef.current.scrollTop = this.state.scrollPos
+                }
                 newState = 'assetsList';
                 break;
             case 'viewAsset':
@@ -185,7 +195,7 @@ export default class DiscoverList extends Component {
             <>
                 {displayState === 'browseAssets' && <>
                     {assetsList.length !== 0 && 
-                        <List>
+                        <List ref={this.listRef}>
                             {assetsList}
                         </List>
                     }

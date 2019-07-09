@@ -160,6 +160,7 @@ export default class SettingsPage extends Component {
                         <h3>Minecraft Manager is made possible thanks to <a href="https://electronjs.org/">Electron, </a> <a href="https://reactjs.org/">React, </a> and other projects</h3>
                         <h3><a href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project</a> created by stairman06</h3>
                         <h3>Minecraft Manager also uses <a href="https://github.com/stairman06/omaf">the open-source OMAF standard, </a> also created by stairman06, with help from others</h3>
+                        <h3>Minecraft Manager uses the Roboto font created by Google. <a href="http://www.apache.org/licenses/LICENSE-2.0.html">The font license is viewable here</a></h3>
                     </AboutBottom>
                 </About>
                 <Settings>
