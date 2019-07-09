@@ -8,6 +8,7 @@ import path from 'path';
 import ProfilesManager from "../../manager/profilesManager";
 import ForgeManager from "../../manager/forgeManager";
 import rimraf from 'rimraf';
+import ToastManager from "../../manager/toastManager";
 const admzip = require('adm-zip');
 let Curse = {
     cached: {
@@ -19,6 +20,17 @@ let Curse = {
         }
     },
     concurrentDownloads: [],
+    async HTTPGet(url, qs) {
+        try {
+            return await HTTPRequest.get(url, qs);
+        }catch(err) {
+            this.sendCantConnect();
+            return undefined;
+        }
+    },
+    sendCantConnect() {
+        ToastManager.createToast('Whoops!', "Looks like we can't connect to Curse right now. Check your internet connection and try again.");
+    },
     readCurseAssetList(list) {
         let finalList = [];
         for(let asset of list) {
@@ -149,7 +161,7 @@ let Curse = {
     },
 
     async getInfo(asset) {
-        return JSON.parse(await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}`));
+        return JSON.parse(await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}`));
     },
 
     async addDescription(asset) {
@@ -170,7 +182,7 @@ let Curse = {
 
     async getDescription(asset) {
         if(!this.cached.assets[asset.cachedID].description) {
-            return await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/description`, {
+            return await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/description`, {
                 addonID: asset.hosts.curse.id
             });
         }else{
@@ -179,7 +191,7 @@ let Curse = {
     },
 
     async search(term, type) {
-        const result = await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/search`, {
+        const result = await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/search`, {
             searchFilter: term,
             gameId: 432,
             sectionId: Curse.getCurseTypeID(type),
@@ -237,11 +249,11 @@ let Curse = {
     },
 
     async getFileChangelog(asset, fileID) {
-        return await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/file/${fileID}/changelog`);
+        return await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/file/${fileID}/changelog`);
     },
 
     async getFileInfo(asset, fileID) {
-        return JSON.parse(await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/file/${fileID}`));
+        return JSON.parse(await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/file/${fileID}`));
     },
 
     async getDependencies(asset) {
@@ -409,7 +421,7 @@ let Curse = {
         console.log(this.cached.assets[asset.cachedID]);
         if(this.cached.assets[asset.cachedID]) {
             if(!this.cached.assets[asset.cachedID].hosts.curse.versionCache) {
-                const results = JSON.parse(await HTTPRequest.get(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/files`));
+                const results = JSON.parse(await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/files`));
                 let sorted = results.sort((a, b) => {return new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime()})
                 const final = sorted.map(ver => ver = this.parseCurseVersion(ver));
                 this.cached.assets[asset.cachedID].hosts.curse.versionCache = final;

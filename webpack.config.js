@@ -18,6 +18,10 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.(css)$/,
+                loaders: ['css-loader']
+            },
+            {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
                 loaders: ['babel-loader'],
@@ -32,14 +36,11 @@ module.exports = {
                 loader: "file-loader",
             },
             {
-                test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
-                use: [{
-                    loader: 'file-loader',
-                    options: {
-                        name: '[name].[ext]',
-                        outputPath: 'src/fonts/'
-                    }
-                }]
+                test: /\.(ttf|woff|woff2)$/,
+                loader: 'file-loader',
+                options: {
+                  outputPath: 'src/font'
+                },
             }
         ],
     },
