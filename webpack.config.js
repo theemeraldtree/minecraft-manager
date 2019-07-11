@@ -14,17 +14,13 @@ module.exports = {
             template: './index.html',
         }),
     ],
+    devtool: 'source-map',
     target: 'electron-main',
     module: {
         rules: [
             {
                 test: /\.(css)$/,
                 loaders: ['css-loader']
-            },
-            {
-                test: /\.(js|jsx)$/,
-                exclude: /node_modules/,
-                loaders: ['babel-loader'],
             },
             {
                 test: /\.(js|jsx)$/,

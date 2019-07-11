@@ -1,24 +1,26 @@
 import styled from 'styled-components';
-const Button = styled.div`
+function getColor(name) {
+    if(name === 'purple') {
+        return '#911895';
+    }else if(name === 'green') {
+        return '#15950C'
+    }else if(name === 'yellow') {
+        return '#D4B107'
+    }else if(name === 'blue') {
+        return '#185F95';
+    }else if(name === 'red') {
+        return '#951818';
+    }
+}
+const Button = styled.div.attrs(props => ({
+    style: {
+        backgroundColor: getColor(props.color)
+    }
+}))`
     padding: 11.5px;
     color: white;
     width: fit-content;
     display: inline-block;
-    ${props => props.color === 'purple' && `
-        background-color: #911895;
-    `}
-    ${props => props.color === 'green' && `
-        background-color: #15950C;
-    `}
-    ${props => props.color === 'yellow' && `
-        background-color: #D4B107;
-    `}
-    ${props => props.color === 'blue' && `
-        background-color: #185F95;
-    `}
-    ${props => props.color === 'red' && `
-        background-color: #951818;
-    `}
     cursor: pointer;
     transition: 300ms;
     ${props => props.disabled && `

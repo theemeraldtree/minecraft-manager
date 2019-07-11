@@ -20,12 +20,20 @@ let Curse = {
         }
     },
     concurrentDownloads: [],
-    async HTTPGet(url, qs) {
+    async HTTPGet(url, qs, tries) {
         try {
             return await HTTPRequest.get(url, qs);
         }catch(err) {
-            this.sendCantConnect();
-            return undefined;
+            if(!tries) {
+                return await this.HTTPGet(url, qs, 1);
+            }else{
+                if(tries !== 3) {
+                    return await this.HTTPGet(url, qs, tries + 1);
+                }else{
+                    this.sendCantConnect();
+                    return undefined;
+                }
+            }
         }
     },
     sendCantConnect() {
@@ -72,8 +80,9 @@ let Curse = {
                 obj.iconpath = attach.url;
                 omaf.iconURL = attach.url;
                 obj.iconURL = attach.url;
-
             }
+
+            Global.cacheImage(obj.iconURL);
 
             this.cached.assets[omaf.cachedID] = omaf;
 
@@ -406,6 +415,9 @@ let Curse = {
             timestamp: new Date(ver.fileDate).getTime(),
             minecraftversions: ver.gameVersion,
             cachedID: cacheID,
+            TEMP: {
+                downloadUrl: ver.downloadUrl,
+            },
             hosts: {
                 curse: {
                     fileID: ver.id
@@ -432,13 +444,14 @@ let Curse = {
         }else{
             const cachedID = `curse-cached-${Global.createID(asset.name)}`;
             this.cached.assets[cachedID] = asset;
+            asset.cachedID = cachedID;
             return await this.getVersionsFromAsset(asset);
         }
     },
 
     async cacheAllAssetInfo(asset) {
         if(!this.cached.assets[asset.cachedID]) {
-            this.cached.assets[asset.cachedID] = asset;
+            this.cached. assets[asset.cachedID] = asset;
         }
         let cachedAsset = this.cached.assets[asset.cachedID];
 
@@ -476,9 +489,12 @@ let Curse = {
             let cachedAsset = this.cached.assets[mp.cachedID];
 
             let downloadUrl, verObj;
+            console.log(`were looking for: ${version}`);
             for(let ver of versions) {
-                if(ver.id === parseInt(version)) {
-                    downloadUrl = ver.downloadUrl;
+                console.log(ver);
+                console.log(`comparing ${ver.id} to ${version}`);
+                if(ver.displayName === version) {
+                    downloadUrl = ver.TEMP.downloadUrl;
                     verObj = ver;
                 }
             }
@@ -503,7 +519,7 @@ let Curse = {
                     profile.hosts.curse.fullyInstalled = false;
                     profile.hosts.curse.fileID = verObj.id;
                     profile.hosts.curse.fileName = verObj.fileName;
-                    profile.setProfileVersion(verObj.displayName);
+                    profile.setProfileVersion(verObj);
                     profile.changeMCVersion(manifest.minecraft.version);
                     profile.setForgeInstalled(true);
                     profile.setForgeVersion(`${manifest.minecraft.version}-${manifest.minecraft.modLoaders[0].id.substring(6)}`);

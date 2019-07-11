@@ -14,6 +14,7 @@ const yaml = require('js-yaml');
 const semver = require('semver');
 const { version } = require('../package.json');
 const os = require('os');
+
 async function load() {
   if(fs.existsSync(Global.PROFILES_PATH)) {
     //LogManager.log('info', '[index] Getting profiles...');

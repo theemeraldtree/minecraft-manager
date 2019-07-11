@@ -48,6 +48,15 @@ const VersionsManager = {
                 return false;
         }
     },
+    renameVersion: function(profile, newName) {
+        const oldVersionName = `${profile.safename} [Minecraft Manager]`;
+        const newVersionName = `${newName} [Minecraft Manager]`;
+
+        const oldVersionPath = path.join(this.getVersionsPath(), oldVersionName);
+        const newVersionPath = path.join(this.getVersionsPath(), newVersionName);
+        fs.renameSync(path.join(oldVersionPath, `/${oldVersionName}.json`), path.join(oldVersionPath, `/${newVersionName}.json`));
+        fs.renameSync(oldVersionPath, newVersionPath);
+    },
     deleteVersion: function(profile) {
         return new Promise((resolve) => {
             if(profile.launcherVersion) {

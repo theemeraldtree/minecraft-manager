@@ -4,6 +4,8 @@ import Mod from "./mod";
 import jimp from 'jimp';
 import ProfilesManager from "../manager/profilesManager";
 import Curse from "../host/curse/curse";
+import VersionsManager from "../manager/versionsManager";
+import LibrariesManager from "../manager/librariesManager";
 const archiver = require('archiver');
 const path = require('path');
 const fs = require('fs');
@@ -13,13 +15,16 @@ function Profile(rawOMAF) {
     Object.assign(this, rawOMAF);
 
     this.local = ['installed', 'safename', 'versionname', 'folderpath', 'iconpath', 'modsPath', 'state', 'downloadTemp'];
+    this.initLocalValues();
+}
+
+Profile.prototype.initLocalValues = function() {
     this.safename = Global.createSafeName(this.name);
     this.versionname = `${this.safename} [Minecraft Manager]`;
     this.folderpath = path.join(Global.PROFILES_PATH + `/${this.id}`).replace("\\","/");
     this.gameDir = path.join(this.folderpath, '/files');
-    this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
-    this.forgeVersion = '1.12.2-14.23.5.2838';
     this.modsPath = path.join(this.gameDir, `/mods/`);
+    this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
     this.state = '';
     this.installed = true;
     let newList = [];
@@ -269,6 +274,24 @@ Profile.prototype.changeCurseVersion = function(versionToChangeTo, onUpdate) {
             resolve(newprofile);
         });
     })
+}
 
+Profile.prototype.rename = function(newName) {
+    console.log(this);
+    const newID = Global.createID(newName);
+    const safeName = Global.createSafeName(newName);
+    LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
+    LauncherManager.setProfileData(this, 'name', newName);
+    LauncherManager.renameProfile(this, newID);
+    VersionsManager.renameVersion(this, safeName);
+    LibrariesManager.renameLibrary(this, newID);
+
+    this.id = newID;
+    this.name = newName;
+    this.versionname = this.safename;
+
+    fs.renameSync(this.folderpath, path.join(Global.PROFILES_PATH, `/${newID}/`));
+    this.initLocalValues();
+    this.save();
 }
 export default Profile;

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import Page from '../../page';
 import Header from '../../../component/header/header';
 import ProfilesManager from '../../../manager/profilesManager';
@@ -48,7 +49,7 @@ const Icon = styled.img`
     max-height: 80px;
     flex-shrink: 0;
 `;
-export default class EditPageGeneral extends Component {
+export default withRouter(class EditPageGeneral extends Component {
     constructor(props) {
         super(props);
         let profile = ProfilesManager.getProfileFromID(props.match.params.id);
@@ -106,6 +107,12 @@ export default class EditPageGeneral extends Component {
         }
     }
 
+    confirmNameChange = () => {
+        const { profile } = this.state;
+        profile.rename(this.state.nameValue);
+        this.props.history.push(`/edit/general/${Global.createID(this.state.nameValue)}`);
+    }
+
     resetIcon = () => {
         this.state.profile.resetIcon();
         this.forceUpdate();
@@ -126,7 +133,7 @@ export default class EditPageGeneral extends Component {
                     <Detail>profile name</Detail>
                     <InputContainer>
                         <TextInput value={nameValue} onChange={this.nameChange} placeholder="Enter a name" />
-                        <Button disabled={nameDisabled} color='green'>change</Button>
+                        <Button onClick={this.confirmNameChange} disabled={nameDisabled} color='green'>change</Button>
                     </InputContainer>
                     <Detail>internal id: {profile.id}</Detail>
                     <Detail>version-safe name: {profile.safename}</Detail>
@@ -145,4 +152,4 @@ export default class EditPageGeneral extends Component {
         )   
     }
 
-}
+})

@@ -17,7 +17,6 @@ const Global = {
     cacheUpdateTime: new Date().getTime(),
     cached: {
         versions: {}
-
     },
     getMCFilterOptions() {
         let copy = this.MC_VERSIONS.slice(0);
@@ -151,6 +150,10 @@ const Global = {
     },
     updateCache: function() {
         Global.cacheUpdateTime = new Date().getTime();
+    },
+    cacheImage: function(image) {
+        const img = new Image();
+        img.src = image;
     }
 }
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
-import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 const BG = styled.div`
     margin-top: 5px;
     width:100%;
@@ -20,8 +19,11 @@ const BG = styled.div`
     `}
 `
 
-const Image = styled.div`
-    background-image: url('${props =>  props.src}');
+const Image = styled.div.attrs(props => ({
+    style: {
+        backgroundImage: `url('${props.src}')`
+    }
+}))`
     width: 80px;
     height: 80px;
     background-size: contain;
@@ -81,42 +83,33 @@ const Details = styled.div`
 `
 
 const AssetCard = ({asset, onClick, showDelete, progressState, showInstall, disableHover, installed, installClick, deleteClick, showBlurb}) => (
-    <>
-        <ContextMenuTrigger id={`asset${asset.id}`}>
-            <BG disableHover={disableHover} data-cachedid={asset.cachedID} data-assetid={asset.id} onClick={onClick}>
-                {asset.icon || asset.iconpath && <Image src={asset.iconpath} />}
-                {asset.iconURL && !asset.iconpath && !asset.icon && <Image src={asset.iconURL} />}
-                <Details>
-                    <Title>{asset.name}</Title>
-                    <Version buttonShown={showInstall || showDelete}>{!showBlurb && asset.version && asset.version.displayName}{showBlurb && asset.blurb}</Version>
-                </Details>
-                <Buttons>
-                    {showDelete && 
-                    <Button onClick={deleteClick} color='red'>delete</Button>
-                    }
+    <BG disableHover={disableHover} data-cachedid={asset.cachedID} data-assetid={asset.id} onClick={onClick}>
+        {asset.icon || asset.iconpath && <Image src={asset.iconpath} />}
+        {asset.iconURL && !asset.iconpath && !asset.icon && <Image src={asset.iconURL} />}
+        <Details>
+            <Title>{asset.name}</Title>
+            <Version buttonShown={showInstall || showDelete}>{!showBlurb && asset.version && asset.version.displayName}{showBlurb && asset.blurb}</Version>
+        </Details>
+        <Buttons>
+            {showDelete && 
+            <Button onClick={deleteClick} color='red'>delete</Button>
+            }
 
-                    {showInstall && installed &&
-                    <Button disabled color='green'>installed</Button>
-                    }
+            {showInstall && installed &&
+            <Button disabled color='green'>installed</Button>
+            }
 
-                    {showInstall && !installed && !progressState &&
-                    <Button color='green' onClick={installClick}>install</Button>
-                    }
+            {showInstall && !installed && !progressState &&
+            <Button color='green' onClick={installClick}>install</Button>
+            }
 
-                    {showInstall && !installed && progressState === 'notavailable' &&
-                    <Button color='green' disabled>not available</Button>
-                    }
+            {showInstall && !installed && progressState === 'notavailable' &&
+            <Button color='green' disabled>not available</Button>
+            }
 
-                    {progressState === 'installing' && !installed && showInstall && <Button color='green' disabled>installing</Button>}
-                </Buttons>
-            </BG>
-        </ContextMenuTrigger>
-        <ContextMenu id={`asset${asset.id}`}>
-            <MenuItem>Install</MenuItem>
-            <MenuItem>Share</MenuItem>
-            <MenuItem>Details</MenuItem>
-        </ContextMenu>
-    </>
+            {progressState === 'installing' && !installed && showInstall && <Button color='green' disabled>installing</Button>}
+        </Buttons>
+    </BG>
 )
 
 export default AssetCard;
