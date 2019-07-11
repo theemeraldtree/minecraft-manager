@@ -123,7 +123,7 @@ export default class AssetInfo extends Component {
         const { localAsset } = this.props;
         if(activeAsset.hosts.curse) {
             this.setState({
-                versions: [<LoadingText>loading</LoadingText>]
+                versions: [<LoadingText key ='loading1'>loading</LoadingText>]
             })
             const versions = await Curse.getVersionsFromAsset(activeAsset);
             let final = [];
@@ -136,9 +136,9 @@ export default class AssetInfo extends Component {
                     }
                     const forceVerFilter = this.props.forceVersionFilter && (mcVerFilter !== this.props.mcVerFilter);
                     if(localAsset) {
-                        final.push(<VersionCard progressState={ps} installClick={this.versionInstall} asset={activeAsset} installed={activeAsset.version.hosts.curse.fileID === version.hosts.curse.fileID} disableMcVer={forceVerFilter} version={version} />);
+                        final.push(<VersionCard key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} installed={activeAsset.version.hosts.curse.fileID === version.hosts.curse.fileID} disableMcVer={forceVerFilter} version={version} />);
                     }else{
-                        final.push(<VersionCard progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMCVer={forceVerFilter} version={version} />);
+                        final.push(<VersionCard key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMCVer={forceVerFilter} version={version} />);
                     }
                 }
             }
@@ -146,7 +146,7 @@ export default class AssetInfo extends Component {
             console.log(this.state.scrollPosition);
 
             if(final.length === 0) {
-                final.push(<LoadingText>no versions found</LoadingText>)
+                final.push(<LoadingText key='none1'>no versions found</LoadingText>)
             }
             this.setState({
                 versions: final
@@ -155,7 +155,7 @@ export default class AssetInfo extends Component {
             })
         }else{
             this.setState({
-                versions: [<LoadingText>no versions found, as this is a local file</LoadingText>]
+                versions: [<LoadingText key='none2'>no versions found, as this is a local file</LoadingText>]
             })
         }
     }

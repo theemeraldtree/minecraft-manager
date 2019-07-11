@@ -33,6 +33,12 @@ const LibrariesManager = {
             }
         })
     },
+    renameLibrary: function(profile, newID) {
+        if(profile.forgeInstalled) {
+            fs.renameSync(path.join(this.getMCMLibraries(), `/mcm-${profile.id}/profiles-mcm-${profile.id}.jar`), path.join(this.getMCMLibraries(), `/mcm-${profile.id}/profiles-mcm-${newID}.jar`));
+            fs.renameSync(path.join(this.getMCMLibraries(), `/mcm-${profile.id}`), path.join(this.getMCMLibraries(), `/mcm-${newID}`));
+        }
+    },
     deleteLibrary: function(profile) {
         return new Promise((resolve) => {
             let libraryPath = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);

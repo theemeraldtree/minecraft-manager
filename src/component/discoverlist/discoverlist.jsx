@@ -23,10 +23,10 @@ const List = styled.div`
 export default class DiscoverList extends Component {
     constructor(props) {
         super(props);
+        this.listRef = React.createRef();
         this.state = {
             displayState: '',
-            assetsList: [],
-            listRef: undefined
+            assetsList: []
         }
     }
 
@@ -55,27 +55,26 @@ export default class DiscoverList extends Component {
         if(prevProps.progressState !== this.props.progressState) {
             this.updateProgressStates();
         }
+        if(prevProps.state !== this.props.state) {
+            this.stateChange();
+        }
     }
 
     updateProgressStates = () => {
         this.renderAssets(this.state.assets);
     }
     renderAssets = (assets) => {
-        console.log('re rendering assets');
         let newAssetsList = [];
         let progressState = this.props.progressState;
         if(assets) {
             if(assets.length >= 1) {
                 for(let asset of assets) {
-                    console.log(asset);
                     newAssetsList.push(<AssetCard key={asset.id} installed={progressState[asset.id] === 'installed'} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall showBlurb asset={asset} />);
                 }
             }else{
                 newAssetsList.push(<LoadingText key='none'>No Results</LoadingText>);
             }
         }
-
-        console.log(newAssetsList);
 
         this.setState({
             assetsList: newAssetsList,
@@ -91,7 +90,6 @@ export default class DiscoverList extends Component {
                 scrollPos = this.listRef.current.scrollTop;
             }
             let mod = Curse.cached.assets[e.currentTarget.dataset.cachedid];
-            console.log(mod);
             this.props.stateChange('viewAsset');
             this.setState({
                 previousState: 'browseAssets',
@@ -102,16 +100,22 @@ export default class DiscoverList extends Component {
             });
         }
     }
+    
+    stateChange = () => {
+        const { state } = this.props;
+        if(state === 'browseAssets') {
+            if(this.state.scrollPos) {
+                this.listRef.current.scrollTop = this.state.scrollPos
+            }   
+        }
+    }
 
     goBack = () => {
+        console.log('back has been clicked!');
         let { displayState, previousState } = this.state;
         let newState;
         switch(displayState) {
             case 'browseAssets':
-                
-                if(this.state.scrollPos) {
-                    this.listRef.current.scrollTop = this.state.scrollPos
-                }
                 newState = 'assetsList';
                 break;
             case 'viewAsset':

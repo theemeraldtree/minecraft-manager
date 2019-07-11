@@ -42,8 +42,7 @@ const Items = styled.div`
 
 const Header = ({title, backlink, backClick, children, showBackButton}) => (
     <BG>
-        {showBackButton && backClick && <BackButton onClick={backClick}>back</BackButton>}
-        {showBackButton && !backClick && <BackButton onClick={window.history.back}>back</BackButton>}
+        {showBackButton && <BackButton onClick={backClick ? backClick : window.history.back}>back</BackButton>}
         {backlink && <BackButton><Link to={backlink}>back</Link></BackButton>}
         <Title>{title}</Title>
         <Items>

@@ -21,8 +21,11 @@ const BG = styled.div`
     }
 `
 
-const Image = styled.div`
-    background-image: url('${props =>  props.src}');
+const Image = styled.div.attrs(props => ({
+    style: {
+        backgroundImage: `url('${props.src})`
+    }
+}))`
     width: 100%;
     height: 80px;
     background-size: contain;
@@ -85,7 +88,7 @@ const StateOverlay = styled.div`
     text-align: center;
     flex-flow: column;
 `
-const ProfileCard = ({profile, history, showDeletion}) => (
+const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) => (
     <Wrapper>
         {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && <StateOverlay><b>ERROR</b>   <br />Unfinished Curse Profile Install</StateOverlay>}
         {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
@@ -102,8 +105,8 @@ const ProfileCard = ({profile, history, showDeletion}) => (
         <ContextMenu id={`profilecard${profile.id}`}>
             <MenuItem onClick={() => {profile.launch()}}>Launch</MenuItem>
             <MenuItem onClick={() => {history.push(`/edit/general/${profile.id}`)}}>Edit</MenuItem>
-            <MenuItem>Update</MenuItem>
-            <MenuItem>Share</MenuItem>
+            <MenuItem onClick={() => {showUpdate(profile)}}>Update</MenuItem>
+            <MenuItem onClick={() => {showShare(profile)}}>Share</MenuItem>
             <MenuItem divider />
             <MenuItem onClick={() => {showDeletion(profile)}}>Delete</MenuItem>
         </ContextMenu>

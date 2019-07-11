@@ -3,6 +3,8 @@ import ProfilesManager from '../../../manager/profilesManager';
 import ProfileCard from '../../../component/profilecard/profilecard';
 import styled from 'styled-components';
 import Confirmation from '../../../component/confirmation/confirmation';
+import ShareOverlay from '../../../component/shareoverlay/shareoverlay';
+import UpdateOverlay from '../../../component/updateoverlay/updateoverlay';
 const BG = styled.div`
     overflow-y: scroll;
     flex: 1 1 auto;
@@ -32,11 +34,36 @@ export default class ProfileGrid extends Component {
         }
     }
 
+    showUpdate = (profile) => {
+        this.setState({
+            showUpdate: true,
+            activeProfile: profile
+        })
+    }
+
+    cancelUpdate = () => {
+        this.setState({
+            showUpdate: false
+        })
+    }
+
+    showShare = (profile) => {
+        this.setState({
+            showShare: true,
+            activeProfile: profile
+        })
+    }
+
+    cancelShare = () => {
+        this.setState({
+            showShare: false
+        })
+    }
     generateProfiles = () => {
         let profilesComponents = [];
         for(let profile of ProfilesManager.loadedProfiles) {
             if(profile.name.toLowerCase().includes(this.props.searchTerm)) {
-                profilesComponents.push(<ProfileCard showDeletion={this.showDeletion} key={profile.id} profile={profile} />);
+                profilesComponents.push(<ProfileCard showUpdate={this.showUpdate} showShare={this.showShare} showDeletion={this.showDeletion} key={profile.id} profile={profile} />);
             }
         }
         this.setState({
@@ -70,6 +97,8 @@ export default class ProfileGrid extends Component {
     render() {
         return (
             <BG>
+                {this.state.showShare && <ShareOverlay profile={this.state.activeProfile} cancelClick={this.cancelShare} />}
+                {this.state.showUpdate && <UpdateOverlay profile={this.state.activeProfile} cancelClick={this.cancelUpdate} />}
                 {this.state.showDelete && 
                     <Confirmation cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />
                 }
