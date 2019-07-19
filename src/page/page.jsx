@@ -4,7 +4,6 @@ import WindowBar from '../component/windowbar/windowbar';
 import Navbar from '../component/navbar/navbar';
 import ImportOverlay from '../component/importoverlay/importoverlay';
 import ProfilesManager from '../manager/profilesManager';
-import Toast from '../component/toast/toast';
 const app = require('electron').remote;
 const BG = styled.div`
     background-color: #444444;
@@ -52,7 +51,6 @@ export default class Page extends Component {
             <BG>
                 <WindowBar />
                 <Content>
-                    <Toast />
                     {!noNavbar && <Navbar />}
                     {app.process.argv[1] !== '.' && app.process.argv[1] && !this.state.hideOverlay && localStorage.getItem('importDone') === 'false' && <ImportOverlay file={app.process.argv[1]} cancelClick={this.importCancel} />}
                     <ContentSide>

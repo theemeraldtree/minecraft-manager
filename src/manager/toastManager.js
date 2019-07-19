@@ -2,12 +2,10 @@ const ToastManager = {
     toasts: [],
     toastHandler: undefined,
     registerHandler(handler) {
-        console.log('registering handler!');
-        console.log(handler);
         this.toastHandler = handler;
+        this.updateHandler();
     },
     updateHandler() {
-        console.log(this.toastHandler)
         if(this.toastHandler) {
             this.toastHandler();
         }
@@ -21,9 +19,9 @@ const ToastManager = {
         this.updateHandler();
     },
     createToast(title, body) {
-        console.log(this);
+        console.log('New Toast');
         this.toasts.push({
-            id: `toast-${title}-${new Date().getTime()}`,
+            id: `toast-${title}-${new Date().getTime()}-${Math.random().toString(36).substring(6)}`,
             title: title,
             body: body
         })

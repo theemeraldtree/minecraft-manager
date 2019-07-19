@@ -14,7 +14,7 @@ const rimraf = require('rimraf');
 function Profile(rawOMAF) {
     Object.assign(this, rawOMAF);
 
-    this.local = ['installed', 'safename', 'versionname', 'folderpath', 'iconpath', 'modsPath', 'state', 'downloadTemp'];
+    this.local = ['launcherVersion', 'installed', 'safename', 'versionname', 'folderpath', 'iconpath', 'modsPath', 'state', 'downloadTemp'];
     this.initLocalValues();
 }
 
@@ -45,6 +45,10 @@ Profile.prototype.initLocalValues = function() {
         this.hosts = {};
     }
 
+    if(!this.customVersions) {
+        this.customVersions = {};
+    }
+
     if(!this.omafVersion) {
         this.omafVersion = '0.1.2';
         Global.checkMigration();
@@ -62,6 +66,23 @@ Profile.prototype.toJSON = function() {
         copy[i] = undefined;
     }
     copy.local = undefined;
+
+    if(this.hosts) {
+        if(this.hosts.curse) {
+            copy.hosts.curse.localValues = undefined;
+            copy.hosts.curse.versionCache = undefined;
+        }
+    }
+
+    if(this.version) {
+        if(this.version.TEMP) {
+            this.version.TEMP = undefined;
+        }
+
+        if(this.version.cachedID) {
+            this.version.cachedID = undefined;
+        }
+    }
     return JSON.stringify(copy);
 }
 
@@ -85,11 +106,11 @@ Profile.prototype.removeAllMods = function() {
     this.save();
 }
 Profile.prototype.changeMCVersion = function(newver) {
-    if(this.forgeInstalled) {
+    if(this.customVersions.forge) {
         this.removeAllMods();
     }
 
-    if(!this.forgeInstalled) {
+    if(!this.customVersions.forge) {
         LauncherManager.setProfileData(this, 'lastVersionId', newver);
     }
     this.minecraftversion = newver;
@@ -114,12 +135,19 @@ Profile.prototype.setVersion = function(newver) {
 }
 
 Profile.prototype.setForgeVersion = function(newver) {
-    this.forgeVersion = newver;
+    if(!this.customVersions.forge) {
+        this.customVersions.forge = {}
+    }
+    this.customVersions.forge.version = newver;
     this.save();
 }
 
 Profile.prototype.setForgeInstalled = function(installed) {
-    this.forgeInstalled = installed;
+    if(!this.customVersions.forge && installed) {
+        this.customVersions.forge = {};
+    }else if(this.customVersions.forge && !installed) {
+        this.customVersions.forge = undefined;
+    }
     this.save();
 }
 
@@ -134,7 +162,6 @@ Profile.prototype.setHostId = function(host, id) {
 
 Profile.prototype.removeForge = function() {
     this.setForgeInstalled(false);
-    delete this.forgeVersion;
     this.save();
 }
 
@@ -157,7 +184,7 @@ Profile.prototype.getModFromID = function(id) {
 Profile.prototype.deleteMod = function(mod) {
     return new Promise((resolve) => {
         this.mods.splice(this.mods.indexOf(mod), 1);
-        fs.unlink(path.join(this.modsPath, `/${mod.jar}`), () => {
+        fs.unlink(path.join(this.modsPath, `/${mod.getJARFile()}`), () => {
             this.save();
             resolve();
         })
@@ -218,7 +245,7 @@ Profile.prototype.export = function(output, exportFolders, exportProgress) {
         for(const mod of this.mods) {
             if(mod.hosts) { 
                 if(mod.hosts.curse) {
-                    fs.unlinkSync(path.join(filesPath, `/mods/${mod.jar}`));
+                    fs.unlinkSync(path.join(filesPath, `/mods/${mod.getJARFile()}`));
                 }
             }
         }
@@ -271,6 +298,8 @@ Profile.prototype.changeCurseVersion = function(versionToChangeTo, onUpdate) {
             }
     
             rimraf.sync(oldpath);
+            onUpdate('Reloading profiles...');
+            await ProfilesManager.getProfiles();
             resolve(newprofile);
         });
     })

@@ -7,7 +7,6 @@ import EditContainer from '../components/editcontainer';
 import Detail from '../../../component/detail/detail';
 import OptionBreak from '../components/optionbreak';
 import InputContainer from '../components/inputcontainer';
-import TextInput from '../../../component/textinput/textinput';
 import Button from '../../../component/button/button';
 import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import Global from '../../../util/global';
@@ -67,7 +66,7 @@ export default class EditPageVersions extends Component {
 
     mcverChange = (version, e) => {
         let { profile } = this.state;
-        if(!profile.forgeInstalled) {
+        if(!profile.customVersions.forge) {
             this.setState({
                 mcverValue: version
             })
@@ -143,19 +142,19 @@ export default class EditPageVersions extends Component {
                     if(ver.latest) {
                         name += ' (latest)';
                     }
-                    if(profile.version === ver.displayName) {
+                    if(profile.version.displayName === ver.displayName) {
                         name += ' (current)';
                     }
 
                     nameArray.push({
-                        id: ver.id,
+                        id: ver.hosts.curse.fileID,
                         name: name
                     })
                 }
 
                 this.setState({
                     hostVersionValues: nameArray,
-                    curseVerValue: profile.hosts.curse.fileID
+                    curseVerValue: profile.version.hosts.curse.fileID
                 })
             }
         }
@@ -215,29 +214,23 @@ export default class EditPageVersions extends Component {
                     <Detail>minecraft version</Detail>
                     <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} value={mcverValue} />
                     <OptionBreak />
-                    <Detail>profile version</Detail>
-                    {!profile.hosts.curse &&
-                    <InputContainer>
-                        <TextInput placeholder='Enter a version' />
-                        <Button color='green'>change</Button>
-                    </InputContainer>}
                     {profile.hosts.curse && <>
                     <Detail>because this is from an online source, you can only choose versions available online</Detail>
                     {hostVersionValues && <CustomDropdown value={curseVerValue} onChange={this.curseVersionChange} items={hostVersionValues} />}
                     </>}
 
-                    <Detail>version timestamp: {profile.versionTimestamp}</Detail>
+                    <Detail>version timestamp: {profile.version.timestamp}</Detail>
                     <OptionBreak />
                     <Detail>custom versions</Detail>
                     <CustomVersions>
                         <Detail>forge</Detail>
-                        {!profile.forgeInstalled && !forgeIsInstalling &&
+                        {!profile.customVersions.forge && !forgeIsInstalling &&
                         <Button onClick={this.downloadForge} color='green'>install forge</Button>
                         }
                         {forgeIsInstalling && <p>Forge is installing. To check progress, open the Downloads viewer in the sidebar</p>}
                         {forgeIsUninstalling && <p>Forge is being removed. To check progress, open the Downloads viewer in the sidebar</p>}
-                        {profile.forgeInstalled && !forgeIsUninstalling && <>
-                        <p>Version: {profile.forgeVersion}</p>
+                        {profile.customVersions.forge && !forgeIsUninstalling && <>
+                        <p>Version: {profile.customVersions.forge.version}</p>
                         <Button onClick={this.uninstallForge} color='red'>uninstall forge</Button>
                         </>}
                     </CustomVersions>

@@ -78,7 +78,7 @@ export default class UpdateOverlay extends Component {
         this.setState({
             displayState: 'progress'
         })
-        profile.changeCurseVersion(updateVersion.id, (progress) => {
+        profile.changeCurseVersion(updateVersion.hosts.curse.fileID, (progress) => {
             this.setState({
                 updateProgress: progress
             })
@@ -103,7 +103,7 @@ export default class UpdateOverlay extends Component {
                         {displayState !== 'done' && <Title>Update your profile</Title>}
                         {!noUpdates && !updateAvailable && <Subtext>Checking for updates...</Subtext>}
                         {noUpdates && <Subtext>You have the latest version. No update is available</Subtext>}
-                        {updateAvailable && <Subtext>A new version is available. You have version {this.props.profile.version} and the latest version is {updateVersion.displayName}. Would you like to update?</Subtext>}
+                        {updateAvailable && <Subtext>A new version is available. You have version {this.props.profile.version.displayName} and the latest version is {updateVersion.displayName}. Would you like to update?</Subtext>}
                         <Breaker />
                         <ButtonsContainer>
                             {updateAvailable && <>

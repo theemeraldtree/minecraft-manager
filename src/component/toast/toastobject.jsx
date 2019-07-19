@@ -25,7 +25,8 @@ const slideOut = keyframes`
 const BG = styled.div`
     width: fit-content;
     max-width: 350px;
-    height: 50px;
+    height: fit-content;
+    min-height: 50px;
     background-color: #262626;
     z-index: 9999;
     box-shadow: 0px 0px 17px 0px rgba(0,0,0,0.75);

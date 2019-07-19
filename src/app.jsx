@@ -15,6 +15,7 @@ import Global from './util/global';
 import WelcomePage from './page/welcome/welcome';
 import globalStyles from './styles.css'; //eslint-disable-line
 import { createGlobalStyle } from 'styled-components';
+import Toast from './component/toast/toast';
 console.log(globalStyles[0][1]);
 const GlobalStyle = createGlobalStyle`
     ${globalStyles[0][1]}
@@ -26,6 +27,7 @@ const App = () => (
         {SettingsManager.loadSettings()}
         <Router>
             <div>
+                <Toast />
                 <GlobalStyle />
                 {!fs.existsSync(Global.PROFILES_PATH) && <Redirect to='/welcome' />}
                 <Route exact path='/' component={HomePage} />

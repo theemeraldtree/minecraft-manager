@@ -6,7 +6,6 @@ import fs from 'fs';
 import Global from "./util/global";
 import path from 'path';
 import SettingsManager from "./manager/settingsManager";
-import Curse from "./host/curse/curse";
 const { remote, shell } = require('electron');
 const { dialog } = require('electron').remote;
 const request = require('request');
@@ -21,8 +20,6 @@ async function load() {
   }
 
   await ProfilesManager.getProfiles();
-
-  Curse.cacheCommon();
   
   document.addEventListener('keydown', (e) => {
     if(e.keyCode == 123) {

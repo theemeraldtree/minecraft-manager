@@ -2,6 +2,7 @@ import SettingsManager from '../manager/settingsManager';
 import ProfilesManager from '../manager/profilesManager';
 import Mod from '../type/mod';
 import Profile from '../type/profile';
+import ToastManager from '../manager/toastManager';
 
 const remote = require('electron').remote;
 const app = remote.app;
@@ -104,6 +105,7 @@ const Global = {
         }
     },
     checkMigration: function() {
+        let showMigrationmessage = false;
         for(let profile of ProfilesManager.loadedProfiles) {
             
             // From beta 4.1 and earlier there was no info about the OMAF format version
@@ -142,8 +144,27 @@ const Global = {
                     profile.addIconToLauncher();
 
                     profile.save();
+                }else if(profile.omafVersion === '0.1.2') {
+                    profile.omafVersion = '0.1.3';
+                    if(!(profile.version instanceof Object)) {
+                        profile.version = {
+                            displayname: profile.version,
+                            timestamp: profile.versionTimestamp
+                        }
+
+                        profile.versionTimestamp = undefined;
+                    }
+
+                    profile.save();
+
+                    showMigrationmessage = true;
                 }
             }
+        }
+
+        if(showMigrationmessage) {
+            console.log('Migration message');
+            ToastManager.createToast('Hey There!', 'Hello there beta tester! Just a quick message about this new version: your old profiles will not work 100%. Some features may work, some may not. This is due to internal restructuring as to how many things are stored. We hope you understand!');
         }
 
         ProfilesManager.updateReloadListeners();
