@@ -12,7 +12,7 @@ const LibrariesManager = {
     },
     createForgeLibrary: function(profile) {
         return new Promise((resolve) => {
-            if(profile.forgeVersion) {
+            if(profile.customVersions.forge.version) {
                 const libraryPath = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
                 if(!fs.existsSync(libraryPath)) {
                     fs.mkdirSync(libraryPath)
@@ -20,13 +20,13 @@ const LibrariesManager = {
                 let jarPath = path.join(this.getMCMLibraries(), `/mcm-${profile.id}/profiles-mcm-${profile.id}.jar`);
                 fs.writeFile(jarPath, 'Minecraft Manager - Downloading...', () => {
                     const mcversion = profile.minecraftversion;
-                    let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.forgeVersion}/forge-${profile.forgeVersion}-universal.jar`;
+                    let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.customVersions.forge.version}/forge-${profile.customVersions.forge.version}-universal.jar`;
                     if(mcversion === '1.7.10') {
-                        downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.forgeVersion}-1.7.10/forge-${profile.forgeVersion}-1.7.10-universal.jar`
+                        downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.customVersions.forge.version}-1.7.10/forge-${profile.customVersions.forge.version}-1.7.10-universal.jar`
                     }else if(mcversion === '1.8.9' || mcversion === '1.8.8' || mcversion === '1.8') {
-                        downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.forgeVersion}-${mcversion}/forge-${profile.forgeVersion}-${mcversion}-universal.jar`
+                        downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.customVersions.forge.version}-${mcversion}/forge-${profile.customVersions.forge.version}-${mcversion}-universal.jar`
                     }
-                    DownloadsManager.startFileDownload(`Minecraft Forge ${profile.forgeVersion} for ${profile.name}`, downloadURL, jarPath).then(() => {
+                    DownloadsManager.startFileDownload(`Minecraft Forge ${profile.customVersions.forge.version} for ${profile.name}`, downloadURL, jarPath).then(() => {
                         resolve();
                     });
                 });
@@ -34,7 +34,7 @@ const LibrariesManager = {
         })
     },
     renameLibrary: function(profile, newID) {
-        if(profile.forgeInstalled) {
+        if(profile.customVersions.forge) {
             fs.renameSync(path.join(this.getMCMLibraries(), `/mcm-${profile.id}/profiles-mcm-${profile.id}.jar`), path.join(this.getMCMLibraries(), `/mcm-${profile.id}/profiles-mcm-${newID}.jar`));
             fs.renameSync(path.join(this.getMCMLibraries(), `/mcm-${profile.id}`), path.join(this.getMCMLibraries(), `/mcm-${newID}`));
         }

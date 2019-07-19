@@ -131,7 +131,7 @@ const ProfilesManager = {
                                 stateChange('Creating launcher profile...');
                                 LogManager.log('info', `[ProfilesManager] (ProfileImport) Creating launcher profile for ${profile.id}`);
                                 LauncherManager.createProfile(profile);
-                                if(profile.forgeInstalled) {
+                                if(profile.customVersions.forge) {
                                     LogManager.log('info', `[ProfilesManager] (ProfileImport) Installing Forge for ${profile.id}`);
                                     stateChange('Installing forge...');
                                     ForgeManager.setupForge(profile).then(() => {
@@ -195,7 +195,10 @@ const ProfilesManager = {
                 name: name,
                 minecraftversion: mcversion,
                 icon: 'icon.png',
-                omafVersion: '0.1.2'
+                omafVersion: '0.1.2',
+                version: {
+                    timestamp: new Date().getTime()
+                }
             });
 
             profile.resetIcon();

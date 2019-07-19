@@ -5,7 +5,38 @@ function Mod(rawOMAF) {
         this.hosts = {};
     }
 
+    if(!this.files) {
+        this.files = [];
+    }
     this.local = ['installed', 'detailedInfo', 'cachedID', 'iconpath', 'versions', 'downloadTemp']
+}
+
+Mod.prototype.setJARFile = function(newJarFile) {
+    let existing;
+    for(let file of this.files) {
+        if(file.type === 'jar' && file.priority === 'mainFile') {
+            existing = file;
+        }
+    }
+
+    if(existing) {
+        existing.path = newJarFile;
+    }else{
+        this.files.push({
+           displayName: 'Main JAR File',
+           type: 'jar',
+           priority: 'mainFile',
+           path: newJarFile
+        })
+    }
+}
+
+Mod.prototype.getJARFile = function() {
+    for(let file of this.files) {
+        if(file.type === 'jar' && file.priority === 'mainFile') {
+            return file;
+        }
+    }
 }
 
 Mod.prototype.cleanObject = function() {
@@ -24,6 +55,11 @@ Mod.prototype.cleanObject = function() {
         }
     }
 
+    if(this.version) {
+        if(this.version.TEMP) {
+            this.version.TEMP = undefined;
+        }
+    }
     if(this.hosts) {
         if(this.hosts.curse) {
             if(this.hosts.curse.localValues) {

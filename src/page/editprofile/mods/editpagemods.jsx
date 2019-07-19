@@ -108,10 +108,12 @@ export default class EditPageMods extends Component {
     showInfoClick = (e) => {
         let mod = this.state.profile.getModFromID(e.currentTarget.dataset.assetid);
         console.log(mod);
-        this.setState({
-            displayState: 'modInfo',
-            activeMod: mod
-        })
+        if(mod.hosts) {
+            this.setState({
+                displayState: 'modInfo',
+                activeMod: mod
+            })
+        }
     }
 
     goBack = () => {
@@ -204,18 +206,20 @@ export default class EditPageMods extends Component {
             buttonLabel: 'Choose Mod',
             properties: ['openFile']
         });
-        let { profile } = this.state;
-        let pth = p[0];
-        let filename = path.basename(pth);
-        let mod = new Mod({
-            name: filename,
-            id: Global.createID(name),
-            minecraftversion: profile.minecraftversion,
-            jar: filename
-        });
-        fs.copyFileSync(pth, path.join(profile.modsPath, filename));
-        profile.addMod(mod);
-        this.reloadModsList();
+        if(p[0]) {
+            let { profile } = this.state;
+            let pth = p[0];
+            let filename = path.basename(pth);
+            let mod = new Mod({
+                name: filename,
+                id: Global.createID(name),
+                minecraftversion: profile.minecraftversion,
+                jar: filename
+            });
+            fs.copyFileSync(pth, path.join(profile.modsPath, filename));
+            profile.addMod(mod);
+            this.reloadModsList();
+        }
     }
 
     versionInstall = (version, mod) => {

@@ -169,7 +169,7 @@ class ViewProfilePage extends Component {
                     <Specs>
                         <p>internal id: {profile.id}</p>
                         <p>version safe name: {profile.safename}</p>
-                        <p>version timestamp: {profile.versionTimestamp}</p>
+                        <p>version timestamp: {profile.version.timestamp}</p>
                     </Specs>
                 </MiddlePanel>
                 <Description>

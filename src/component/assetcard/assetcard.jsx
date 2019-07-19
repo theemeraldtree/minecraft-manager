@@ -11,6 +11,7 @@ const BG = styled.div`
     transition: 150ms;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
     ${props => !props.disableHover && `
         cursor: pointer;
         &:hover {

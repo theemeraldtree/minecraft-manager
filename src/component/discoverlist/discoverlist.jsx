@@ -11,6 +11,8 @@ const LoadingText = styled.div`
     align-items: center;
     height: 100%;
     color: white;
+    flex-flow: row;
+    flex-flow: column;
 `
 
 const List = styled.div`
@@ -20,22 +22,39 @@ const List = styled.div`
     margin-bottom: 20px;
 `
 
+const TryAgain = styled.p`
+    margin: 0;
+    color: lightblue;
+    font-size: 14pt;
+    cursor: pointer;
+`
 export default class DiscoverList extends Component {
     constructor(props) {
         super(props);
         this.listRef = React.createRef();
         this.state = {
             displayState: '',
-            assetsList: []
+            assetsList: [],
+            cantConnect: false,
+            isSearching: false
         }
     }
 
     browseAssets = async () => {
         this.setState({
-            displayState: 'browseAssets'
+            displayState: 'browseAssets',
+            isSearching: false,
+            cantConnect: false
         })
 
-        this.renderAssets(await Curse.getPopularAssets(this.props.type));
+        const assets = await Curse.getPopularAssets(this.props.type);
+        if(assets) {
+            this.renderAssets(assets);
+        }else{
+            this.setState({
+                cantConnect: true
+            })
+        }
     }
 
     static getDerivedStateFromProps(props) {
@@ -175,11 +194,22 @@ export default class DiscoverList extends Component {
         }
     }
 
+    tryAgain = () => {
+        let { displayState, isSearching } = this.state;
+        if(displayState === 'browseAssets' && !isSearching) {
+            this.browseAssets();
+        }else if(isSearching) {
+            this.renderSearch();
+        }
+    }
+
     renderSearch = () => {
         let { displayState } = this.state;
         let term = this.props.searchTerm;
         this.setState({
-            assetsList: []
+            assetsList: [],
+            isSearching: true,
+            cantConnect: false
         });
         if(displayState === 'browseAssets') {
             if(term.trim() !== '') { 
@@ -193,7 +223,7 @@ export default class DiscoverList extends Component {
     }
 
     render() {
-        let { displayState, assetsList, activeAsset } = this.state;
+        let { displayState, assetsList, activeAsset, cantConnect } = this.state;
         let { type, progressState, installClick, versionInstall, mcVerFilter, forceVersionFilter, versionState } = this.props;
         return (
             <>
@@ -203,9 +233,13 @@ export default class DiscoverList extends Component {
                             {assetsList}
                         </List>
                     }
-                    {assetsList.length === 0 && <LoadingText>loading...</LoadingText>}
+                    {assetsList.length === 0 && !cantConnect && <LoadingText>loading...</LoadingText>}
+                    {cantConnect && <LoadingText>
+                    can't connect
+                    <TryAgain onClick={this.tryAgain}>try again</TryAgain>
+                    </LoadingText>}
                 </>}
-                {displayState === 'viewAsset' && <AssetInfo versionInstall={versionInstall} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} progressState={progressState[activeAsset.id]} asset={activeAsset} installClick={installClick} type={type} />}
+                {displayState === 'viewAsset' && <AssetInfo versionInstall={versionInstall} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} progressState={progressState} asset={activeAsset} installClick={installClick} type={type} />}
             </>
         )
     }

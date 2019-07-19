@@ -176,13 +176,16 @@ let Curse = {
     async addDescription(asset) {
         if(this.cached.assets[asset.cachedID]) {
             if(!this.cached.assets[asset.cachedID].description) {
-                asset.description = await this.getDescription(asset);
-                this.cached.assets[asset.cachedID] = asset;
+                const desc =  await this.getDescription(asset);
+                asset.description = desc;
+                if(desc) {
+                    this.cached.assets[asset.cachedID] = asset;
+                }
                 return asset;
             }else{
                 return this.cached.assets[asset.cachedID];
             }
-        }else{
+        }else{ 
             asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
             this.cached.assets[asset.cachedID] = {};
             return await this.addDescription(asset);
@@ -208,9 +211,14 @@ let Curse = {
             sort: 0,
             pageSize: 20,
             index: 0
-        })
+        });
 
-        return this.readCurseAssetList(JSON.parse(result));
+        if(result) {
+            return this.readCurseAssetList(JSON.parse(result));
+        }else{
+            return undefined;
+        }
+
     },
 
     async cacheCommon() {
@@ -222,7 +230,11 @@ let Curse = {
         let res;
         if(!this.cached.popular[type]) {
             res = await this.search('', type);
-            this.cached.popular[type] = res;
+            if(res) {
+                this.cached.popular[type] = res;
+            }else{
+                return undefined;
+            }
         }else{
             res = this.cached.popular[type];
         }
@@ -232,29 +244,34 @@ let Curse = {
     async addFileInfo(asset, fileID) {
         const info = await this.getFileInfo(asset, fileID);
 
-        asset.version = this.parseCurseVersion(info);
-        asset.hosts.curse.fileID = fileID;
-        asset.hosts.curse.fileName = info.fileName;
-        asset.downloadTemp = info.downloadUrl;
-        this.cached.assets[asset.cachedID] = asset;
-
-        const dependFinal = [];
-        if(info.dependencies) {
-            for(let dependency of info.dependencies) {
-                if(dependency.type === 3) {
-                    dependFinal.push({
-                        hosts: {
-                            curse: {
-                                id: dependency.addonId
+        if(info) {
+            asset.version = this.parseCurseVersion(info);
+            asset.hosts.curse.fileID = fileID;
+            asset.hosts.curse.fileName = info.fileName;
+            asset.downloadTemp = info.downloadUrl;
+            this.cached.assets[asset.cachedID] = asset;
+    
+            const dependFinal = [];
+            if(info.dependencies) {
+                for(let dependency of info.dependencies) {
+                    if(dependency.type === 3) {
+                        dependFinal.push({
+                            hosts: {
+                                curse: {
+                                    id: dependency.addonId
+                                }
                             }
-                        }
-                    })
+                        })
+                    }
                 }
             }
+    
+            asset.dependencies = dependFinal;
+            return asset;
+        }else{
+            return undefined;
         }
 
-        asset.dependencies = dependFinal;
-        return asset;
     },
 
     async getFileChangelog(asset, fileID) {
@@ -262,7 +279,12 @@ let Curse = {
     },
 
     async getFileInfo(asset, fileID) {
-        return JSON.parse(await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/file/${fileID}`));
+        const res = await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/file/${fileID}`);
+        if(res) {
+            return JSON.parse(res);
+        }else{
+            return undefined;
+        }
     },
 
     async getDependencies(asset) {
@@ -274,12 +296,18 @@ let Curse = {
                 }else{
                     newAsset = await this.addFileInfo(asset, asset.hosts.curse.fileID);
                 }
-                let final = [];
-                for(let depend of newAsset.dependencies) {
-                    final.push(await this.getFullAsset(depend, 'unknown'));
+
+                if(newAsset) {
+                    let final = [];
+                    for(let depend of newAsset.dependencies) {
+                        final.push(await this.getFullAsset(depend, 'unknown'));
+                    }
+                    this.cached.assets[asset.cachedID].dependencies = final;
+                    return final;
+                }else{
+                    return undefined;
                 }
-                this.cached.assets[asset.cachedID].dependencies = final;
-                return final;
+
             }else{
                 const dependList = this.cached.assets[asset.cachedID].dependencies;
                 if(dependList.length >= 1) {
@@ -309,7 +337,7 @@ let Curse = {
         if(asset.dependencies) {
             for(let depend of asset.dependencies) {
                 if(depend.hosts.curse.fileID) {
-                    this.installModVersion(profile, depend, depend.hosts.curse.fileID);
+                    this.installModVersionToProfile(profile, depend, depend.hosts.curse.fileID);
                 }else{
                     this.installModToProfile(profile, depend);
                 }
@@ -321,7 +349,6 @@ let Curse = {
         if(asset.hosts.curse.localValues && asset.hosts.curse.localValues.gameVerLatestFiles) { 
             for(let ver of asset.hosts.curse.localValues.gameVerLatestFiles) {
                 if(ver.gameVersion === mcversion) {
-                    console.log(ver);
                     return ver;
                 }
             }
@@ -354,30 +381,42 @@ let Curse = {
 
     async installModVersionToProfile(profile, mod, dependencies) {
         return new Promise(async (resolve) => {
-            if(!fs.existsSync(path.join(profile.gameDir, `/mods/${mod.jar}`))) {
+            console.log(mod);
+            if(!fs.existsSync(path.join(profile.gameDir, `/mods/${mod.id}.jar`))) {
                 if(!mod.name) {
                     let newm = await this.getFullAsset(mod, 'mod');
                     newm.hosts.curse.fileID = mod.hosts.curse.fileID;
                     mod = newm;
                 }
+                console.log('start progressive download bruhther');
                 DownloadsManager.createProgressiveDownload(`Info for ${mod.name}`).then(async (download) => {
+                    console.log('checking for dependencies bruh');
                     if(dependencies) {
                         this.installDependencies(profile, mod);
                     }
+                    console.log('removin old download');
                     DownloadsManager.removeDownload(download.name);
 
+                    console.log('checking if we got downlaodtemp');
                     if(!mod.downloadTemp) {
+                        console.log('adding file info');
                         mod = await this.addFileInfo(mod, mod.hosts.curse.fileID);
                     }
 
+                    console.log('creatin new object');
+                    const modObj = new Mod(mod);
+
+                    console.log('starting mod download');
                     DownloadsManager.startModDownload(profile, mod, mod.downloadTemp, false).then(async () => {
-                        mod.jar = `${mod.id}.jar`;
+                        modObj.setJARFile(`${mod.id}.jar`);
                         if(!profile.getModFromID(mod.id)) {
-                            profile.addMod(new Mod(mod));
+                            profile.addMod(modObj);
                         }
                         resolve(mod);
                     })
                 })
+            }else{
+                resolve(mod);
             }
         })
     },
@@ -430,14 +469,18 @@ let Curse = {
     },
 
     async getVersionsFromAsset(asset) {
-        console.log(this.cached.assets[asset.cachedID]);
         if(this.cached.assets[asset.cachedID]) {
             if(!this.cached.assets[asset.cachedID].hosts.curse.versionCache) {
-                const results = JSON.parse(await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/files`));
-                let sorted = results.sort((a, b) => {return new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime()})
-                const final = sorted.map(ver => ver = this.parseCurseVersion(ver));
-                this.cached.assets[asset.cachedID].hosts.curse.versionCache = final;
-                return final;
+                const req = await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/${asset.hosts.curse.id}/files`);
+                if(req) {
+                    const results = JSON.parse(req);
+                    let sorted = results.sort((a, b) => {return new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime()})
+                    const final = sorted.map(ver => ver = this.parseCurseVersion(ver));
+                    this.cached.assets[asset.cachedID].hosts.curse.versionCache = final;
+                    return final;
+                }else{
+                    return undefined;
+                }
             }else{
                 return this.cached.assets[asset.cachedID].hosts.curse.versionCache;
             }
@@ -469,7 +512,7 @@ let Curse = {
         const versions = await this.getVersionsFromAsset(asset);
         let newver;
         for(let ver of versions.reverse()) {
-            if(new Date(ver.fileDate).getTime() > asset.versionTimestamp) {
+            if(new Date(ver.timestamp).getTime() > asset.version.timestamp) {
                 newver = ver;
             }
         }
@@ -489,13 +532,14 @@ let Curse = {
             let cachedAsset = this.cached.assets[mp.cachedID];
 
             let downloadUrl, verObj;
-            console.log(`were looking for: ${version}`);
+            const versionIsNumber = parseInt(version);
             for(let ver of versions) {
-                console.log(ver);
-                console.log(`comparing ${ver.id} to ${version}`);
-                if(ver.displayName === version) {
-                    downloadUrl = ver.TEMP.downloadUrl;
-                    verObj = ver;
+                if(versionIsNumber &&
+                    (ver.hosts.curse.fileID === parseInt(version)) ||
+                    !versionIsNumber &&
+                    (ver.displayName === version)) {
+                        downloadUrl = ver.TEMP.downloadUrl;
+                        verObj = ver;
                 }
             }
 
@@ -515,7 +559,6 @@ let Curse = {
                     profile.iconURL = modpack.iconURL;
                     profile.blurb = modpack.blurb;
                     profile.description = modpack.description;
-                    profile.versionTimestamp = new Date(verObj.fileDate).getTime();
                     profile.hosts.curse.fullyInstalled = false;
                     profile.hosts.curse.fileID = verObj.id;
                     profile.hosts.curse.fileName = verObj.fileName;
