@@ -17,6 +17,15 @@ const os = require('os');
 async function load() {
   if(fs.existsSync(Global.PROFILES_PATH)) {
     //LogManager.log('info', '[index] Getting profiles...');
+  
+    // Check for directories - we need to make sure everything exists
+    if(!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
+      fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
+    }
+
+    if(!fs.existsSync(Global.getMCPath(), '/libraries/minecraftmanager/profiles')) {
+      fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
+    }
   }
 
   await ProfilesManager.getProfiles();
@@ -28,14 +37,7 @@ async function load() {
   });
 
   SettingsManager.loadSettings();
-  // Check for directories - we need to make sure everything exists
-  if(!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
-    fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
-  }
 
-  if(!fs.existsSync(Global.getMCPath(), '/libraries/minecraftmanager/profiles')) {
-    fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
-  }
 
   // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
   Global.checkMigration();
