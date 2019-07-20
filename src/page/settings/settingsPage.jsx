@@ -62,6 +62,10 @@ const Logo = styled.div`
 const WarningMSG = styled.p`
     color: red;
 `
+
+const PathInput = styled(TextInput)`
+    width: 590px;
+`
 export default class SettingsPage extends Component {
     constructor(props) {
         super(props);
@@ -167,14 +171,14 @@ export default class SettingsPage extends Component {
                     <InputHolder>
                         <Detail>MINECRAFT HOME DIRECTORY</Detail>
                         <div>
-                            <TextInput disabled value={this.state.mcHome} />
+                            <PathInput disabled value={this.state.mcHome} />
                             <Button onClick={this.chooseHomeDirectory} color='green'>choose</Button>
                         </div>
                     </InputHolder>
                     <InputHolder>
                         <Detail>MINECRAFT EXECUTABLE</Detail>
                         <div>
-                            <TextInput disabled value={this.state.mcExe} />
+                            <PathInput disabled value={this.state.mcExe} />
                             <Button onClick={this.chooseMCExe} color='green'>choose</Button>
                         </div>
                     </InputHolder>

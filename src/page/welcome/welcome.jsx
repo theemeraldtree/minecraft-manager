@@ -12,20 +12,41 @@ import fs from 'fs';
 import path from 'path';
 import LibrariesManager from '../../manager/librariesManager';
 import os from 'os';
+import logo from '../../img/logo-sm.png';
 const { dialog }  = require('electron').remote;
 const Title = styled.p`
     color: white;
-    font-size: 32pt;
+    font-size: 26pt;
     font-weight: 200;
     margin: 0;
 `
-
+const WelcomeBox = styled.div`
+    background-color: #717171;
+    max-width: 600px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: column;
+`
 const Subtext = styled.p`
     color: white;
+    margin: 0;
 `
 
 const Content = styled.div`
     padding: 5px;
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+`
+
+const Logo = styled.div`
+    background-image: url(${logo});
+    width: 150px;
+    height: 150px;
+    background-size: contain;
 `
 
 const TI = styled(TextInput)`
@@ -35,6 +56,22 @@ const TI = styled(TextInput)`
 
 const GB = styled(Button)`
     margin-top: 20px;
+`
+
+const IH = styled(InputHolder)`
+    margin-top: 1px;
+    max-width: 650px;
+    width: 100%;
+`
+const Spacing = styled.div`
+    width: 100%;
+    height: 30px;
+`
+
+const AutofillText = styled.p`
+    margin: 0;
+    font-size: 10pt;
+    color: white;
 `
 export default withRouter(class WelcomePage extends Component {
     constructor() {
@@ -94,26 +131,36 @@ export default withRouter(class WelcomePage extends Component {
             <Page noNavbar>
                 <Header title='welcome' />
                 <Content>
-                    <Title>Welcome to Minecraft Manager</Title>
-                    <Subtext>Before you start, what's your Minecraft Home Folder? This is typically referred to as the <b>.minecraft</b> folder</Subtext>
+                    <Spacing />
+                    <WelcomeBox>
+                        <Logo />
+                        <Title>Welcome to Minecraft Manager</Title>
+                        <Subtext>the easiest way to manage minecraft mods and modpacks</Subtext>
+                    </WelcomeBox>
 
-                    <InputHolder>
+                    <Spacing />
+                    <Subtext>What is your Minecraft Home Directory? This is typically referred to as the .minecraft folder.</Subtext>
+
+                    <IH>
                         <div>
                             <TI disabled value={this.state.mcHome} />
                             <Button onClick={this.chooseHomeDirectory} color='green'>choose</Button>
                         </div>
-                    </InputHolder>
+                    </IH>
+                    <AutofillText>This field has been autofilled with our best guess. Most people will not have changed their home directory</AutofillText>
 
-                    <Subtext>Now where is your Minecraft Launcher executable?</Subtext>
+                    <Spacing />
+                    <Subtext>Where's your Minecraft Executable, or Minecraft Launcher application?</Subtext>
 
-                    <InputHolder>
+                    <IH>
                         <div>
                             <TI disabled value={this.state.mcExe} />
                             <Button onClick={this.chooseMCExe} color='green'>choose</Button>
                         </div>
-                    </InputHolder>
+                    </IH>
+                    <AutofillText>This field has been autofilled with our best guess. Most people will not have changed their executable path</AutofillText>
 
-                    <GB onClick={this.start} color='green'>Go!</GB>
+                    <GB onClick={this.start} color='green'>All done, let's go!</GB>
                 </Content>
             </Page>
         )

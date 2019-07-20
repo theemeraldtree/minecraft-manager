@@ -19,19 +19,25 @@ const ProfilesManager = {
         this.loadedProfiles = [];
         LogManager.log('info', '[ProfilesManager] Getting profiles...');
         return new Promise(resolve => {
-            fs.readdir(Global.PROFILES_PATH, (err, files) => {
-                if(files.length >= 1) {
-                    files.forEach(async (file) => {
-                        await this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
+            if(fs.existsSync(Global.PROFILES_PATH)) {
+                fs.readdir(Global.PROFILES_PATH, (err, files) => {
+                    if(files.length >= 1) {
+                        files.forEach(async (file) => {
+                            await this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
+                            this.updateReloadListeners();
+                            resolve();
+                        })
+                    }else{
+                        LogManager.log('info', '[ProfilesManager] done getting profiles');
                         this.updateReloadListeners();
                         resolve();
-                    })
-                }else{
-                    LogManager.log('info', '[ProfilesManager] done getting profiles');
-                    this.updateReloadListeners();
-                    resolve();
-                }
-            })
+                    }
+                })
+            }else{
+                this.loadedProfiles = [];
+                resolve();
+            }
+
         })
     },
     updateReloadListeners: function() {
