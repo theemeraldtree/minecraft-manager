@@ -21,7 +21,7 @@ let Curse = {
     },
     concurrentDownloads: [],
     async HTTPGet(url, qs, tries) {
-        try {
+         try {
             return await HTTPRequest.get(url, qs);
         }catch(err) {
             if(!tries) {
@@ -204,7 +204,7 @@ let Curse = {
 
     async search(term, type) {
         const result = await this.HTTPGet(`https://addons-ecs.forgesvc.net/api/v2/addon/search`, {
-            searchFilter: term,
+            searchFilter: term.split(' ').join('%20'),
             gameId: 432,
             sectionId: Curse.getCurseTypeID(type),
             categoryId: 0,

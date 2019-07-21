@@ -3,6 +3,7 @@ import ProfilesManager from '../manager/profilesManager';
 import Mod from '../type/mod';
 import Profile from '../type/profile';
 import ToastManager from '../manager/toastManager';
+import HTTPRequest from '../host/httprequest';
 
 const remote = require('electron').remote;
 const app = remote.app;
@@ -14,10 +15,44 @@ const Global = {
     BACKUPS_DIR: path.join(app.getPath('userData'), `/backups`),
     MCM_TEMP: path.join(app.getPath('userData'), `/temp/`),
     PROFILES_PATH: path.join(app.getPath('userData') + '/profiles/'),
-    MC_VERSIONS: ['1.14.2', '1.14.1', '1.14', '1.13.2', '1.13.1', '1.13', '1.12.2', '1.12.1', '1.12', '1.11.2', '1.11.1', '1.11', '1.10.2', '1.10.1', '1.10', '1.9.4', '1.9.3', '1.9.2', '1.9.1', '1.9.0', '1.8.9', '1.8.8', '1.8.7', '1.8.6', '1.8.5', '1.8.4', '1.8.3', '1.8.2', '1.8.1', '1.8', '1.7.10', '1.7.9', '1.7.8', '1.7.7', '1.7.6', '1.7.5', '1.7.4', '1.7.3', '1.7.2', '1.6.4', '1.6.2', '1.6.1', '1.5.2', '1.5.1', '1.4.7', '1.4.6', '1.4.5', '1.4.4', '1.4.2', '1.3.2', '1.3.1', '1.2.5', '1.2.4', '1.2.3', '1.2.2', '1.2.1', '1.1', '1.0'],
+    MC_VERSIONS: [],
+    ALL_VERSIONS: [],
     cacheUpdateTime: new Date().getTime(),
     cached: {
         versions: {}
+    },
+    async updateMCVersions() {
+        let versionsJSON;
+        let req;
+        if(fs.existsSync(path.join(this.MCM_PATH, '/mcvercache.json'))) {
+            this.parseVersionsJSON(JSON.parse(fs.readFileSync(path.join(this.MCM_PATH, '/mcvercache.json'))));
+        }
+
+        try {
+            req = await HTTPRequest.get('https://launchermeta.mojang.com/mc/game/version_manifest.json');
+        }catch(e) {
+            req = undefined;
+        }
+
+        if(req !== undefined) {
+            versionsJSON = JSON.parse(req);
+        }
+        if(versionsJSON) {
+             this.parseVersionsJSON(versionsJSON);
+        }
+
+    },
+    parseVersionsJSON(versionsJSON) {
+        this.ALL_VERSIONS = [];
+        this.MC_VERSIONS = [];
+        for(let ver of versionsJSON.versions) {
+            this.ALL_VERSIONS.push(ver.id);
+            if(ver.type === 'release') {
+                this.MC_VERSIONS.push(ver.id);
+            }
+        }
+        fs.writeFileSync(path.join(this.MCM_PATH, '/mcvercache.json'), JSON.stringify(versionsJSON));
+  
     },
     getMCFilterOptions() {
         let copy = this.MC_VERSIONS.slice(0);

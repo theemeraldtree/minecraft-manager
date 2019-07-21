@@ -73,7 +73,7 @@ export default withRouter(class EditPageGeneral extends Component {
     nameChange = (e) => {
         let newName = e.target.value;
         let namedisable = true;
-        if(newName != this.state.profile.name) {
+        if(newName != this.state.profile.name && newName.trim() !== '') {
             namedisable = false;
         }
         this.setState({

@@ -10,6 +10,24 @@ const LauncherManager = {
     getLauncherProfiles: function() {
         return path.join(Global.getMCPath(), '/launcher_profiles.json');
     },
+    profileExists: function(profile) {
+        let id = `mcm-${profile.id}`;
+        let obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
+        if(obj.profiles[id]) {
+            return true;
+        }else{
+            return false;
+        }
+    },
+    updateVersion: function(profile) {
+        let verId;
+        if(profile.customVersions.forge) {
+            verId = `${profile.safename} [Minecraft Manager]`
+        }else{
+            verId = profile.minecraftversion;
+        }
+        this.setProfileData(profile, 'lastVersionId', verId);
+    },
     createProfile: function (profile) {
         let obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
         obj.profiles[`mcm-${profile.id}`] = {
