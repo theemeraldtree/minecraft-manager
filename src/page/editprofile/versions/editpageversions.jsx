@@ -102,13 +102,22 @@ export default class EditPageVersions extends Component {
         });
         ForgeManager.getForgePromotions().then((promos) => {
             let obj = JSON.parse(promos);
-            let version = `${profile.minecraftversion}-${obj.promos[`${profile.minecraftversion}-latest`].version}`;
-            profile.setForgeVersion(version);
-            ForgeManager.setupForge(profile).then(() => {
+            let verObj = obj.promos[`${profile.minecraftversion}-latest`];
+            if(verObj) {
+                let version = `${profile.minecraftversion}-${verObj.version}`;
+                profile.setForgeVersion(version);
+                ForgeManager.setupForge(profile).then(() => {
+                    this.setState({
+                        forgeIsInstalling: false
+                    })
+                });
+            }else{
                 this.setState({
-                    forgeIsInstalling: false
+                    forgeIsInstalling: false,
+                    noForgeVerAvailable: true
                 })
-            });
+            }
+
         })
     }
 
@@ -187,6 +196,12 @@ export default class EditPageVersions extends Component {
         })
     }
 
+    closeNoForgeVer = () => {
+        this.setState({
+            noForgeVerAvailable: false
+        })
+    }
+
     render() {
         let { profile, forgeIsInstalling, forgeIsUninstalling, mcverValue, curseVerValue, hostVersionValues } = this.state;
         return (
@@ -199,6 +214,16 @@ export default class EditPageVersions extends Component {
                         <InputContainer>
                             <Button onClick={this.cancelCurseVerChange} color='red'>cancel</Button>
                             <Button onClick={this.confirmCurseVerChange} color='green'>I understand, continue</Button>
+                        </InputContainer>
+                    </BG>
+                </Overlay>}
+
+                {this.state.noForgeVerAvailable && <Overlay>
+                    <BG>
+                        <Title>no forge version</Title>
+                        <p>There is no Forge version available for Minecraft {profile.minecraftversion}</p>
+                        <InputContainer>
+                            <Button color='green' onClick={this.closeNoForgeVer}>ok</Button>
                         </InputContainer>
                     </BG>
                 </Overlay>}

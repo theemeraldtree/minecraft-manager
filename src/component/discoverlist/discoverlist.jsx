@@ -47,6 +47,8 @@ export default class DiscoverList extends Component {
             cantConnect: false
         })
 
+        console.log('browse assets');
+
         const assets = await Curse.getPopularAssets(this.props.type);
         if(assets) {
             this.renderAssets(assets);

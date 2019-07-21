@@ -120,6 +120,11 @@ Profile.prototype.changeMCVersion = function(newver) {
 Profile.prototype.launch = function() {
     console.log('launchign!');
     console.log(this);
+    if(!LauncherManager.profileExists(this)) {
+        LauncherManager.createProfile(this);
+    }
+    this.addIconToLauncher();
+    LauncherManager.updateVersion(this);
     LauncherManager.setMostRecentProfile(this);
     LauncherManager.openLauncher();
 }

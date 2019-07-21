@@ -15,6 +15,9 @@ const { version } = require('../package.json');
 const os = require('os');
 
 async function load() {
+  SettingsManager.loadSettings();
+
+  Global.updateMCVersions();
   if(fs.existsSync(Global.PROFILES_PATH)) {
     //LogManager.log('info', '[index] Getting profiles...');
   
@@ -36,7 +39,6 @@ async function load() {
     }
   });
 
-  SettingsManager.loadSettings();
 
 
   // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
