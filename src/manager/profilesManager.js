@@ -201,7 +201,7 @@ const ProfilesManager = {
                 name: name,
                 minecraftversion: mcversion,
                 icon: 'icon.png',
-                omafVersion: '0.1.2',
+                omafVersion: '0.1.3',
                 version: {
                     timestamp: new Date().getTime()
                 }

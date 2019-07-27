@@ -69,7 +69,11 @@ export default class HomePage extends Component {
     }
 
     createNameChange = (e) => {
-        if(e.target.value.trim() !== '') {
+        let names = [];
+        for(let prof of ProfilesManager.loadedProfiles) {
+            names.push(prof.name)
+        }
+        if(e.target.value.trim() !== '' && !names.includes(e.target.value)) {
             this.setState({
                 nameEntered: true
             })
