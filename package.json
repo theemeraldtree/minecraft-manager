@@ -1,6 +1,6 @@
 {
     "name": "minecraft-manager",
-    "version": "2.0.0-beta.8",
+    "version": "2.0.0-pre.1",
     "license": "GPL-3.0",
     "main": "main.js",
     "author": "stairman06",
@@ -78,7 +78,7 @@
         "webpack-cli": "3.2.1"
     },
     "scripts": {
-        "dev": "webpack-dev-server --hot --inline",
+        "dev": "webpack-dev-server --hot --inline --port 9483",
         "compile": "webpack",
         "build": "electron-builder ./",
         "package": "npm run compile && npm run build"

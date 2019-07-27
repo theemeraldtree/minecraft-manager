@@ -21,6 +21,7 @@ const Item = styled(NavLink)`
     &.active {
         font-weight: bolder;
     }
+    transition: 300ms;
     margin-bottom: 15px;
 `
 const Sidebar = ({profile}) => (

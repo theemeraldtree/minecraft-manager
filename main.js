@@ -20,7 +20,7 @@ function createWindow() {
     if(dev && process.argv.indexOf('--noDevServer') === -1) {
         index = url.format({
           protocol: 'http:',
-          host: 'localhost:8080',
+          host: 'localhost:9483',
           pathname: 'index.html',
           slashes: true
         });
@@ -50,7 +50,7 @@ function createWindow() {
 
 
 function navigation(event, url) {
-    if(url.substring(0, 22) !== 'http://localhost:8080/' || url.substring(21, 29) === '/linkout') {
+    if(url.substring(0, 22) !== 'http://localhost:9483/' || url.substring(21, 29) === '/linkout') {
         let finalUrl = url;
 
 
