@@ -92,10 +92,10 @@ export default class EditPageMods extends Component {
             ps[mod.id] = 'installed';
             if(this.state.displayState === 'modsList') {
                 if(mod.name.toLowerCase().includes(this.state.liveSearchTerm.toLowerCase())) {
-                    newList.push(<AssetCard key={mod.id} asset={mod} showDelete onClick={this.showInfoClick} deleteClick={this.deleteClick} />);
+                    newList.push(<AssetCard disableHover={!mod.hosts.curse} key={mod.id} asset={mod} showDelete onClick={this.showInfoClick} deleteClick={this.deleteClick} />);
                 }
             }else{
-                newList.push(<AssetCard key={mod.id} asset={mod} showDelete onClick={this.showInfoClick} deleteClick={this.deleteClick} />);
+                newList.push(<AssetCard disableHover={!mod.hosts.curse} key={mod.id} asset={mod} showDelete onClick={this.showInfoClick} deleteClick={this.deleteClick} />);
             }
         }
 
@@ -108,7 +108,7 @@ export default class EditPageMods extends Component {
     showInfoClick = (e) => {
         let mod = this.state.profile.getModFromID(e.currentTarget.dataset.assetid);
         console.log(mod);
-        if(mod.hosts) {
+        if(mod.hosts.curse) {
             this.setState({
                 displayState: 'modInfo',
                 activeMod: mod

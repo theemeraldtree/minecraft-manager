@@ -21,7 +21,7 @@ const Global = {
     cached: {
         versions: {}
     },
-    async updateMCVersions() {
+    async updateMCVersions(firstTime) {
         let versionsJSON;
         let req;
         if(fs.existsSync(path.join(this.MCM_PATH, '/mcvercache.json'))) {
@@ -36,11 +36,13 @@ const Global = {
 
         if(req !== undefined) {
             versionsJSON = JSON.parse(req);
+        }else if(req == undefined && firstTime) {
+            ToastManager.createToast('Uh oh!', "We're having trouble downloading the latest Minecraft versions. This is necessary for Minecraft Manager to function. Check your internet connection and try again");
+            return 'no-connection';
         }
         if(versionsJSON) {
              this.parseVersionsJSON(versionsJSON);
         }
-
     },
     parseVersionsJSON(versionsJSON) {
         this.ALL_VERSIONS = [];

@@ -25,9 +25,11 @@ const App = () => (
         {localStorage.setItem('showDownloads', false)}
         {localStorage.setItem('importDone', false)}
         {SettingsManager.loadSettings()}
+        <div>
+            <Toast />
+        </div>
         <Router>
             <div>
-                <Toast />
                 <GlobalStyle />
                 {!fs.existsSync(Global.PROFILES_PATH) && <Redirect to='/welcome' />}
                 <Route exact path='/' component={HomePage} />
