@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import WindowBar from '../component/windowbar/windowbar';
 import Navbar from '../component/navbar/navbar';
@@ -28,7 +28,7 @@ const ContentSide = styled.div`
     overflow-x: hidden;
 `
 
-export default class Page extends Component {
+export default class Page extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -44,6 +44,7 @@ export default class Page extends Component {
             })
         })
     }
+
 
     render() {
         const { noNavbar, children } = this.props;

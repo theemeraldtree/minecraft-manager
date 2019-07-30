@@ -45,6 +45,7 @@ const Title = styled.p`
     text-align: center;
     margin: 5px 2px;
     user-select: none;
+    max-width: 120px;
 `
 
 const Buttons = styled.div`
