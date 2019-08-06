@@ -73,7 +73,7 @@ export default withRouter(class EditPageGeneral extends Component {
     nameChange = (e) => {
         let newName = e.target.value;
         let namedisable = true;
-        if(newName != this.state.profile.name && newName.trim() !== '') {
+        if(newName != this.state.profile.name && newName.trim() !== '' && !ProfilesManager.containsProfileWithName(newName)) {
             namedisable = false;
         }
         this.setState({
@@ -109,6 +109,9 @@ export default withRouter(class EditPageGeneral extends Component {
 
     confirmNameChange = () => {
         const { profile } = this.state;
+        this.setState({
+            nameDisabled: true
+        })
         profile.rename(this.state.nameValue);
         this.props.history.push(`/edit/general/${Global.createID(this.state.nameValue)}`);
     }

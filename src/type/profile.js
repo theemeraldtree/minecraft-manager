@@ -314,11 +314,16 @@ Profile.prototype.rename = function(newName) {
     console.log(this);
     const newID = Global.createID(newName);
     const safeName = Global.createSafeName(newName);
-    LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
+    if(!LauncherManager.profileExists(this)) {
+        LauncherManager.createProfile(this);
+    }
     LauncherManager.setProfileData(this, 'name', newName);
     LauncherManager.renameProfile(this, newID);
-    VersionsManager.renameVersion(this, safeName);
-    LibrariesManager.renameLibrary(this, newID);
+    if(this.customVersions.curse) {
+        LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
+        VersionsManager.renameVersion(this, safeName);
+        LibrariesManager.renameLibrary(this, newID);
+    }
 
     this.id = newID;
     this.name = newName;

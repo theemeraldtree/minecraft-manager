@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Page from '../page';
 import Header from '../../component/header/header';
 import SearchBox from '../../component/searchbox/searchbox';
@@ -6,7 +6,7 @@ import DiscoverList from '../../component/discoverlist/discoverlist';
 import Curse from '../../host/curse/curse';
 import ProfilesManager from '../../manager/profilesManager';
 
-export default class DiscoverPage extends Component {
+export default class DiscoverPage extends PureComponent {
     constructor() {
         super();
         this.state = {
