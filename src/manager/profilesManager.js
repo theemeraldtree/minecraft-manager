@@ -186,6 +186,15 @@ const ProfilesManager = {
         throw `Profile with ID: ${id} not found`
     },
 
+    containsProfileWithName: function(name) {
+        for(let profile of this.loadedProfiles) {
+            if(profile.name.toLowerCase() === name.toLowerCase()) {
+                return true;
+            }
+        }
+        return false;
+    },
+
     createProfile: function(name, mcversion) {
         LogManager.log('info', `[ProfilesManager] (CreateProfile) Starting profile creation...`);
         let id = Global.createID(name);

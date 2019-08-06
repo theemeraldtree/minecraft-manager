@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import Page from '../page';
 import Header from '../../component/header/header';
@@ -38,7 +38,7 @@ const CreateControls = styled.div`
         margin: 2px;
     }
 `
-export default class HomePage extends Component {
+export default class HomePage extends PureComponent {
     constructor() {
         super();
         this.state = {

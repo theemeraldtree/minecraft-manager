@@ -35,7 +35,6 @@ export default class Page extends PureComponent {
             hideOverlay: false
         }
     }
-
     importCancel = () => {
         localStorage.setItem('importDone', true);
         ProfilesManager.getProfiles().then(() => {
@@ -53,7 +52,7 @@ export default class Page extends PureComponent {
                 <WindowBar />
                 <Content>
                     {!noNavbar && <Navbar />}
-                    {app.process.argv[1] !== '.' && app.process.argv[1] && !this.state.hideOverlay && localStorage.getItem('importDone') === 'false' && <ImportOverlay file={app.process.argv[1]} cancelClick={this.importCancel} />}
+                    {app.process.argv[1] !== '.' && app.process.argv[1] !== '--updated' && app.process.argv[1] && !this.state.hideOverlay && localStorage.getItem('importDone') === 'false' && <ImportOverlay file={app.process.argv[1]} cancelClick={this.importCancel} />}
                     <ContentSide>
                         {children}
                     </ContentSide>

@@ -10,6 +10,7 @@ import InputHolder from '../../component/inputholder/inputholder';
 import Global from '../../util/global';
 import SettingsManager from '../../manager/settingsManager';
 import os from 'os';
+import { ipcRenderer } from 'electron';
 const { dialog }  = require('electron').remote;
 const About = styled.div`
     max-width: 600px;
@@ -66,6 +67,10 @@ const WarningMSG = styled.p`
 const PathInput = styled(TextInput)`
     width: 590px;
 `
+
+const Updates = styled.div`
+    margin-bottom: 10px;
+`
 export default class SettingsPage extends Component {
     constructor(props) {
         super(props);
@@ -73,7 +78,9 @@ export default class SettingsPage extends Component {
             mcHome: SettingsManager.MC_HOME,
             mcExe: SettingsManager.currentSettings.mcExe,
             dedicatedRam: SettingsManager.currentSettings.dedicatedRam,
-            ramChangeDisabled: true
+            ramChangeDisabled: true,
+            updateText: 'check for updates',
+            updateDisabled: false
         }
     }
     chooseHomeDirectory = () => {
@@ -149,6 +156,53 @@ export default class SettingsPage extends Component {
         }
     }
 
+    checkForUpdates = () => {
+        if(this.state.updateText !== 'restart') {
+            this.setState({
+                updateDisabled: true,
+                updateText: 'checking for updates...',
+                updateSubText: ''
+            });
+
+            ipcRenderer.send('check-for-updates');
+
+            ipcRenderer.on('update-available', () => {
+                this.setState({
+                    updateText: 'downloading',
+                    updateDisabled: true,
+                    updateSubText: 'Update available. Downloading...'
+                })
+            });
+
+            ipcRenderer.on('update-downloaded', () => {
+                this.setState({
+                    updateSubText: 'Restart to install the update',
+                    updateText: 'restart',
+                    updateDisabled: false
+                })
+            })
+
+            ipcRenderer.on('error', (event, err) => {
+                console.error(err);
+                this.setState({
+                    updateText: 'check for updates',
+                    updateDisabled: false,
+                    updateSubText: `Error checking for updates.`
+                })
+            })
+
+            ipcRenderer.on('update-not-available', () => {
+                this.setState({
+                    updateText: 'check for updates',
+                    updateDisabled: false,
+                    updateSubText: 'Update not available'
+                })
+            })
+        }else{
+            ipcRenderer.send('install-update');
+        }
+    }
+
     render() {
         return (
             <Page>
@@ -159,8 +213,13 @@ export default class SettingsPage extends Component {
                         <h1>About Minecraft Manager</h1>
                     </AboutTop>
                     <AboutBottom>
-                        <h2>Minecraft Manager Version 2.0.0 (pre release 1)</h2>
-                        <h2>released 7/26/2019</h2>
+                        <h2>Minecraft Manager Version 2.0.0 (pre release 2)</h2>
+                        <h2>released 8/5/2019</h2>
+
+                        <Updates>
+                            <Button onClick={this.checkForUpdates} disabled={this.state.updateDisabled} color='green'>{this.state.updateText}</Button>
+                            <h3>{this.state.updateSubText}</h3>
+                        </Updates>
                         <h3>Minecraft Manager is made possible thanks to <a href="https://electronjs.org/">Electron, </a> <a href="https://reactjs.org/">React, </a> and other projects</h3>
                         <h3><a href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project</a> created by stairman06</h3>
                         <h3>Minecraft Manager also uses <a href="https://github.com/stairman06/omaf">the open-source OMAF standard, </a> also created by stairman06, with help from others</h3>
