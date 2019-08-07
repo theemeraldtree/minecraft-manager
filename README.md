@@ -41,7 +41,7 @@ for electron-builder
 
 
 ### Credits
-Credits are viewable in the Settings menu of Minecraft Manager, however I've listen them here because why not
+Credits are viewable in the Settings menu of Minecraft Manager, however I've listed them here because why not
 - [Electron](https://electronjs.org)
 - [React](https://reactjs.org)
 - [Webpack](https://webpack.js.org)
