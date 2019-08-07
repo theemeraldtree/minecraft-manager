@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router-dom';
 import Page from '../../page';
 import Header from '../../../component/header/header';
@@ -49,7 +49,7 @@ const Icon = styled.img`
     max-height: 80px;
     flex-shrink: 0;
 `;
-export default withRouter(class EditPageGeneral extends Component {
+export default withRouter(class EditPageGeneral extends PureComponent {
     constructor(props) {
         super(props);
         let profile = ProfilesManager.getProfileFromID(props.match.params.id);

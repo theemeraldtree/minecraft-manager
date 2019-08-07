@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import Page from '../../page';
 import Header from '../../../component/header/header';
@@ -49,7 +49,7 @@ const SearchContainer = styled(InputContainer)`
 `
 
 
-export default class EditPageMods extends Component {
+export default class EditPageMods extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -277,7 +277,7 @@ export default class EditPageMods extends Component {
                                 { displayState === 'modInfo' && <>
                                     <AssetInfo versionState={versionState} disableVersionInstall={disableVersionInstall} versionState={versionState} versionInstall={this.versionInstall} forceVersionFilter mcVerFilter={profile.minecraftversion} asset={activeMod} displayState={progressState} type='mod' localAsset />
                                 </>}
-                                {displayState === 'addMods' && <DiscoverList versionInstall={this.versionInstall} versionState={versionState} forceVersionFilter mcVerFilter={profile.minecraftversion} progressState={progressState} type='mod' installClick={this.installClick} searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
+                                {displayState === 'addMods' && <DiscoverList disableVersionInstall versionInstall={this.versionInstall} versionState={versionState} forceVersionFilter mcVerFilter={profile.minecraftversion} progressState={progressState} type='mod' installClick={this.installClick} searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
                                 {this.state.invalidVersion && <Confirmation questionText={`There is no Minecraft ${profile.minecraftversion} version of ${errorMod.name}.`} hideConfirm cancelText='Ok' cancelDelete={() => {this.setState({invalidVersion: false})}} /> } 
                         </Container>
                     </Wrapper>

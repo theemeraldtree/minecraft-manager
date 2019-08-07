@@ -87,7 +87,7 @@ export default class AssetInfo extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if(prevProps.versionState !== this.props.versionState) {
+        if(prevProps.versionState !== this.props.versionState && this.state.displayState === 'versions') {
             this.showVersions();
         }
     }
@@ -97,12 +97,10 @@ export default class AssetInfo extends Component {
         if(newAsset.description) {
             this.setState({
                 activeAsset: newAsset,
-                displayState: 'description',
                 description: true
             })
         }else{
             this.setState({
-                displayState: 'description',
                 description: false,
                 cantConnect: true
             })
