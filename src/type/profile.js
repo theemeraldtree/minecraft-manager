@@ -188,11 +188,15 @@ Profile.prototype.getModFromID = function(id) {
 
 Profile.prototype.deleteMod = function(mod) {
     return new Promise((resolve) => {
-        this.mods.splice(this.mods.indexOf(mod), 1);
-        fs.unlink(path.join(this.modsPath, `/${mod.getJARFile()}`), () => {
-            this.save();
+        if(mod && mod instanceof Mod) {
+            this.mods.splice(this.mods.indexOf(mod), 1);
+            fs.unlink(path.join(this.modsPath, `/${mod.getJARFile()}`), () => {
+                this.save();
+                resolve();
+            })
+        }else{
             resolve();
-        })
+        }
     })
 }
 

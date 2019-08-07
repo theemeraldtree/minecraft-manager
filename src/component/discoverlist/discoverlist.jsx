@@ -226,7 +226,7 @@ export default class DiscoverList extends Component {
 
     render() {
         let { displayState, assetsList, activeAsset, cantConnect } = this.state;
-        let { type, progressState, installClick, versionInstall, mcVerFilter, forceVersionFilter, versionState } = this.props;
+        let { type, progressState, installClick, versionInstall, mcVerFilter, forceVersionFilter, versionState, disableVersionInstall } = this.props;
         return (
             <>
                 {displayState === 'browseAssets' && <>
@@ -241,7 +241,7 @@ export default class DiscoverList extends Component {
                     <TryAgain onClick={this.tryAgain}>try again</TryAgain>
                     </LoadingText>}
                 </>}
-                {displayState === 'viewAsset' && <AssetInfo versionInstall={versionInstall} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} progressState={progressState} asset={activeAsset} installClick={installClick} type={type} />}
+                {displayState === 'viewAsset' && <AssetInfo versionInstall={versionInstall} progressState={progressState[activeAsset.id]} disableVersionInstall={disableVersionInstall} localAsset={false} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
             </>
         )
     }

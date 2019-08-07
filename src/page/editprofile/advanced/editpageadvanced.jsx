@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Page from '../../page';
 import Header from '../../../component/header/header';
 import ProfilesManager from '../../../manager/profilesManager';
 import EditContainer from '../components/editcontainer'; 
 import Button from '../../../component/button/button';
 import { shell } from 'electron';
-export default class EditPageAdvanced extends Component {
+export default class EditPageAdvanced extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

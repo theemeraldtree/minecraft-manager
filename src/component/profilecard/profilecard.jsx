@@ -93,7 +93,7 @@ const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) =>
     <Wrapper>
         {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && <StateOverlay><b>ERROR</b>   <br />Unfinished Curse Profile Install</StateOverlay>}
         {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
-        <ContextMenuTrigger id={`profilecard${profile.id}`}>
+        <ContextMenuTrigger holdToDisplay={-1} id={`profilecard${profile.id}`}>
             <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
                 <Image src={`${profile.iconpath}#${Global.cacheUpdateTime}`} />
                 <Title>{profile.name}</Title>
@@ -103,7 +103,7 @@ const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) =>
                 </Buttons>
             </BG>
         </ContextMenuTrigger>
-        <ContextMenu id={`profilecard${profile.id}`}>
+        <ContextMenu holdToDisplay={-1} id={`profilecard${profile.id}`}>
             <MenuItem onClick={() => {profile.launch()}}>Launch</MenuItem>
             <MenuItem onClick={() => {history.push(`/edit/general/${profile.id}`)}}>Edit</MenuItem>
             <MenuItem onClick={() => {showUpdate(profile)}}>Update</MenuItem>

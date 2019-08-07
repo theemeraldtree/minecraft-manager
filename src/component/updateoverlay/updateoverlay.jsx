@@ -59,12 +59,18 @@ export default class UpdateOverlay extends Component {
     
     async componentDidMount() {
         let { profile } = this.props;
-        const update = await Curse.checkForAssetUpdates(profile);
-        if(update) {
-            this.setState({
-                updateAvailable: true,
-                updateVersion: update
-            })
+        if(profile.hosts.curse) {
+            const update = await Curse.checkForAssetUpdates(profile);
+            if(update) {
+                this.setState({
+                    updateAvailable: true,
+                    updateVersion: update
+                })
+            }else{
+                this.setState({
+                    noUpdates: true
+                })
+            }
         }else{
             this.setState({
                 noUpdates: true

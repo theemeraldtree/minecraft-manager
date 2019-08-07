@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Page from '../page';
 import { withRouter } from 'react-router-dom';
 import Header from '../../component/header/header';
@@ -77,7 +77,7 @@ const Description = styled.div`
     background-color: #717171;
     margin: 10px;
 `
-class ViewProfilePage extends Component {
+class ViewProfilePage extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

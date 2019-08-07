@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Page from '../page';
 import Header from '../../component/header/header';
 import styled from 'styled-components';
@@ -13,7 +13,7 @@ import os from 'os';
 import { ipcRenderer } from 'electron';
 const { dialog }  = require('electron').remote;
 const About = styled.div`
-    max-width: 600px;
+    max-width: 680px;
     background-color: #717171;
     margin: 10px;
 `
@@ -71,7 +71,7 @@ const PathInput = styled(TextInput)`
 const Updates = styled.div`
     margin-bottom: 10px;
 `
-export default class SettingsPage extends Component {
+export default class SettingsPage extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {
@@ -213,17 +213,21 @@ export default class SettingsPage extends Component {
                         <h1>About Minecraft Manager</h1>
                     </AboutTop>
                     <AboutBottom>
-                        <h2>Minecraft Manager Version 2.0.0 (pre release 2)</h2>
-                        <h2>released 8/5/2019</h2>
+                        <h2>Minecraft Manager Version 2.0.0</h2>
+                        <h2>released 8/7/2019</h2>
 
                         <Updates>
                             <Button onClick={this.checkForUpdates} disabled={this.state.updateDisabled} color='green'>{this.state.updateText}</Button>
                             <h3>{this.state.updateSubText}</h3>
                         </Updates>
-                        <h3>Minecraft Manager is made possible thanks to <a href="https://electronjs.org/">Electron, </a> <a href="https://reactjs.org/">React, </a> and other projects</h3>
-                        <h3><a href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project</a> created by stairman06</h3>
-                        <h3>Minecraft Manager also uses <a href="https://github.com/stairman06/omaf">the open-source OMAF standard, </a> also created by stairman06, with help from others</h3>
-                        <h3>Minecraft Manager uses the Roboto font created by Google. <a href="http://www.apache.org/licenses/LICENSE-2.0.html">The font license is viewable here</a></h3>
+                        <h3>Minecraft Manager is made possible thanks to <a href="https://electronjs.org/">Electron, </a> <a href="https://reactjs.org/">React, </a> <a href="https://webpack.js.org">Webpack,</a> and other projects</h3>
+                        <h3><a title="Minecraft Manager Source Code" href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project</a> created by stairman06</h3>
+                        <h3><a title="OMAF Wiki and Documentation" href="https://github.com/stairman06/omaf/wiki">Minecraft Manager uses the open-source OMAF standard, </a> created by stairman06, with help from others</h3>
+                        <h3><a title="Roboto Font License" href="http://www.apache.org/licenses/LICENSE-2.0.html">Minecraft Manager uses the Roboto font created by Google.</a></h3>
+
+                        <h2>Need help?</h2>
+                        <h3><a href="https://github.com/stairman06/minecraft-manager/wiki">Check out the Minecraft Manager Wiki</a></h3>
+                        <h3><a href="https://github.com/stairman06/minecraft-manager/issues">Found a bug or want to request a feature? Do it here</a></h3>
                     </AboutBottom>
                 </About>
                 <Settings>
