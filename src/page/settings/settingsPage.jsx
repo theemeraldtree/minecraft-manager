@@ -213,8 +213,8 @@ export default class SettingsPage extends PureComponent {
                         <h1>About Minecraft Manager</h1>
                     </AboutTop>
                     <AboutBottom>
-                        <h2>Minecraft Manager Version 2.0.0</h2>
-                        <h2>released 8/7/2019</h2>
+                        <h2>Minecraft Manager Version 2.0.1</h2>
+                        <h2>released 8/8/2019</h2>
 
                         <Updates>
                             <Button onClick={this.checkForUpdates} disabled={this.state.updateDisabled} color='green'>{this.state.updateText}</Button>
