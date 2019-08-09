@@ -187,10 +187,15 @@ Profile.prototype.getModFromID = function(id) {
 }
 
 Profile.prototype.deleteMod = function(mod) {
+    console.log('DELETE ME');
+    console.log(mod);
     return new Promise((resolve) => {
+        if(!(mod instanceof Mod)) {
+            mod = new Mod(mod);
+        }
         if(mod && mod instanceof Mod) {
             this.mods.splice(this.mods.indexOf(mod), 1);
-            fs.unlink(path.join(this.modsPath, `/${mod.getJARFile()}`), () => {
+            fs.unlink(path.join(this.modsPath, `/${mod.getJARFile().path}`), () => {
                 this.save();
                 resolve();
             })
@@ -251,10 +256,14 @@ Profile.prototype.export = function(output, exportFolders, exportProgress) {
         Global.copyDirSync(this.folderpath, tempPath);
     
         exportProgress('Removing Online Mods...');
-        for(const mod of this.mods) {
+        for(let mod of this.mods) {
+            if(!(mod instanceof Mod)) {
+                mod = new Mod(mod);
+            }
             if(mod.hosts) { 
                 if(mod.hosts.curse) {
-                    fs.unlinkSync(path.join(filesPath, `/mods/${mod.getJARFile()}`));
+                    console.log(mod.getJARFile());
+                    fs.unlinkSync(path.join(filesPath, `/mods/${mod.getJARFile().path}`));
                 }
             }
         }
