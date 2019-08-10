@@ -71,6 +71,11 @@ const PathInput = styled(TextInput)`
 const Updates = styled.div`
     margin-bottom: 10px;
 `
+
+const Wrapper = styled.div`
+    overflow: scroll;
+    height: 100%;
+`
 export default class SettingsPage extends PureComponent {
     constructor(props) {
         super(props);
@@ -207,53 +212,55 @@ export default class SettingsPage extends PureComponent {
         return (
             <Page>
                 <Header showBackButton title='settings' />
-                <About>
-                    <AboutTop>
-                        <Logo />
-                        <h1>About Minecraft Manager</h1>
-                    </AboutTop>
-                    <AboutBottom>
-                        <h2>Minecraft Manager Version 2.0.1</h2>
-                        <h2>released 8/8/2019</h2>
+                <Wrapper>
+                    <About>
+                        <AboutTop>
+                            <Logo />
+                            <h1>About Minecraft Manager</h1>
+                        </AboutTop>
+                        <AboutBottom>
+                            <h2>Minecraft Manager Version 2.0.1</h2>
+                            <h2>released 8/8/2019</h2>
 
-                        <Updates>
-                            <Button onClick={this.checkForUpdates} disabled={this.state.updateDisabled} color='green'>{this.state.updateText}</Button>
-                            <h3>{this.state.updateSubText}</h3>
-                        </Updates>
-                        <h3>Minecraft Manager is made possible thanks to <a href="https://electronjs.org/">Electron, </a> <a href="https://reactjs.org/">React, </a> <a href="https://webpack.js.org">Webpack,</a> and other projects</h3>
-                        <h3><a title="Minecraft Manager Source Code" href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project</a> created by stairman06</h3>
-                        <h3><a title="OMAF Wiki and Documentation" href="https://github.com/stairman06/omaf/wiki">Minecraft Manager uses the open-source OMAF standard, </a> created by stairman06, with help from others</h3>
-                        <h3><a title="Roboto Font License" href="http://www.apache.org/licenses/LICENSE-2.0.html">Minecraft Manager uses the Roboto font created by Google.</a></h3>
+                            <Updates>
+                                <Button onClick={this.checkForUpdates} disabled={this.state.updateDisabled} color='green'>{this.state.updateText}</Button>
+                                <h3>{this.state.updateSubText}</h3>
+                            </Updates>
+                            <h3>Minecraft Manager is made possible thanks to <a href="https://electronjs.org/">Electron, </a> <a href="https://reactjs.org/">React, </a> <a href="https://webpack.js.org">Webpack,</a> and other projects</h3>
+                            <h3><a title="Minecraft Manager Source Code" href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project</a> created by stairman06</h3>
+                            <h3><a title="OMAF Wiki and Documentation" href="https://github.com/stairman06/omaf/wiki">Minecraft Manager uses the open-source OMAF standard, </a> created by stairman06, with help from others</h3>
+                            <h3><a title="Roboto Font License" href="http://www.apache.org/licenses/LICENSE-2.0.html">Minecraft Manager uses the Roboto font created by Google.</a></h3>
 
-                        <h2>Need help?</h2>
-                        <h3><a href="https://github.com/stairman06/minecraft-manager/wiki">Check out the Minecraft Manager Wiki</a></h3>
-                        <h3><a href="https://github.com/stairman06/minecraft-manager/issues">Found a bug or want to request a feature? Do it here</a></h3>
-                    </AboutBottom>
-                </About>
-                <Settings>
-                    <InputHolder>
-                        <Detail>MINECRAFT HOME DIRECTORY</Detail>
-                        <div>
-                            <PathInput disabled value={this.state.mcHome} />
-                            <Button onClick={this.chooseHomeDirectory} color='green'>choose</Button>
-                        </div>
-                    </InputHolder>
-                    <InputHolder>
-                        <Detail>MINECRAFT EXECUTABLE</Detail>
-                        <div>
-                            <PathInput disabled value={this.state.mcExe} />
-                            <Button onClick={this.chooseMCExe} color='green'>choose</Button>
-                        </div>
-                    </InputHolder>
-                    <InputHolder>
-                        <Detail>DEDICATED RAM</Detail>
-                        <div>
-                            <TextInput onChange={this.ramAmountChange} value={this.state.dedicatedRam} />
-                            <Button disabled={this.state.ramChangeDisabled} onClick={this.changeRAM} color='green'>change</Button>
-                        </div>
-                        <WarningMSG>{this.state.warningMessage}</WarningMSG>
-                    </InputHolder>
-                </Settings>
+                            <h2>Need help?</h2>
+                            <h3><a href="https://github.com/stairman06/minecraft-manager/wiki">Check out the Minecraft Manager Wiki</a></h3>
+                            <h3><a href="https://github.com/stairman06/minecraft-manager/issues">Found a bug or want to request a feature? Do it here</a></h3>
+                        </AboutBottom>
+                    </About>
+                    <Settings>
+                        <InputHolder>
+                            <Detail>MINECRAFT HOME DIRECTORY</Detail>
+                            <div>
+                                <PathInput disabled value={this.state.mcHome} />
+                                <Button onClick={this.chooseHomeDirectory} color='green'>choose</Button>
+                            </div>
+                        </InputHolder>
+                        <InputHolder>
+                            <Detail>MINECRAFT EXECUTABLE</Detail>
+                            <div>
+                                <PathInput disabled value={this.state.mcExe} />
+                                <Button onClick={this.chooseMCExe} color='green'>choose</Button>
+                            </div>
+                        </InputHolder>
+                        <InputHolder>
+                            <Detail>DEDICATED RAM</Detail>
+                            <div>
+                                <TextInput onChange={this.ramAmountChange} value={this.state.dedicatedRam} />
+                                <Button disabled={this.state.ramChangeDisabled} onClick={this.changeRAM} color='green'>change</Button>
+                            </div>
+                            <WarningMSG>{this.state.warningMessage}</WarningMSG>
+                        </InputHolder>
+                    </Settings>
+                </Wrapper>
             </Page>
         )
     }
