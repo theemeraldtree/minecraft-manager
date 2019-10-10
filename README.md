@@ -1,10 +1,10 @@
-# [Minecraft Manager](https://theemeraldtree.net)
+# [Minecraft Manager](https://theemeraldtree.net/mcm/)
 ## app for minecraft mod/modpack installation and management
 
 Minecraft Manager is an app used for installation of Minecraft mods/modpacks and more.
 
 ## Getting Started
-If you'd like an already built version, [you can download it from the website here](https://theemeraldtree.net/download)
+If you'd like an already built version, [you can download it from the website here](https://theemeraldtree.net/mcm/download)
 
 If you would like to build it and run it for yourself, it is very easy.
 ### Clone the repo & install packages
