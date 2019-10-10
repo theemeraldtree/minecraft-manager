@@ -13,9 +13,6 @@ git clone https://github.com/stairman06/minecraft-manager.git
 cd minecraft-manager
 yarn
 ```
-If you're attempting to build a development version, specify the branch with ```--specify-branch --branch=BRANCHNAME```  
-Example: ```git clone --specify-branch --branch=rewrite-2.0 https://github.com/stairman06/minecraft-manager.git```
-
 Yarn is recommended over NPM as it is faster
 
 ### Running in a dev environment
@@ -41,7 +38,7 @@ for electron-builder
 
 
 ### Credits
-Credits are viewable in the Settings menu of Minecraft Manager, however I've listed them here because why not
+Credits are viewable in the Settings menu of Minecraft Manager, however I've also listed them here.
 - [Electron](https://electronjs.org)
 - [React](https://reactjs.org)
 - [Webpack](https://webpack.js.org)
