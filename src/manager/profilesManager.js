@@ -7,6 +7,7 @@ import VersionsManager from "./versionsManager";
 import DownloadsManager from "./downloadsManager";
 import Curse from "../host/curse/curse";
 import ForgeManager from "./forgeManager";
+import ToastManager from "./toastManager";
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -165,13 +166,17 @@ const ProfilesManager = {
         LogManager.log('info', `[ProfilesManager] Processing profile folder at ${location}`);
         let profilePath = path.join(location, '/profile.json')
         if(fs.existsSync(profilePath)) {
-            let rawOMAF = JSON.parse(fs.readFileSync(profilePath));
-
+            let rawOMAF;
+            try {
+                rawOMAF = JSON.parse(fs.readFileSync(profilePath));
+            }catch(e) {
+                ToastManager.createToast('Warning', `The '${path.basename(location)}' profile has a corrupted/malformed JSON info file! That's no good!`, 'OMAF-PROFILE-MALFORMED-JSON');
+            }
             LogManager.log('info', `[ProfilesManager] Loading profile at ${location}`);
             let profile = new Profile(rawOMAF);
             this.loadedProfiles.push(profile);
         }else{
-            LogManager.log('SEVERE', `Error: Profile at path ${location} DOES NOT CONTAIN a profile.json file! The profile is probably improperly imported or created! Fix this now, as furthur imports of this profile will not work!`)
+            ToastManager.createToast(`Warning`, `In your profiles folder, the '${path.basename(location)}' folder is missing the essential profile.json file!`, 'OMAF-PROFILE-MISSING-JSON');
         }
     },
 

@@ -4,6 +4,9 @@ import Mod from '../type/mod';
 import Profile from '../type/profile';
 import ToastManager from '../manager/toastManager';
 import HTTPRequest from '../host/httprequest';
+import VersionsManager from '../manager/versionsManager';
+import LauncherManager from '../manager/launcherManager';
+import LibrariesManager from '../manager/librariesManager';
 
 const remote = require('electron').remote;
 const app = remote.app;
@@ -42,6 +45,50 @@ const Global = {
         }
         if(versionsJSON) {
              this.parseVersionsJSON(versionsJSON);
+        }
+    },
+    checkMinecraftVersions() {
+        let totalCount = 0;
+        fs.readdirSync(VersionsManager.getVersionsPath()).forEach(file => {
+            console.log(file);
+            if(file.indexOf('[Minecraft Manager]') !== -1) {
+                console.log(ProfilesManager.loadedProfiles.find(prof => prof.versionname === file));
+                if(!ProfilesManager.loadedProfiles.find(prof => prof.versionname === file)) {
+                    totalCount++;
+                }
+            }
+        });
+        if(totalCount) {
+            ToastManager.createToast('Warning', `There are ${totalCount} Minecraft Manager-related version(s) in your Minecraft installation that do not need to exist!`, 'EXTRA-MINECRAFT-VERSIONS');
+        }
+    },
+    checkMinecraftProfiles() {
+        const obj = JSON.parse(fs.readFileSync(LauncherManager.getLauncherProfiles()));
+        let totalCount = 0;
+        Object.keys(obj.profiles).forEach(key => {
+            if(key.substring(0, 4) === 'mcm-') {
+                if(!ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)) {
+                    totalCount++;
+                }
+            }
+        });
+
+        if(totalCount) {
+            ToastManager.createToast('Warning', `There are ${totalCount} Minecraft Manager-related launcher profile(s) in your Minecraft installation that do not need to exist!`, 'EXTRA-MINECRAFT-PROFILES');
+        }
+    },
+    checkMinecraftLibraries() {
+        let totalCount = 0;
+        fs.readdirSync(LibrariesManager.getMCMLibraries()).forEach(file => {
+            if(file.substring(0, 4) === 'mcm-') {
+                if(!ProfilesManager.loadedProfiles.find(prof => file === `mcm-${prof.id}`)) {
+                    totalCount++;
+                }
+            }
+        });
+
+        if(totalCount) {
+            ToastManager.createToast('Warning', `There are ${totalCount} Minecraft-Manager-related launcher libraries in your Minecraft installation that do not need to exist!`, 'EXTRA-MINECRAFT-LIBRARIES');
         }
     },
     parseVersionsJSON(versionsJSON) {

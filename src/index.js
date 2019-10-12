@@ -46,9 +46,11 @@ async function load() {
 
   ipcRenderer.on('file-download-finish', (event, progress) => {
     HTTPRequest.fileDownloadFinish(progress);
-  })
+  });
 
-
+  Global.checkMinecraftVersions();
+  Global.checkMinecraftProfiles();
+  Global.checkMinecraftLibraries();
   // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
   Global.checkMigration();
 
