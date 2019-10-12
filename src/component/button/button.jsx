@@ -1,15 +1,16 @@
 import styled from 'styled-components';
 function getColor(name) {
-    if(name === 'purple') {
-        return '#911895';
-    }else if(name === 'green') {
-        return '#15950C'
-    }else if(name === 'yellow') {
-        return '#D4B107'
-    }else if(name === 'blue') {
-        return '#185F95';
-    }else if(name === 'red') {
-        return '#951818';
+    switch(name) {
+        case 'purple':
+            return '#911895';
+        case 'green':
+            return '#15950C';
+        case 'yellow':
+            return '#D4B107';
+        case 'blue':
+            return '#185F95';
+        case 'red':
+            return '#951818';
     }
 }
 const Button = styled.div.attrs(props => ({
@@ -22,7 +23,7 @@ const Button = styled.div.attrs(props => ({
     width: fit-content;
     display: inline-block;
     cursor: pointer;
-    transition: 300ms;
+    transition: 150ms;
     ${props => props.disabled && `
         filter: brightness(0.65);
     `}

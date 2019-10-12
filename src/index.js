@@ -6,7 +6,8 @@ import fs from 'fs';
 import Global from "./util/global";
 import path from 'path';
 import SettingsManager from "./manager/settingsManager";
-const { remote, shell } = require('electron');
+import HTTPRequest from "./host/httprequest";
+const { remote, shell, ipcRenderer } = require('electron');
 const { dialog } = require('electron').remote;
 const request = require('request');
 const yaml = require('js-yaml');
@@ -39,6 +40,13 @@ async function load() {
     }
   });
 
+  ipcRenderer.on('file-download-progress', (event, progress) => {
+    HTTPRequest.fileDownloadProgress(progress);
+  });
+
+  ipcRenderer.on('file-download-finish', (event, progress) => {
+    HTTPRequest.fileDownloadFinish(progress);
+  })
 
 
   // We call this function in order to see if any changes to OMAF or any other method have been made since the last version

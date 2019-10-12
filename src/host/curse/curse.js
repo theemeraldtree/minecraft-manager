@@ -381,32 +381,24 @@ let Curse = {
 
     async installModVersionToProfile(profile, mod, dependencies) {
         return new Promise(async (resolve) => {
-            console.log(mod);
             if(!fs.existsSync(path.join(profile.gameDir, `/mods/${mod.id}.jar`))) {
                 if(!mod.name) {
                     let newm = await this.getFullAsset(mod, 'mod');
                     newm.hosts.curse.fileID = mod.hosts.curse.fileID;
                     mod = newm;
                 }
-                console.log('start progressive download bruhther');
                 DownloadsManager.createProgressiveDownload(`Info for ${mod.name}`).then(async (download) => {
-                    console.log('checking for dependencies bruh');
                     if(dependencies) {
                         this.installDependencies(profile, mod);
                     }
-                    console.log('removin old download');
                     DownloadsManager.removeDownload(download.name);
 
-                    console.log('checking if we got downlaodtemp');
                     if(!mod.downloadTemp) {
-                        console.log('adding file info');
                         mod = await this.addFileInfo(mod, mod.hosts.curse.fileID);
                     }
 
-                    console.log('creatin new object');
                     const modObj = new Mod(mod);
 
-                    console.log('starting mod download');
                     DownloadsManager.startModDownload(profile, mod, mod.downloadTemp, false).then(async () => {
                         modObj.setJARFile(`${mod.id}.jar`);
                         if(!profile.getModFromID(mod.id)) {
@@ -587,7 +579,7 @@ let Curse = {
                     
                     DownloadsManager.createProgressiveDownload(`Curse mods from ${profile.name}`).then(download => {
                         let numberDownloaded = 0;
-                        const concurrent = manifest.files.length >= 5 ? 5 : 0;
+                        const concurrent = manifest.files.length >= 10 ? 10 : 0;
                         this.downloadModList(profile, list, () => {
                             if(numberDownloaded === manifest.files.length) {
                                 DownloadsManager.removeDownload(download.name);
@@ -599,7 +591,7 @@ let Curse = {
                                             fs.readdirSync(path.join(overridesFolder, file)).forEach(f => {
                                                 Global.copyDirSync(path.join(overridesFolder, file, f), path.join(profile.gameDir, file, f));
                                             })
-                                        }else{
+                                        }else{  
                                             Global.copyDirSync(path.join(overridesFolder, file), path.join(profile.gameDir, file));
                                         }
                                     })

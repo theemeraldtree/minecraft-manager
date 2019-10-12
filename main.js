@@ -2,6 +2,8 @@ const { app, BrowserWindow, shell, ipcMain, Notification } = require('electron')
 const { autoUpdater } = require('electron-updater');
 const url = require('url');
 const path = require('path');
+const fs = require('fs');
+const request = require('request-promise');
 // Security warning IS DISABLED because we're loading from localhost.
 // this is only disabled so it doesn't clog the console in dev mode
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
@@ -10,6 +12,43 @@ ipcMain.on('install-update', () => {
     autoUpdater.quitAndInstall();
 });
 
+const downloadProgresses = {};
+
+ipcMain.on('download-file', (event, url, dest, id) => {
+    downloadProgresses[id] = 0;
+    let progressData = 0;
+    let contentLength = 0;
+    let ws = fs.createWriteStream(dest);
+    let req = request(url, {
+        url: url,
+        headers: {
+            'User-Agent': 'Minecraft-Manager'
+        },
+        followAllRedirects: true
+    });
+    req.on('data', (data) => {
+        progressData += data.length;
+        
+        let prog = Math.trunc((progressData / contentLength) * 100);
+        if(prog - downloadProgresses[id] >= 10) {
+            downloadProgresses[id] = prog;
+            event.sender.send('file-download-progress', {
+                id: id,
+                progress: prog ,
+            });
+        }
+    })
+    req.on('response', (res) => {
+        contentLength = res.headers['content-length'];
+        res.pipe(ws);
+        ws.on('finish', () => event.sender.send('file-download-finish', {
+            id: id
+        }));
+    })
+    req.on('error', () => {
+        ws.end();
+    });
+})
 
 
 function checkForUpdates() {
