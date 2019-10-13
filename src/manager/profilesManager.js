@@ -15,6 +15,7 @@ const admzip = require('adm-zip');
 const ProfilesManager = {
     loadedProfiles: [],
     reloadListeners: [],
+    previouslyRemovedProfiles: [],
     profilesBeingInstalled: [],
     getProfiles: function() {
         this.loadedProfiles = [];
@@ -172,9 +173,12 @@ const ProfilesManager = {
             }catch(e) {
                 ToastManager.createToast('Warning', `The '${path.basename(location)}' profile has a corrupted/malformed JSON info file! That's no good!`, 'OMAF-PROFILE-MALFORMED-JSON');
             }
-            LogManager.log('info', `[ProfilesManager] Loading profile at ${location}`);
-            let profile = new Profile(rawOMAF);
-            this.loadedProfiles.push(profile);
+            if(rawOMAF) {
+                rawOMAF.fpath = location;
+                LogManager.log('info', `[ProfilesManager] Loading profile at ${location}`);
+                let profile = new Profile(rawOMAF);
+                this.loadedProfiles.push(profile);    
+            }
         }else{
             ToastManager.createToast(`Warning`, `In your profiles folder, the '${path.basename(location)}' folder is missing the essential profile.json file!`, 'OMAF-PROFILE-MISSING-JSON');
         }
@@ -182,13 +186,7 @@ const ProfilesManager = {
 
 
     getProfileFromID: function(id) {
-        for(let profile of this.loadedProfiles) {
-            if(profile.id === id) {
-                return profile;
-            }
-        }
-        
-        throw `Profile with ID: ${id} not found`
+        return this.loadedProfiles.find(prof => prof.id === id);
     },
 
     containsProfileWithName: function(name) {
@@ -216,6 +214,7 @@ const ProfilesManager = {
                 minecraftversion: mcversion,
                 icon: 'icon.png',
                 omafVersion: '0.1.3',
+                fpath: path.join(Global.PROFILES_PATH, id),
                 version: {
                     timestamp: new Date().getTime()
                 }
@@ -241,6 +240,7 @@ const ProfilesManager = {
     },
 
     deleteProfile: function(profile) {
+        this.previouslyRemovedProfiles.push(profile);
         LogManager.log('info', `[ProfilesManager] (DeleteProfile) Starting profile deletion for ${profile.id}`);
         return new Promise((resolve) => {
             LogManager.log('info', `[ProfilesManager] (DeleteProfile) Deleting launcher profile for ${profile.id}`);
@@ -256,6 +256,12 @@ const ProfilesManager = {
                         this.loadedProfiles = [];
                         LogManager.log('info', `[ProfilesManager] (DeleteProfile) Reloading profiles`);
                         this.getProfiles().then(() => {
+                            this.loadedProfiles.forEach(prof => {
+                                // removes weird backups that can happen when the app crashes/is closed during a profile update
+                                if(prof.id === profile.id && !this.previouslyRemovedProfiles.includes(prof)) {
+                                    this.deleteProfile(prof);
+                                }
+                            })
                             LogManager.log('info', `[ProfilesManager] (DeleteProfile) Done`);
                             resolve();
                         });

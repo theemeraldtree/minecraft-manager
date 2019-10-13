@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import { Redirect } from 'react-router-dom';
 import Page from '../../page';
 import Header from '../../../component/header/header';
 import ProfilesManager from '../../../manager/profilesManager';
@@ -201,6 +202,13 @@ export default class EditPageVersions extends Component {
             }, () => {
                 this.reloadCurseVersionsList();
             });
+        }).catch(() => {
+            this.setState({
+                updateConfirm: false,
+                updateOverlay: false
+            }, () => {
+                this.reloadCurseVersionsList();
+            })
         })
     }
 
@@ -218,71 +226,77 @@ export default class EditPageVersions extends Component {
 
     render() {
         let { profile, forgeIsInstalling, forgeIsUninstalling, mcverValue, curseVerValue, hostVersionValues } = this.state;
-        return (
-            <Page>
-                {this.state.updateConfirm && <Overlay>
-                    <BG>
-                        <Title>are you sure?</Title>
-                        <p>Updating or changing a profile's version will modify the current files. A backup will be created of the current files. If you've modified files or added mods, you will need to move them over from the backup. <b>The saves folder and options.txt are automatically moved.</b></p>
-                        
-                        <InputContainer>
-                            <Button onClick={this.cancelCurseVerChange} color='red'>cancel</Button>
-                            <Button onClick={this.confirmCurseVerChange} color='green'>I understand, continue</Button>
-                        </InputContainer>
-                    </BG>
-                </Overlay>}
-
-                {this.state.noForgeVerAvailable && <Overlay>
-                    <BG>
-                        <Title>no forge version</Title>
-                        <p>There is no Forge version available for Minecraft {profile.minecraftversion}</p>
-                        <InputContainer>
-                            <Button color='green' onClick={this.closeNoForgeVer}>ok</Button>
-                        </InputContainer>
-                    </BG>
-                </Overlay>}
-
-                {!this.state.updateOverlay && <Header title='edit profile' backlink={`/profile/${profile.id}`}/>}
-                {this.state.updateOverlay && <Header title='edit profile' backlink={`'/`}/>}
-                <EditContainer profile={profile}>
-                    {this.state.updateOverlay && <Overlay>
+        if(profile) {
+            return (
+                <Page>
+                    {this.state.updateConfirm && <Overlay>
                         <BG>
-                            <Title>{this.state.updateOverlayText}</Title>
+                            <Title>are you sure?</Title>
+                            <p>Updating or changing a profile's version will modify the current files. A backup will be created of the current files. If you've modified files or added mods, you will need to move them over from the backup. <b>The saves folder and options.txt are automatically moved.</b></p>
+                            
+                            <InputContainer>
+                                <Button onClick={this.cancelCurseVerChange} color='red'>cancel</Button>
+                                <Button onClick={this.confirmCurseVerChange} color='green'>I understand, continue</Button>
+                            </InputContainer>
                         </BG>
                     </Overlay>}
-                    <Detail>minecraft version</Detail>
-                    <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} value={mcverValue} />
-                    <OptionBreak />
-                    {profile.hosts.curse && <>
-                    <Detail>because this is from an online source, you can only choose versions available online</Detail>
-                    {hostVersionValues && <CustomDropdown value={curseVerValue} onChange={this.curseVersionChange} items={hostVersionValues} />}
-                    </>}
-
-                    <Detail>version timestamp: {profile.version.timestamp}</Detail>
-                    <OptionBreak />
-                    <Detail>custom versions</Detail>
-                    <CustomVersions>
-                        <Detail>forge</Detail>
-                        {!profile.customVersions.forge && !forgeIsInstalling &&
-                        <Button onClick={this.downloadForge} color='green'>install forge</Button>
-                        }
-                        {forgeIsInstalling && <p>Forge is installing. To check progress, open the Downloads viewer in the sidebar</p>}
-                        {forgeIsUninstalling && <p>Forge is being removed. To check progress, open the Downloads viewer in the sidebar</p>}
-                        {profile.customVersions.forge && !forgeIsUninstalling && <>
-                        <p>Version: {profile.customVersions.forge.version}</p>
-                        <Button onClick={this.uninstallForge} color='red'>uninstall forge</Button>
+    
+                    {this.state.noForgeVerAvailable && <Overlay>
+                        <BG>
+                            <Title>no forge version</Title>
+                            <p>There is no Forge version available for Minecraft {profile.minecraftversion}</p>
+                            <InputContainer>
+                                <Button color='green' onClick={this.closeNoForgeVer}>ok</Button>
+                            </InputContainer>
+                        </BG>
+                    </Overlay>}
+    
+                    {!this.state.updateOverlay && <Header title='edit profile' backlink={`/profile/${profile.id}`}/>}
+                    {this.state.updateOverlay && <Header title='edit profile' backlink={`'/`}/>}
+                    <EditContainer profile={profile}>
+                        {this.state.updateOverlay && <Overlay>
+                            <BG>
+                                <Title>{this.state.updateOverlayText}</Title>
+                            </BG>
+                        </Overlay>}
+                        <Detail>minecraft version</Detail>
+                        <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} value={mcverValue} />
+                        <OptionBreak />
+                        {profile.hosts.curse && <>
+                        <Detail>because this is from an online source, you can only choose versions available online</Detail>
+                        {hostVersionValues && <CustomDropdown value={curseVerValue} onChange={this.curseVersionChange} items={hostVersionValues} />}
                         </>}
-                    </CustomVersions>
-
-                    {this.state.badForgeVersion && <Confirmation hideConfirm cancelDelete={this.badForgeVersionClose} cancelText='Close'>
-                        <h1>Error</h1>
-                        <p>There is currently no support for Forge in Minecraft 1.13+, however it may be implemented in the future.</p>
-                        <a href="https://github.com/stairman06/minecraft-manager/wiki/Forge-1.13-">For why, check out this wiki article</a>
-                    </Confirmation> }
-                    {this.state.versionChangeWarning && <Confirmation confirmDelete={this.confirmVersionChange} cancelDelete={this.cancelVersionChange} questionText='Changing your Minecraft version will remove Forge and all your mods. Are you sure?' cancelText="Don't change" confirmText='Yes, change it' />}
-                </EditContainer>
-            </Page>
-        )   
+    
+                        <Detail>version timestamp: {profile.version.timestamp}</Detail>
+                        <OptionBreak />
+                        <Detail>custom versions</Detail>
+                        <CustomVersions>
+                            <Detail>forge</Detail>
+                            {!profile.customVersions.forge && !forgeIsInstalling &&
+                            <Button onClick={this.downloadForge} color='green'>install forge</Button>
+                            }
+                            {forgeIsInstalling && <p>Forge is installing. To check progress, open the Downloads viewer in the sidebar</p>}
+                            {forgeIsUninstalling && <p>Forge is being removed. To check progress, open the Downloads viewer in the sidebar</p>}
+                            {profile.customVersions.forge && !forgeIsUninstalling && <>
+                            <p>Version: {profile.customVersions.forge.version}</p>
+                            <Button onClick={this.uninstallForge} color='red'>uninstall forge</Button>
+                            </>}
+                        </CustomVersions>
+    
+                        {this.state.badForgeVersion && <Confirmation hideConfirm cancelDelete={this.badForgeVersionClose} cancelText='Close'>
+                            <h1>Error</h1>
+                            <p>There is currently no support for Forge in Minecraft 1.13+, however it may be implemented in the future.</p>
+                            <a href="https://github.com/stairman06/minecraft-manager/wiki/Forge-1.13-">For why, check out this wiki article</a>
+                        </Confirmation> }
+                        {this.state.versionChangeWarning && <Confirmation confirmDelete={this.confirmVersionChange} cancelDelete={this.cancelVersionChange} questionText='Changing your Minecraft version will remove Forge and all your mods. Are you sure?' cancelText="Don't change" confirmText='Yes, change it' />}
+                    </EditContainer>
+                </Page>
+            )
+        }else{
+            return (
+                <Redirect to='/' />
+            )
+        }
     }
 
 }

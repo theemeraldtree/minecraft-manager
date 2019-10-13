@@ -33,10 +33,14 @@ ipcMain.on('download-file', (event, url, dest, id) => {
         let prog = Math.trunc((progressData / contentLength) * 100);
         if(prog - downloadProgresses[id] >= 10) {
             downloadProgresses[id] = prog;
-            event.sender.send('file-download-progress', {
-                id: id,
-                progress: prog ,
-            });
+            if(event) {
+                if(event.sender) {
+                    event.sender.send('file-download-progress', {
+                        id: id,
+                        progress: prog ,
+                    });
+                }
+            }
         }
     })
     req.on('response', (res) => {

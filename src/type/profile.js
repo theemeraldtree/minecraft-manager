@@ -6,6 +6,7 @@ import ProfilesManager from "../manager/profilesManager";
 import Curse from "../host/curse/curse";
 import VersionsManager from "../manager/versionsManager";
 import LibrariesManager from "../manager/librariesManager";
+import ToastManager from "../manager/toastManager";
 const archiver = require('archiver');
 const path = require('path');
 const fs = require('fs');
@@ -19,14 +20,19 @@ function Profile(rawOMAF) {
 }
 
 Profile.prototype.initLocalValues = function() {
+    if(!this.fpath) {
+        this.fpath = '__NONE__';
+    }
     this.safename = Global.createSafeName(this.name);
     this.versionname = `${this.safename} [Minecraft Manager]`;
-    this.folderpath = path.join(Global.PROFILES_PATH + `/${this.id}`).replace("\\","/");
+    this.folderpath = path.join(this.fpath);
     this.gameDir = path.join(this.folderpath, '/files');
     this.modsPath = path.join(this.gameDir, `/mods/`);
     this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
     this.state = '';
     this.installed = true;
+    
+    this.error = false;
     let newList = [];
     if(this.mods) {
         for(let item of this.mods) {
@@ -53,6 +59,14 @@ Profile.prototype.initLocalValues = function() {
         this.omafVersion = '0.1.2';
         Global.checkMigration();
     }
+
+    
+    if(this.hosts.curse) {
+        if(!this.hosts.curse.fullyInstalled) {
+            console.log('error');
+            this.error = true;
+        }
+    }
 }
 
 Profile.prototype.setProfileVersion = function(newVer) {
@@ -67,6 +81,7 @@ Profile.prototype.toJSON = function() {
     }
     copy.local = undefined;
 
+    copy.fpath = undefined;
     if(this.hosts) {
         if(this.hosts.curse) {
             copy.hosts.curse.localValues = undefined;
@@ -263,6 +278,15 @@ Profile.prototype.export = function(output, exportFolders, exportProgress) {
             }
         }
     
+        exportProgress('Cleaning up properties...');
+        let obj = JSON.parse(fs.readFileSync(tempPath, '/profile.json'));
+        if(obj.hideFromClient) {
+            obj.hideFromClient = undefined;
+            delete obj.hideFromClient;
+        }
+
+        fs.writeFileSync(path.join(tempPath, '/profile.json'), JSON.stringify(obj));
+
         exportProgress('Removing non-chosen folders...');
         fs.readdir(path.join(tempPath, '/files'), (err, files) => {
             files.forEach(file => {
@@ -291,28 +315,38 @@ Profile.prototype.export = function(output, exportFolders, exportProgress) {
 }
 
 Profile.prototype.changeCurseVersion = function(versionToChangeTo, onUpdate) {
-    return new Promise((resolve) => {
-        onUpdate('Creating backup...');
-        ProfilesManager.createBackup(this);
-        onUpdate('Moving old folder...');
-        const oldpath = path.join(Global.PROFILES_PATH, `/${this.id}-update-${new Date().getTime()}`);
-        const oldgamedir = path.join(oldpath, '/files');
-        fs.rename(this.folderpath, oldpath, async () => {
-            onUpdate('Installing modpack...');
-            const newprofile = await Curse.installModpackVersion(this, versionToChangeTo);
-            if(fs.existsSync(path.join(oldgamedir, `/saves`))) {
-                Global.copyDirSync(path.join(oldgamedir, `/saves`), path.join(this.gameDir, `/saves`));
-            }
-    
-            if(fs.existsSync(path.join(oldgamedir, '/options.txt'))) {
-                fs.copyFileSync(path.join(oldgamedir, '/options.txt'), path.join(this.gameDir, '/options.txt'));
-            }
-    
-            rimraf.sync(oldpath);
-            onUpdate('Reloading profiles...');
-            await ProfilesManager.getProfiles();
-            resolve(newprofile);
-        });
+    return new Promise(async (resolve, reject) => {
+            onUpdate('Creating backup...');
+            ProfilesManager.createBackup(this);
+            this.hideFromClient = true;
+            await this.save();
+            onUpdate('Moving old folder...');
+            const oldpath = path.join(Global.PROFILES_PATH, `/${this.id}-update-${new Date().getTime()}`);
+            const oldgamedir = path.join(oldpath, '/files');
+            fs.rename(this.folderpath, oldpath, async (err) => {
+                if(err) {
+                    ToastManager.createToast('Error', err.toString());
+                    reject();
+                }else{
+                    onUpdate('Installing modpack...');
+                    const newprofile = await Curse.installModpackVersion(this, versionToChangeTo);
+                    newprofile.hideFromClient = false;
+                    newprofile.save();
+                    if(fs.existsSync(path.join(oldgamedir, `/saves`))) {
+                        Global.copyDirSync(path.join(oldgamedir, `/saves`), path.join(this.gameDir, `/saves`));
+                    }
+            
+                    if(fs.existsSync(path.join(oldgamedir, '/options.txt'))) {
+                        fs.copyFileSync(path.join(oldgamedir, '/options.txt'), path.join(this.gameDir, '/options.txt'));
+                    }
+            
+                    rimraf.sync(oldpath);
+                    onUpdate('Reloading profiles...');
+                    await ProfilesManager.getProfiles();
+                    resolve(newprofile);
+                
+                }
+            });
     })
 }
 

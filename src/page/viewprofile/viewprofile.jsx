@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import Page from '../page';
-import { withRouter } from 'react-router-dom';
+import { Redirect, withRouter } from 'react-router-dom';
 import Header from '../../component/header/header';
 import ProfilesManager from '../../manager/profilesManager';
 import styled from 'styled-components';
@@ -90,8 +90,15 @@ class ViewProfilePage extends PureComponent {
     }
 
     static getDerivedStateFromProps(props) {
-        return {
-            profile: ProfilesManager.getProfileFromID(props.match.params.id)
+        const prof = ProfilesManager.getProfileFromID(props.match.params.id);
+        if(prof) {
+            return {
+                profile: ProfilesManager.getProfileFromID(props.match.params.id)
+            }
+        }else {
+            return {
+                profile: undefined
+            }
         }
     }
 
@@ -146,39 +153,48 @@ class ViewProfilePage extends PureComponent {
 
     render() {
         let { profile, showDelete } = this.state;
-        return (
-            <Page>
-                {showDelete && <Confirmation cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />}
-                <Header title='profile' backlink='/' />
-                <ProfileHeader>
-                    <Image src={`${profile.iconpath}#${new Date().getTime()}`} />
-                    <PHSide>
-                        <Title>{profile.name}</Title>
-                        <Blurb>{profile.blurb}</Blurb>
-                    </PHSide>
-                </ProfileHeader>
-                
-                <MiddlePanel>
-                    <ButtonGroup>
-                        <CustomButton onClick={this.launchProfile} color='green'>launch</CustomButton>
-                        <CustomButton onClick={this.editprofile} color='yellow'>edit</CustomButton>
-                        <CustomButton onClick={this.showUpdate} color='purple'>update</CustomButton>
-                        <CustomButton onClick={this.showShare} color='blue'>share</CustomButton>
-                        <CustomButton onClick={this.deleteClick} color='red'>delete</CustomButton>
-                    </ButtonGroup>
-                    <Specs>
-                        <p>internal id: {profile.id}</p>
-                        <p>version safe name: {profile.safename}</p>
-                        <p>version timestamp: {profile.version.timestamp}</p>
-                    </Specs>
-                </MiddlePanel>
-                <Description>
-                    <SanitizedHTML html={profile.description} />
-                </Description>
-                {this.state.showShareOverlay && <ShareOverlay cancelClick={this.hideShare} profile={profile} />}
-                {this.state.showUpdateOverlay && <UpdateOverlay cancelClick={this.hideUpdate} profile={profile} />}
-            </Page>
-        )
+        console.log(profile);
+        if(profile) {
+            return (
+                <Page>
+                    {showDelete && <Confirmation cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />}
+                    <Header title='profile' backlink='/' />
+                    <ProfileHeader>
+                        <Image src={`${profile.iconpath}#${new Date().getTime()}`} />
+                        <PHSide>
+                            <Title>{profile.name}</Title>
+                            <Blurb>{profile.blurb}</Blurb>
+                        </PHSide>
+                    </ProfileHeader>
+                    
+                    <MiddlePanel>
+                        <ButtonGroup>
+                            <CustomButton onClick={this.launchProfile} color='green'>launch</CustomButton>
+                            <CustomButton onClick={this.editprofile} color='yellow'>edit</CustomButton>
+                            <CustomButton onClick={this.showUpdate} color='purple'>update</CustomButton>
+                            <CustomButton onClick={this.showShare} color='blue'>share</CustomButton>
+                            <CustomButton onClick={this.deleteClick} color='red'>delete</CustomButton>
+                        </ButtonGroup>
+                        <Specs>
+                            <p>internal id: {profile.id}</p>
+                            <p>version safe name: {profile.safename}</p>
+                            <p>version timestamp: {profile.version.timestamp}</p>
+                        </Specs>
+                    </MiddlePanel>
+                    <Description>
+                        <SanitizedHTML html={profile.description} />
+                    </Description>
+                    {this.state.showShareOverlay && <ShareOverlay cancelClick={this.hideShare} profile={profile} />}
+                    {this.state.showUpdateOverlay && <UpdateOverlay cancelClick={this.hideUpdate} profile={profile} />}
+                }
+                </Page>
+            )
+        }else{
+            return (
+                <Redirect to='/' />
+            )
+        }
+        
     }
 }
 

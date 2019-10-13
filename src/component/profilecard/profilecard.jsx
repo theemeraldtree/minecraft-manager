@@ -91,9 +91,9 @@ const StateOverlay = styled.div`
 `
 const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) => (
     <Wrapper>
-        {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && <StateOverlay><b>ERROR</b>   <br />Unfinished Curse Profile Install</StateOverlay>}
-        {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
         <ContextMenuTrigger holdToDisplay={-1} id={`profilecard${profile.id}`}>
+            {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && <StateOverlay><b>ERROR</b>   <br />Unfinished Curse Profile Install</StateOverlay>}
+            {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
             <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
                 <Image src={`${profile.iconpath}#${Global.cacheUpdateTime}`} />
                 <Title>{profile.name}</Title>
@@ -104,11 +104,15 @@ const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) =>
             </BG>
         </ContextMenuTrigger>
         <ContextMenu holdToDisplay={-1} id={`profilecard${profile.id}`}>
-            <MenuItem onClick={() => {profile.launch()}}>Launch</MenuItem>
-            <MenuItem onClick={() => {history.push(`/edit/general/${profile.id}`)}}>Edit</MenuItem>
-            <MenuItem onClick={() => {showUpdate(profile)}}>Update</MenuItem>
-            <MenuItem onClick={() => {showShare(profile)}}>Share</MenuItem>
-            <MenuItem divider />
+            {
+                !profile.error && <>
+                    <MenuItem onClick={() => {profile.launch()}}>Launch</MenuItem>
+                    <MenuItem onClick={() => {history.push(`/edit/general/${profile.id}`)}}>Edit</MenuItem>
+                    <MenuItem onClick={() => {showUpdate(profile)}}>Update</MenuItem>
+                    <MenuItem onClick={() => {showShare(profile)}}>Share</MenuItem>
+                    <MenuItem divider />            
+                </>
+            }
             <MenuItem onClick={() => {showDeletion(profile)}}>Delete</MenuItem>
         </ContextMenu>
     </Wrapper>

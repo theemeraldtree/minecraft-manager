@@ -62,8 +62,10 @@ export default class ProfileGrid extends Component {
     generateProfiles = () => {
         let profilesComponents = [];
         for(let profile of ProfilesManager.loadedProfiles) {
-            if(profile.name.toLowerCase().includes(this.props.searchTerm)) {
-                profilesComponents.push(<ProfileCard showUpdate={this.showUpdate} showShare={this.showShare} showDeletion={this.showDeletion} key={profile.id} profile={profile} />);
+            if(!profile.hideFromClient) {
+                if(profile.name.toLowerCase().includes(this.props.searchTerm)) {
+                    profilesComponents.push(<ProfileCard showUpdate={this.showUpdate} showShare={this.showShare} showDeletion={this.showDeletion} key={profile.id} profile={profile} />);
+                }
             }
         }
         this.setState({
