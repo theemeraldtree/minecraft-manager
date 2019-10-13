@@ -14,6 +14,7 @@ ipcMain.on('install-update', () => {
 
 const downloadProgresses = {};
 
+
 ipcMain.on('download-file', (event, url, dest, id) => {
     downloadProgresses[id] = 0;
     let progressData = 0;
@@ -92,11 +93,21 @@ let dev = require('process').execPath.includes('electron');
 let mainWindow;
 
 function createWindow() {
-
-
     mainWindow = new BrowserWindow({width: 800, height: 800, frame: false, backgroundColor: '#444444', webPreferences: {webSecurity: false}, titleBarStyle: 'hidden'});
 
     if(dev) {
+
+        // install the react devtools
+        // make sure you create a .reactDevtools.json file that looks similar to the following
+        // {
+        //    "extPath": "PATH TO EXTENSION GOES HERE"
+        // }
+
+        if(fs.existsSync('.reactDevtools.json')) {
+            const json = JSON.parse(fs.readFileSync('.reactDevtools.json'));
+            BrowserWindow.addDevToolsExtension(path.join(json.extPath));    
+        }
+
         mainWindow.openDevTools();
     }
 

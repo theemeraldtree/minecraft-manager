@@ -14,7 +14,7 @@ const yaml = require('js-yaml');
 const semver = require('semver');
 const { version } = require('../package.json');
 const os = require('os');
-
+require('typeface-roboto');
 async function load() {
   SettingsManager.loadSettings();
 

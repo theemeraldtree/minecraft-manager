@@ -21,7 +21,6 @@ module.exports = {
         rules: [
             {
                 test: /\.(css)$/,
-                include: path.resolve(__dirname, 'src'),
                 loaders: ['css-loader']
             },
             {

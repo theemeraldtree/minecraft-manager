@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
 import Detail from '../detail/detail';
@@ -75,7 +75,7 @@ const ButtonContainer = styled.div`
     top: 10px;
     right: 10px;
 `
-export default class VersionCard extends Component {
+export default class VersionCard extends PureComponent {
     constructor(props) {
         super(props);
         this.state = {

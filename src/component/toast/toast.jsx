@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import ToastObject from './toastobject';
 import ToastManager from '../../manager/toastManager'
@@ -18,7 +18,7 @@ const Container = styled.div`
 const List = styled.div`
     margin-bottom: 10px;
 `
-export default class Toast extends Component {
+export default class Toast extends PureComponent {
     constructor() {
         super();
         this.state = {
@@ -56,12 +56,14 @@ export default class Toast extends Component {
         this.setState({
             list: list,
             existingToasts: exist
-        })
+        });
     }
     componentDidMount() {
+        console.log('toast mount');
         ToastManager.registerHandler(this.toastUpdate);
     }
     render() {
+        console.log('toast rerender');
         return (
             <Container>
                 <List>
