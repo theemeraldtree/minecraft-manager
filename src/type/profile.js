@@ -118,8 +118,6 @@ Profile.prototype.changeMCVersion = function(newver) {
 }
 
 Profile.prototype.launch = function() {
-    console.log('launchign!');
-    console.log(this);
     if(!LauncherManager.profileExists(this)) {
         LauncherManager.createProfile(this);
     }
@@ -187,8 +185,6 @@ Profile.prototype.getModFromID = function(id) {
 }
 
 Profile.prototype.deleteMod = function(mod) {
-    console.log('DELETE ME');
-    console.log(mod);
     return new Promise((resolve) => {
         if(!(mod instanceof Mod)) {
             mod = new Mod(mod);
@@ -262,13 +258,10 @@ Profile.prototype.export = function(output, exportFolders, exportProgress) {
             }
             if(mod.hosts) { 
                 if(mod.hosts.curse) {
-                    console.log(mod.getJARFile());
                     fs.unlinkSync(path.join(filesPath, `/mods/${mod.getJARFile().path}`));
                 }
             }
         }
-
-        console.log(exportFolders);
     
         exportProgress('Removing non-chosen folders...');
         fs.readdir(path.join(tempPath, '/files'), (err, files) => {
@@ -324,7 +317,6 @@ Profile.prototype.changeCurseVersion = function(versionToChangeTo, onUpdate) {
 }
 
 Profile.prototype.rename = function(newName) {
-    console.log(this);
     const newID = Global.createID(newName);
     const safeName = Global.createSafeName(newName);
     if(!LauncherManager.profileExists(this)) {

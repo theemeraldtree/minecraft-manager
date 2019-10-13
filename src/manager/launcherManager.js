@@ -77,7 +77,6 @@ const LauncherManager = {
     },
     setDedicatedRam: function(amount) {
         for(let profile of ProfilesManager.loadedProfiles) {
-            console.log(`Setting launch arguments for: ${profile.name} with RAM of ${amount}`);
             this.setLaunchArguments(profile, `-Xmx${amount}G ${this.DEFAULT_JAVA_ARGS}`)
         }
     }

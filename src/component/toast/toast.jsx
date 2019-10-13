@@ -46,7 +46,6 @@ export default class Toast extends PureComponent {
     renderToasts() {
         let list = [];
         let exist = this.state.existingToasts.slice();
-        console.log(ToastManager.toasts);
         for(let toast of ToastManager.toasts) {
             list.push(<ToastObject key={`${toast.id}`} disableAnimation={exist.includes(toast.id)} slideOut={this.state.dismissingToasts.includes(toast.id)} dismiss={this.dismiss} id={toast.id} title={toast.title} body={toast.body} error={toast.error} />);
             if(!exist.includes(toast.id)) {
@@ -59,11 +58,9 @@ export default class Toast extends PureComponent {
         });
     }
     componentDidMount() {
-        console.log('toast mount');
         ToastManager.registerHandler(this.toastUpdate);
     }
     render() {
-        console.log('toast rerender');
         return (
             <Container>
                 <List>

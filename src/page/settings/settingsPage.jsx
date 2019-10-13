@@ -187,8 +187,7 @@ export default class SettingsPage extends PureComponent {
                 })
             })
 
-            ipcRenderer.on('error', (event, err) => {
-                console.error(err);
+            ipcRenderer.on('error', () => {
                 this.setState({
                     updateText: 'check for updates',
                     updateDisabled: false,

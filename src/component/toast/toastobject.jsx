@@ -63,7 +63,6 @@ const Dismiss = styled.p`
     color: #a1a1a1;
 `
 export default function ToastObject({id, title, body, error, dismiss, slideOut, disableAnimation}) {
-    console.log('toast object rerender');
     return (
         <BG disableAnimation={disableAnimation} slideOut={slideOut}>
             <Title>{title}</Title>

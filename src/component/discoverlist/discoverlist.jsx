@@ -47,8 +47,6 @@ export default class DiscoverList extends Component {
             cantConnect: false
         })
 
-        console.log('browse assets');
-
         const assets = await Curse.getPopularAssets(this.props.type);
         if(assets) {
             this.renderAssets(assets);
@@ -132,7 +130,6 @@ export default class DiscoverList extends Component {
     }
 
     goBack = () => {
-        console.log('back has been clicked!');
         let { displayState, previousState } = this.state;
         let newState;
         switch(displayState) {
@@ -165,7 +162,6 @@ export default class DiscoverList extends Component {
             assetDependencies: [<LoadingText key='loading'>loading...</LoadingText>]
         });
         const res = await Curse.getDependencies(this.state.activeAsset);
-        console.log(res);
         newAsset.dependencies = res;
 
         let newDependList = [];

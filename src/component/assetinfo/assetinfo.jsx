@@ -113,15 +113,12 @@ export default class AssetInfo extends Component {
             assetDependencies: [<LoadingText key='loading'>loading...</LoadingText>]
         });
         const res = await Curse.getDependencies(this.state.activeAsset);
-        console.log(res);
         if(res) {
-            console.log(res);
             newAsset.dependencies = res;
     
             let newDependList = [];
             if(res.length >= 1) {
                 for(let asset of res) {
-                    console.log(asset);
                     newDependList.push(<AssetCard disableHover key={asset.id} showBlurb={true} asset={asset} />);
                 }
             }else{
@@ -166,9 +163,7 @@ export default class AssetInfo extends Component {
                         }
                     }
                 }
-    
-                console.log(this.state.scrollPosition);
-    
+        
                 if(final.length === 0) {
                     final.push(<LoadingText key='none1'>no versions found</LoadingText>)
                 }
@@ -192,8 +187,6 @@ export default class AssetInfo extends Component {
 
     versionInstall = (e) => {
         const version = Global.cached.versions[e.currentTarget.dataset.version];
-        console.log(Global.cached.versions);
-        console.log(version);
         this.setState({
             scrollPosition: this.versionsListRef.current.scrollTop
         })
@@ -213,7 +206,6 @@ export default class AssetInfo extends Component {
         }else if(newState === 'dependencies') {
             this.showDependencies();
         }else if(newState === 'versions') {
-            console.log(this.props.asset.minecraftversion);
             this.showVersions();
         }
     }

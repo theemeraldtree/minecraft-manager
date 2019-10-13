@@ -19,7 +19,6 @@ const ToastManager = {
         this.updateHandler();
     },
     createToast(title, body, error) {
-        console.log('New Toast');
         this.toasts.push({
             id: `toast-${title}-${new Date().getTime()}-${Math.random().toString(36).substring(6)}`,
             title: title,

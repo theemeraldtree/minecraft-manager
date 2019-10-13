@@ -107,7 +107,6 @@ export default class EditPageMods extends PureComponent {
 
     showInfoClick = (e) => {
         let mod = this.state.profile.getModFromID(e.currentTarget.dataset.assetid);
-        console.log(mod);
         if(mod.hosts.curse) {
             this.setState({
                 displayState: 'modInfo',
@@ -223,7 +222,6 @@ export default class EditPageMods extends PureComponent {
     }
 
     versionInstall = (version, mod) => {
-        console.log(version);
         const { profile } = this.state;
         profile.deleteMod(mod).then(() => {
             const verCopy = Object.assign({}, this.state.versionState);

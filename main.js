@@ -55,30 +55,24 @@ ipcMain.on('download-file', (event, url, dest, id) => {
 function checkForUpdates() {
     autoUpdater.checkForUpdates();
     autoUpdater.on('checking-for-update', () => {
-        console.log('Checking for updates...');
         mainWindow.webContents.send('checking-for-update');
     });
 
     autoUpdater.on('update-available', () => {
-        console.log('Update available');
         mainWindow.webContents.send('update-available');
     });
 
     autoUpdater.on('update-downloaded', () => {
-        console.log('Update downloaded');
         const notif = new Notification({title: 'Minecraft Manager', body: 'An update is available for Minecraft Manager. It has been downloaded and will be installed next time you start the app.'});
         notif.show();
         mainWindow.webContents.send('update-downloaded');
     })
 
     autoUpdater.on('update-not-available', () => {
-        console.log('Update not available');
         mainWindow.webContents.send('update-not-available');
     })
 
     autoUpdater.on('error', (error) => {
-        console.log('Error checking for updates');
-        console.log(error);
         mainWindow.webContents.send('error', error);
     })
 }

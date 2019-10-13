@@ -50,9 +50,7 @@ const Global = {
     checkMinecraftVersions() {
         let totalCount = 0;
         fs.readdirSync(VersionsManager.getVersionsPath()).forEach(file => {
-            console.log(file);
             if(file.indexOf('[Minecraft Manager]') !== -1) {
-                console.log(ProfilesManager.loadedProfiles.find(prof => prof.versionname === file));
                 if(!ProfilesManager.loadedProfiles.find(prof => prof.versionname === file)) {
                     totalCount++;
                 }
@@ -247,7 +245,6 @@ const Global = {
         }
 
         if(showMigrationmessage) {
-            console.log('Migration message');
             ToastManager.createToast('Hey There!', 'Hello there beta tester! Just a quick message about this new version: your old profiles will not work 100%. Some features may work, some may not. This is due to internal restructuring as to how many things are stored. We hope you understand!');
         }
 
