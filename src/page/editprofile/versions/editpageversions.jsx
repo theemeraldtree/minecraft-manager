@@ -14,6 +14,7 @@ import ForgeManager from '../../../manager/forgeManager';
 import Confirmation from '../../../component/confirmation/confirmation';
 import Curse from '../../../host/curse/curse';
 import Overlay from '../../../component/overlay/overlay';
+import VersionsManager from '../../../manager/versionsManager';
 const CustomVersions = styled.div`
     background-color: #505050;
     width: 350px;
@@ -46,7 +47,8 @@ export default class EditPageVersions extends Component {
             curseVerValue: '',
             updateOverlay: false,
             updateOverlayText: 'Getting things ready...',
-            updateConfirm: false
+            updateConfirm: false,
+            badForgeVersion: false
         }
     }
 
@@ -80,6 +82,12 @@ export default class EditPageVersions extends Component {
         }
     }
 
+    badForgeVersionClose = () => {
+        this.setState({
+            badForgeVersion: false
+        })
+    }
+
     cancelVersionChange = () => {
         this.setState({
             versionChangeWarning: false
@@ -97,28 +105,34 @@ export default class EditPageVersions extends Component {
 
     downloadForge = () => {
         let { profile } = this.state;
-        this.setState({
-            forgeIsInstalling: true
-        });
-        ForgeManager.getForgePromotions().then((promos) => {
-            let obj = JSON.parse(promos);
-            let verObj = obj.promos[`${profile.minecraftversion}-latest`];
-            if(verObj) {
-                let version = `${profile.minecraftversion}-${verObj.version}`;
-                profile.setForgeVersion(version);
-                ForgeManager.setupForge(profile).then(() => {
+        if(!VersionsManager.checkIs113OrHigher(profile)) {
+            this.setState({
+                forgeIsInstalling: true
+            });
+            ForgeManager.getForgePromotions().then((promos) => {
+                let obj = JSON.parse(promos);
+                let verObj = obj.promos[`${profile.minecraftversion}-latest`];
+                if(verObj) {
+                    let version = `${profile.minecraftversion}-${verObj.version}`;
+                    profile.setForgeVersion(version);
+                    ForgeManager.setupForge(profile).then(() => {
+                        this.setState({
+                            forgeIsInstalling: false
+                        })
+                    });
+                }else{
                     this.setState({
-                        forgeIsInstalling: false
+                        forgeIsInstalling: false,
+                        noForgeVerAvailable: true
                     })
-                });
-            }else{
-                this.setState({
-                    forgeIsInstalling: false,
-                    noForgeVerAvailable: true
-                })
-            }
+                }
+            })
+        }else{
+            this.setState({
+                badForgeVersion: true
+            })
+        }
 
-        })
     }
 
     uninstallForge = () => {
@@ -260,6 +274,11 @@ export default class EditPageVersions extends Component {
                         </>}
                     </CustomVersions>
 
+                    {this.state.badForgeVersion && <Confirmation hideConfirm cancelDelete={this.badForgeVersionClose} cancelText='Close'>
+                        <h1>Error</h1>
+                        <p>There is currently no support for Forge in Minecraft 1.13+, however it may be implemented in the future.</p>
+                        <a href="https://github.com/stairman06/minecraft-manager/wiki/Forge-1.13-">For why, check out this wiki article</a>
+                    </Confirmation> }
                     {this.state.versionChangeWarning && <Confirmation confirmDelete={this.confirmVersionChange} cancelDelete={this.cancelVersionChange} questionText='Changing your Minecraft version will remove Forge and all your mods. Are you sure?' cancelText="Don't change" confirmText='Yes, change it' />}
                 </EditContainer>
             </Page>

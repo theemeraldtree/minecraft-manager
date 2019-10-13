@@ -34,7 +34,8 @@ export default class Confirmation extends Component {
         return (
             <Overlay>
                 <DelConfirm>
-                    <h1>{this.props.questionText}</h1>
+                    {this.props.questionText && <h1>{this.props.questionText}</h1>}
+                    {this.props.children && this.props.children}
                     <DelButtons>
                         <Button onClick={cancelDelete} color='green'>{this.props.cancelText}</Button>
                         {!this.props.hideConfirm && <Button onClick={confirmDelete} color='red'>{this.props.confirmText}</Button>}
@@ -46,7 +47,6 @@ export default class Confirmation extends Component {
 }
 
 Confirmation.defaultProps = {
-    questionText: 'are you sure?',
     cancelText: 'cancel',
     confirmText: 'confirm'
 }

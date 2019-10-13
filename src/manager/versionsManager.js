@@ -5,6 +5,7 @@ import LauncherManager from './launcherManager';
 import rimraf from 'rimraf';
 const defaultVersion = require('../assets/defaultVersion.json');
 const version1710 = require('../assets/1710version.json');
+const semver = require('semver');
 const VersionsManager = {
     getVersionsPath: function() {
         return path.join(Global.getMCPath(), '/versions')
@@ -47,6 +48,15 @@ const VersionsManager = {
             default:
                 return false;
         }
+    },
+    checkIs113OrHigher: function(profile) {
+        let version = profile.minecraftversion;
+        if(version.split('.').length === 2) {
+            let arr = version.split('.');
+            arr.push('0');
+            version = arr.join('.');
+        }
+        return semver.gte(version, '1.13.0');
     },
     renameVersion: function(profile, newName) {
         const oldVersionName = `${profile.safename} [Minecraft Manager]`;
