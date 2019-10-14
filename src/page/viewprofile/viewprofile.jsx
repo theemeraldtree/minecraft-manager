@@ -157,7 +157,7 @@ class ViewProfilePage extends PureComponent {
         if(profile) {
             return (
                 <Page>
-                    {showDelete && <Confirmation cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />}
+                    {showDelete && <Confirmation questionText='are you sure?' cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />}
                     <Header title='profile' backlink='/' />
                     <ProfileHeader>
                         <Image src={`${profile.iconpath}#${new Date().getTime()}`} />
@@ -186,7 +186,6 @@ class ViewProfilePage extends PureComponent {
                     </Description>
                     {this.state.showShareOverlay && <ShareOverlay cancelClick={this.hideShare} profile={profile} />}
                     {this.state.showUpdateOverlay && <UpdateOverlay cancelClick={this.hideUpdate} profile={profile} />}
-                }
                 </Page>
             )
         }else{
