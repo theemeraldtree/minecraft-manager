@@ -16,6 +16,8 @@ const DelConfirm = styled.div`
     padding-bottom: 70px;
     h1 {
         margin: 0;
+        font-weight: 200;
+        font-size: 21pt;
     }
 `
 

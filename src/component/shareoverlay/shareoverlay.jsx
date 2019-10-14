@@ -138,6 +138,8 @@ export default class ShareOverlay extends Component {
                 });
             }).then(() => {
                 this.props.cancelClick();
+            }).catch(() => {
+                this.props.cancelClick();
             })
             this.setState({
                 displayState: 'progress'

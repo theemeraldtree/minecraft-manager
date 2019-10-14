@@ -7,6 +7,7 @@ import HTTPRequest from '../host/httprequest';
 import VersionsManager from '../manager/versionsManager';
 import LauncherManager from '../manager/launcherManager';
 import LibrariesManager from '../manager/librariesManager';
+import ErrorManager from '../manager/errorManager';
 
 const remote = require('electron').remote;
 const app = remote.app;
@@ -174,16 +175,20 @@ const Global = {
         return SettingsManager.MC_HOME;
     },
     copyDirSync: function(src, dest) {
-        const exists = fs.existsSync(src);
-        const stats = exists && fs.statSync(src);
-        const isDirectory = exists && stats.isDirectory();
-        if(exists && isDirectory) {
-            fs.mkdirSync(dest);
-            fs.readdirSync(src).forEach((childItem) => {
-                this.copyDirSync(path.join(src, childItem), path.join(dest, childItem));
-            })
-        }else{
-            fs.linkSync(src, dest);
+        try {
+            const exists = fs.existsSync(src);
+            const stats = exists && fs.statSync(src);
+            const isDirectory = exists && stats.isDirectory();
+            if(exists && isDirectory) {
+                fs.mkdirSync(dest);
+                fs.readdirSync(src).forEach((childItem) => {
+                    this.copyDirSync(path.join(src, childItem), path.join(dest, childItem));
+                })
+            }else{
+                fs.linkSync(src, dest);
+            }
+        }catch(e) {
+            ToastManager.createToast('Error', ErrorManager.makeReadable(e));
         }
     },
     checkMigration: function() {

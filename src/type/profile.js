@@ -7,6 +7,7 @@ import Curse from "../host/curse/curse";
 import VersionsManager from "../manager/versionsManager";
 import LibrariesManager from "../manager/librariesManager";
 import ToastManager from "../manager/toastManager";
+import ErrorManager from "../manager/errorManager";
 const archiver = require('archiver');
 const path = require('path');
 const fs = require('fs');
@@ -80,8 +81,10 @@ Profile.prototype.toJSON = function() {
         copy[i] = undefined;
     }
     copy.local = undefined;
-
+    copy.gameDir = undefined;
+    copy.error = undefined;
     copy.fpath = undefined;
+    copy.iconURL = undefined;
     if(this.hosts) {
         if(this.hosts.curse) {
             copy.hosts.curse.localValues = undefined;
@@ -257,60 +260,68 @@ Profile.prototype.setCurrentState = function(state) {
 }
 
 Profile.prototype.export = function(output, exportFolders, exportProgress) {
-    return new Promise((resolve) => {
-        const tempPath = path.join(Global.MCM_TEMP, `/profileexport-${this.id}/`);
-        if(fs.existsSync(tempPath)) {
-            rimraf.sync(tempPath);
-        }
-        const filesPath = path.join(tempPath, '/files');
-        exportProgress('Preparing...');
-        Global.copyDirSync(this.folderpath, tempPath);
-    
-        exportProgress('Removing Online Mods...');
-        for(let mod of this.mods) {
-            if(!(mod instanceof Mod)) {
-                mod = new Mod(mod);
+    return new Promise((resolve, reject) => {
+        try {
+            const tempPath = path.join(Global.MCM_TEMP, `/profileexport-${this.id}/`);
+            if(fs.existsSync(tempPath)) {
+                rimraf.sync(tempPath);
             }
-            if(mod.hosts) { 
-                if(mod.hosts.curse) {
-                    fs.unlinkSync(path.join(filesPath, `/mods/${mod.getJARFile().path}`));
+            const filesPath = path.join(tempPath, '/files');
+            exportProgress('Preparing...');
+            Global.copyDirSync(this.folderpath, tempPath);
+        
+            exportProgress('Removing Online Mods...');
+            for(let mod of this.mods) {
+                if(!(mod instanceof Mod)) {
+                    mod = new Mod(mod);
                 }
-            }
-        }
-    
-        exportProgress('Cleaning up properties...');
-        let obj = JSON.parse(fs.readFileSync(tempPath, '/profile.json'));
-        if(obj.hideFromClient) {
-            obj.hideFromClient = undefined;
-            delete obj.hideFromClient;
-        }
-
-        fs.writeFileSync(path.join(tempPath, '/profile.json'), JSON.stringify(obj));
-
-        exportProgress('Removing non-chosen folders...');
-        fs.readdir(path.join(tempPath, '/files'), (err, files) => {
-            files.forEach(file => {
-                if(!exportFolders[file]) {
-                    if(file !== 'mods') {
-                        rimraf.sync(path.join(filesPath, file));
+                if(mod.hosts) { 
+                    if(mod.hosts.curse) {
+                        fs.unlinkSync(path.join(filesPath, `/mods/${mod.getJARFile().path}`));
                     }
                 }
+            }
+        
+            exportProgress('Cleaning up properties...');
+            let obj = JSON.parse(fs.readFileSync(path.join(tempPath, '/profile.json')));
+            if(obj.hideFromClient) {
+                obj.hideFromClient = undefined;
+                delete obj.hideFromClient;
+            }
+    
+            fs.writeFileSync(path.join(tempPath, '/profile.json'), JSON.stringify(obj));
+    
+            exportProgress('Removing non-chosen folders...');
+            fs.readdir(path.join(tempPath, '/files'), (err, files) => {
+                files.forEach(file => {
+                    if(!exportFolders[file]) {
+                        if(file !== 'mods') {
+                            rimraf.sync(path.join(filesPath, file));
+                        }
+                    }
+                });
+        
+                exportProgress('Creating archive...');
+                const archive = archiver('zip');
+        
+                archive.pipe(fs.createWriteStream(output)).on('error', (e) => {
+                    ToastManager.createToast('Error archiving', ErrorManager.makeReadable(e));
+                    reject();
+                });
+                archive.directory(tempPath, false);
+                archive.finalize();
+        
+                archive.on('finish', () => {
+                    exportProgress('Cleaning up...');
+                    rimraf.sync(tempPath);
+                    exportProgress('Done');
+                    resolve();
+                });
             });
-    
-            exportProgress('Creating archive...');
-            const archive = archiver('zip');
-    
-            archive.pipe(fs.createWriteStream(output));
-            archive.directory(tempPath, false);
-            archive.finalize();
-    
-            archive.on('finish', () => {
-                exportProgress('Cleaning up...');
-                rimraf.sync(tempPath);
-                exportProgress('Done');
-                resolve();
-            })
-        })
+        }catch(e) {
+            ToastManager.createToast('Error', ErrorManager.makeReadable(e));
+            reject();
+        }
     })
 }
 
@@ -323,10 +334,10 @@ Profile.prototype.changeCurseVersion = function(versionToChangeTo, onUpdate) {
             onUpdate('Moving old folder...');
             const oldpath = path.join(Global.PROFILES_PATH, `/${this.id}-update-${new Date().getTime()}`);
             const oldgamedir = path.join(oldpath, '/files');
-            fs.rename(this.folderpath, oldpath, async (err) => {
-                if(err) {
-                    ToastManager.createToast('Error', err.toString());
-                    reject();
+            fs.rename(this.folderpath, oldpath, async (e) => {
+                if(e) {
+                    ToastManager.createToast('Error', ErrorManager.makeReadable(e));
+                    reject(e);
                 }else{
                     onUpdate('Installing modpack...');
                     const newprofile = await Curse.installModpackVersion(this, versionToChangeTo);
