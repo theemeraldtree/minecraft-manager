@@ -75,6 +75,8 @@ const Updates = styled.div`
 const Wrapper = styled.div`
     overflow: scroll;
     height: 100%;
+    margin-bottom: -17px;
+    padding-bottom: 20px;
 `
 export default class SettingsPage extends PureComponent {
     constructor(props) {
@@ -218,17 +220,23 @@ export default class SettingsPage extends PureComponent {
                             <h1>About Minecraft Manager</h1>
                         </AboutTop>
                         <AboutBottom>
-                            <h2>Minecraft Manager Version 2.0.1</h2>
-                            <h2>released 8/8/2019</h2>
-
+                            <h2>Minecraft Manager (Alpha Branch) Version 2.1a</h2>
+                            <h2>released 10/14/2019</h2>
+                            
                             <Updates>
                                 <Button onClick={this.checkForUpdates} disabled={this.state.updateDisabled} color='green'>{this.state.updateText}</Button>
                                 <h3>{this.state.updateSubText}</h3>
                             </Updates>
-                            <h3>Minecraft Manager is made possible thanks to <a href="https://electronjs.org/">Electron, </a> <a href="https://reactjs.org/">React, </a> <a href="https://webpack.js.org">Webpack,</a> and other projects</h3>
+                            <h3><a href="https://github.com/stairman06/minecraft-manager/blob/master/LICENSE">Minecraft Manager is licensed under the GNU General Public License v3</a></h3>
                             <h3><a title="Minecraft Manager Source Code" href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project</a> created by stairman06</h3>
+                            <h3>Minecraft Manager is made possible thanks to the following projects:
+                                <li><a href="https://electronjs.org/">Electron</a></li>
+                                <li><a href="https://reactjs.org/">React</a></li> 
+                                <li><a href="https://webpack.js.org">Webpack</a></li>
+                                <li><a href="http://www.apache.org/licenses/LICENSE-2.0.html">the Roboto font</a></li>
+                                and other projects</h3>
+
                             <h3><a title="OMAF Wiki and Documentation" href="https://github.com/stairman06/omaf/wiki">Minecraft Manager uses the open-source OMAF standard, </a> created by stairman06, with help from others</h3>
-                            <h3><a title="Roboto Font License" href="http://www.apache.org/licenses/LICENSE-2.0.html">Minecraft Manager uses the Roboto font created by Google.</a></h3>
 
                             <h2>Need help?</h2>
                             <h3><a href="https://github.com/stairman06/minecraft-manager/wiki">Check out the Minecraft Manager Wiki</a></h3>
