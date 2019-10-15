@@ -35,13 +35,17 @@ const ExportList = styled.div`
     overflow: scroll;
     background-color: #717171;
     margin-top: 5px;
-    flex: 1 1 auto;
+    height: min-content;
+    display: table;
 `
 
 const ExportItem = styled.div`
     border-bottom: 2px solid #444444;
     display: flex;
     align-items: center;
+    &:last-child {
+        border: 0;
+    }
 `
 
 const Checkbox = styled.input`
@@ -89,10 +93,6 @@ export default class ShareOverlay extends Component {
             let exportFolders = [];
             let exportItems = [];
 
-            exportItems.push(<ExportItem key="mods">
-                <Checkbox type="checkbox" checked disabled />
-                <Label>mods</Label>
-            </ExportItem>)
 
             files.forEach(file => {
                 if(file !== 'mods') {
@@ -103,6 +103,11 @@ export default class ShareOverlay extends Component {
                             <Label>{file}</Label>
                         </ExportItem>)
                     }
+                }else{
+                    exportItems.push(<ExportItem key="mods">
+                        <Checkbox type="checkbox" checked disabled />
+                        <Label>mods</Label>
+                    </ExportItem>)
                 }
             })
 
@@ -155,11 +160,15 @@ export default class ShareOverlay extends Component {
                         <Title>Share your profile</Title>
                         <Subtext>Exporting your profile will export it to the <b>.mcjprofile</b> file format, which can be used in Minecraft Manager or other OMAF-supporting apps</Subtext>
                         <Breaker />
-                        <Title>Choose your folders</Title>
-                        <Subtext>Choose your folders that you'd like to include with your export. The mods folder is included by default</Subtext>
-                        <ExportList>
-                            {this.state.exportItems}
-                        </ExportList>
+                        {
+                            this.state.exportItems && <>
+                                <Title>Choose your folders</Title>
+                                <Subtext>Choose your folders that you'd like to include with your export. If you have mods installed, they are automatically included</Subtext>
+                                <ExportList>
+                                    {this.state.exportItems}
+                                </ExportList>        
+                            </>
+                        }
                         <ButtonsContainer>
                             <Button onClick={this.props.cancelClick} color='red'>cancel</Button>
                             <Button onClick={this.exportClick} color='green'>export</Button>

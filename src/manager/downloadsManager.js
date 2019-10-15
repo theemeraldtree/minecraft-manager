@@ -3,6 +3,7 @@ import Download from "../type/download";
 import path from 'path';
 import Global from '../util/global';
 import LogManager from "./logManager";
+import fs from 'fs';
 
 const DownloadsManager = {
     activeDownloads: [],
@@ -70,6 +71,9 @@ const DownloadsManager = {
     },
     startModDownload: function(profile, mod, url, modpack) {
         return new Promise((resolve) => {
+            if(!fs.existsSync(path.join(profile.gameDir, '/mods'))) {
+                fs.mkdirSync(path.join(profile.gameDir, '/mods'));
+            }
             if(modpack === false) {
                 this.startFileDownload(`${mod.name} to ${profile.name}`, url, path.join(profile.modsPath, `/${Global.createID(mod.name)}.jar`)).then(() => {
                     resolve();

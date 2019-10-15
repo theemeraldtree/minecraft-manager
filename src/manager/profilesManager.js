@@ -205,7 +205,6 @@ const ProfilesManager = {
             LogManager.log('info', `[ProfilesManager] (CreateProfile) Creating profile directories`);
             fs.mkdirSync(path.join(Global.PROFILES_PATH, id));
             fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/files'));
-            fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/files/mods'));
 
             LogManager.log('info', `[ProfilesManager] Copying default logo to profile`);
             let profile = new Profile({
