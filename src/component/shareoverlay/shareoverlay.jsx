@@ -32,11 +32,10 @@ const Breaker = styled.div`
 `
 
 const ExportList = styled.div`
-    overflow: scroll;
+    overflow-y: scroll;
     background-color: #717171;
     margin-top: 5px;
     height: min-content;
-    display: table;
 `
 
 const ExportItem = styled.div`
@@ -104,7 +103,7 @@ export default class ShareOverlay extends Component {
                         </ExportItem>)
                     }
                 }else{
-                    exportItems.push(<ExportItem key="mods">
+                    exportItems.unshift(<ExportItem key="mods">
                         <Checkbox type="checkbox" checked disabled />
                         <Label>mods</Label>
                     </ExportItem>)

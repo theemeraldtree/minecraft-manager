@@ -19,7 +19,7 @@ const LoadingText = styled.div`
 `
 
 const Description = styled.div`
-    overflow: scroll;
+    overflow-y: scroll;
     background-color: #717171;
     margin-top: 10px;
     margin-bottom: 10px;

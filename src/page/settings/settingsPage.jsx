@@ -73,9 +73,8 @@ const Updates = styled.div`
 `
 
 const Wrapper = styled.div`
-    overflow: scroll;
+    overflow-y: scroll;
     height: 100%;
-    margin-bottom: -17px;
     padding-bottom: 20px;
 `
 export default class SettingsPage extends PureComponent {

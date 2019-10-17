@@ -73,7 +73,7 @@ const Specs = styled.div`
 `
 
 const Description = styled.div`
-    overflow: scroll;
+    overflow-y: scroll;
     background-color: #717171;
     margin: 10px;
 `
