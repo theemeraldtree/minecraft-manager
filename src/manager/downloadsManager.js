@@ -75,7 +75,7 @@ const DownloadsManager = {
                 fs.mkdirSync(path.join(profile.gameDir, '/mods'));
             }
             if(modpack === false) {
-                this.startFileDownload(`${mod.name} to ${profile.name}`, url, path.join(profile.modsPath, `/${Global.createID(mod.name)}.jar`)).then(() => {
+                this.startFileDownload(`${mod.name}\n_A_${profile.name}`, url, path.join(profile.modsPath, `/${Global.createID(mod.name)}.jar`)).then(() => {
                     resolve();
                 })
             }

@@ -26,7 +26,7 @@ const LibrariesManager = {
                     }else if(mcversion === '1.8.9' || mcversion === '1.8.8' || mcversion === '1.8') {
                         downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.customVersions.forge.version}-${mcversion}/forge-${profile.customVersions.forge.version}-${mcversion}-universal.jar`
                     }
-                    DownloadsManager.startFileDownload(`Minecraft Forge ${profile.customVersions.forge.version} for ${profile.name}`, downloadURL, jarPath).then(() => {
+                    DownloadsManager.startFileDownload(`Minecraft Forge ${profile.customVersions.forge.version}\n_A_${profile.name}`, downloadURL, jarPath).then(() => {
                         resolve();
                     });
                 });

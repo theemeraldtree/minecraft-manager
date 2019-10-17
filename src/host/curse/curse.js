@@ -387,7 +387,7 @@ let Curse = {
                     newm.hosts.curse.fileID = mod.hosts.curse.fileID;
                     mod = newm;
                 }
-                DownloadsManager.createProgressiveDownload(`Info for ${mod.name}`).then(async (download) => {
+                DownloadsManager.createProgressiveDownload(`${mod.name}\n_A_`).then(async (download) => {
                     if(dependencies) {
                         this.installDependencies(profile, mod);
                     }
@@ -538,7 +538,7 @@ let Curse = {
             const modpack = cachedAsset;
             const infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`);
 
-            DownloadsManager.startFileDownload(`Info for ${modpack.name}`, downloadUrl, infoDownload).then(async () => {
+            DownloadsManager.startFileDownload(`${modpack.name}\n_A_Info`, downloadUrl, infoDownload).then(async () => {
                 const zip = new admzip(infoDownload);
 
                 const extractPath = path.join(Global.MCM_TEMP, `${modpack.id}-install/`);
@@ -577,7 +577,7 @@ let Curse = {
                         return mod;
                     });
                     
-                    DownloadsManager.createProgressiveDownload(`Curse mods from ${profile.name}`).then(download => {
+                    DownloadsManager.createProgressiveDownload(`Curse mods\n_A_${profile.name}`).then(download => {
                         let numberDownloaded = 0;
                         const concurrent = manifest.files.length >= 10 ? 10 : 0;
                         this.downloadModList(profile, list, () => {
@@ -598,7 +598,7 @@ let Curse = {
                                 }
 
                                 ForgeManager.setupForge(profile).then(() => {
-                                    DownloadsManager.startFileDownload(`Icon for ${profile.name}`, modpack.iconURL, path.join(profile.folderpath, '/icon.png')).then(() => {
+                                    DownloadsManager.startFileDownload(`${profile.name}\n_A_`, modpack.iconURL, path.join(profile.folderpath, '/icon.png')).then(() => {
                                         rimraf.sync(extractPath);
                                         profile.hosts.curse.fullyInstalled = true;
                                         profile.save();
