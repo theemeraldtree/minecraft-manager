@@ -132,7 +132,7 @@ export default class SettingsPage extends PureComponent {
             })
 
             let intAmount = parseInt(newAmount);
-            if(intAmount >= Math.ceil(os.totalmem() / 1000000000)) {
+            if(intAmount >= Math.ceil(os.totalmem() / 1073741824)) {
                 this.setState({
                     warningMessage: 'That is equal to or higher than your available RAM! Please set it lower!'
                 })
