@@ -59,7 +59,6 @@ export default class EditPageMods extends PureComponent {
             displayState: 'modsList',
             listState: 'browseAssets',
             progressState: {},
-            versionState: {},
             profile: {
                 name: 'Loading'
             },
