@@ -151,7 +151,7 @@ export default class AssetInfo extends Component {
                             ps.progress = 'disable-install';
                         }
                         const forceVerFilter = this.props.forceVersionFilter && (mcVerFilter !== this.props.mcVerFilter);
-                        final.push(<VersionCard allowVersionReinstallation={allowVersionReinstallation} badMCVer={!version.minecraftversions.includes(specificMCVer)} key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMcVer={forceVerFilter} version={version} />);
+                        final.push(<VersionCard allowVersionReinstallation={allowVersionReinstallation} badMCVer={specificMCVer ? !version.minecraftversions.includes(specificMCVer) : false} key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMcVer={forceVerFilter} version={version} />);
                     }
                 }
         
