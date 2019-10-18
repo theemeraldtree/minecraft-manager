@@ -102,17 +102,26 @@ export default class VersionCard extends PureComponent {
 
     render() {
         const { showMoreInfo, changelog } = this.state;
-        const { version, progressState, disableMcVer, installClick } = this.props;
+        const { hideButtons, version, badMCVer, progressState, disableMcVer, installClick, allowVersionReinstallation } = this.props;
 
         let progress = '';
-        if(progressState.version === version.displayName) {
-            progress = progressState.progress;
-        }else{
-            if(progressState.progress === 'installed' || progressState.progress === 'installing') {
-                progress = 'disable-install';
-            }    
+        if(progressState) {
+            if(progressState.version === version.displayName) {
+                progress = progressState.progress;
+            }else{
+                if(progressState.progress === 'installed' && !allowVersionReinstallation) {
+                    progress = 'disable-install';
+                }else if(progressState.progress === 'installing') {
+                    progress = 'disable-install';
+                }
+            }
+    
+            if(badMCVer) {
+                progress = 'bad-mc-ver';
+            }
+    
         }
-
+        
         let installed = progress === 'installed';
 
         const freeToInstall = progress !== 'installing' && progress !== 'disable-install';
@@ -121,14 +130,15 @@ export default class VersionCard extends PureComponent {
                 <Details>
                     <Title>{version.displayName}</Title>
                 </Details>
-                <ButtonContainer>
-                    {disableMcVer && !installed && !progress && <Button disabled color='green'>wrong minecraft version</Button>}
-                    {installed && !disableMcVer && progress !== 'disable-install' && <Button disabled color='green'>installed</Button>}
-                    {progress === 'installing' && <Button disabled color='green'>installing</Button>}
-                    {progress === 'disable-install' && <Button disabled color='green'>install</Button>}
-                    {!installed && !disableMcVer && freeToInstall && <Button data-version={version.cachedID} onClick={installClick} color='green'>install</Button>}
-                </ButtonContainer>
-
+                {!hideButtons && 
+                    <ButtonContainer>
+                        {progress === 'bad-mc-ver' && <Button disabled color='green'>wrong minecraft version</Button>}
+                        {installed && !disableMcVer && progress !== 'disable-install' && <Button disabled color='green'>installed</Button>}
+                        {progress === 'installing' && <Button disabled color='green'>installing</Button>}
+                        {progress === 'disable-install' && <Button disabled color='green'>install</Button>}
+                        {!installed && freeToInstall && progress !== 'bad-mc-ver' && <Button data-version={version.cachedID} onClick={installClick} color='green'>install</Button>}
+                    </ButtonContainer>
+                }
                 {!showMoreInfo && <MoreInfo onClick={this.toggleMoreInfo}>more info</MoreInfo>}
                 <InfoSection>
                     <Detail>changelog</Detail>

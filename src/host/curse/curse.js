@@ -404,6 +404,12 @@ let Curse = {
                         if(!profile.getModFromID(mod.id)) {
                             profile.addMod(modObj);
                         }
+                        if(profile.progressState[mod.id]) {
+                            profile.progressState[mod.id] = {
+                                progress: 'installed',
+                                version: mod.version.displayName
+                            }
+                        }
                         resolve(mod);
                     })
                 })

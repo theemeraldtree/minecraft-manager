@@ -33,6 +33,7 @@ Profile.prototype.initLocalValues = function() {
     this.state = '';
     this.installed = true;
     
+    this.progressState = {};
     this.error = false;
     let newList = [];
     if(this.mods) {
@@ -40,6 +41,10 @@ Profile.prototype.initLocalValues = function() {
             let modItem = Object.assign({}, item);
             modItem.installed = true;
             newList.push(new Mod(modItem));
+            this.progressState[item.id] = {
+                progress: 'installed',
+                version: item.version.displayName
+            }
         }
     }
     this.mods = newList;
@@ -84,6 +89,7 @@ Profile.prototype.toJSON = function() {
     copy.error = undefined;
     copy.fpath = undefined;
     copy.iconURL = undefined;
+    copy.progressState = undefined;
     if(this.hosts) {
         if(this.hosts.curse) {
             copy.hosts.curse.localValues = undefined;
@@ -203,11 +209,13 @@ Profile.prototype.getModFromID = function(id) {
 
 Profile.prototype.deleteMod = function(mod) {
     return new Promise((resolve) => {
+        mod = this.mods.find(m => m.id === mod.id);
         if(!(mod instanceof Mod)) {
             mod = new Mod(mod);
         }
-        if(mod && mod instanceof Mod) {
+        if(mod && mod instanceof Mod && mod.getJARFile().path !== undefined) {
             this.mods.splice(this.mods.indexOf(mod), 1);
+            this.progressState[mod.id] = undefined;
             fs.unlink(path.join(this.modsPath, `/${mod.getJARFile().path}`), () => {
                 this.save();
                 resolve();

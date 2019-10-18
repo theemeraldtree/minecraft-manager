@@ -53,10 +53,6 @@ const Header = styled.h4`
     color: white;
 `
 
-const Container = styled.div`
-    flex-shrink: 0;
-`
-
 const TryAgain = styled.p`
     margin: 0;
     color: lightblue;
@@ -119,7 +115,7 @@ export default class AssetInfo extends Component {
             let newDependList = [];
             if(res.length >= 1) {
                 for(let asset of res) {
-                    newDependList.push(<AssetCard disableHover key={asset.id} showBlurb={true} asset={asset} />);
+                    newDependList.push(<AssetCard progressState={{}} disableHover key={asset.id} showBlurb={true} asset={asset} />);
                 }
             }else{
                 newDependList.push(<LoadingText key='none2'>No Dependencies</LoadingText>);
@@ -140,7 +136,7 @@ export default class AssetInfo extends Component {
 
     showVersions = async () => {
         const { activeAsset, mcVerFilter } = this.state;
-        const { localAsset } = this.props;
+        const { specificMCVer, allowVersionReinstallation } = this.props;
         if(activeAsset.hosts.curse) {
             this.setState({
                 versions: [<LoadingText key ='loading1'>loading</LoadingText>]
@@ -150,17 +146,12 @@ export default class AssetInfo extends Component {
                 let final = [];
                 for(let version of versions) {
                     if(version.minecraftversions.includes(mcVerFilter) || mcVerFilter === 'All') {
-    
                         let ps = this.props.progressState;
                         if(this.props.disableVersionInstall && ps.progress !== 'installing') {
                             ps.progress = 'disable-install';
                         }
                         const forceVerFilter = this.props.forceVersionFilter && (mcVerFilter !== this.props.mcVerFilter);
-                        if(localAsset) {
-                            final.push(<VersionCard key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMcVer={forceVerFilter} version={version} />);
-                        }else{
-                            final.push(<VersionCard key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMCVer={forceVerFilter} version={version} />);
-                        }
+                        final.push(<VersionCard allowVersionReinstallation={allowVersionReinstallation} badMCVer={!version.minecraftversions.includes(specificMCVer)} key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMcVer={forceVerFilter} version={version} />);
                     }
                 }
         
@@ -260,11 +251,6 @@ export default class AssetInfo extends Component {
                         <TryAgain onClick={this.tryAgain}>try again</TryAgain>
                     </LoadingText>}
                     {displayState === 'versions' && <>
-                        {localAsset && ! cantConnect && <Container>
-                            <Header>current version</Header>
-                            <VersionCard installed asset={activeAsset} version={activeAsset.version} />
-                        </Container>}
-
                         {!cantConnect && <>
                             <Header>all versions</Header>
                             <Detail>minecraft version</Detail>

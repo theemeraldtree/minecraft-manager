@@ -37,6 +37,9 @@ Mod.prototype.getJARFile = function() {
             return file;
         }
     }
+    return {
+        path: undefined
+    }
 }
 
 Mod.prototype.cleanObject = function() {

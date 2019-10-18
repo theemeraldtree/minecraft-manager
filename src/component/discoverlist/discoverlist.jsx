@@ -63,12 +63,17 @@ export default class DiscoverList extends Component {
 
     static getDerivedStateFromProps(props) {
         return {
-            displayState: props.state
+            displayState: props.state,
+            progressState: props.progressState
         }
     }
 
     componentDidMount() {
         this.browseAssets();
+    }
+
+    shouldComponentUpdate() {
+        return true;
     }
 
     componentDidUpdate(prevProps) {
@@ -214,8 +219,8 @@ export default class DiscoverList extends Component {
     }
 
     render() {
-        let { displayState, assets, loading, activeAsset, cantConnect } = this.state;
-        let { type, progressState, installClick, versionInstall, mcVerFilter, forceVersionFilter, versionState } = this.props;
+        let { displayState, assets, loading, activeAsset, progressState, cantConnect } = this.state;
+        let { type, installClick, versionInstall, allowVersionReinstallation, mcVerFilter, forceVersionFilter, specificMCVer, versionState } = this.props;
         return (
             <>
                 {displayState === 'browseAssets' && <>
@@ -238,7 +243,7 @@ export default class DiscoverList extends Component {
                     <TryAgain onClick={this.tryAgain}>try again</TryAgain>
                     </LoadingText>}
                 </>}
-                {displayState === 'viewAsset' && <AssetInfo versionInstall={versionInstall} progressState={progressState[activeAsset.id]} localAsset={false} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
+                {displayState === 'viewAsset' && <AssetInfo allowVersionReinstallation={allowVersionReinstallation} specificMCVer={specificMCVer} versionInstall={versionInstall} progressState={progressState[activeAsset.id]} localAsset={false} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
             </>
         )
     }
