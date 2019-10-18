@@ -87,7 +87,7 @@ export default class AssetInfo extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if(prevProps.versionState !== this.props.versionState && this.state.displayState === 'versions') {
+        if(prevProps.progressState !== this.props.progressState && this.state.displayState === 'versions') {
             this.showVersions();
         }
     }
@@ -138,7 +138,7 @@ export default class AssetInfo extends Component {
         
     }
 
-    showVersions = async () =>{
+    showVersions = async () => {
         const { activeAsset, mcVerFilter } = this.state;
         const { localAsset } = this.props;
         if(activeAsset.hosts.curse) {
@@ -151,13 +151,13 @@ export default class AssetInfo extends Component {
                 for(let version of versions) {
                     if(version.minecraftversions.includes(mcVerFilter) || mcVerFilter === 'All') {
     
-                        let ps = this.props.versionState[version.displayName];
-                        if(this.props.disableVersionInstall && ps !== 'installing') {
-                            ps = 'disable-install';
+                        let ps = this.props.progressState;
+                        if(this.props.disableVersionInstall && ps.progress !== 'installing') {
+                            ps.progress = 'disable-install';
                         }
                         const forceVerFilter = this.props.forceVersionFilter && (mcVerFilter !== this.props.mcVerFilter);
                         if(localAsset) {
-                            final.push(<VersionCard key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} installed={activeAsset.version.hosts.curse.fileID === version.hosts.curse.fileID} disableMcVer={forceVerFilter} version={version} />);
+                            final.push(<VersionCard key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMcVer={forceVerFilter} version={version} />);
                         }else{
                             final.push(<VersionCard key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMCVer={forceVerFilter} version={version} />);
                         }

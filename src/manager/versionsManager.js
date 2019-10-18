@@ -68,8 +68,6 @@ const VersionsManager = {
         fs.renameSync(oldVersionPath, newVersionPath);
     },
     deleteVersion: function(profile) {
-        console.log('del version!!');
-        console.log(profile);
         return new Promise((resolve) => {
             if(fs.existsSync(path.join(this.getVersionsPath(), `${profile.safename} [Minecraft Manager]`))) {
                 rimraf(path.join(this.getVersionsPath(), `${profile.safename} [Minecraft Manager]`), () => {

@@ -96,19 +96,19 @@ const AssetCard = ({asset, onClick, showDelete, progressState, showInstall, disa
             <Button onClick={deleteClick} color='red'>delete</Button>
             }
 
-            {showInstall && (installed || progressState === 'installed') &&
+            {showInstall && (installed || progressState.progress === 'installed') &&
             <Button disabled color='green'>installed</Button>
             }
 
-            {showInstall && !installed && !progressState &&
+            {showInstall && !installed && !progressState.progress &&
             <Button color='green' onClick={installClick}>install</Button>
             }
-
-            {showInstall && !installed && progressState === 'notavailable' &&
+    
+            {showInstall && !installed && progressState.progress === 'notavailable' &&
             <Button color='green' disabled>not available</Button>
             }
 
-            {progressState === 'installing' && !installed && showInstall && <Button color='green' disabled>installing</Button>}
+            {progressState.progress === 'installing' && !installed && showInstall && <Button color='green' disabled>installing</Button>}
         </Buttons>
     </BG>
 )

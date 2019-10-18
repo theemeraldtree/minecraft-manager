@@ -34,7 +34,8 @@ export default class DiscoverList extends Component {
         this.listRef = React.createRef();
         this.state = {
             displayState: '',
-            assetsList: [],
+            assets: [],
+            loading: true,
             cantConnect: false,
             isSearching: false
         }
@@ -49,7 +50,10 @@ export default class DiscoverList extends Component {
 
         const assets = await Curse.getPopularAssets(this.props.type);
         if(assets) {
-            this.renderAssets(assets);
+            this.setState({
+                assets: assets,
+                loading: false
+            })
         }else{
             this.setState({
                 cantConnect: true
@@ -80,25 +84,9 @@ export default class DiscoverList extends Component {
     }
 
     updateProgressStates = () => {
-        this.renderAssets(this.state.assets);
-    }
-    renderAssets = (assets) => {
-        let newAssetsList = [];
-        let progressState = this.props.progressState;
-        if(assets) {
-            if(assets.length >= 1) {
-                for(let asset of assets) {
-                    newAssetsList.push(<AssetCard key={asset.id} installed={progressState[asset.id] === 'installed'} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall showBlurb asset={asset} />);
-                }
-            }else{
-                newAssetsList.push(<LoadingText key='none'>No Results</LoadingText>);
-            }
-        }
-
         this.setState({
-            assetsList: newAssetsList,
-            assets: assets
-        });
+            psUpdatePending: true
+        })
     }
 
     showAsset = (e) => {
@@ -122,11 +110,12 @@ export default class DiscoverList extends Component {
     
     stateChange = () => {
         const { state } = this.props;
-        if(state === 'browseAssets') {
+        if(state === 'browseAssets') {       
             if(this.state.scrollPos) {
                 this.listRef.current.scrollTop = this.state.scrollPos
             }   
         }
+
     }
 
     goBack = () => {
@@ -205,14 +194,18 @@ export default class DiscoverList extends Component {
         let { displayState } = this.state;
         let term = this.props.searchTerm;
         this.setState({
-            assetsList: [],
+            assets: [],
+            loading: true,
             isSearching: true,
             cantConnect: false
         });
         if(displayState === 'browseAssets') {
             if(term.trim() !== '') { 
                 Curse.search(term, this.props.type).then((res) => {
-                    this.renderAssets(res);
+                    this.setState({
+                        assets: res,
+                        loading: false
+                    });
                 });
             }else{
                 this.browseAssets();
@@ -221,23 +214,31 @@ export default class DiscoverList extends Component {
     }
 
     render() {
-        let { displayState, assetsList, activeAsset, cantConnect } = this.state;
-        let { type, progressState, installClick, versionInstall, mcVerFilter, forceVersionFilter, versionState, disableVersionInstall } = this.props;
+        let { displayState, assets, loading, activeAsset, cantConnect } = this.state;
+        let { type, progressState, installClick, versionInstall, mcVerFilter, forceVersionFilter, versionState } = this.props;
         return (
             <>
                 {displayState === 'browseAssets' && <>
-                    {assetsList.length !== 0 && 
-                        <List ref={this.listRef}>
-                            {assetsList}
-                        </List>
-                    }
-                    {assetsList.length === 0 && !cantConnect && <LoadingText>loading...</LoadingText>}
+                    <List ref={this.listRef}>
+                        {
+                            assets.length >= 1 && !loading && assets.map(asset => {
+                                    if(!progressState[asset.id]) {
+                                        progressState[asset.id] = {};
+                                    }
+                                    return <AssetCard key={asset.id} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall showBlurb asset={asset} />;
+                            })
+                        }
+                        {
+                            assets.length === 0 && !loading && <LoadingText key='none'>No Results</LoadingText>
+                        }
+                    </List>
+                    {loading && !cantConnect && <LoadingText>loading...</LoadingText>}
                     {cantConnect && <LoadingText>
                     can't connect
                     <TryAgain onClick={this.tryAgain}>try again</TryAgain>
                     </LoadingText>}
                 </>}
-                {displayState === 'viewAsset' && <AssetInfo versionInstall={versionInstall} progressState={progressState[activeAsset.id]} disableVersionInstall={disableVersionInstall} localAsset={false} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
+                {displayState === 'viewAsset' && <AssetInfo versionInstall={versionInstall} progressState={progressState[activeAsset.id]} localAsset={false} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
             </>
         )
     }

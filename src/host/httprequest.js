@@ -52,11 +52,15 @@ let HTTPRequest = {
     },
 
     fileDownloadProgress(download) {
-        this.fileDownloads[download.id].onProgress(download.progress);
+        if(this.fileDownloads[download.id]) {
+            this.fileDownloads[download.id].onProgress(download.progress);
+        }
     },
 
     fileDownloadFinish(download) {
-        this.fileDownloads[download.id].onFinish();
+        if(this.fileDownloads[download.id]) {
+            this.fileDownloads[download.id].onFinish();
+        }
     },
 
     async get(url, qs) {

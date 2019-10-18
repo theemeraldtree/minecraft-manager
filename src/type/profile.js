@@ -64,7 +64,6 @@ Profile.prototype.initLocalValues = function() {
     
     if(this.hosts.curse) {
         if(!this.hosts.curse.fullyInstalled) {
-            console.log('error');
             this.error = true;
         }
     }

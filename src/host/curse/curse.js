@@ -603,6 +603,10 @@ let Curse = {
                                         profile.hosts.curse.fullyInstalled = true;
                                         profile.save();
                                         profile.addIconToLauncher();
+                                        ProfilesManager.progressState[profile.id] = {
+                                            progress: 'installed',
+                                            version: profile.version.displayName
+                                        }
                                         ProfilesManager.profilesBeingInstalled.splice(ProfilesManager.profilesBeingInstalled.indexOf(modpack.id), 1);
                                         resolve(profile);
                                     })

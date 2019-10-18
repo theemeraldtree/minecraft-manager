@@ -105,7 +105,7 @@ const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) =>
         </ContextMenuTrigger>
         <ContextMenu holdToDisplay={-1} id={`profilecard${profile.id}`}>
             {
-                !profile.error && <>
+                !profile.error && profile.state !== 'installing' && <>
                     <MenuItem onClick={() => {profile.launch()}}>Launch</MenuItem>
                     <MenuItem onClick={() => {history.push(`/edit/general/${profile.id}`)}}>Edit</MenuItem>
                     <MenuItem onClick={() => {showUpdate(profile)}}>Update</MenuItem>
@@ -113,7 +113,9 @@ const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) =>
                     <MenuItem divider />            
                 </>
             }
-            <MenuItem onClick={() => {showDeletion(profile)}}>Delete</MenuItem>
+            {
+                profile.state !== 'installing' && <MenuItem onClick={() => {showDeletion(profile)}}>Delete</MenuItem>
+            }
         </ContextMenu>
     </Wrapper>
 )

@@ -17,6 +17,7 @@ const ProfilesManager = {
     reloadListeners: [],
     previouslyRemovedProfiles: [],
     profilesBeingInstalled: [],
+    progressState: {},
     getProfiles: function() {
         this.loadedProfiles = [];
         LogManager.log('info', '[ProfilesManager] Getting profiles...');
@@ -178,6 +179,22 @@ const ProfilesManager = {
                 LogManager.log('info', `[ProfilesManager] Loading profile at ${location}`);
                 let profile = new Profile(rawOMAF);
                 this.loadedProfiles.push(profile);    
+                
+
+                let progvar = 'installed';
+                let version = profile.version.displayName;
+                if(this.progressState) {
+                    if(this.progressState[profile.id]) {
+                        if(this.progressState[profile.id] !== 'installed') {
+                            progvar = this.progressState[profile.id].progress;
+                            version = this.progressState[profile.id].version;
+                        }
+                    }
+                }
+                this.progressState[profile.id] = {
+                    progress: progvar,
+                    version: version
+                } 
             }
         }else{
             ToastManager.createToast(`Warning`, `In your profiles folder, the '${path.basename(location)}' folder is missing the essential profile.json file!`, 'OMAF-PROFILE-MISSING-JSON');
@@ -240,6 +257,9 @@ const ProfilesManager = {
 
     deleteProfile: function(profile) {
         this.previouslyRemovedProfiles.push(profile);
+        if(this.progressState[profile.id]) {
+            delete this.progressState[profile.id];
+        }
         LogManager.log('info', `[ProfilesManager] (DeleteProfile) Starting profile deletion for ${profile.id}`);
         return new Promise((resolve) => {
             LogManager.log('info', `[ProfilesManager] (DeleteProfile) Deleting launcher profile for ${profile.id}`);

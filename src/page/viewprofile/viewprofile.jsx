@@ -153,7 +153,6 @@ class ViewProfilePage extends PureComponent {
 
     render() {
         let { profile, showDelete } = this.state;
-        console.log(profile);
         if(profile) {
             return (
                 <Page>

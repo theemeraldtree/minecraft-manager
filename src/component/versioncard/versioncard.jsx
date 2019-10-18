@@ -104,26 +104,28 @@ export default class VersionCard extends PureComponent {
         const { showMoreInfo, changelog } = this.state;
         const { version, progressState, disableMcVer, installClick } = this.props;
 
-        let installed = this.props.installed;
-        if(progressState === 'installed') {
-            installed = false;
-        }else if(progressState === 'force-not-installed') {
-            installed = false;
-        }else if(progressState === 'installed-done') {
-            installed = true;
+        let progress = '';
+        if(progressState.version === version.displayName) {
+            progress = progressState.progress;
+        }else{
+            if(progressState.progress === 'installed' || progressState.progress === 'installing') {
+                progress = 'disable-install';
+            }    
         }
 
-        const freeToInstall = progressState !== 'installing' && progressState !== 'disable-install';
+        let installed = progress === 'installed';
+
+        const freeToInstall = progress !== 'installing' && progress !== 'disable-install';
         return (
             <BG extraInfo={showMoreInfo}>
                 <Details>
                     <Title>{version.displayName}</Title>
                 </Details>
                 <ButtonContainer>
-                    {disableMcVer && !installed && !progressState && <Button disabled color='green'>wrong minecraft version</Button>}
-                    {installed && !disableMcVer && progressState !== 'disable-install' && <Button disabled color='green'>installed</Button>}
-                    {progressState === 'installing' && <Button disabled color='green'>installing</Button>}
-                    {progressState === 'disable-install' && <Button disabled color='green'>install</Button>}
+                    {disableMcVer && !installed && !progress && <Button disabled color='green'>wrong minecraft version</Button>}
+                    {installed && !disableMcVer && progress !== 'disable-install' && <Button disabled color='green'>installed</Button>}
+                    {progress === 'installing' && <Button disabled color='green'>installing</Button>}
+                    {progress === 'disable-install' && <Button disabled color='green'>install</Button>}
                     {!installed && !disableMcVer && freeToInstall && <Button data-version={version.cachedID} onClick={installClick} color='green'>install</Button>}
                 </ButtonContainer>
 
