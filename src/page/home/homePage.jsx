@@ -69,11 +69,9 @@ export default class HomePage extends PureComponent {
     }
 
     createNameChange = (e) => {
-        let names = [];
-        for(let prof of ProfilesManager.loadedProfiles) {
-            names.push(prof.name)
-        }
-        if(e.target.value.trim() !== '' && !names.includes(e.target.value)) {
+        const input = e.target.value;
+        const names = ProfilesManager.loadedProfiles.map(prof => prof.name.toLowerCase());
+        if(input.trim() !== '' && !names.includes(Global.createID(input.toLowerCase()))) {
             this.setState({
                 nameEntered: true
             })
@@ -83,7 +81,7 @@ export default class HomePage extends PureComponent {
             })
         }
         this.setState({
-            createName: e.target.value
+            createName: input
         })
     }
 
