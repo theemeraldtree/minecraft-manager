@@ -70,8 +70,8 @@ export default class HomePage extends PureComponent {
 
     createNameChange = (e) => {
         const input = e.target.value;
-        const names = ProfilesManager.loadedProfiles.map(prof => prof.name.toLowerCase());
-        if(input.trim() !== '' && !names.includes(Global.createID(input.toLowerCase()))) {
+        const names = ProfilesManager.loadedProfiles.map(prof => prof.id);
+        if(input.trim() !== '' && !names.includes(Global.createID(input))) {
             this.setState({
                 nameEntered: true
             })
