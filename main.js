@@ -14,13 +14,12 @@ ipcMain.on('install-update', () => {
 
 const downloadProgresses = {};
 
-
 ipcMain.on('download-file', (event, url, dest, id) => {
     downloadProgresses[id] = 0;
     let progressData = 0;
     let contentLength = 0;
-    let ws = fs.createWriteStream(dest);
-    let req = request(url, {
+    const ws = fs.createWriteStream(dest);
+    const req = request(url, {
         url: url,
         headers: {
             'User-Agent': 'Minecraft-Manager'

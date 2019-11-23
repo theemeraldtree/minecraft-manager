@@ -227,7 +227,9 @@ export default class SettingsPage extends PureComponent {
                                 <h3>{this.state.updateSubText}</h3>
                             </Updates>
                             <h3><a href="https://github.com/stairman06/minecraft-manager/blob/master/LICENSE">Minecraft Manager is licensed under the GNU General Public License v3</a></h3>
-                            <h3><a title="Minecraft Manager Source Code" href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project</a> created by stairman06</h3>
+                            <h3><a title="Minecraft Manager Source Code" href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project created by stairman06</a></h3>
+                            <h3><a title="OMAF Wiki and Documentation" href="https://github.com/stairman06/omaf/wiki">Minecraft Manager uses the open-source OMAF standard, </a> created by stairman06, with help from others</h3>
+                            <br />
                             <h3>Minecraft Manager is made possible thanks to the following projects:
                                 <li><a href="https://electronjs.org/">Electron</a></li>
                                 <li><a href="https://reactjs.org/">React</a></li> 
@@ -235,7 +237,6 @@ export default class SettingsPage extends PureComponent {
                                 <li><a href="http://www.apache.org/licenses/LICENSE-2.0.html">the Roboto font</a></li>
                                 and other projects</h3>
 
-                            <h3><a title="OMAF Wiki and Documentation" href="https://github.com/stairman06/omaf/wiki">Minecraft Manager uses the open-source OMAF standard, </a> created by stairman06, with help from others</h3>
 
                             <h2>Need help?</h2>
                             <h3><a href="https://github.com/stairman06/minecraft-manager/wiki">Check out the Minecraft Manager Wiki</a></h3>
