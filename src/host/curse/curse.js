@@ -1,3 +1,7 @@
+// THIS IS BEING DEPRECATED
+// everything is moving to curseRework.js
+// this file will eventually be replaced by curserework,
+// however it's here know just for backwards compat
 import Profile from "../../type/profile";
 import Global from "../../util/global";
 import Mod from "../../type/mod";

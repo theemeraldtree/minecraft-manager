@@ -91,9 +91,26 @@ export default class DiscoverPage extends PureComponent {
         return (
             <Page>
                 <Header showBackButton={listState !== 'browseAssets'} backClick={this.backClick} title='discover'>
-                    {listState === 'browseAssets' && <SearchBox value={this.state.searchValue} onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='search' />}
+                    {listState === 'browseAssets' && <SearchBox 
+                                                        value={this.state.searchValue} 
+                                                        onChange={this.searchChange} 
+                                                        onKeyPress={this.searchChange} 
+                                                        placeholder='search' 
+                                                    />
+                    }
                 </Header>
-                <DiscoverList mcVerFilter='All' versionInstall={this.versionInstall} progressState={progressState} stateChange={this.listStateChange} state={listState} type='profile' installClick={this.installClick} searchTerm={this.state.searchTerm} />
+
+                <DiscoverList 
+                    host='curse' 
+                    mcVerFilter='All' 
+                    versionInstall={this.versionInstall} 
+                    progressState={progressState} 
+                    stateChange={this.listStateChange} 
+                    state={listState} 
+                    type='profile' 
+                    installClick={this.installClick} 
+                    searchTerm={this.state.searchTerm} 
+                />
             </Page>
         )
     }

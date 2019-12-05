@@ -3,6 +3,7 @@ import Curse from '../../host/curse/curse';
 import styled from 'styled-components';
 import AssetCard from '../assetcard/assetcard';
 import AssetInfo from '../assetinfo/assetinfo';
+import Hosts from '../../host/Hosts';
 
 const LoadingText = styled.div`
     font-size: 23pt;
@@ -27,7 +28,13 @@ const TryAgain = styled.p`
     color: lightblue;
     font-size: 14pt;
     cursor: pointer;
-`
+`;
+
+const Persists = styled.p`
+    font-size: 14pt;
+    text-align: center;
+    color: white;
+`;
 export default class DiscoverList extends Component {
     constructor(props) {
         super(props);
@@ -42,13 +49,14 @@ export default class DiscoverList extends Component {
     }
 
     browseAssets = async () => {
+        const { host, type } = this.props;
         this.setState({
             displayState: 'browseAssets',
             isSearching: false,
             cantConnect: false
         })
 
-        const assets = await Curse.getPopularAssets(this.props.type);
+        const assets = await Hosts.getTopAssets(host, type);
         if(assets) {
             this.setState({
                 assets: assets,
@@ -195,9 +203,9 @@ export default class DiscoverList extends Component {
         }
     }
 
-    renderSearch = () => {
+    renderSearch = async () => {
         let { displayState } = this.state;
-        let term = this.props.searchTerm;
+        let { searchTerm, type, host } = this.props;
         this.setState({
             assets: [],
             loading: true,
@@ -205,12 +213,12 @@ export default class DiscoverList extends Component {
             cantConnect: false
         });
         if(displayState === 'browseAssets') {
-            if(term.trim() !== '') { 
-                Curse.search(term, this.props.type).then((res) => {
-                    this.setState({
-                        assets: res,
-                        loading: false
-                    });
+            if(searchTerm.trim() !== '') { 
+                const res = await Hosts.searchAssets(host, type, searchTerm);
+                console.log(res); 
+                this.setState({
+                    assets: res,
+                    loading: false
                 });
             }else{
                 this.browseAssets();
@@ -226,7 +234,7 @@ export default class DiscoverList extends Component {
                 {displayState === 'browseAssets' && <>
                     <List ref={this.listRef}>
                         {
-                            assets.length >= 1 && !loading && assets.map(asset => {
+                            assets && assets.length >= 1 && !loading && assets.map(asset => {
                                     if(!progressState[asset.id]) {
                                         progressState[asset.id] = {};
                                     }
@@ -234,14 +242,25 @@ export default class DiscoverList extends Component {
                             })
                         }
                         {
-                            assets.length === 0 && !loading && <LoadingText key='none'>No Results</LoadingText>
+                            assets && assets.length === 0 && !loading && <LoadingText key='none'>No Results</LoadingText>
                         }
                     </List>
                     {loading && !cantConnect && <LoadingText>loading...</LoadingText>}
-                    {cantConnect && <LoadingText>
-                    can't connect
-                    <TryAgain onClick={this.tryAgain}>try again</TryAgain>
-                    </LoadingText>}
+                    {cantConnect &&
+                        <LoadingText>
+                            can't connect
+                            <TryAgain onClick={this.tryAgain}>try again</TryAgain>
+                        </LoadingText>
+                    }
+
+                    {!assets && <>
+                        <LoadingText>
+                            something's strange<br />
+                            we can't find anything<br />
+                            <TryAgain onClick={this.tryAgain}>try again</TryAgain> 
+                            <Persists>problem persists? <a href="https://theemeraldtree.net/mcm/issues">report it here</a></Persists>
+                        </LoadingText>
+                    </>}
                 </>}
                 {displayState === 'viewAsset' && <AssetInfo allowVersionReinstallation={allowVersionReinstallation} specificMCVer={specificMCVer} versionInstall={versionInstall} progressState={progressState[activeAsset.id]} localAsset={false} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
             </>

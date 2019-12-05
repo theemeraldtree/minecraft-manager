@@ -21,17 +21,19 @@ function Profile(rawOMAF) {
 }
 
 Profile.prototype.initLocalValues = function() {
-    if(!this.fpath) {
-        this.fpath = '__NONE__';
+    if(this.installed) {
+        if(!this.fpath) {
+            this.fpath = '__NONE__';
+        }
+        this.folderpath = path.join(this.fpath);
+        this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
+        this.gameDir = path.join(this.folderpath, '/files');
+        this.modsPath = path.join(this.gameDir, `/mods/`);
     }
     this.safename = Global.createSafeName(this.name);
     this.versionname = `${this.safename} [Minecraft Manager]`;
-    this.folderpath = path.join(this.fpath);
-    this.gameDir = path.join(this.folderpath, '/files');
-    this.modsPath = path.join(this.gameDir, `/mods/`);
-    this.iconpath = path.join(this.folderpath + `/${this.icon}`).replace(/\\/g,"/");
+
     this.state = '';
-    this.installed = true;
     
     this.progressState = {};
     this.error = false;
