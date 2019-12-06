@@ -3,7 +3,6 @@ import Page from '../page';
 import Header from '../../component/header/header';
 import SearchBox from '../../component/searchbox/searchbox';
 import DiscoverList from '../../component/discoverlist/discoverlist';
-import Curse from '../../host/curse/curse';
 import ProfilesManager from '../../manager/profilesManager';
 import Hosts from '../../host/Hosts';
 
@@ -81,7 +80,7 @@ export default class DiscoverPage extends PureComponent {
             version: version.displayName
         }
         this.updateProgressStates();
-        await Curse.installModpackVersion(mp, version.hosts.curse.fileID);
+        await Hosts.installModpackVersion('curse', mp, version.hosts.curse.fileID);
         ProfilesManager.getProfiles().then(() => {
            this.updateProgressStates();
         })

@@ -13,9 +13,9 @@ import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import Global from '../../../util/global';
 import ForgeManager from '../../../manager/forgeManager';
 import Confirmation from '../../../component/confirmation/confirmation';
-import Curse from '../../../host/curse/curse';
 import Overlay from '../../../component/overlay/overlay';
 import VersionsManager from '../../../manager/versionsManager';
+import Hosts from '../../../host/Hosts';
 const CustomVersions = styled.div`
     background-color: #505050;
     width: 350px;
@@ -158,7 +158,7 @@ export default class EditPageVersions extends Component {
         const { profile } = this.state;
         if(profile.hosts) {
             if(profile.hosts.curse) {
-                const versions = await Curse.getVersionsFromAsset(profile);
+                const versions = await Hosts.getVersions('curse', profile);
                 let nameArray = [];
                 versions[0].latest = true;
                 for(let ver of versions) {

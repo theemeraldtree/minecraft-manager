@@ -3,11 +3,11 @@ import LauncherManager from '../manager/launcherManager';
 import Mod from "./mod";
 import jimp from 'jimp';
 import ProfilesManager from "../manager/profilesManager";
-import Curse from "../host/curse/curse";
 import VersionsManager from "../manager/versionsManager";
 import LibrariesManager from "../manager/librariesManager";
 import ToastManager from "../manager/toastManager";
 import ErrorManager from "../manager/errorManager";
+import Hosts from "../host/Hosts";
 const archiver = require('archiver');
 const path = require('path');
 const fs = require('fs');
@@ -349,7 +349,7 @@ Profile.prototype.changeCurseVersion = function(versionToChangeTo, onUpdate) {
                     reject(e);
                 }else{
                     onUpdate('Installing modpack...');
-                    const newprofile = await Curse.installModpackVersion(this, versionToChangeTo);
+                    const newprofile = await Hosts.installModpackVersion('curse', this, versionToChangeTo);
                     newprofile.hideFromClient = false;
                     newprofile.save();
                     if(fs.existsSync(path.join(oldgamedir, `/saves`))) {

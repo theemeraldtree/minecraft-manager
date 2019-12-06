@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Curse from '../../host/curse/curse';
 import styled from 'styled-components';
 import AssetCard from '../assetcard/assetcard';
 import AssetInfo from '../assetinfo/assetinfo';
@@ -160,29 +159,6 @@ export default class DiscoverList extends Component {
         })
     }
 
-    showDependencies = async () => {
-        let newAsset = Object.assign({}, this.state.activeAsset);
-        this.setState({
-            assetDependencies: [<LoadingText key='loading'>loading...</LoadingText>]
-        });
-        const res = await Curse.getDependencies(this.state.activeAsset);
-        newAsset.dependencies = res;
-
-        let newDependList = [];
-        if(res.length >= 1) {
-            for(let asset of res) {
-                newDependList.push(<AssetCard showInstall={true} disableHover key={asset.id} showBlurb={true} asset={asset} />);
-            }
-        }else{
-            newDependList.push(<LoadingText key='none2'>No Dependencies</LoadingText>);
-        }
-
-        this.setState({
-            activeAsset: newAsset,
-            assetDependencies: newDependList,
-        });
-    }
-
     previewStateSwitch = (e) => {
         let newState = e.currentTarget.dataset.state;
 
@@ -191,8 +167,6 @@ export default class DiscoverList extends Component {
         });
         if(newState === 'description') {
             this.showDescription();
-        }else if(newState === 'dependencies') {
-            this.showDependencies();
         }
     }
 

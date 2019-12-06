@@ -1,10 +1,9 @@
 import ToastManager from "../manager/toastManager";
 import HTTPRequest from "./httprequest";
-import CurseRework from "./curse/curseRework";
+import Curse from "./curse/curse";
 import fs from 'fs';
 import path from 'path';
 import DownloadsManager from "../manager/downloadsManager";
-import Curse from "./curse/curse";
 import Mod from "../type/mod";
 import Global from "../util/global";
 import ProfilesManager from "../manager/profilesManager";
@@ -52,7 +51,7 @@ const Hosts = {
     async getTopAssets(host, assetType) {
         if(host === 'curse') {
             if(!this.cache.popular.curse[assetType]) {
-                return await CurseRework.getPopularAssets(assetType);
+                return await Curse.getPopularAssets(assetType);
             }
             
             return this.cache.popular.curse[assetType];
@@ -61,40 +60,48 @@ const Hosts = {
 
     async getDependencies(host, asset) {
         if(host === 'curse') {
-            return await CurseRework.getDependencies(asset);
+            return await Curse.getDependencies(asset);
         }
     },
 
     async getVersions(host, asset) {
         if(host === 'curse') {
-            const versionCache = this.cache.assets[asset.cachedID].hosts.curse.versionCache;
-            if(versionCache) return versionCache;
+            if(this.cache.assets[asset.cachedID]) {
+                const versionCache = this.cache.assets[asset.cachedID].hosts.curse.versionCache;
+                if(versionCache) return versionCache;
+            }
 
-            return await CurseRework.getVersions(asset);
+            return await Curse.getVersions(asset);
+        }
+    },
+
+    async checkForAssetUpdates(host, asset) {
+        if(host === 'curse') {
+            return await Curse.checkForAssetUpdates(asset);
         }
     },
 
     async getLatestVersionForMCVersion(host, asset, mcVersion) {
         if(host === 'curse') {
-            return await CurseRework.getLatestVersionForMCVersion(asset, mcVersion);
+            return await Curse.getLatestVersionForMCVersion(asset, mcVersion);
         }
     },
 
     async getFileChangelog(host, asset, fileID) {
         if(host === 'curse') {
-            return await CurseRework.getFileChangelog(asset, fileID);
+            return await Curse.getFileChangelog(asset, fileID);
         }
     },
 
     async searchAssets(host, assetType, searchTerm) {
         if(host === 'curse') {
-            return await CurseRework.search(assetType, searchTerm); 
+            return await Curse.search(assetType, searchTerm); 
         }
     },
 
     async addMissingInfo(host, info, asset) {
         if(host === 'curse') {
-            return await CurseRework.addMissingInfo(info, asset);
+            return await Curse.addMissingInfo(info, asset);
         }
     },
 
@@ -145,7 +152,7 @@ const Hosts = {
     async installModToProfile(host, profile, mod) {
         if(!mod.name) {
             if(host === 'curse') {
-                mod = await CurseRework.getFullAsset(mod, 'mod');
+                mod = await Curse.getFullAsset(mod, 'mod');
             }
         }
 
@@ -156,7 +163,7 @@ const Hosts = {
 
         let newMod;
         if(host === 'curse') {
-            newMod = await CurseRework.addFileInfo(mod, ver.projectFileId);
+            newMod = await Curse.addFileInfo(mod, ver.projectFileId);
         }
 
         return await this.installModVersionToProfile(host, profile, newMod, true);
@@ -179,7 +186,7 @@ const Hosts = {
             if(!fs.existsSync(path.join(profile.gameDir, `/mods/${mod.id}.jar`))) {
                 if(!mod.name) {
                     if(host === 'curse') {
-                        let newm = await CurseRework.getFullAsset(mod, 'mod');
+                        let newm = await Curse.getFullAsset(mod, 'mod');
                         newm.hosts.curse.fileID = mod.hosts.curse.fileID;
                         mod = newm;
                     }
@@ -248,15 +255,20 @@ const Hosts = {
             let mods = [];
 
             if(host === 'curse') {
-                mods = await CurseRework.downloadModsListFromModpack(modpack, downloadUrl);
+                mods = await Curse.downloadModsListFromModpack(modpack, downloadUrl);
             }
 
             let minecraftVersion;
             if(host === 'curse') {
-                minecraftVersion = CurseRework.getMinecraftVersionFromModpackInstall(modpack);
+                minecraftVersion = Curse.getMinecraftVersionFromModpackInstall(modpack);
             }
 
-            ProfilesManager.createProfile(modpack.name, minecraftVersion).then(profile => {
+            ProfilesManager.createProfile(modpack.name, minecraftVersion).then(async profile => {
+                if(!modpack.iconURL) {
+                    if(host === 'curse') {
+                        modpack = await Curse.getFullAsset(modpack);
+                    }
+                }
                 profile.hosts = modpack.hosts;
                 profile.iconURL = modpack.iconURL;
                 profile.blurb = modpack.blurb;
@@ -269,7 +281,7 @@ const Hosts = {
                     profile.hosts.curse.fullyInstalled = false;
                     profile.hosts.curse.fileID = verObj.id;
                     profile.hosts.curse.fileName = version.fileName;
-                    profile.setForgeVersion(CurseRework.getForgeVersionForModpackInstall(modpack));
+                    profile.setForgeVersion(Curse.getForgeVersionForModpackInstall(modpack));
                 }
 
                 profile.save();
@@ -285,13 +297,13 @@ const Hosts = {
                             this.concurrentDownloads = [];
                             
                             if(host === 'curse') {
-                                await CurseRework.copyModpackOverrides(profile);
+                                await Curse.copyModpackOverrides(profile);
                             }
 
                             ForgeManager.setupForge(profile).then(() => {
                                 DownloadsManager.startFileDownload(`Icon\n_A_${profile.name}`, profile.iconURL, path.join(profile.folderpath, '/icon.png')).then(async () => {
                                     if(host === 'curse') {
-                                        await CurseRework.cleanupModpackInstall(profile);
+                                        await Curse.cleanupModpackInstall(profile);
                                         profile.hosts.curse.fullyInstalled = true;
                                     }
 
@@ -301,6 +313,10 @@ const Hosts = {
                                         progress: 'installed',
                                         version: profile.version.displayName
                                     }
+                                    if(!modpack.cachedID) {
+                                        modpack.cachedID = `${host}-cached-${modpack.id}`;
+                                    }
+                                    this.cache.assets[modpack.cachedID] = profile;
                                     ProfilesManager.profilesBeingInstalled.splice(ProfilesManager.profilesBeingInstalled.indexOf(modpack.id), 1);
                                     resolve(profile);
                                 })

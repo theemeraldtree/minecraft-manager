@@ -5,9 +5,9 @@ import LauncherManager from "./launcherManager";
 import LibrariesManager from "./librariesManager";
 import VersionsManager from "./versionsManager";
 import DownloadsManager from "./downloadsManager";
-import Curse from "../host/curse/curse";
 import ForgeManager from "./forgeManager";
 import ToastManager from "./toastManager";
+import Hosts from "../host/Hosts";
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -121,7 +121,7 @@ const ProfilesManager = {
                                 LogManager.log('info', `[ProfilesManager] (ProfileImport) Adding mod to download queue ${mod.id}`);
                                 mod.cachedID = `profile-import-${mod.id}`;
                                 mod.detailedInfo = false;
-                                Curse.cached.assets[mod.cachedID] = mod;
+                                Hosts.cache.assets[mod.cachedID] = mod;
                                 curseModsToDownload.push(mod);
                             }
                         }
@@ -134,7 +134,7 @@ const ProfilesManager = {
                         let numberDownloaded = 0;
 
                         const concurrent = curseModsToDownload.length >=5 ? 5 : 0;
-                        Curse.downloadModList(profile, curseModsToDownload.slice(), () => {
+                        Hosts.downloadModList('curse', profile, curseModsToDownload.slice(), () => {
                             if(numberDownloaded === curseModsToDownload.length) {
                                 DownloadsManager.removeDownload(download.name);
                                 stateChange('Creating launcher profile...');
