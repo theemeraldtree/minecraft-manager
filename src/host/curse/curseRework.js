@@ -41,12 +41,10 @@ const CurseRework = {
         if(asset.attachments && asset.attachments.length) {
             let attachment = asset.attachments.find(a => a.isDefault);
             if(attachment) {
-                console.log(attachment);
                 obj.iconpath = attachment.url;
             }
         }
 
-        console.log(obj);
         return obj;
     },
 
@@ -79,7 +77,6 @@ const CurseRework = {
     // read a list of curse assets (typically returned by a search function)
     readAssetList(list) {
         return list.map(asset => {
-            console.log(asset);
             const type = this.getTypeFromCurseID(asset.categorySection.gameCategoryId);
 
             const omaf = this.convertToOMAF(asset);
@@ -98,6 +95,81 @@ const CurseRework = {
         });
     },
 
+    async getDescription(asset) {
+        return await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/description`, {
+            addonID: asset.hosts.curse.id
+        });
+    },
+
+    convertCurseVersion(ver) {
+        const cacheID = `versioncache-curse-${new Date(ver.fileDate).getTime()}`;
+        const obj = {
+            displayName: ver.displayName,
+            timestamp: new Date(ver.fileDate).getTime(),
+            minecraftversions: ver.gameVersion,
+            cachedID: cacheID,
+            TEMP: {
+                downloadUrl: ver.downloadUrl,
+            },
+            hosts: {
+                curse: {
+                    fileID: ver.id
+                }
+            }
+        };
+
+        Global.cached.versions[cacheID] = obj;
+        return obj;
+    },
+
+    async getFileInfo(asset, fileID) {
+        const res = await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}`);
+        if(res) return JSON.parse(res);
+        return undefined;
+    },
+
+    async addFileInfo(asset, fileID) {
+        const info = await this.getFileInfo(asset, fileID);
+
+        if(info) {
+            asset.version = this.convertCurseVersion(info);
+            asset.hosts.curse.fileID = fileID;
+            asset.hosts.curse.fileName = info.fileName;
+            asset.downloadTemp = info.downloadUrl;
+
+            asset.dependencies = info.dependencies.map(dependency => {
+                if(dependency.type === 3) {
+                    return {
+                        hosts: {
+                            curse: {
+                                id: dependency.addonId
+                            }
+                        }
+                    }
+                }
+            });
+
+            Hosts.cache.assets[asset.cachedID] = asset;
+            return asset;
+        }
+
+        return undefined;
+    },
+
+    async getInfo(asset) {
+        return JSON.parse(await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}`));
+    },
+
+    async getFullAsset(asset, type) {
+        const info = await this.getInfo(asset);
+
+        if(type === 'mod') {
+            return new Mod(this.convertToOMAF(info));
+        }
+
+        return this.convertToOMAF(info);
+    },
+
     // search for an asset
     async search(type, term) {
         LogManager.log('info', `[Curse] Searching ${type}s for ${term}`);
@@ -111,11 +183,87 @@ const CurseRework = {
             index: 0
         });
 
-        console.log('resu;l');
-        console.log(result);
-
         if(result) return this.readAssetList(JSON.parse(result));
         return undefined;
+    },
+
+    // add potentially missing info (e.g. description) to an asset
+    async addMissingInfo(info, asset) {
+        if(info === 'description') {
+            const desc = await this.getDescription(asset);
+            asset.description = desc;
+            if(!asset.cachedID) {
+                asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
+            }
+            Hosts.cache.assets[asset.cachedID] = asset;
+            return asset;
+        }
+    },
+
+    // gets the popular assets for a certain asset type (e.g. mod)
+    async getPopularAssets(type) {
+        const res = await this.search(type, '');
+        if(res) {
+            Hosts.cache.popular.curse[type] = res;
+            return res;
+        }
+
+        return undefined;
+    },
+
+    // gets the dependencies required for an asset
+    async getDependencies(asset) {
+        let newAsset;
+        if(!asset.installed) {
+            newAsset = await this.addFileInfo(asset, asset.hosts.curse.latestFileID);
+        }else{
+            newAsset = await this.addFileInfo(asset, asset.hosts.curse.fileID);
+        }
+
+        if(newAsset) {
+            let final = [];
+            for(let dependency of newAsset.dependencies) {
+                final.push(await this.getFullAsset(dependency));
+            }
+
+            if(!asset.cachedID) {
+                asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
+            }
+            Hosts.cache.assets[asset.cachedID].dependencies = final;
+            return final;
+        }
+
+        return undefined;
+    },
+
+    // gets the versions for an asset
+    async getVersions(asset) {
+        const req = await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/files`);
+        if(req) {
+            const results = JSON.parse(req);
+            let sorted = results.sort((a, b) => {
+                return new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime()
+            });
+            const final = sorted.map(ver => ver = this.convertCurseVersion(ver));
+
+            if(!asset.cachedID) {
+                asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
+            }
+
+            if(!Hosts.cache.assets[asset.cachedID]) {
+                Hosts.cache.assets[asset.cachedID] = asset;
+            }
+
+            Hosts.cache.assets[asset.cachedID].hosts.curse.versionCache = final;
+            return final;
+        }
+
+        return undefined;
+    },
+
+    // gets the changelog from a file id
+    async getFileChangelog(asset, fileID) {
+        return await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}/changelog`);
     }
 };
 

@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import Button from '../button/button';
 import AssetCard from '../assetcard/assetcard';
 import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
-import Curse from '../../host/curse/curse';
 import VersionCard from '../versioncard/versioncard';
 import Detail from '../detail/detail';
 import Global from '../../util/global';
 import CustomDropdown from '../customdropdown/customdropdown';
+import Hosts from '../../host/Hosts';
 const LoadingText = styled.div`
     font-size: 23pt;
     display: flex;
@@ -89,7 +89,9 @@ export default class AssetInfo extends Component {
     }
 
     showDescription = async () => {
-        const newAsset = await Curse.addDescription(this.state.activeAsset);
+        const { host } = this.props;
+        const { activeAsset } = this.state;
+        const newAsset = await Hosts.addMissingInfo(host, 'description', activeAsset);
         if(newAsset.description) {
             this.setState({
                 activeAsset: newAsset,
@@ -104,11 +106,14 @@ export default class AssetInfo extends Component {
     }
 
     showDependencies = async () => {
-        const newAsset = Object.assign({}, this.state.activeAsset);
+        const { host } = this.props;
+        const { activeAsset } = this.state;
+        const newAsset = Object.assign({}, activeAsset);
         this.setState({
             assetDependencies: [<LoadingText key='loading'>loading...</LoadingText>]
         });
-        const res = await Curse.getDependencies(this.state.activeAsset);
+
+        const res = await Hosts.getDependencies(host, activeAsset);
         if(res) {
             newAsset.dependencies = res;
     
@@ -136,12 +141,12 @@ export default class AssetInfo extends Component {
 
     showVersions = async () => {
         const { activeAsset, mcVerFilter } = this.state;
-        const { specificMCVer, allowVersionReinstallation } = this.props;
+        const { specificMCVer, allowVersionReinstallation, host } = this.props;
         if(activeAsset.hosts.curse) {
             this.setState({
                 versions: [<LoadingText key ='loading1'>loading</LoadingText>]
             })
-            const versions = await Curse.getVersionsFromAsset(activeAsset);
+            const versions = await Hosts.getVersions(host, activeAsset);
             if(versions) {
                 let final = [];
                 for(let version of versions) {
@@ -151,7 +156,16 @@ export default class AssetInfo extends Component {
                             ps.progress = 'disable-install';
                         }
                         const forceVerFilter = this.props.forceVersionFilter && (mcVerFilter !== this.props.mcVerFilter);
-                        final.push(<VersionCard allowVersionReinstallation={allowVersionReinstallation} badMCVer={specificMCVer ? !version.minecraftversions.includes(specificMCVer) : false} key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMcVer={forceVerFilter} version={version} />);
+                        final.push(<VersionCard 
+                            allowVersionReinstallation={allowVersionReinstallation}
+                            badMCVer={specificMCVer ? !version.minecraftversions.includes(specificMCVer) : false}
+                            key={version.displayName}
+                            progressState={ps} 
+                            installClick={this.versionInstall} 
+                            asset={activeAsset}
+                            host={host}
+                            disableMcVer={forceVerFilter}
+                            version={version} />);
                     }
                 }
         

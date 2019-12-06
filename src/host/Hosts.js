@@ -1,4 +1,3 @@
-import Curse from "./curse/curse"
 import ToastManager from "../manager/toastManager";
 import HTTPRequest from "./httprequest";
 import CurseRework from "./curse/curseRework";
@@ -20,8 +19,6 @@ const Hosts = {
         ToastManager.createToast('Whoops!', "Looks like we can't connect to Curse right now. Check your internet connection and try again.");
     },
     async HTTPGet(url, qs, tries) {
-        console.log(url);
-        console.log(qs);
         try {
             return await HTTPRequest.get(url, qs);
         }catch(err) {
@@ -42,7 +39,32 @@ const Hosts = {
     /* functions for using hosts */
     async getTopAssets(host, assetType) {
         if(host === 'curse') {
-            return await Curse.getPopularAssets(assetType);
+            if(!this.cache.popular.curse[assetType]) {
+                return await CurseRework.getPopularAssets(assetType);
+            }
+            
+            return this.cache.popular.curse[assetType];
+        }
+    },
+
+    async getDependencies(host, asset) {
+        if(host === 'curse') {
+            return await CurseRework.getDependencies(asset);
+        }
+    },
+
+    async getVersions(host, asset) {
+        if(host === 'curse') {
+            const versionCache = this.cache.assets[asset.cachedID].hosts.curse.versionCache;
+            if(versionCache) return versionCache;
+
+            return await CurseRework.getVersions(asset);
+        }
+    },
+
+    async getFileChangelog(host, asset, fileID) {
+        if(host === 'curse') {
+            return await CurseRework.getFileChangelog(asset, fileID);
         }
     },
 
@@ -50,7 +72,14 @@ const Hosts = {
         if(host === 'curse') {
             return await CurseRework.search(assetType, searchTerm); 
         }
+    },
+
+    async addMissingInfo(host, info, asset) {
+        if(host === 'curse') {
+            return await CurseRework.addMissingInfo(info, asset);
+        }
     }
+
 }
 
 export default Hosts;

@@ -2,8 +2,8 @@ import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
 import Detail from '../detail/detail';
-import Curse from '../../host/curse/curse';
 import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
+import Hosts from '../../host/Hosts';
 const BG = styled.div`
     margin-top: 5px;
     width: 100%;
@@ -89,10 +89,10 @@ export default class VersionCard extends PureComponent {
             showMoreInfo: !this.state.showMoreInfo
         })
 
-        const { version, asset } = this.props;
+        const { version, asset, host } = this.props;
         if(version.hosts.curse) {
             if(this.state.changelog === 'loading...') {
-                const changelog = await Curse.getFileChangelog(asset, version.hosts.curse.fileID);
+                const changelog = await Hosts.getFileChangelog(host, asset, version.hosts.curse.fileID);
                 this.setState({
                     changelog: changelog
                 })

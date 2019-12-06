@@ -8,7 +8,11 @@ function Mod(rawOMAF) {
     if(!this.files) {
         this.files = [];
     }
-    this.local = ['installed', 'detailedInfo', 'cachedID', 'iconpath', 'versions', 'downloadTemp']
+    this.local = ['installed', 'detailedInfo', 'cachedID', 'iconpath', 'versions', 'downloadTemp', 'primaryHost'];
+
+    if(this.hosts.curse) {
+        this.primaryHost = 'curse'
+    }
 }
 
 Mod.prototype.setJARFile = function(newJarFile) {

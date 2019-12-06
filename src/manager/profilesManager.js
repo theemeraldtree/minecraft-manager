@@ -58,7 +58,7 @@ const ProfilesManager = {
         this.reloadListeners.splice(this.reloadListeners.indexOf(listener), 1);
     },
     updateProfile: function(newProfile) {
-        LogManager.log('info', `[ProfilesManager] Upadting profile ${newProfile.id}`);
+        LogManager.log('info', `[ProfilesManager] Updating profile ${newProfile.id}`);
         const oldProfile = this.loadedProfiles.findIndex(item => (item.id === newProfile.id));
         this.loadedProfiles[oldProfile] = newProfile;
         this.updateReloadListeners();
@@ -176,6 +176,7 @@ const ProfilesManager = {
             }
             if(rawOMAF) {
                 rawOMAF.fpath = location;
+                rawOMAF.installed = true;
                 LogManager.log('info', `[ProfilesManager] Loading profile at ${location}`);
                 let profile = new Profile(rawOMAF);
                 this.loadedProfiles.push(profile);    

@@ -109,7 +109,7 @@ export default class DiscoverList extends Component {
             if(this.listRef) {
                 scrollPos = this.listRef.current.scrollTop;
             }
-            let mod = Curse.cached.assets[e.currentTarget.dataset.cachedid];
+            let mod = Hosts.cache.assets[e.currentTarget.dataset.cachedid];
             this.props.stateChange('viewAsset');
             this.setState({
                 previousState: 'browseAssets',
@@ -151,7 +151,9 @@ export default class DiscoverList extends Component {
     }
 
     showDescription = async () => {
-        const newAsset = await Curse.addDescription(this.state.activeAsset);
+        const { activeAsset } = this.state;
+        const { host } = this.props;
+        const newAsset = await Hosts.addMissingInfo(host, 'description', activeAsset);
         this.setState({
             activeAsset: newAsset,
             description: true
@@ -215,7 +217,6 @@ export default class DiscoverList extends Component {
         if(displayState === 'browseAssets') {
             if(searchTerm.trim() !== '') { 
                 const res = await Hosts.searchAssets(host, type, searchTerm);
-                console.log(res); 
                 this.setState({
                     assets: res,
                     loading: false
@@ -228,7 +229,7 @@ export default class DiscoverList extends Component {
 
     render() {
         let { displayState, assets, loading, activeAsset, progressState, cantConnect } = this.state;
-        let { type, installClick, versionInstall, allowVersionReinstallation, mcVerFilter, forceVersionFilter, specificMCVer } = this.props;
+        let { type, installClick, versionInstall, allowVersionReinstallation, host, mcVerFilter, forceVersionFilter, specificMCVer } = this.props;
         return (
             <>
                 {displayState === 'browseAssets' && <>
@@ -262,7 +263,7 @@ export default class DiscoverList extends Component {
                         </LoadingText>
                     </>}
                 </>}
-                {displayState === 'viewAsset' && <AssetInfo allowVersionReinstallation={allowVersionReinstallation} specificMCVer={specificMCVer} versionInstall={versionInstall} progressState={progressState[activeAsset.id]} localAsset={false} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
+                {displayState === 'viewAsset' && <AssetInfo host={host} allowVersionReinstallation={allowVersionReinstallation} specificMCVer={specificMCVer} versionInstall={versionInstall} progressState={progressState[activeAsset.id]} localAsset={false} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
             </>
         )
     }

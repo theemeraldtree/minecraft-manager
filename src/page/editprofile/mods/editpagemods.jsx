@@ -252,9 +252,34 @@ export default class EditPageMods extends PureComponent {
                                 </List>
                                 </>}
                                 { displayState === 'modInfo' && <>
-                                    <AssetInfo allowVersionReinstallation specificMCVer={profile.minecraftversion} progressState={progressState[activeMod.id]} disableVersionInstall={disableVersionInstall} versionInstall={this.versionInstall} forceVersionFilter mcVerFilter={profile.minecraftversion} asset={activeMod} displayState={progressState} type='mod' localAsset />
+                                    <AssetInfo 
+                                    host={activeMod.primaryHost}
+                                    allowVersionReinstallation 
+                                    specificMCVer={profile.minecraftversion} 
+                                    progressState={progressState[activeMod.id]} 
+                                    disableVersionInstall={disableVersionInstall} 
+                                    versionInstall={this.versionInstall} 
+                                    forceVersionFilter 
+                                    mcVerFilter={profile.minecraftversion} 
+                                    asset={activeMod} 
+                                    displayState={progressState} 
+                                    type='mod' 
+                                    localAsset />
                                 </>}
-                                {displayState === 'addMods' && <DiscoverList allowVersionReinstallation specificMCVer={profile.minecraftversion} disableVersionInstall versionInstall={this.versionInstall} forceVersionFilter mcVerFilter={profile.minecraftversion} progressState={progressState} type='mod' installClick={this.installClick} searchTerm={searchTerm} state={listState} stateChange={this.listStateChange} />}
+                                {displayState === 'addMods' && <DiscoverList 
+                                host='curse'
+                                allowVersionReinstallation 
+                                specificMCVer={profile.minecraftversion} 
+                                disableVersionInstall 
+                                versionInstall={this.versionInstall} 
+                                forceVersionFilter 
+                                mcVerFilter={profile.minecraftversion} 
+                                progressState={progressState} 
+                                type='mod' 
+                                installClick={this.installClick} 
+                                searchTerm={searchTerm} 
+                                state={listState} 
+                                stateChange={this.listStateChange} />}
                         </Container>
                     </Wrapper>
                 </EditContainer>
