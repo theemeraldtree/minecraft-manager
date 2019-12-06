@@ -9,13 +9,13 @@ import Button from '../../../component/button/button';
 import DiscoverList from '../../../component/discoverlist/discoverlist';
 import InputContainer from '../components/inputcontainer';
 import AssetCard from '../../../component/assetcard/assetcard';
-import Curse from '../../../host/curse/curse';
 import Mod from '../../../type/mod';
 import path from 'path';
 import fs from 'fs';
 import Global from '../../../util/global';
 import AssetInfo from '../../../component/assetinfo/assetinfo';
 import ToastManager from '../../../manager/toastManager';
+import Hosts from '../../../host/Hosts';
 const { dialog } = require('electron').remote;
 const Wrapper = styled.div`
     height: 100%;
@@ -83,6 +83,9 @@ export default class EditPageMods extends PureComponent {
     showInfoClick = (e) => {
         let mod = this.state.profile.getModFromID(e.currentTarget.dataset.assetid);
         if(mod.hosts.curse) {
+            if(!(mod instanceof Mod)) {
+                mod = new Mod(mod);
+            }
             this.setState({
                 displayState: 'modInfo',
                 activeMod: mod
@@ -140,7 +143,7 @@ export default class EditPageMods extends PureComponent {
         e.stopPropagation();
         let { profile } = this.state;
         let cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
-        let mod = Curse.cached.assets[cachedID];
+        let mod = Hosts.cache.assets[cachedID];
         let id = mod.id;
         profile.progressState[id] = {
             progress: 'installing',
@@ -148,7 +151,7 @@ export default class EditPageMods extends PureComponent {
         }
         this.updateProgressStates();
         try {
-           await Curse.installModToProfile(this.state.profile, mod);
+           await Hosts.installModToProfile('curse', this.state.profile, mod);
            this.updateProgressStates();
         }catch(err) {
             if(err === 'no-version-available') {
@@ -212,7 +215,7 @@ export default class EditPageMods extends PureComponent {
             const newMod = Object.assign({}, mod);
             newMod.version = version;
             newMod.hosts.curse.fileID = version.hosts.curse.fileID;
-            Curse.installModVersionToProfile(profile, newMod, true).then(() => {
+            Hosts.installModVersionToProfile('curse', profile, newMod, true).then(() => {
                 profile.progressState[mod.id] = {
                     progress: 'installed',
                     version: version.displayName
@@ -224,7 +227,7 @@ export default class EditPageMods extends PureComponent {
 
     render() {
         let { profile, progressState, disableVersionInstall, displayState, liveSearchTerm, searchTerm, listState, activeMod } = this.state;
-        const { mods} = profile;
+        const { mods } = profile;
         return (
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
@@ -253,18 +256,18 @@ export default class EditPageMods extends PureComponent {
                                 </>}
                                 { displayState === 'modInfo' && <>
                                     <AssetInfo 
-                                    host={activeMod.primaryHost}
-                                    allowVersionReinstallation 
-                                    specificMCVer={profile.minecraftversion} 
-                                    progressState={progressState[activeMod.id]} 
-                                    disableVersionInstall={disableVersionInstall} 
-                                    versionInstall={this.versionInstall} 
-                                    forceVersionFilter 
-                                    mcVerFilter={profile.minecraftversion} 
-                                    asset={activeMod} 
-                                    displayState={progressState} 
-                                    type='mod' 
-                                    localAsset />
+                                        host={activeMod.getPrimaryHost()}
+                                        allowVersionReinstallation 
+                                        specificMCVer={profile.minecraftversion} 
+                                        progressState={progressState[activeMod.id]} 
+                                        disableVersionInstall={disableVersionInstall} 
+                                        versionInstall={this.versionInstall} 
+                                        forceVersionFilter 
+                                        mcVerFilter={profile.minecraftversion} 
+                                        asset={activeMod} 
+                                        displayState={progressState} 
+                                        type='mod' 
+                                        localAsset />
                                 </>}
                                 {displayState === 'addMods' && <DiscoverList 
                                 host='curse'

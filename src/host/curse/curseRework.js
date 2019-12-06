@@ -41,6 +41,7 @@ const CurseRework = {
         if(asset.attachments && asset.attachments.length) {
             let attachment = asset.attachments.find(a => a.isDefault);
             if(attachment) {
+                obj.iconURL = attachment.url;
                 obj.iconpath = attachment.url;
             }
         }
@@ -259,6 +260,17 @@ const CurseRework = {
         }
 
         return undefined;
+    },
+
+    // gets the latest version of the asset available for a specific minecraft version
+    async getLatestVersionForMCVersion(asset, mcVersion) {
+        if(asset.hosts.curse.localValues && asset.hosts.curse.localValues.gameVerLatestFiles) {
+            return asset.hosts.curse.localValues.gameVerLatestFiles.find(ver => ver.gameVersion === mcVersion);
+        }else{
+            const fullAsset = this.getFullAsset(asset);
+            const res = await this.getLatestVersionForMCVersion(fullAsset, mcVersion);
+            return res;
+        }
     },
 
     // gets the changelog from a file id

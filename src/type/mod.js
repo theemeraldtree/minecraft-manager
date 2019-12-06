@@ -10,9 +10,15 @@ function Mod(rawOMAF) {
     }
     this.local = ['installed', 'detailedInfo', 'cachedID', 'iconpath', 'versions', 'downloadTemp', 'primaryHost'];
 
+    this.getPrimaryHost();
+}
+
+Mod.prototype.getPrimaryHost = function() {
     if(this.hosts.curse) {
         this.primaryHost = 'curse'
     }
+
+    return this.primaryHost;
 }
 
 Mod.prototype.setJARFile = function(newJarFile) {
