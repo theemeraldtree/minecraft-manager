@@ -3,6 +3,12 @@ import Profile from "../../type/profile";
 import Mod from "../../type/mod";
 import Hosts from "../Hosts";
 import LogManager from "../../manager/logManager";
+import DownloadsManager from "../../manager/downloadsManager";
+import fs from 'fs';
+import path from 'path';
+import rimraf from 'rimraf';
+
+const admzip = require('adm-zip');
 
 // the curse object is used as a sort of "translator" to convert curse's data format to work with OMAF
 const CurseRework = {
@@ -276,6 +282,74 @@ const CurseRework = {
     // gets the changelog from a file id
     async getFileChangelog(asset, fileID) {
         return await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}/changelog`);
+    },
+
+    // downloads, extracts, and reads the version of a modpack to get the mods list
+    async downloadModsListFromModpack(mp, downloadUrl) {
+        return new Promise(resolve => {
+
+            const modpack = mp;
+            const infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`);
+            
+            DownloadsManager.startFileDownload(`${modpack.name}\n_A_Info`, downloadUrl, infoDownload).then(async () => {
+                const zip = new admzip(infoDownload);
+    
+                const extractPath = path.join(Global.MCM_TEMP, `${modpack.id}-install/`);
+                zip.extractAllTo(extractPath, false);
+                fs.unlinkSync(infoDownload);
+    
+                const manifest = JSON.parse(fs.readFileSync(path.join(extractPath, 'manifest.json')));
+    
+                const list = manifest.files.map(file => {
+                    const mod = new Mod({
+                        hosts: {
+                            curse: {
+                                id: file.projectID,
+                                fileID: file.fileID
+                            }
+                        },
+                        cachedID: `curse-mod-install-${file.projectID}`
+                    });
+                    return mod;
+                });
+                resolve(list);
+            })
+        })
+    },
+
+    // copies the overrides after a modpack has been downloaded (and is in temp folder)
+    async copyModpackOverrides(profile) {
+        const extractPath = path.join(Global.MCM_TEMP, `${profile.id}-install/`);
+        const overridesFolder = path.join(extractPath, `/overrides`);
+        if(fs.existsSync(overridesFolder)) {
+            fs.readdirSync(overridesFolder).forEach(file => {
+                if(file === 'mods') {
+                    fs.readdirSync(path.join(overridesFolder, file)).forEach(f => {
+                        Global.copyDirSync(path.join(overridesFolder, file, f), path.join(profile.gameDir, file, f));
+                    })
+                }else{
+                    Global.copyDirSync(path.join(overridesFolder, file), path.join(profile.gameDir, file));
+                }
+            })
+        }
+    },
+
+    // removes leftover files (e.g. extract directory) from modpack install
+    async cleanupModpackInstall(profile) {
+        const extractPath = path.join(Global.MCM_TEMP, `${profile.id}-install/`);
+        rimraf.sync(extractPath);
+    },
+
+    // gets the forge version from the extractpath
+    getForgeVersionForModpackInstall(profile) {
+        const manifest = JSON.parse(fs.readFileSync(path.join(Global.MCM_TEMP, `${profile.id}-install/manifest.json`)));
+        return `${manifest.minecraft.version}-${manifest.minecraft.modLoaders[0].id.substring(6)}`;
+    },
+
+    // gets the minecraft version from the extractpath
+    getMinecraftVersionFromModpackInstall(modpack) {
+        const manifest = JSON.parse(fs.readFileSync(path.join(Global.MCM_TEMP, `${modpack.id}-install/manifest.json`)));
+        return manifest.minecraft.version;
     }
 };
 

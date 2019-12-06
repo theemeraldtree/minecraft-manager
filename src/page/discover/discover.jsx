@@ -5,6 +5,7 @@ import SearchBox from '../../component/searchbox/searchbox';
 import DiscoverList from '../../component/discoverlist/discoverlist';
 import Curse from '../../host/curse/curse';
 import ProfilesManager from '../../manager/profilesManager';
+import Hosts from '../../host/Hosts';
 
 export default class DiscoverPage extends PureComponent {
     constructor() {
@@ -62,13 +63,13 @@ export default class DiscoverPage extends PureComponent {
     installClick = async (e) => {
         e.stopPropagation();
         let cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
-        let modpack = Curse.cached.assets[cachedID];
+        let modpack = Hosts.cache.assets[cachedID];
         ProfilesManager.progressState[modpack.id] = {
             progress: 'installing',
             version: `temp-${new Date().getTime()}`
         }
         this.updateProgressStates();
-        await Curse.installModpack(modpack);
+        await Hosts.installModpack('curse', modpack);
         ProfilesManager.getProfiles().then(() => {
             this.updateProgressStates();
         });

@@ -232,6 +232,7 @@ const ProfilesManager = {
                 icon: 'icon.png',
                 omafVersion: '0.1.3',
                 fpath: path.join(Global.PROFILES_PATH, id),
+                installed: true,
                 version: {
                     timestamp: new Date().getTime()
                 }
