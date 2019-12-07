@@ -39,9 +39,6 @@ export default function General() {
         });
         SettingsManager.setHomeDirectory(p[0]);
         setMCHome(p[0]);
-        this.setState({
-            mcHome: p[0]
-        })
     }
 
     const chooseMCExe = () => {
@@ -57,7 +54,7 @@ export default function General() {
             buttonLabel: 'Select File',
             properties: properties
         });
-        SettingsManager.setHomeDirectory(p[0]);
+        SettingsManager.setMCExe(p[0]);
         setMCExe(p[0]);
     }
 

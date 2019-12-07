@@ -7,6 +7,8 @@ import Global from "./util/global";
 import path from 'path';
 import SettingsManager from "./manager/settingsManager";
 import HTTPRequest from "./host/httprequest";
+import ToastManager from "./manager/toastManager";
+import ErrorManager from "./manager/errorManager";
 const { remote, shell, ipcRenderer } = require('electron');
 const { dialog } = require('electron').remote;
 const request = require('request');
@@ -16,21 +18,27 @@ const { version } = require('../package.json');
 const os = require('os');
 require('typeface-roboto');
 async function load() {
-  SettingsManager.loadSettings();
+  try {
+    SettingsManager.loadSettings();
 
-  Global.updateMCVersions();
-  if(fs.existsSync(Global.PROFILES_PATH)) {
-    //LogManager.log('info', '[index] Getting profiles...');
+    Global.updateMCVersions();
+    if(fs.existsSync(Global.PROFILES_PATH)) {
+      //LogManager.log('info', '[index] Getting profiles...');
+    
+      // Check for directories - we need to make sure everything exists
+      if(!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
+        fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
+      }
   
-    // Check for directories - we need to make sure everything exists
-    if(!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
-      fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
+      if(!fs.existsSync(Global.getMCPath(), '/libraries/minecraftmanager/profiles')) {
+        fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
+      }
     }
-
-    if(!fs.existsSync(Global.getMCPath(), '/libraries/minecraftmanager/profiles')) {
-      fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
-    }
+  }catch(e) {
+    ToastManager.createToast(`ERROR`, ErrorManager.makeReadable(e));
+    console.error(e);
   }
+  
 
   await ProfilesManager.getProfiles();
   
@@ -48,11 +56,16 @@ async function load() {
     HTTPRequest.fileDownloadFinish(progress);
   });
 
-  Global.checkMinecraftVersions();
-  Global.checkMinecraftProfiles();
-  Global.checkMinecraftLibraries();
-  // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
-  Global.checkMigration();
+  try {
+    Global.checkMinecraftVersions();
+    Global.checkMinecraftProfiles();
+    Global.checkMinecraftLibraries();
+    // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
+    Global.checkMigration();
+  }catch(e) {
+    ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
+    console.error(e);
+  }
 
   // We're on a Mac, which means auto update doesn't work.
   // Here, we manually check for updates and inform the user a new version is available

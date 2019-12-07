@@ -14,6 +14,8 @@ import fs from 'fs';
 import Global from './util/global';
 import WelcomePage from './page/welcome/welcome';
 import Toast from './component/toast/toast';
+import ErrorBoundary from './errorBoundary';
+
 const App = () => (
     <div>            
         {localStorage.setItem('showDownloads', false)}
@@ -23,7 +25,7 @@ const App = () => (
             <Toast />
         </div>
         <Router>
-            <div>
+            <ErrorBoundary>
                 {!fs.existsSync(Global.PROFILES_PATH) && <Redirect to='/welcome' />}
                 <Route exact path='/' component={HomePage} />
                 <Route path='/discover' component={DiscoverPage} />
@@ -34,7 +36,7 @@ const App = () => (
                 <Route path='/edit/versions/:id' component={EditPageVersions} />
                 <Route path='/edit/mods/:id' component={EditPageMods} />
                 <Route path='/edit/advanced/:id' component={EditPageAdvanced} />
-            </div>
+            </ErrorBoundary>
         </Router>
     </div>
 );
