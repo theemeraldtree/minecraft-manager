@@ -18,7 +18,7 @@ const Content = styled.div`
     display: flex;
     position: relative;
     height: 100%;
-    overflow-x: hidden;
+    overflow: hidden;
 `
 
 const ContentSide = styled.div`
