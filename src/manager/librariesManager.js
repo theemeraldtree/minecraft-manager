@@ -3,6 +3,8 @@ import Global from '../util/global';
 import fs from 'fs';
 import DownloadsManager from './downloadsManager';
 import rimraf from 'rimraf';
+import ProfilesManager from './profilesManager';
+import LogManager from './logManager';
 const LibrariesManager = {
     getLibrariesPath: function() {
         return path.join(Global.getMCPath(), '/libraries/')
@@ -48,6 +50,17 @@ const LibrariesManager = {
                 })
             }else{
                 resolve();
+            }
+        })
+    },
+    cleanLibraries: function() {
+        LogManager.log('info', `[LibrariesManager] [CleanLibraries] Starting clean libraries...`);
+        fs.readdirSync(this.getMCMLibraries()).forEach(file => {
+            if(file.substring(0, 4) === 'mcm-') {
+                if(!ProfilesManager.loadedProfiles.find(prof => file === `mcm-${prof.id}`)) {
+                    rimraf.sync(path.join(this.getMCMLibraries(), file));
+                    LogManager.log('info', `[LibrariesManager] [CleanLibraries] Removed library ${file}`);
+                }
             }
         })
     }

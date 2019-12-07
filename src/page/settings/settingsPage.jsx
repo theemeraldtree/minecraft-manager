@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import SettingsManager from '../../manager/settingsManager';
 import About from './pages/about';
 import General from './pages/general';
+import Help from './pages/help';
 const Sidebar = styled.div`
     height: 100%;
     position: absolute;
@@ -72,10 +73,12 @@ export default class SettingsPage extends PureComponent {
                     <Sidebar>
                         <Item onClick={() => this.switchPage('about')} active={settingsPage === 'about'}>about</Item>
                         <Item onClick={() => this.switchPage('general')} active={settingsPage === 'general'}>general</Item>
+                        <Item onClick={() => this.switchPage('help')} active={settingsPage === 'help'}>help</Item>
                     </Sidebar>
                     <Container>
                         {settingsPage === 'about' && <About />}
                         {settingsPage === 'general' && <General />}
+                        {settingsPage === 'help' && <Help />}
                     </Container>
                     
                 </Wrapper>

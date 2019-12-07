@@ -5,6 +5,7 @@ import os from 'os';
 import exec from 'child_process';
 import ProfilesManager from './profilesManager';
 import SettingsManager from './settingsManager';
+import LogManager from './logManager';
 const LauncherManager = {
     DEFAULT_JAVA_ARGS: '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M',
     getLauncherProfiles: function() {
@@ -79,6 +80,21 @@ const LauncherManager = {
         for(let profile of ProfilesManager.loadedProfiles) {
             this.setLaunchArguments(profile, `-Xmx${amount}G ${this.DEFAULT_JAVA_ARGS}`)
         }
+    },
+    cleanMinecraftProfiles: function() {
+        LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Starting clean...')
+        const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
+        Object.keys(obj.profiles).forEach(key => {
+            if(key.substring(0, 4) === 'mcm-') {
+                if(!ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)) {
+                    delete obj.profiles[key];
+                    LogManager.log('info', `[LauncherManager] [CleanMinecraftProfiles] Removed profile key ${key}`);
+                }
+            }
+        });
+        LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Writing changes...');
+        fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
+        LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Successfully written');
     }
 }
 

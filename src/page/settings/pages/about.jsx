@@ -3,21 +3,8 @@ import styled from 'styled-components';
 import logo from '../../../img/logo-sm.png';
 import { ipcRenderer } from 'electron';
 import Button from '../../../component/button/button';
-
-const AboutC = styled.div`
-    max-width: 680px;
-    background-color: #717171;
-    margin: 10px;
-    padding: 10px;
-    h2 {
-        font-size: 14pt;
-    }
-    h3 {
-        font-size: 11pt;
-        margin-top: 5px;
-        margin-bottom: 5px;
-    }
-`
+import Section from '../components/section';
+import NeedHelp from '../components/needhelp';
 
 const AboutTop = styled.div`
     display: flex;
@@ -110,7 +97,7 @@ export default function About() {
 
     return (
         <>
-            <AboutC>
+            <Section>
                 <AboutTop>
                     <Logo />
                     <div>
@@ -125,20 +112,13 @@ export default function About() {
                     </div>
                 </AboutTop>
                 <AboutBottom>
-
-                    
-
                     <h3><a href="https://github.com/stairman06/minecraft-manager/blob/master/LICENSE">Minecraft Manager is licensed under the GNU General Public License v3</a></h3>
                     <h3><a title="Minecraft Manager Source Code" href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project created by stairman06</a></h3>
                     <h3><a title="OMAF Wiki and Documentation" href="https://github.com/stairman06/omaf/wiki">Minecraft Manager uses the open-source OMAF standard</a></h3>
                 </AboutBottom>
-            </AboutC>
-            <AboutC>
-                <h2>Need help?</h2>
-                <h3><a href="https://theemeraldtree.net/mcm/wiki">Check out the Minecraft Manager Wiki</a></h3>
-                <h3><a href="https://theemeraldtree.net/mcm/issues">Found a bug or want to request a feature? Do it here</a></h3>
-            </AboutC>
-            <AboutC>
+            </Section>
+            <NeedHelp />
+            <Section>
                 <h2>Credits</h2>
                 <h3>Minecraft Manager is made possible thanks to:
                     <li><a href="https://electronjs.org/">Electron</a></li>
@@ -159,7 +139,7 @@ export default function About() {
                     <li><a href="https://github.com/KyleAMathews/typefaces/tree/master/packages/roboto">typeface-roboto</a></li>
                     <li>other projects</li>
                     and of course, YOU! Thank you!</h3>
-            </AboutC>
+            </Section>
         </>
     )
 }

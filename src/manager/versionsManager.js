@@ -3,6 +3,8 @@ import Global from '../util/global';
 import fs from 'fs';
 import LauncherManager from './launcherManager';
 import rimraf from 'rimraf';
+import ProfilesManager from './profilesManager';
+import LogManager from './logManager';
 const defaultVersion = require('../assets/defaultVersion.json');
 const version1710 = require('../assets/1710version.json');
 const semver = require('semver');
@@ -75,6 +77,17 @@ const VersionsManager = {
                 })
             }else{
                 resolve();
+            }
+        })
+    },
+    cleanVersions: function() {
+        LogManager.log('info', `[VersionsManager] [CleanVersions] Cleaning Launcher Versions...`);
+        fs.readdirSync(this.getVersionsPath()).forEach(file => {
+            if(file.indexOf('[Minecraft Manager]') !== -1) {
+                if(!ProfilesManager.loadedProfiles.find(prof => prof.versionname === file)) {
+                    rimraf.sync(path.join(this.getVersionsPath(), file));
+                    LogManager.log('info', `[VersionsManager] [CleanVersions] Removed version ${file}`);
+                }
             }
         })
     }
