@@ -80,7 +80,6 @@ export default class SettingsPage extends PureComponent {
                         {settingsPage === 'general' && <General />}
                         {settingsPage === 'help' && <Help />}
                     </Container>
-                    
                 </Wrapper>
             </Page>
         )

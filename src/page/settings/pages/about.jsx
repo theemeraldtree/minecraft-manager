@@ -103,7 +103,7 @@ export default function About() {
                     <div>
                         <h1>About Minecraft Manager</h1>
                         <h3>Version 2.1a [Alpha Branch]</h3>
-                        <h3>released 12/6/2019</h3>
+                        <h3>released 12/7/2019</h3>
                                        
                         <Updates>
                                 <Button onClick={checkForUpdates} disabled={updateDisabled} color='green'>{updateText}</Button>
