@@ -15,7 +15,6 @@ const BG = styled.div`
     flex-flow: column;
     cursor: pointer;
     user-select: none;
-    transition: 150ms;
     position: relative;
     &:hover {
         background-color: #5b5b5b;

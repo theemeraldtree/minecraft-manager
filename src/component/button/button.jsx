@@ -23,7 +23,6 @@ const Button = styled.div.attrs(props => ({
     width: fit-content;
     display: inline-block;
     cursor: pointer;
-    transition: 150ms;
     ${props => props.disabled && `
         filter: brightness(0.65);
     `}

@@ -24,8 +24,14 @@ const Item = styled.p`
     font-size: 15pt;
     font-weight: 100;
     cursor: pointer;
+    &:hover {
+        filter: brightness(0.75);
+    }
     ${props => props.active && `
         font-weight: bolder;
+        &:hover {
+            filter: brightness(1.0);
+        }
     `}
     margin-bottom: 15px;
 `;

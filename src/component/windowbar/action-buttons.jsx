@@ -11,19 +11,19 @@ import os from 'os';
 const currentWindow = remote.getCurrentWindow();
 
 const ActionButton = styled.div`
-    width: 20px;
-    height: 20px;
-    margin: 4px;
+    width: 29px;
+    height: 29px;
     z-index: 20;
     top: 0;
     float: right;
-    background-size: cover;
-    transition: -webkit-filter 300ms;
+    background-color: #1D1D1D;
+    background-size: 15px;
+    background-position: center;
+    background-repeat: no-repeat;
     cursor: pointer;
     -webkit-app-region: no-drag;
     &:hover {
         filter: brightness(0.5);
-        transition: -webkit-filter 300ms;
     }
 `
 

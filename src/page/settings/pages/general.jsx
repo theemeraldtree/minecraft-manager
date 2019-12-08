@@ -73,15 +73,15 @@ export default function General() {
             }else if(intAmount === 0) {
                 setWarningMessage(`You need to provide SOME amount of RAM!`);
             }else{
-                setRamChangeDisabled(newMount === oldAmount);
+                setRamChangeDisabled(newAmount === oldAmount);
                 setWarningMessage('');
             }
         }
     }
 
     const changeRAM = () => {
-        if(!this.state.ramChangeDisabled) {
-            SettingsManager.setDedicatedRam(this.state.dedicatedRam);
+        if(!ramChangeDisabled) {
+            SettingsManager.setDedicatedRam(dedicatedRam);
             setRamChangeDisabled(true);
         }
     }

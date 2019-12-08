@@ -3,12 +3,11 @@ import styled from 'styled-components';
 import Button from '../button/button';
 const BG = styled.div`
     margin-top: 5px;
-    width:100%;
+    width: 100%;
     height: 90px;
     background-color: #717171;
     display: inline-flex;
     user-select: none;
-    transition: 150ms;
     position: relative;
     overflow: hidden;
     flex-shrink: 0;

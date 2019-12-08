@@ -4,15 +4,18 @@ import styled from 'styled-components';
 import downloadsImg from './downloads.png';
 import DownloadItem from './downloadItem';
 const DownloadsButton = styled.div`
-    background-image: url(${downloadsImg});
     width: 50px;
     height: 50px;
-    background-size: contain;
     position: absolute;
     bottom: 0;
     margin: 25px;
     cursor: pointer;
     z-index: 999;
+    background-image: url(${downloadsImg}); 
+    background-size: contain;
+    &:hover {
+        filter: brightness(0.75);
+    }
 `
 const DownloadsOverlay = styled.div`
     width: 350px;
@@ -21,8 +24,8 @@ const DownloadsOverlay = styled.div`
     z-index: 9999;
     cursor: default;
     position: absolute;
-    left: 90px;
-    bottom: 0;
+    left: 120px;
+    bottom: 20px;
     color: white;
     display: flex;
     flex-flow: column;
@@ -81,7 +84,8 @@ export default class Downloads extends Component {
 
     render() {
         return (
-            <DownloadsButton onClick={this.showDownloads}>
+            <>
+                <DownloadsButton onClick={this.showDownloads} />
                 {this.state.showOverlay && 
                 <DownloadsOverlay>
                     <Title>downloads</Title>
@@ -89,7 +93,8 @@ export default class Downloads extends Component {
                         {this.state.downloadsList}
                     </List>
                 </DownloadsOverlay>}
-            </DownloadsButton>
+            </>
+                
         )
     }
 }

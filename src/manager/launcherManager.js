@@ -57,7 +57,9 @@ const LauncherManager = {
     setProfileData: function(profile, tag, val) {
         let id = `mcm-${profile.id}`;
         let obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
-        obj.profiles[id][tag] = val;
+        if(obj.profiles[id]) {
+            obj.profiles[id][tag] = val;
+        }
         fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
     },
     setMostRecentProfile: function (profile) {

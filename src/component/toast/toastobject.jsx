@@ -49,7 +49,7 @@ const Title = styled.p`
 `
 const Body = styled.p`
     margin: 0;
-    word-break: break-all;
+    word-break: break-word;
     a {
         color: #42b3f5;
         text-decoration: none;

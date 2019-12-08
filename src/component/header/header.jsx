@@ -23,10 +23,9 @@ const BackButton = styled.div`
     font-size: 17pt;
     margin-left: 10px;
     margin-right: 12px;
-    transition: 300ms;
     cursor: pointer;
     &:hover {
-        opacity: 0.7;
+        filter: brightness(0.75);;
     }
     & a {
         text-decoration: none;
