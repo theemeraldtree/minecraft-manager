@@ -11,7 +11,7 @@ const TextInput = styled.input`
         color: white;
     }
     &:hover:not(:disabled) {
-        filter: brightness(0.75);
+        filter: brightness(0.85);
     }
 `
 
