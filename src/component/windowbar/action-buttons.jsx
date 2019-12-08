@@ -35,6 +35,10 @@ const MaximizeButton = styled(ActionButton)`
 `
 const CloseButton = styled(ActionButton)`
     background-image: url(${closeImage});
+    &:hover {
+        filter: brightness(0.9);
+        background-color: red;
+    }
 `
 
 const SettingsButton = styled(ActionButton)`
