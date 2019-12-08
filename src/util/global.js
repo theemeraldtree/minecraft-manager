@@ -9,6 +9,7 @@ import LauncherManager from '../manager/launcherManager';
 import LibrariesManager from '../manager/librariesManager';
 import ErrorManager from '../manager/errorManager';
 
+const semver = require('semver');
 const remote = require('electron').remote;
 const app = remote.app;
 const path = require('path');
@@ -24,6 +25,20 @@ const Global = {
     cacheUpdateTime: new Date().getTime(),
     cached: {
         versions: {}
+    },
+
+    MCM_VERSION: '2.1.0',
+    MCM_RELEASE_DATE: '12/8/2019',
+
+    checkChangelog() {
+        const version = SettingsManager.currentSettings.lastVersion;
+        if(!version || semver.gt(this.MCM_VERSION, version)) {
+            ToastManager.createToast(
+                `Welcome to ${this.MCM_VERSION}!`, 
+                `With a new settings page, graphics update, and more! <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the full changelog</a>`
+            );
+            SettingsManager.setLastVersion(this.MCM_VERSION);
+        }
     },
     async updateMCVersions(firstTime) {
         let versionsJSON;

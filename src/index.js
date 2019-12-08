@@ -60,6 +60,7 @@ async function load() {
     Global.checkMinecraftVersions();
     Global.checkMinecraftProfiles();
     Global.checkMinecraftLibraries();
+    Global.checkChangelog();
     // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
     Global.checkMigration();
   }catch(e) {
@@ -70,7 +71,7 @@ async function load() {
   // We're on a Mac, which means auto update doesn't work.
   // Here, we manually check for updates and inform the user a new version is available
   if(os.platform() === 'darwin') {
-    request.get(`https://theemeraldtree.net/updates/mac/beta-mac.yml`, (err, resp, body) => {
+    request.get(`https://theemeraldtree.net/updates/mac/mac.yml`, (err, resp, body) => {
         const doc = yaml.safeLoad(body);
         if(semver.gt(doc.version, version)) {
             dialog.showMessageBox({
@@ -82,7 +83,7 @@ async function load() {
                 ]
             }, buttonIndex => {
                 if(buttonIndex === 1) {
-                    shell.openExternal(`https://theemeraldtree.net`);
+                    shell.openExternal(`https://theemeraldtree.net/mcm/download`);
                 }
             });
         }

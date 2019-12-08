@@ -5,6 +5,7 @@ import { ipcRenderer } from 'electron';
 import Button from '../../../component/button/button';
 import Section from '../components/section';
 import NeedHelp from '../components/needhelp';
+import Global from '../../../util/global';
 
 const AboutTop = styled.div`
     display: flex;
@@ -102,8 +103,8 @@ export default function About() {
                     <Logo />
                     <div>
                         <h1>About Minecraft Manager</h1>
-                        <h3>Version 2.1.0-b1 [Beta Branch]</h3>
-                        <h3>released 12/7/2019</h3>
+                        <h3>Version {Global.MCM_VERSION}</h3>
+                        <h3>released {Global.MCM_RELEASE_DATE}</h3>
                                        
                         <Updates>
                                 <Button onClick={checkForUpdates} disabled={updateDisabled} color='green'>{updateText}</Button>

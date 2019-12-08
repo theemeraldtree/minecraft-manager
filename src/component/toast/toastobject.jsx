@@ -68,11 +68,12 @@ export default function ToastObject({id, title, body, error, dismiss, slideOut, 
         <BG disableAnimation={disableAnimation} slideOut={slideOut}>
             <Title>{title}</Title>
             <Dismiss onClick={() => {dismiss(id)}}>close</Dismiss>
-            <Body>{body}
-            {error && <>
+            {!error && <Body dangerouslySetInnerHTML={{ __html: body}} />}
+            {error && <Body>
+                {body}
                 <br />
                 <a href={`https://github.com/stairman06/minecraft-manager/wiki/Error-Codes#${error}`}>Error Code: {error}</a>
-            </>}</Body>
+            </Body>}
         </BG>
     )
 }
