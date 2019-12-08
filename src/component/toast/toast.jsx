@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import ToastObject from './toastobject';
 import ToastManager from '../../manager/toastManager'
@@ -18,7 +18,7 @@ const Container = styled.div`
 const List = styled.div`
     margin-bottom: 10px;
 `
-export default class Toast extends Component {
+export default class Toast extends PureComponent {
     constructor() {
         super();
         this.state = {
@@ -46,9 +46,8 @@ export default class Toast extends Component {
     renderToasts() {
         let list = [];
         let exist = this.state.existingToasts.slice();
-        console.log(ToastManager.toasts);
         for(let toast of ToastManager.toasts) {
-            list.push(<ToastObject key={`${toast.id}`} disableAnimation={exist.includes(toast.id)} slideOut={this.state.dismissingToasts.includes(toast.id)} dismiss={this.dismiss} id={toast.id} title={toast.title} body={toast.body} />);
+            list.push(<ToastObject key={`${toast.id}`} disableAnimation={exist.includes(toast.id)} slideOut={this.state.dismissingToasts.includes(toast.id)} dismiss={this.dismiss} id={toast.id} title={toast.title} body={toast.body} error={toast.error} />);
             if(!exist.includes(toast.id)) {
                 exist.push(toast.id);
             }
@@ -56,7 +55,7 @@ export default class Toast extends Component {
         this.setState({
             list: list,
             existingToasts: exist
-        })
+        });
     }
     componentDidMount() {
         ToastManager.registerHandler(this.toastUpdate);

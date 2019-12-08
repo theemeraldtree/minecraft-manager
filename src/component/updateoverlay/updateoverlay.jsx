@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import Overlay from '../overlay/overlay';
 import Button from '../button/button';
-import Curse from '../../host/curse/curse';
+import Hosts from '../../host/Hosts';
 const BG = styled.div`
     width: 100%;
     height: fit-content;
@@ -60,7 +60,7 @@ export default class UpdateOverlay extends Component {
     async componentDidMount() {
         let { profile } = this.props;
         if(profile.hosts.curse) {
-            const update = await Curse.checkForAssetUpdates(profile);
+            const update = await Hosts.checkForAssetUpdates('curse', profile);
             if(update) {
                 this.setState({
                     updateAvailable: true,

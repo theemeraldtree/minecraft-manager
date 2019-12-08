@@ -18,10 +18,13 @@ const Item = styled(NavLink)`
     text-decoration: none;
     font-size: 15pt;
     font-weight: 100;
-    &.active {
+    &:hover {
+        filter: brightness(0.75);
+    }
+    &.active, &.active:hover {
+        filter: brightness(1.0);
         font-weight: bolder;
     }
-    transition: 300ms;
     margin-bottom: 15px;
 `
 const Sidebar = ({profile}) => (

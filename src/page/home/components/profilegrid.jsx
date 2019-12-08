@@ -10,6 +10,11 @@ const BG = styled.div`
     flex: 1 1 auto;
     padding-bottom: 10px;
 `
+const NoProfileText = styled.p`
+    margin: 20px;
+    color: white;
+    font-size: 21pt;
+`
 export default class ProfileGrid extends Component {
     constructor(props) {
         super(props);
@@ -20,18 +25,18 @@ export default class ProfileGrid extends Component {
     }
 
     componentDidMount = () => {
-        ProfilesManager.registerReloadListener(this.generateProfiles);
-        this.generateProfiles();
+        ProfilesManager.registerReloadListener(this.updateProfiles);
+        this.updateProfiles();
     }
 
     componentWillUnmount = () => {
-        ProfilesManager.unregisterReloadListener(this.generateProfiles);
+        ProfilesManager.unregisterReloadListener(this.updateProfiles);
     }
-    
-    componentDidUpdate = (prevProps) => {
-        if(this.props.searchTerm !== prevProps.searchTerm) {
-            this.generateProfiles();
-        }
+
+    updateProfiles = () => {
+        this.setState({
+            profiles: ProfilesManager.loadedProfiles
+        })
     }
 
     showUpdate = (profile) => {
@@ -59,17 +64,6 @@ export default class ProfileGrid extends Component {
             showShare: false
         })
     }
-    generateProfiles = () => {
-        let profilesComponents = [];
-        for(let profile of ProfilesManager.loadedProfiles) {
-            if(profile.name.toLowerCase().includes(this.props.searchTerm)) {
-                profilesComponents.push(<ProfileCard showUpdate={this.showUpdate} showShare={this.showShare} showDeletion={this.showDeletion} key={profile.id} profile={profile} />);
-            }
-        }
-        this.setState({
-            profiles: profilesComponents
-        })
-    }
 
     showDeletion = (profile) => {
         this.setState({
@@ -87,7 +81,6 @@ export default class ProfileGrid extends Component {
     confirmDelete = () => {
         let { deletingProfile } = this.state;
         ProfilesManager.deleteProfile(deletingProfile).then(() => {
-            this.generateProfiles();
             this.setState({
                 showDelete: false
             })
@@ -95,14 +88,35 @@ export default class ProfileGrid extends Component {
     }
 
     render() {
+        const { showShare, showUpdate, showDelete, activeProfile, profiles } = this.state;
+        const { searchTerm } = this.props;
         return (
             <BG>
-                {this.state.showShare && <ShareOverlay profile={this.state.activeProfile} cancelClick={this.cancelShare} />}
-                {this.state.showUpdate && <UpdateOverlay profile={this.state.activeProfile} cancelClick={this.cancelUpdate} />}
-                {this.state.showDelete && 
-                    <Confirmation cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />
+                {showShare && <ShareOverlay profile={activeProfile} cancelClick={this.cancelShare} />}
+                {showUpdate && <UpdateOverlay profile={activeProfile} cancelClick={this.cancelUpdate} />}
+                {showDelete && 
+                    <Confirmation questionText='are you sure?' cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />
                 }
-                {this.state.profiles}
+                {
+                    profiles.length >= 1 && profiles.map(profile => {
+                        if(profile) {
+                            if(!profile.hideFromClient && profile.name.toLowerCase().includes(searchTerm)) {
+                                return (
+                                    <ProfileCard showUpdate={this.showUpdate} showShare={this.showShare} showDeletion={this.showDeletion} key={profile.id} profile={profile} />
+                                );
+                            }else{
+                                return;
+                            }
+                        }
+                    })
+                }
+                {
+                    profiles.length === 0 && <>
+                        <NoProfileText>
+                            Looks like you have no profiles! Create one using the create button, or download one from the discover tab!
+                        </NoProfileText>
+                    </>
+                }
             </BG>
         )
     }

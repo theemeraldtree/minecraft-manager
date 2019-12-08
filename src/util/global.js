@@ -4,7 +4,12 @@ import Mod from '../type/mod';
 import Profile from '../type/profile';
 import ToastManager from '../manager/toastManager';
 import HTTPRequest from '../host/httprequest';
+import VersionsManager from '../manager/versionsManager';
+import LauncherManager from '../manager/launcherManager';
+import LibrariesManager from '../manager/librariesManager';
+import ErrorManager from '../manager/errorManager';
 
+const semver = require('semver');
 const remote = require('electron').remote;
 const app = remote.app;
 const path = require('path');
@@ -21,11 +26,29 @@ const Global = {
     cached: {
         versions: {}
     },
+
+    MCM_VERSION: '2.1.0',
+    MCM_RELEASE_DATE: '12/8/2019',
+
+    checkChangelog() {
+        const version = SettingsManager.currentSettings.lastVersion;
+        if(!version || semver.gt(this.MCM_VERSION, version)) {
+            ToastManager.createToast(
+                `Welcome to ${this.MCM_VERSION}!`, 
+                `With a new settings page, graphics update, and more! <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the full changelog</a>`
+            );
+            SettingsManager.setLastVersion(this.MCM_VERSION);
+        }
+    },
     async updateMCVersions(firstTime) {
         let versionsJSON;
         let req;
-        if(fs.existsSync(path.join(this.MCM_PATH, '/mcvercache.json'))) {
-            this.parseVersionsJSON(JSON.parse(fs.readFileSync(path.join(this.MCM_PATH, '/mcvercache.json'))));
+        try {
+            if(fs.existsSync(path.join(this.MCM_PATH, '/mcvercache.json'))) {
+                this.parseVersionsJSON(JSON.parse(fs.readFileSync(path.join(this.MCM_PATH, '/mcvercache.json'))));
+            }
+        }catch(e) {
+            ToastManager.createToast(`Just a quick note`, `There's a corrupt Minecraft verison cache. However this probably won't continue in the future.`);
         }
 
         try {
@@ -42,6 +65,48 @@ const Global = {
         }
         if(versionsJSON) {
              this.parseVersionsJSON(versionsJSON);
+        }
+    },
+    checkMinecraftVersions() {
+        let totalCount = 0;
+        fs.readdirSync(VersionsManager.getVersionsPath()).forEach(file => {
+            if(file.indexOf('[Minecraft Manager]') !== -1) {
+                if(!ProfilesManager.loadedProfiles.find(prof => prof.versionname === file)) {
+                    totalCount++;
+                }
+            }
+        });
+        if(totalCount) {
+            ToastManager.createToast('Warning', `There are ${totalCount} Minecraft Manager-related version(s) in your Minecraft installation that do not need to exist!`, 'EXTRA-MINECRAFT-VERSIONS');
+        }
+    },
+    checkMinecraftProfiles() {
+        const obj = JSON.parse(fs.readFileSync(LauncherManager.getLauncherProfiles()));
+        let totalCount = 0;
+        Object.keys(obj.profiles).forEach(key => {
+            if(key.substring(0, 4) === 'mcm-') {
+                if(!ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)) {
+                    totalCount++;
+                }
+            }
+        });
+
+        if(totalCount) {
+            ToastManager.createToast('Warning', `There are ${totalCount} Minecraft Manager-related launcher profile(s) in your Minecraft installation that do not need to exist!`, 'EXTRA-MINECRAFT-PROFILES');
+        }
+    },
+    checkMinecraftLibraries() {
+        let totalCount = 0;
+        fs.readdirSync(LibrariesManager.getMCMLibraries()).forEach(file => {
+            if(file.substring(0, 4) === 'mcm-') {
+                if(!ProfilesManager.loadedProfiles.find(prof => file === `mcm-${prof.id}`)) {
+                    totalCount++;
+                }
+            }
+        });
+
+        if(totalCount) {
+            ToastManager.createToast('Warning', `There are ${totalCount} Minecraft-Manager-related launcher libraries in your Minecraft installation that do not need to exist!`, 'EXTRA-MINECRAFT-LIBRARIES');
         }
     },
     parseVersionsJSON(versionsJSON) {
@@ -129,16 +194,20 @@ const Global = {
         return SettingsManager.MC_HOME;
     },
     copyDirSync: function(src, dest) {
-        const exists = fs.existsSync(src);
-        const stats = exists && fs.statSync(src);
-        const isDirectory = exists && stats.isDirectory();
-        if(exists && isDirectory) {
-            fs.mkdirSync(dest);
-            fs.readdirSync(src).forEach((childItem) => {
-                this.copyDirSync(path.join(src, childItem), path.join(dest, childItem));
-            })
-        }else{
-            fs.linkSync(src, dest);
+        try {
+            const exists = fs.existsSync(src);
+            const stats = exists && fs.statSync(src);
+            const isDirectory = exists && stats.isDirectory();
+            if(exists && isDirectory) {
+                fs.mkdirSync(dest);
+                fs.readdirSync(src).forEach((childItem) => {
+                    this.copyDirSync(path.join(src, childItem), path.join(dest, childItem));
+                })
+            }else{
+                fs.linkSync(src, dest);
+            }
+        }catch(e) {
+            ToastManager.createToast('Error', ErrorManager.makeReadable(e));
         }
     },
     checkMigration: function() {
@@ -200,7 +269,6 @@ const Global = {
         }
 
         if(showMigrationmessage) {
-            console.log('Migration message');
             ToastManager.createToast('Hey There!', 'Hello there beta tester! Just a quick message about this new version: your old profiles will not work 100%. Some features may work, some may not. This is due to internal restructuring as to how many things are stored. We hope you understand!');
         }
 

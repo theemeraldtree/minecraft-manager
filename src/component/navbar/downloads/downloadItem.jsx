@@ -29,14 +29,19 @@ const PBWrapper = styled.div`
     width: 100%;
     left: 0;
 `
-const DownloadItem = ({download}) => (
-    <BG>
-        <Title>{download.name}</Title>
-        <Progress>{download.progress}</Progress>
-        <PBWrapper>
-            <ProgressBar progress={download.progressPercent} />
-        </PBWrapper>
-    </BG>
-);
+export default function DownloadItem({download}) {
 
-export default DownloadItem;
+    const split = download.name.split('\n');
+
+    return (
+        <BG>
+            <Title>{download.name.split('\n')[0]}<br />
+            
+            {split.length === 2 && download.name.split('\n')[1].replace('_A_', '⮡      ')}</Title>
+            <Progress>{download.progress}</Progress>
+            <PBWrapper>
+                <ProgressBar progress={download.progressPercent} />
+            </PBWrapper>
+        </BG>
+    )
+}

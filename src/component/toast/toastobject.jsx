@@ -18,7 +18,7 @@ const slideOut = keyframes`
 
     100% {
         opacity: 0;
-        margin-bottom: -70px;
+        margin-bottom: -120px;
     }
 `
 
@@ -49,6 +49,11 @@ const Title = styled.p`
 `
 const Body = styled.p`
     margin: 0;
+    word-break: break-word;
+    a {
+        color: #42b3f5;
+        text-decoration: none;
+    }
 `
 const Dismiss = styled.p`
     position: absolute;
@@ -58,12 +63,17 @@ const Dismiss = styled.p`
     cursor: pointer;
     color: #a1a1a1;
 `
-const ToastObject = ({id, title, body, dismiss, slideOut, disableAnimation}) => (
-    <BG disableAnimation={disableAnimation} slideOut={slideOut}>
-        <Title>{title}</Title>
-        <Dismiss onClick={() => {dismiss(id)}}>close</Dismiss>
-        <Body>{body}</Body>
-    </BG>
-)
-
-export default ToastObject;
+export default function ToastObject({id, title, body, error, dismiss, slideOut, disableAnimation}) {
+    return (
+        <BG disableAnimation={disableAnimation} slideOut={slideOut}>
+            <Title>{title}</Title>
+            <Dismiss onClick={() => {dismiss(id)}}>close</Dismiss>
+            {!error && <Body dangerouslySetInnerHTML={{ __html: body}} />}
+            {error && <Body>
+                {body}
+                <br />
+                <a href={`https://github.com/stairman06/minecraft-manager/wiki/Error-Codes#${error}`}>Error Code: {error}</a>
+            </Body>}
+        </BG>
+    )
+}

@@ -1,8 +1,9 @@
 const request = require('request');
 const req = require('request-promise');
 const cheerio = require('cheerio');
-const fs = require('fs');
+const { ipcRenderer } = require('electron');
 let HTTPRequest = {
+    fileDownloads: {},
     httpGet(url) {
         return new Promise((resolve, reject) => {
 
@@ -40,35 +41,26 @@ let HTTPRequest = {
     },
 
     download(url, dest, onProgress) {
-        return new Promise((resolve, reject) => {
-            let progressData = 0;
-            let contentLength = 0;
-            let ws = fs.createWriteStream(dest);
-            let req = request(url, {
-                url: url,
-                headers: {
-                    'User-Agent': 'Minecraft-Manager'
-                },
-                followAllRedirects: true
-            });
-            req.on('data', (data) => {
-                if(onProgress) {
-                    progressData += data.length;
-                    onProgress(Math.trunc((progressData / contentLength) * 100));
-                }
-            })
-            req.on('response', (res) => {
-                contentLength = res.headers['content-length'];
-                res.pipe(ws);
-                ws.on('finish', () => {
-                    resolve();
-                })
-            })
-            req.on('error', () => {
-                ws.end();
-                reject();
-            })
+        return new Promise((resolve) => {
+            const id = `${url}-${dest}`;
+            this.fileDownloads[id] = {
+                onProgress: onProgress,
+                onFinish: resolve
+            }
+            ipcRenderer.send('download-file', url, dest, id);
         })
+    },
+
+    fileDownloadProgress(download) {
+        if(this.fileDownloads[download.id]) {
+            this.fileDownloads[download.id].onProgress(download.progress);
+        }
+    },
+
+    fileDownloadFinish(download) {
+        if(this.fileDownloads[download.id]) {
+            this.fileDownloads[download.id].onFinish();
+        }
     },
 
     async get(url, qs) {

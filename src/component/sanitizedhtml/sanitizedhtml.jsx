@@ -37,7 +37,7 @@ const Styling = styled.div`
 `
 const SanitizedHTML = ({html, small}) => (
     <Styling small={small} dangerouslySetInnerHTML={{__html: sanitizeHTML(html, {
-        allowedTags: [ 'b', 'i', 'em', 'strong', 'a', 'iframe', 'h1', 'p', 'img', 'span', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'li'],
+        allowedTags: [ 'br', 'b', 'i', 'em', 'strong', 'a', 'iframe', 'h1', 'p', 'img', 'span', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'li'],
         allowedAttributes: {
           '*': [ 'style' ],
           'a': [ 'href' ],

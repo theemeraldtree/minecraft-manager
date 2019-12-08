@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { spawn } = require('child_process');
 const process = require('process');
+const path = require('path');
 
 module.exports = {
     context: __dirname + '/src',
@@ -29,6 +30,7 @@ module.exports = {
             },
             {
                 test: /\.(gif|svg|jpg|png)$/,
+                include: path.resolve(__dirname, 'src'),
                 loader: "file-loader",
             },
             {

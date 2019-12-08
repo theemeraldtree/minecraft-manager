@@ -10,6 +10,9 @@ const TextInput = styled.input`
     &::placeholder {
         color: white;
     }
+    &:hover:not(:disabled) {
+        filter: brightness(0.85);
+    }
 `
 
 export default TextInput;

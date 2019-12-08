@@ -13,13 +13,9 @@ import SettingsManager from './manager/settingsManager';
 import fs from 'fs';
 import Global from './util/global';
 import WelcomePage from './page/welcome/welcome';
-import globalStyles from './styles.css'; //eslint-disable-line
-import { createGlobalStyle } from 'styled-components';
 import Toast from './component/toast/toast';
-console.log(globalStyles[0][1]);
-const GlobalStyle = createGlobalStyle`
-    ${globalStyles[0][1]}
-`
+import ErrorBoundary from './errorBoundary';
+
 const App = () => (
     <div>            
         {localStorage.setItem('showDownloads', false)}
@@ -29,8 +25,7 @@ const App = () => (
             <Toast />
         </div>
         <Router>
-            <div>
-                <GlobalStyle />
+            <ErrorBoundary>
                 {!fs.existsSync(Global.PROFILES_PATH) && <Redirect to='/welcome' />}
                 <Route exact path='/' component={HomePage} />
                 <Route path='/discover' component={DiscoverPage} />
@@ -41,7 +36,7 @@ const App = () => (
                 <Route path='/edit/versions/:id' component={EditPageVersions} />
                 <Route path='/edit/mods/:id' component={EditPageMods} />
                 <Route path='/edit/advanced/:id' component={EditPageAdvanced} />
-            </div>
+            </ErrorBoundary>
         </Router>
     </div>
 );

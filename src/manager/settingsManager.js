@@ -32,6 +32,10 @@ const SettingsManager = {
         this.currentSettings.dedicatedRam = amount;
         this.save();
     },
+    setLastVersion: function(version) {
+        this.currentSettings.lastVersion = version;
+        this.save();
+    },
     createSettings: function() {
         let obj = {
             homeDirectory: '',

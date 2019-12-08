@@ -11,5 +11,9 @@ const Dropdown = styled.select`
     flex-shrink: 0;
     -webkit-user-select: none;
     -webkit-appearance: menulist-button;
+    cursor: pointer;
+    &:hover {
+        filter: brightness(0.75);
+    }
 `
 export default Dropdown;

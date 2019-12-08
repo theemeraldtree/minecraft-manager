@@ -3,6 +3,8 @@ import Global from '../util/global';
 import fs from 'fs';
 import DownloadsManager from './downloadsManager';
 import rimraf from 'rimraf';
+import ProfilesManager from './profilesManager';
+import LogManager from './logManager';
 const LibrariesManager = {
     getLibrariesPath: function() {
         return path.join(Global.getMCPath(), '/libraries/')
@@ -26,7 +28,7 @@ const LibrariesManager = {
                     }else if(mcversion === '1.8.9' || mcversion === '1.8.8' || mcversion === '1.8') {
                         downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.customVersions.forge.version}-${mcversion}/forge-${profile.customVersions.forge.version}-${mcversion}-universal.jar`
                     }
-                    DownloadsManager.startFileDownload(`Minecraft Forge ${profile.customVersions.forge.version} for ${profile.name}`, downloadURL, jarPath).then(() => {
+                    DownloadsManager.startFileDownload(`Minecraft Forge ${profile.customVersions.forge.version}\n_A_${profile.name}`, downloadURL, jarPath).then(() => {
                         resolve();
                     });
                 });
@@ -48,6 +50,17 @@ const LibrariesManager = {
                 })
             }else{
                 resolve();
+            }
+        })
+    },
+    cleanLibraries: function() {
+        LogManager.log('info', `[LibrariesManager] [CleanLibraries] Starting clean libraries...`);
+        fs.readdirSync(this.getMCMLibraries()).forEach(file => {
+            if(file.substring(0, 4) === 'mcm-') {
+                if(!ProfilesManager.loadedProfiles.find(prof => file === `mcm-${prof.id}`)) {
+                    rimraf.sync(path.join(this.getMCMLibraries(), file));
+                    LogManager.log('info', `[LibrariesManager] [CleanLibraries] Removed library ${file}`);
+                }
             }
         })
     }

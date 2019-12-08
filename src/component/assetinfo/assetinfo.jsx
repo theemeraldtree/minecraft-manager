@@ -3,11 +3,11 @@ import styled from 'styled-components';
 import Button from '../button/button';
 import AssetCard from '../assetcard/assetcard';
 import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
-import Curse from '../../host/curse/curse';
 import VersionCard from '../versioncard/versioncard';
 import Detail from '../detail/detail';
 import Global from '../../util/global';
 import CustomDropdown from '../customdropdown/customdropdown';
+import Hosts from '../../host/Hosts';
 const LoadingText = styled.div`
     font-size: 23pt;
     display: flex;
@@ -19,7 +19,7 @@ const LoadingText = styled.div`
 `
 
 const Description = styled.div`
-    overflow: scroll;
+    overflow-y: scroll;
     background-color: #717171;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -53,10 +53,6 @@ const Header = styled.h4`
     color: white;
 `
 
-const Container = styled.div`
-    flex-shrink: 0;
-`
-
 const TryAgain = styled.p`
     margin: 0;
     color: lightblue;
@@ -87,13 +83,15 @@ export default class AssetInfo extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if(prevProps.versionState !== this.props.versionState && this.state.displayState === 'versions') {
+        if(prevProps.progressState !== this.props.progressState && this.state.displayState === 'versions') {
             this.showVersions();
         }
     }
 
     showDescription = async () => {
-        const newAsset = await Curse.addDescription(this.state.activeAsset);
+        const { host } = this.props;
+        const { activeAsset } = this.state;
+        const newAsset = await Hosts.addMissingInfo(host, 'description', activeAsset);
         if(newAsset.description) {
             this.setState({
                 activeAsset: newAsset,
@@ -108,21 +106,21 @@ export default class AssetInfo extends Component {
     }
 
     showDependencies = async () => {
-        const newAsset = Object.assign({}, this.state.activeAsset);
+        const { host } = this.props;
+        const { activeAsset } = this.state;
+        const newAsset = Object.assign({}, activeAsset);
         this.setState({
             assetDependencies: [<LoadingText key='loading'>loading...</LoadingText>]
         });
-        const res = await Curse.getDependencies(this.state.activeAsset);
-        console.log(res);
+
+        const res = await Hosts.getDependencies(host, activeAsset);
         if(res) {
-            console.log(res);
             newAsset.dependencies = res;
     
             let newDependList = [];
             if(res.length >= 1) {
                 for(let asset of res) {
-                    console.log(asset);
-                    newDependList.push(<AssetCard disableHover key={asset.id} showBlurb={true} asset={asset} />);
+                    newDependList.push(<AssetCard progressState={{}} disableHover key={asset.id} showBlurb={true} asset={asset} />);
                 }
             }else{
                 newDependList.push(<LoadingText key='none2'>No Dependencies</LoadingText>);
@@ -141,34 +139,36 @@ export default class AssetInfo extends Component {
         
     }
 
-    showVersions = async () =>{
+    showVersions = async () => {
         const { activeAsset, mcVerFilter } = this.state;
-        const { localAsset } = this.props;
+        const { specificMCVer, allowVersionReinstallation, host } = this.props;
         if(activeAsset.hosts.curse) {
             this.setState({
                 versions: [<LoadingText key ='loading1'>loading</LoadingText>]
             })
-            const versions = await Curse.getVersionsFromAsset(activeAsset);
+            const versions = await Hosts.getVersions(host, activeAsset);
             if(versions) {
                 let final = [];
                 for(let version of versions) {
                     if(version.minecraftversions.includes(mcVerFilter) || mcVerFilter === 'All') {
-    
-                        let ps = this.props.versionState[version.displayName];
-                        if(this.props.disableVersionInstall && ps !== 'installing') {
-                            ps = 'disable-install';
+                        let ps = this.props.progressState;
+                        if(this.props.disableVersionInstall && ps.progress !== 'installing') {
+                            ps.progress = 'disable-install';
                         }
                         const forceVerFilter = this.props.forceVersionFilter && (mcVerFilter !== this.props.mcVerFilter);
-                        if(localAsset) {
-                            final.push(<VersionCard key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} installed={activeAsset.version.hosts.curse.fileID === version.hosts.curse.fileID} disableMcVer={forceVerFilter} version={version} />);
-                        }else{
-                            final.push(<VersionCard key={version.displayName} progressState={ps} installClick={this.versionInstall} asset={activeAsset} disableMCVer={forceVerFilter} version={version} />);
-                        }
+                        final.push(<VersionCard 
+                            allowVersionReinstallation={allowVersionReinstallation}
+                            badMCVer={specificMCVer ? !version.minecraftversions.includes(specificMCVer) : false}
+                            key={version.displayName}
+                            progressState={ps} 
+                            installClick={this.versionInstall} 
+                            asset={activeAsset}
+                            host={host}
+                            disableMcVer={forceVerFilter}
+                            version={version} />);
                     }
                 }
-    
-                console.log(this.state.scrollPosition);
-    
+        
                 if(final.length === 0) {
                     final.push(<LoadingText key='none1'>no versions found</LoadingText>)
                 }
@@ -192,8 +192,6 @@ export default class AssetInfo extends Component {
 
     versionInstall = (e) => {
         const version = Global.cached.versions[e.currentTarget.dataset.version];
-        console.log(Global.cached.versions);
-        console.log(version);
         this.setState({
             scrollPosition: this.versionsListRef.current.scrollTop
         })
@@ -213,7 +211,6 @@ export default class AssetInfo extends Component {
         }else if(newState === 'dependencies') {
             this.showDependencies();
         }else if(newState === 'versions') {
-            console.log(this.props.asset.minecraftversion);
             this.showVersions();
         }
     }
@@ -268,11 +265,6 @@ export default class AssetInfo extends Component {
                         <TryAgain onClick={this.tryAgain}>try again</TryAgain>
                     </LoadingText>}
                     {displayState === 'versions' && <>
-                        {localAsset && ! cantConnect && <Container>
-                            <Header>current version</Header>
-                            <VersionCard installed asset={activeAsset} version={activeAsset.version} />
-                        </Container>}
-
                         {!cantConnect && <>
                             <Header>all versions</Header>
                             <Detail>minecraft version</Detail>

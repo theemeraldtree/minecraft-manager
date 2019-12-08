@@ -17,7 +17,6 @@ export default class CustomDropdown extends Component {
         let finalArr = [];
         for(let item of this.props.items) {
             if(item instanceof Object) {
-                console.log(item);
                 finalArr.push(<option key={item.id} value={item.id}>{item.name}</option>)
             }else{
                 finalArr.push(<option key={item} value={item}>{item}</option>)
@@ -31,8 +30,6 @@ export default class CustomDropdown extends Component {
 
     componentDidUpdate(prevProps) {
         if(this.props.value !== prevProps.value) {
-            console.log('!! NEW VALUE !!');
-            console.log(this.props.value);
             this.setState({
                 value: this.props.value
             })

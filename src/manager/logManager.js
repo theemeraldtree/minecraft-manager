@@ -11,7 +11,7 @@ let LogManager = {
                 console.warn(`WARN ${message}`);
                 break;
             case 'INFO':
-                console.info(`INFO ${message}`);
+                console.info(message);
                 break;
             default:
                 console.error(`!!! ERROR MISSING SEVERITY !!! ${message}`);

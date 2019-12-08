@@ -3,8 +3,8 @@ import Page from '../page';
 import Header from '../../component/header/header';
 import SearchBox from '../../component/searchbox/searchbox';
 import DiscoverList from '../../component/discoverlist/discoverlist';
-import Curse from '../../host/curse/curse';
 import ProfilesManager from '../../manager/profilesManager';
+import Hosts from '../../host/Hosts';
 
 export default class DiscoverPage extends PureComponent {
     constructor() {
@@ -18,7 +18,12 @@ export default class DiscoverPage extends PureComponent {
     }
 
     componentDidMount() {
+        ProfilesManager.registerReloadListener(this.updateProgressStates);
         this.updateProgressStates();
+    }
+
+    componentWillUnmount() {
+        ProfilesManager.unregisterReloadListener(this.updateProgressStates);
     }
 
     searchChange = (e) => {
@@ -48,43 +53,36 @@ export default class DiscoverPage extends PureComponent {
     }
 
     updateProgressStates = () => {
-        let ps = {};
-        for(let profile of ProfilesManager.loadedProfiles) {
-            if(profile.hosts) {
-                if(profile.hosts.curse) {
-                    ps[profile.id] = 'installed';
-                }
-            }
-        }
-
-        for(let profile of ProfilesManager.profilesBeingInstalled) {
-            ps[profile] = 'installing';
-        }
-
         this.setState({
-            progressState: ps
-        })
+            progressState: ProfilesManager.progressState
+        });
+        this.forceUpdate();
     }
 
-    installClick = (e) => {
+    installClick = async (e) => {
         e.stopPropagation();
         let cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
-        let modpack = Curse.cached.assets[cachedID];
-        let id = modpack.id;
-        let ps = Object.assign({}, this.state.progressState);
-        ps[id] = 'installing';
-        this.setState({
-            progressState: ps
-        }, async () => {
-            await Curse.installModpack(modpack);
-            ProfilesManager.getProfiles().then(() => {
-                this.updateProgressStates();
-            })
-            // Curse.installModpack(modpack).then(() => {
-            //     ProfilesManager.getProfiles().then(() => {
-            //         this.updateProgressStates();
-            //     });
-            // });
+        let modpack = Hosts.cache.assets[cachedID];
+        ProfilesManager.progressState[modpack.id] = {
+            progress: 'installing',
+            version: `temp-${new Date().getTime()}`
+        }
+        this.updateProgressStates();
+        await Hosts.installModpack('curse', modpack);
+        ProfilesManager.getProfiles().then(() => {
+            this.updateProgressStates();
+        });
+    }
+    
+    versionInstall = async (version, mp) => {
+        ProfilesManager.progressState[mp.id] = {
+            progress: 'installing',
+            version: version.displayName
+        }
+        this.updateProgressStates();
+        await Hosts.installModpackVersion('curse', mp, version.hosts.curse.fileID);
+        ProfilesManager.getProfiles().then(() => {
+           this.updateProgressStates();
         })
     }
 
@@ -93,9 +91,26 @@ export default class DiscoverPage extends PureComponent {
         return (
             <Page>
                 <Header showBackButton={listState !== 'browseAssets'} backClick={this.backClick} title='discover'>
-                    {listState === 'browseAssets' && <SearchBox value={this.state.searchValue} onChange={this.searchChange} onKeyPress={this.searchChange} placeholder='search' />}
+                    {listState === 'browseAssets' && <SearchBox 
+                                                        value={this.state.searchValue} 
+                                                        onChange={this.searchChange} 
+                                                        onKeyPress={this.searchChange} 
+                                                        placeholder='search' 
+                                                    />
+                    }
                 </Header>
-                <DiscoverList mcVerFilter='All' versionState={{}} progressState={progressState} stateChange={this.listStateChange} state={listState} type='profile' installClick={this.installClick} searchTerm={this.state.searchTerm} />
+
+                <DiscoverList 
+                    host='curse' 
+                    mcVerFilter='All' 
+                    versionInstall={this.versionInstall} 
+                    progressState={progressState} 
+                    stateChange={this.listStateChange} 
+                    state={listState} 
+                    type='profile' 
+                    installClick={this.installClick} 
+                    searchTerm={this.state.searchTerm} 
+                />
             </Page>
         )
     }

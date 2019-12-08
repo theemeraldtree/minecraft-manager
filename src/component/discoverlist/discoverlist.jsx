@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Curse from '../../host/curse/curse';
 import styled from 'styled-components';
 import AssetCard from '../assetcard/assetcard';
 import AssetInfo from '../assetinfo/assetinfo';
+import Hosts from '../../host/Hosts';
 
 const LoadingText = styled.div`
     font-size: 23pt;
@@ -27,31 +27,40 @@ const TryAgain = styled.p`
     color: lightblue;
     font-size: 14pt;
     cursor: pointer;
-`
+`;
+
+const Persists = styled.p`
+    font-size: 14pt;
+    text-align: center;
+    color: white;
+`;
 export default class DiscoverList extends Component {
     constructor(props) {
         super(props);
         this.listRef = React.createRef();
         this.state = {
             displayState: '',
-            assetsList: [],
+            assets: [],
+            loading: true,
             cantConnect: false,
             isSearching: false
         }
     }
 
     browseAssets = async () => {
+        const { host, type } = this.props;
         this.setState({
             displayState: 'browseAssets',
             isSearching: false,
             cantConnect: false
         })
 
-        console.log('browse assets');
-
-        const assets = await Curse.getPopularAssets(this.props.type);
+        const assets = await Hosts.getTopAssets(host, type);
         if(assets) {
-            this.renderAssets(assets);
+            this.setState({
+                assets: assets,
+                loading: false
+            })
         }else{
             this.setState({
                 cantConnect: true
@@ -61,12 +70,17 @@ export default class DiscoverList extends Component {
 
     static getDerivedStateFromProps(props) {
         return {
-            displayState: props.state
+            displayState: props.state,
+            progressState: props.progressState
         }
     }
 
     componentDidMount() {
         this.browseAssets();
+    }
+
+    shouldComponentUpdate() {
+        return true;
     }
 
     componentDidUpdate(prevProps) {
@@ -82,25 +96,9 @@ export default class DiscoverList extends Component {
     }
 
     updateProgressStates = () => {
-        this.renderAssets(this.state.assets);
-    }
-    renderAssets = (assets) => {
-        let newAssetsList = [];
-        let progressState = this.props.progressState;
-        if(assets) {
-            if(assets.length >= 1) {
-                for(let asset of assets) {
-                    newAssetsList.push(<AssetCard key={asset.id} installed={progressState[asset.id] === 'installed'} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall showBlurb asset={asset} />);
-                }
-            }else{
-                newAssetsList.push(<LoadingText key='none'>No Results</LoadingText>);
-            }
-        }
-
         this.setState({
-            assetsList: newAssetsList,
-            assets: assets
-        });
+            psUpdatePending: true
+        })
     }
 
     showAsset = (e) => {
@@ -110,7 +108,7 @@ export default class DiscoverList extends Component {
             if(this.listRef) {
                 scrollPos = this.listRef.current.scrollTop;
             }
-            let mod = Curse.cached.assets[e.currentTarget.dataset.cachedid];
+            let mod = Hosts.cache.assets[e.currentTarget.dataset.cachedid];
             this.props.stateChange('viewAsset');
             this.setState({
                 previousState: 'browseAssets',
@@ -124,15 +122,15 @@ export default class DiscoverList extends Component {
     
     stateChange = () => {
         const { state } = this.props;
-        if(state === 'browseAssets') {
+        if(state === 'browseAssets') {       
             if(this.state.scrollPos) {
                 this.listRef.current.scrollTop = this.state.scrollPos
             }   
         }
+
     }
 
     goBack = () => {
-        console.log('back has been clicked!');
         let { displayState, previousState } = this.state;
         let newState;
         switch(displayState) {
@@ -152,35 +150,13 @@ export default class DiscoverList extends Component {
     }
 
     showDescription = async () => {
-        const newAsset = await Curse.addDescription(this.state.activeAsset);
+        const { activeAsset } = this.state;
+        const { host } = this.props;
+        const newAsset = await Hosts.addMissingInfo(host, 'description', activeAsset);
         this.setState({
             activeAsset: newAsset,
             description: true
         })
-    }
-
-    showDependencies = async () => {
-        let newAsset = Object.assign({}, this.state.activeAsset);
-        this.setState({
-            assetDependencies: [<LoadingText key='loading'>loading...</LoadingText>]
-        });
-        const res = await Curse.getDependencies(this.state.activeAsset);
-        console.log(res);
-        newAsset.dependencies = res;
-
-        let newDependList = [];
-        if(res.length >= 1) {
-            for(let asset of res) {
-                newDependList.push(<AssetCard showInstall={true} disableHover key={asset.id} showBlurb={true} asset={asset} />);
-            }
-        }else{
-            newDependList.push(<LoadingText key='none2'>No Dependencies</LoadingText>);
-        }
-
-        this.setState({
-            activeAsset: newAsset,
-            assetDependencies: newDependList,
-        });
     }
 
     previewStateSwitch = (e) => {
@@ -191,8 +167,6 @@ export default class DiscoverList extends Component {
         });
         if(newState === 'description') {
             this.showDescription();
-        }else if(newState === 'dependencies') {
-            this.showDependencies();
         }
     }
 
@@ -205,18 +179,21 @@ export default class DiscoverList extends Component {
         }
     }
 
-    renderSearch = () => {
+    renderSearch = async () => {
         let { displayState } = this.state;
-        let term = this.props.searchTerm;
+        let { searchTerm, type, host } = this.props;
         this.setState({
-            assetsList: [],
+            assets: [],
+            loading: true,
             isSearching: true,
             cantConnect: false
         });
         if(displayState === 'browseAssets') {
-            if(term.trim() !== '') { 
-                Curse.search(term, this.props.type).then((res) => {
-                    this.renderAssets(res);
+            if(searchTerm.trim() !== '') { 
+                const res = await Hosts.searchAssets(host, type, searchTerm);
+                this.setState({
+                    assets: res,
+                    loading: false
                 });
             }else{
                 this.browseAssets();
@@ -225,23 +202,42 @@ export default class DiscoverList extends Component {
     }
 
     render() {
-        let { displayState, assetsList, activeAsset, cantConnect } = this.state;
-        let { type, progressState, installClick, versionInstall, mcVerFilter, forceVersionFilter, versionState, disableVersionInstall } = this.props;
+        let { displayState, assets, loading, activeAsset, progressState, cantConnect } = this.state;
+        let { type, installClick, versionInstall, allowVersionReinstallation, host, mcVerFilter, forceVersionFilter, specificMCVer } = this.props;
         return (
             <>
                 {displayState === 'browseAssets' && <>
-                    {assetsList.length !== 0 && 
-                        <List ref={this.listRef}>
-                            {assetsList}
-                        </List>
+                    <List ref={this.listRef}>
+                        {
+                            assets && assets.length >= 1 && !loading && assets.map(asset => {
+                                    if(!progressState[asset.id]) {
+                                        progressState[asset.id] = {};
+                                    }
+                                    return <AssetCard key={asset.id} progressState={progressState[asset.id]} onClick={this.showAsset} installClick={this.props.installClick} showInstall showBlurb asset={asset} />;
+                            })
+                        }
+                        {
+                            assets && assets.length === 0 && !loading && <LoadingText key='none'>No Results</LoadingText>
+                        }
+                    </List>
+                    {loading && !cantConnect && <LoadingText>loading...</LoadingText>}
+                    {cantConnect &&
+                        <LoadingText>
+                            can't connect
+                            <TryAgain onClick={this.tryAgain}>try again</TryAgain>
+                        </LoadingText>
                     }
-                    {assetsList.length === 0 && !cantConnect && <LoadingText>loading...</LoadingText>}
-                    {cantConnect && <LoadingText>
-                    can't connect
-                    <TryAgain onClick={this.tryAgain}>try again</TryAgain>
-                    </LoadingText>}
+
+                    {!assets && <>
+                        <LoadingText>
+                            something's strange<br />
+                            we can't find anything<br />
+                            <TryAgain onClick={this.tryAgain}>try again</TryAgain> 
+                            <Persists>problem persists? <a href="https://theemeraldtree.net/mcm/issues">report it here</a></Persists>
+                        </LoadingText>
+                    </>}
                 </>}
-                {displayState === 'viewAsset' && <AssetInfo versionInstall={versionInstall} progressState={progressState[activeAsset.id]} disableVersionInstall={disableVersionInstall} localAsset={false} versionState={versionState} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
+                {displayState === 'viewAsset' && <AssetInfo host={host} allowVersionReinstallation={allowVersionReinstallation} specificMCVer={specificMCVer} versionInstall={versionInstall} progressState={progressState[activeAsset.id]} localAsset={false} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
             </>
         )
     }

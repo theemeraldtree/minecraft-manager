@@ -8,7 +8,17 @@ function Mod(rawOMAF) {
     if(!this.files) {
         this.files = [];
     }
-    this.local = ['installed', 'detailedInfo', 'cachedID', 'iconpath', 'versions', 'downloadTemp']
+    this.local = ['installed', 'detailedInfo', 'cachedID', 'iconpath', 'versions', 'downloadTemp', 'primaryHost'];
+
+    this.getPrimaryHost();
+}
+
+Mod.prototype.getPrimaryHost = function() {
+    if(this.hosts.curse) {
+        this.primaryHost = 'curse'
+    }
+
+    return this.primaryHost;
 }
 
 Mod.prototype.setJARFile = function(newJarFile) {
@@ -36,6 +46,9 @@ Mod.prototype.getJARFile = function() {
         if(file.type === 'jar' && file.priority === 'mainFile') {
             return file;
         }
+    }
+    return {
+        path: undefined
     }
 }
 

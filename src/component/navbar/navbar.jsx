@@ -19,7 +19,11 @@ const Link = styled(NavLink)`
     text-decoration: none;
     font-size: 15pt;
     font-weight: 100;
-    &.active {
+    &:hover {
+        filter: brightness(0.75);
+    }
+    &.active, &.active:hover {
+        filter: brightness(1.0);
         font-weight: 900;
     }
     margin-bottom: 15px;
