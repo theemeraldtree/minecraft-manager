@@ -16,6 +16,7 @@ import Confirmation from '../../../component/confirmation/confirmation';
 import Overlay from '../../../component/overlay/overlay';
 import VersionsManager from '../../../manager/versionsManager';
 import Hosts from '../../../host/Hosts';
+import FabricManager from '../../../manager/fabricManager';
 const CustomVersions = styled.div`
     background-color: #505050;
     width: 350px;
@@ -102,6 +103,26 @@ export default class EditPageVersions extends Component {
             versionChangeWarning: false,
             mcverValue: this.state.newVersion
         })
+    }
+
+    downloadFabric = () => {
+        let { profile } = this.state;
+        this.setState({
+            fabricIsInstalling: true
+        });
+        FabricManager.getFabricLoaderVersions(profile.minecraftversion).then(versions => {
+            const version = versions[0];
+            profile.setFabricVersion(version.loader.version);
+            FabricManager.setupFabric(profile);
+        })
+    }
+
+    uninstallFabric = () => {
+        let { profile } = this.state;
+        delete profile.customVersions.fabric;
+        this.setState({
+            fabricIsUninstalling: true
+        });
     }
 
     downloadForge = () => {
@@ -225,7 +246,7 @@ export default class EditPageVersions extends Component {
     }
 
     render() {
-        let { profile, forgeIsInstalling, forgeIsUninstalling, mcverValue, curseVerValue, hostVersionValues } = this.state;
+        let { profile, fabricIsInstalling, forgeIsInstalling, forgeIsUninstalling, mcverValue, curseVerValue, hostVersionValues } = this.state;
         if(profile) {
             return (
                 <Page>
@@ -280,6 +301,16 @@ export default class EditPageVersions extends Component {
                             {profile.customVersions.forge && !forgeIsUninstalling && <>
                             <p>Version: {profile.customVersions.forge.version}</p>
                             <Button onClick={this.uninstallForge} color='red'>uninstall forge</Button>
+                            </>}
+                        </CustomVersions>
+                        <CustomVersions>
+                            <Detail>fabric</Detail>
+                            {!profile.customVersions.fabric && !fabricIsInstalling &&
+                            <Button onClick={this.downloadFabric} color='green'>install fabric</Button>}
+                            {fabricIsInstalling && <p>Fabric is installing. To check progress, open the Downloads viewer in the sidebar</p>}
+                            {profile.customVersions.fabric && <>
+                            <p>Version: {profile.customVersions.fabric.version}</p>
+                            <Button onClick={this.uninstallFabric} color='red'>uninstall fabric</Button>
                             </>}
                         </CustomVersions>
     

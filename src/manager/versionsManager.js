@@ -6,27 +6,54 @@ import rimraf from 'rimraf';
 import ProfilesManager from './profilesManager';
 import LogManager from './logManager';
 const defaultVersion = require('../assets/defaultVersion.json');
+const defaultVersionFabric = require('../assets/defaultVersionFabric.json');
 const version1710 = require('../assets/1710version.json');
 const semver = require('semver');
 const VersionsManager = {
     getVersionsPath: function() {
         return path.join(Global.getMCPath(), '/versions')
     },
-    createVersion: function(profile) {
+    createVersion: function(profile, type) {
         let versionname = `${profile.safename} [Minecraft Manager]`;
         if(!fs.existsSync(path.join(this.getVersionsPath(), versionname))) {
             fs.mkdirSync(path.join(this.getVersionsPath(), versionname));
         }
-        let obj = defaultVersion;
-        if(this.checkIs1710OrLower(profile)) {
-            obj = version1710;
+        let obj;
+        if(type === 'forge') {
+            obj = defaultVersion;
+            if(this.checkIs1710OrLower(profile)) {
+                obj = version1710;
+            }
+            obj.id = versionname;
+            obj.inheritsFrom = profile.minecraftversion;
+            obj.jar = profile.minecraftversion;
+            obj.assets = profile.minecraftversion;
+            obj.libraries[0].name = `minecraftmanager.profiles:mcm-${profile.id}`;
         }
+        fs.writeFile(path.join(this.getVersionsPath(), versionname, `${versionname}.json`), JSON.stringify(obj), () => {
+            profile.setVersion(versionname);
+            LauncherManager.setProfileData(profile, 'lastVersionId', versionname);
+        });
+    },
+    createVersionFabric: function(profile, meta) {
+
+        let versionname = `${profile.safename} [Minecraft Manager]`;
+        if(!fs.existsSync(path.join(this.getVersionsPath(), versionname))) {
+            fs.mkdirSync(path.join(this.getVersionsPath(), versionname));
+        }
+        let obj = defaultVersionFabric;
+        obj.libraries = meta.launcherMeta.libraries.common;
         obj.id = versionname;
         obj.inheritsFrom = profile.minecraftversion;
-        obj.jar = profile.minecraftversion;
-        obj.assets = profile.minecraftversion;
-        obj.libraries[0].name = `minecraftmanager:profiles:mcm-${profile.id}`;
 
+        obj.libraries.push({
+            name: `minecraftmanager.profiles:mcm-${profile.id}:fabric-intermediary`,
+            url: `https://maven.fabricmc.net`
+        });
+        obj.libraries.push({
+            name: `minecraftmanager.profiles:mcm-${profile.id}:fabric-loader`,
+            url: `https://maven.fabricmc.net`
+        });
         fs.writeFile(path.join(this.getVersionsPath(), versionname, `${versionname}.json`), JSON.stringify(obj), () => {
             profile.setVersion(versionname);
             LauncherManager.setProfileData(profile, 'lastVersionId', versionname);

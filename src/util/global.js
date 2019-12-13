@@ -48,7 +48,7 @@ const Global = {
                 this.parseVersionsJSON(JSON.parse(fs.readFileSync(path.join(this.MCM_PATH, '/mcvercache.json'))));
             }
         }catch(e) {
-            ToastManager.createToast(`Just a quick note`, `There's a corrupt Minecraft verison cache. However this probably won't continue in the future.`);
+            ToastManager.createToast(`Just a quick note`, `There's a corrupt Minecraft version cache. However this probably won't continue in the future.`);
         }
 
         try {
