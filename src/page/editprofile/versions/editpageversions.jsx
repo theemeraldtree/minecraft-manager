@@ -70,7 +70,7 @@ export default class EditPageVersions extends Component {
 
     mcverChange = (version, e) => {
         let { profile } = this.state;
-        if(!profile.customVersions.forge) {
+        if(!profile.customVersions.forge && !profile.customVersions.fabric) {
             this.setState({
                 mcverValue: version
             })
@@ -99,6 +99,7 @@ export default class EditPageVersions extends Component {
     confirmVersionChange = () => {
         this.state.profile.changeMCVersion(this.state.newVersion);
         this.uninstallForge();
+        this.uninstallFabric();
         this.setState({
             versionChangeWarning: false,
             mcverValue: this.state.newVersion
@@ -112,12 +113,19 @@ export default class EditPageVersions extends Component {
         });
         FabricManager.getFabricLoaderVersions(profile.minecraftversion).then(versions => {
             const version = versions[0];
-            profile.setFabricVersion(version.loader.version);
-            FabricManager.setupFabric(profile).then(() => {
+            if(version) {
+                profile.setFabricVersion(version.loader.version);
+                FabricManager.setupFabric(profile).then(() => {
+                    this.setState({
+                        fabricIsInstalling: false
+                    })
+                });
+            }else{
                 this.setState({
-                    fabricIsInstalling: false
+                    fabricIsInstalling: false,
+                    noFabricVerAvailable: true
                 })
-            });
+            }
         })
     }
 
@@ -254,6 +262,12 @@ export default class EditPageVersions extends Component {
         })
     }
 
+    closeNoFabricVer = () => {
+        this.setState({
+            noFabricVerAvailable: false
+        })
+    }
+
     render() {
         let { profile, fabricIsInstalling, forgeIsInstalling, forgeIsUninstalling, mcverValue, curseVerValue, hostVersionValues } = this.state;
         if(profile) {
@@ -277,6 +291,16 @@ export default class EditPageVersions extends Component {
                             <p>There is no Forge version available for Minecraft {profile.minecraftversion}</p>
                             <InputContainer>
                                 <Button color='green' onClick={this.closeNoForgeVer}>ok</Button>
+                            </InputContainer>
+                        </BG>
+                    </Overlay>}
+
+                    {this.state.noFabricVerAvailable && <Overlay>
+                        <BG>
+                            <Title>no fabric version</Title>
+                            <p>There is no Fabric version available for Minecraft {profile.minecraftversion}</p>
+                            <InputContainer>
+                                <Button color='green' onClick={this.closeNoFabricVer}>ok</Button>
                             </InputContainer>
                         </BG>
                     </Overlay>}
@@ -328,7 +352,7 @@ export default class EditPageVersions extends Component {
                             <p>There is currently no support for Forge in Minecraft 1.13+, however it may be implemented in the future.</p>
                             <a href="https://github.com/stairman06/minecraft-manager/wiki/Forge-1.13-">For why, check out this wiki article</a>
                         </Confirmation> }
-                        {this.state.versionChangeWarning && <Confirmation confirmDelete={this.confirmVersionChange} cancelDelete={this.cancelVersionChange} questionText='Changing your Minecraft version will remove Forge and all your mods. Are you sure?' cancelText="Don't change" confirmText='Yes, change it' />}
+                        {this.state.versionChangeWarning && <Confirmation confirmDelete={this.confirmVersionChange} cancelDelete={this.cancelVersionChange} questionText='Changing your Minecraft version will remove Forge/Fabric and all your mods. Are you sure?' cancelText="Don't change" confirmText='Yes, change it' />}
                     </EditContainer>
                 </Page>
             )

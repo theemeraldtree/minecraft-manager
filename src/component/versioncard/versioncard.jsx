@@ -7,7 +7,7 @@ import Hosts from '../../host/Hosts';
 const BG = styled.div`
     margin-top: 5px;
     width: 100%;
-    height: 60px;
+    height: 70px;
     display: flex;
     background-color: #717171;
     flex-flow: column;
@@ -23,7 +23,7 @@ const BG = styled.div`
 `
 
 const InfoSection = styled.div`
-    margin-top: 20px;
+    margin-top: 30px;
     flex: 1 1 auto;
     position: relative;
     padding-bottom: 10px;
@@ -44,6 +44,12 @@ const Title = styled.p`
     user-select: none;
     display: inline-block;
     white-space: nowrap;
+`
+
+const Modloader = styled.p`
+    color: #d9d9d9;
+    position: absolute;
+    top: 17px;
 `
 
 const Details = styled.div`
@@ -129,6 +135,9 @@ export default class VersionCard extends PureComponent {
             <BG extraInfo={showMoreInfo}>
                 <Details>
                     <Title>{version.displayName}</Title>
+                    {version.hosts.curse && <Modloader>
+                        {version.hosts.curse.localValues.inferredModloader}
+                    </Modloader>}
                 </Details>
                 {!hideButtons && 
                     <ButtonContainer>
