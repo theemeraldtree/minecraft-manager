@@ -113,16 +113,25 @@ export default class EditPageVersions extends Component {
         FabricManager.getFabricLoaderVersions(profile.minecraftversion).then(versions => {
             const version = versions[0];
             profile.setFabricVersion(version.loader.version);
-            FabricManager.setupFabric(profile);
+            FabricManager.setupFabric(profile).then(() => {
+                this.setState({
+                    fabricIsInstalling: false
+                })
+            });
         })
     }
 
     uninstallFabric = () => {
         let { profile } = this.state;
-        delete profile.customVersions.fabric;
         this.setState({
             fabricIsUninstalling: true
         });
+        FabricManager.uninstallFabric(profile).then(() => {
+            this.setState({
+                fabricIsUninstalling: false
+            })
+        })
+       
     }
 
     downloadForge = () => {

@@ -4,6 +4,7 @@ import DownloadsManager from "./downloadsManager";
 import LibrariesManager from "./librariesManager";
 import path from 'path';
 import fs from 'fs';
+import LauncherManager from "./launcherManager";
 
 const FabricManager = {
     setupFabric: (profile) => {
@@ -36,6 +37,18 @@ const FabricManager = {
 
             
             resolve();
+        })
+    },
+    uninstallFabric: (profile) => {
+        return new Promise(resolve => {
+            LibrariesManager.deleteLibrary(profile).then(() => {
+                VersionsManager.deleteVersion(profile).then(() => {
+                    LauncherManager.setProfileData(profile, 'lastVersionId', profile.minecraftversion);
+                    delete profile.customVersions.fabric;
+                    profile.save();
+                    resolve();
+                })
+            })
         })
     },
     getFabricLoaderVersions: (mcversion) =>     {
