@@ -81,9 +81,9 @@ const Hosts = {
         }
     },
 
-    async getLatestVersionForMCVersion(host, asset, mcVersion) {
+    async getLatestVersionForMCVersion(host, asset, mcVersion, modloader) {
         if(host === 'curse') {
-            return await Curse.getLatestVersionForMCVersion(asset, mcVersion);
+            return await Curse.getLatestVersionForMCVersion(asset, mcVersion, modloader);
         }
     },
 
@@ -156,7 +156,14 @@ const Hosts = {
             }
         }
 
-        const ver = await this.getLatestVersionForMCVersion(host, mod, profile.minecraftversion);
+        let modloader;
+        if(profile.customVersions.forge) {
+            modloader = 'forge';
+        }else if(profile.customVersions.fabric) {
+            modloader = 'fabric';
+        }
+
+        const ver = await this.getLatestVersionForMCVersion(host, mod, profile.minecraftversion, modloader);
         if(!ver) {
             return 'no-version-available';
         }

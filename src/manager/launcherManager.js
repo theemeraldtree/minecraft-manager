@@ -22,7 +22,7 @@ const LauncherManager = {
     },
     updateVersion: function(profile) {
         let verId;
-        if(profile.customVersions.forge) {
+        if(profile.customVersions.forge || profile.customVersions.fabric) {
             verId = `${profile.safename} [Minecraft Manager]`
         }else{
             verId = profile.minecraftversion;
