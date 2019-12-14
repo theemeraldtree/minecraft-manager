@@ -150,15 +150,27 @@ export default class EditPageMods extends PureComponent {
             version: `temp-${new Date().getTime()}`
         }
         this.updateProgressStates();
-        try {
-           await Hosts.installModToProfile('curse', this.state.profile, mod);
-           this.updateProgressStates();
-        }catch(err) {
-            if(err === 'no-version-available') {
-                profile.progressState[id].progress = 'notavailable';
-                this.updateProgressStates();
-                ToastManager.createToast(`Error`, `There is no Minecraft ${profile.minecraftversion} version of ${mod.name} available.`);
+        const m = await Hosts.installModToProfile('curse', this.state.profile, mod);
+        this.updateProgressStates();
+        if(m === 'no-version-available') {
+            let modloader;
+            if(profile.customVersions.forge) {
+                modloader = 'Forge';
+            }else if(profile.customVersions.fabric) {
+                modloader = 'Fabric';
+            }else{
+                modloader = 'none';
             }
+
+            if(modloader !== 'none') {
+                profile.progressState[id].progress = 'notavailable';
+                ToastManager.createToast(`Unavailable`, `There is no ${modloader}-compatible Minecraft ${profile.minecraftversion} version of ${mod.name} available.`);
+            }else{
+                profile.progressState[id].progress = '';
+                ToastManager.createToast(`No modloader`, `You don't have a modloader installed. Install one in the versions tab first.`);
+            }
+
+            this.updateProgressStates();
         }
     }
 

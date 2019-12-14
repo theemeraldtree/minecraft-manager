@@ -280,40 +280,33 @@ const Curse = {
     // gets the latest version of the asset available for a specific minecraft version
     async getLatestVersionForMCVersion(asset, mcVersion, modloader) {
         if(asset.hosts.curse.localValues && asset.hosts.curse.localValues.gameVerLatestFiles) {
-            if(modloader === 'fabric') {
-                // curse does a terrible job indicating whether a file is forge or fabric
-                // we have to make a bunch of guesses
-                    
-                // now it's time to verify modloader compatibility
-
-                const versions = await this.getVersions(asset);
-                const file = versions.find(ver => {
-                    return (
-                        ver.minecraftversions.includes(mcVersion) &&
-                        ver.hosts.curse.localValues.inferredModloader === 'fabric'
-                    );
-                });
+            // curse does a terrible job indicating whether a file is forge or fabric
+            // we have to make a bunch of guesses
                 
+            // now it's time to verify modloader compatibility
 
-                if(file) {
-                    file.projectFileId = file.hosts.curse.fileID;
-                    return file;
-                }
-                
-                return undefined;
-            }
-
-            const file = asset.hosts.curse.localValues.gameVerLatestFiles.find(
-                ver => ver.gameVersion === mcVersion
-            );
-
-            return file;
+            const versions = await this.getVersions(asset);
+            const file = versions.find(ver => {
+                return (
+                    ver.minecraftversions.includes(mcVersion) &&
+                    ver.hosts.curse.localValues.inferredModloader === modloader
+                );
+            });
             
-        }else{
-            const fullAsset = this.getFullAsset(asset);
-            const res = await this.getLatestVersionForMCVersion(fullAsset, mcVersion);
-            return res;
+
+            if(file) {
+                file.projectFileId = file.hosts.curse.fileID;
+                return file;
+            }
+            
+            return undefined;
         }
+
+        const file = asset.hosts.curse.localValues.gameVerLatestFiles.find(
+            ver => ver.gameVersion === mcVersion
+        );
+
+        return file;
     },
 
     // gets the changelog from a file id
