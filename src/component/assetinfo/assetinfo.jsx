@@ -20,7 +20,7 @@ const LoadingText = styled.div`
 
 const Description = styled.div`
     overflow-y: scroll;
-    background-color: #717171;
+    background-color: #404040;
     margin-top: 10px;
     margin-bottom: 10px;
 `
@@ -30,12 +30,12 @@ const HeaderButtons = styled.div`
 `
 
 const HB = styled(Button)`
-    background-color: #717171;
+    background-color: #404040;
     ${props => props.active && `
         border-bottom: 2px solid #08b20b;
     `}
     ${props => !props.active && `
-        border-bottom: 2px solid #717171;
+        border-bottom: 2px solid #404040;
     `}
     margin-right: 3px;
 `

@@ -5,7 +5,7 @@ const BG = styled.div`
     margin-top: 5px;
     width: 100%;
     height: 90px;
-    background-color: #717171;
+    background-color: #404040;
     display: inline-flex;
     user-select: none;
     position: relative;

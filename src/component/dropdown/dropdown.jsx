@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 const Dropdown = styled.select`
-    background-color: #717171;
+    background-color: #404040;
     outline: none;
     border: 0;
     color: white;

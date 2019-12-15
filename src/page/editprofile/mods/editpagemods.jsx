@@ -22,7 +22,7 @@ const Wrapper = styled.div`
     overflow: hidden;
 `
 const Container = styled.div`
-    background-color: #505050;
+    background-color: #2b2b2b;
     overflow: hidden;
     padding: 10px;
     display: flex;
@@ -45,7 +45,7 @@ const Search = styled(TextInput)`
 const SearchContainer = styled(InputContainer)`
     margin-top: 10px;
     flex-shrink: 0;
-    background-color: #717171;
+    background-color: #404040;
 `
 
 

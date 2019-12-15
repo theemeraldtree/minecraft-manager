@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 const BG = styled.div`
     height: 100%;
     position: absolute;
-    background-color: #505050;
+    background-color: #404040;
     width: 120px;
 `
 

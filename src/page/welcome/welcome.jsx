@@ -21,7 +21,7 @@ const Title = styled.p`
     margin: 0;
 `
 const WelcomeBox = styled.div`
-    background-color: #717171;
+    background-color: #404040;
     max-width: 600px;
     padding: 10px;
     text-align: center;

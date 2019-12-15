@@ -27,7 +27,7 @@ const BG = styled.div`
     max-width: 350px;
     height: fit-content;
     min-height: 50px;
-    background-color: #262626;
+    background-color: #2b2b2b;
     z-index: 9999;
     box-shadow: 0px 0px 17px 0px rgba(0,0,0,0.75);
     color: white;

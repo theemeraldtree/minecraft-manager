@@ -24,7 +24,7 @@ const AboutTop = styled.div`
         font-weight: thin;
         font-size: 13pt;
     }
-    background-color: grey;
+    background-color: #505050;
 `
 
 const AboutBottom = styled.div`

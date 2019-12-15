@@ -61,7 +61,7 @@ const ButtonGroup = styled.div`
 `
 
 const Specs = styled.div`
-    background-color: #717171;
+    background-color: #404040;
     flex: 0 1 auto;
     width: 100%;
     height: 230px;
@@ -74,7 +74,7 @@ const Specs = styled.div`
 
 const Description = styled.div`
     overflow-y: scroll;
-    background-color: #717171;
+    background-color: #404040;
     margin: 10px;
 `
 class ViewProfilePage extends PureComponent {

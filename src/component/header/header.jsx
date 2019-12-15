@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 const BG = styled.div`
     min-height: 60px;
-    background-color: #262626;
+    background-color: #2b2b2b;
     display: flex;
     align-items: center;
 `

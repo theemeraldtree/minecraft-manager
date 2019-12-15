@@ -9,7 +9,7 @@ const BG = styled.div`
     width: 100%;
     height: 70px;
     display: flex;
-    background-color: #717171;
+    background-color: #404040;
     flex-flow: column;
     user-select: none;
 
@@ -73,7 +73,7 @@ const Changelog = styled.div`
     height: 200px;
     overflow-y: scroll;
     width: 100%;
-    background-color: #505050;
+    background-color: #2b2b2b;
 `
 
 const ButtonContainer = styled.div`

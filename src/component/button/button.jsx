@@ -4,13 +4,13 @@ function getColor(name) {
         case 'purple':
             return '#911895';
         case 'green':
-            return '#15950C';
+            return '#138c0a';
         case 'yellow':
-            return '#D4B107';
+            return '#a18606';
         case 'blue':
             return '#185F95';
         case 'red':
-            return '#951818';
+            return '#8a1111';
     }
 }
 const Button = styled.div.attrs(props => ({
@@ -26,6 +26,9 @@ const Button = styled.div.attrs(props => ({
     ${props => props.disabled && `
         filter: brightness(0.65);
     `}
+    img {
+        width: 90%;
+    }
     &:hover {
         ${props => !props.disabled && `
             filter: brightness(0.75);

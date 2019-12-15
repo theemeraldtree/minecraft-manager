@@ -18,7 +18,7 @@ import VersionsManager from '../../../manager/versionsManager';
 import Hosts from '../../../host/Hosts';
 import FabricManager from '../../../manager/fabricManager';
 const CustomVersions = styled.div`
-    background-color: #505050;
+    background-color: #2b2b2b;
     width: 350px;
     padding: 10px;
 `

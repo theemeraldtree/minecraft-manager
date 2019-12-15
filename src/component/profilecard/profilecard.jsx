@@ -5,10 +5,13 @@ import Button from '../button/button';
 import { withRouter } from 'react-router-dom';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import Global from '../../util/global';
+import edit from './img/edit.png';
+import launch from './img/launch.png';
+
 const BG = styled.div`
-    width:120px;
-    height: 190px;
-    background-color: #717171;
+    width: 110px;
+    height: 180px;
+    background-color: #404040;
     display: inline-flex;
     margin: 5px;
     align-items: center;
@@ -16,28 +19,34 @@ const BG = styled.div`
     cursor: pointer;
     user-select: none;
     position: relative;
+    transition: 100ms;
+    .buttons {
+        transition: 100ms;
+        bottom: -40px;
+    }
+    overflow: hidden;
     &:hover {
         background-color: #5b5b5b;
+        .buttons {
+            bottom: 3px;
+        }
     }
 `
 
-const Image = styled.div.attrs(props => ({
-    style: {
-        backgroundImage: `url('${props.src})`
-    }
-}))`
+const Image = styled.img`
     width: 100%;
-    height: 80px;
     background-size: contain;
     background-repeat: no-repeat;
-    margin-top: 5px;
     background-position: center;
 `
 
 const Title = styled.p`
     color: white;
     font-weight: bolder;
-    display: -webkit-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -46,6 +55,7 @@ const Title = styled.p`
     margin: 5px 2px;
     user-select: none;
     max-width: 120px;
+    font-size: 11pt;
 `
 
 const Buttons = styled.div`
@@ -53,17 +63,36 @@ const Buttons = styled.div`
     flex-flow: row;
     bottom: 3px;
     position: absolute;
+    left: 0;
+    right: 0;
+    padding-left: 2px;
+    padding-right: 2px;
 `
 
 const LaunchButton = styled(Button)`
-    padding-top: 6px;
-    padding-bottom: 6px;
+    img {
+        width: 20px;
+    }
+    width: 70px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
 `
 
 const EditButton = styled(Button)`
-    padding: 6px 0 6px 0;
-    width: 40px;
+    padding: 3px;
+    padding-left: 0;
+    padding-right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+        width: 20px;
+    }
     margin-left: 3px;
+    width: 30px;
     text-align: center;
 `
 
@@ -97,9 +126,13 @@ const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) =>
             <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
                 <Image src={`${profile.iconpath}#${Global.cacheUpdateTime}`} />
                 <Title>{profile.name}</Title>
-                <Buttons>
-                    <LaunchButton color='green' onClick={(e) => {e.stopPropagation();profile.launch();}}>launch</LaunchButton>
-                    <EditButton color='yellow' onClick={(e) => {e.stopPropagation();history.push(`/edit/general/${profile.id}`);}}>edit</EditButton>
+                <Buttons className='buttons'>
+                    <LaunchButton color='green' onClick={(e) => {e.stopPropagation();profile.launch();}}>
+                        <img src={launch} />
+                    </LaunchButton>
+                    <EditButton color='yellow' onClick={(e) => {e.stopPropagation();history.push(`/edit/general/${profile.id}`);}}>
+                        <img src={edit} />
+                    </EditButton>
                 </Buttons>
             </BG>
         </ContextMenuTrigger>

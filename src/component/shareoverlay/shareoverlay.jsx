@@ -33,7 +33,7 @@ const Breaker = styled.div`
 
 const ExportList = styled.div`
     overflow-y: scroll;
-    background-color: #717171;
+    background-color: #404040;
     margin-top: 5px;
     height: min-content;
 `

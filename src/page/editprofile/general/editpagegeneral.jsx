@@ -23,7 +23,7 @@ const LongDesc = styled(TextBox)`
 const IconWrapper = styled.div`
     width: 80px;
     height: 80px;
-    background-color: #717171;
+    background-color: #404040;
     display: flex;
     align-items: center;
     justify-content: center;
