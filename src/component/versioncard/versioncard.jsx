@@ -14,7 +14,7 @@ const BG = styled.div`
     user-select: none;
 
     ${props => props.extraInfo && `
-        height: 300px;
+        height: 310px;
     `}
     transition: height 150ms ease;
     position: relative;

@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import Page from '../page';
 import Header from '../../component/header/header';
@@ -38,7 +39,7 @@ const CreateControls = styled.div`
         margin: 2px;
     }
 `
-export default class HomePage extends PureComponent {
+export default withRouter(class HomePage extends PureComponent {
     constructor() {
         super();
         this.state = {
@@ -87,9 +88,7 @@ export default class HomePage extends PureComponent {
 
     create = () => {
         ProfilesManager.createProfile(this.state.createName, this.state.mcVersion).then(() => {
-            this.setState({
-                showCreate: false
-            })
+            this.props.history.push(`/profile/${Global.createID(this.state.createName)}`);
         })
     }
 
@@ -141,4 +140,4 @@ export default class HomePage extends PureComponent {
         )
     }
 
-}
+});
