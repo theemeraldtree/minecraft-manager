@@ -9,7 +9,7 @@ const DelConfirm = styled.div`
     max-width: 350px;
     max-height: 200px;
     margin: 10px;
-    background-color: #444444;
+    background-color: #222;
     color: white;
     position: relative;
     padding: 10px;

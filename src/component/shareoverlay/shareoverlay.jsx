@@ -10,7 +10,7 @@ const BG = styled.div`
     height: fit-content;
     max-width: 600px;
     max-height: 500px;
-    background-color: #444444;
+    background-color: #222;
     padding: 10px;
     color: white;
     display: flex;
@@ -39,7 +39,7 @@ const ExportList = styled.div`
 `
 
 const ExportItem = styled.div`
-    border-bottom: 2px solid #444444;
+    border-bottom: 2px solid #222;
     display: flex;
     align-items: center;
     &:last-child {

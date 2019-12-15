@@ -18,6 +18,7 @@ const LoadingText = styled.div`
 const List = styled.div`
     flex: 1 1 auto;
     overflow-y: scroll;
+    padding-bottom: 10px;
 `
 
 const TryAgain = styled.p`

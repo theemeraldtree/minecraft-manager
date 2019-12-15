@@ -18,7 +18,7 @@ const CreateBG = styled.div`
     max-height: 400px;
     width: 100%;
     height: 100%;
-    background-color: #444444;
+    background-color: #222;
     color: white;
     padding: 10px;
     position: relative;

@@ -24,13 +24,12 @@ const Image = styled.div.attrs(props => ({
         backgroundImage: `url('${props.src}')`
     }
 }))`
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     flex-shrink: 0;
-    margin: 5px;
 `
 
 const Title = styled.p`
@@ -61,6 +60,7 @@ const Version = styled.p`
     margin: 5px;
     margin-top: 0;
     user-select: none;
+    color: #dddbdd;
     ${props => props.buttonShown && `
         margin-right: 80px;
     `}

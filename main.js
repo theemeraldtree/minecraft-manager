@@ -90,7 +90,7 @@ let dev = require('process').execPath.includes('electron');
 let mainWindow;
 
 function createWindow() {
-    mainWindow = new BrowserWindow({width: 800, height: 800, frame: false, backgroundColor: '#444444', webPreferences: {webSecurity: false}, titleBarStyle: 'hidden'});
+    mainWindow = new BrowserWindow({width: 800, height: 800, frame: false, backgroundColor: '#222', webPreferences: {webSecurity: false}, titleBarStyle: 'hidden'});
 
     if(dev) {
 
