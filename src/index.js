@@ -57,12 +57,15 @@ async function load() {
   });
 
   try {
-    Global.checkMinecraftVersions();
-    Global.checkMinecraftProfiles();
-    Global.checkMinecraftLibraries();
-    Global.checkChangelog();
-    // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
-    Global.checkMigration();
+    if(fs.existsSync(Global.PROFILES_PATH)) {
+
+      Global.checkMinecraftVersions();
+      Global.checkMinecraftProfiles();
+      Global.checkMinecraftLibraries();
+      Global.checkChangelog();
+      // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
+      Global.checkMigration();
+    }
   }catch(e) {
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
     console.error(e);
