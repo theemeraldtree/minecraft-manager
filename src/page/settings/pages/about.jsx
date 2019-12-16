@@ -138,6 +138,7 @@ export default function About() {
                     <li><a href="https://github.com/apostrophecms/sanitize-html">sanitize-html</a></li>
                     <li><a href="https://fonts.google.com/specimen/Roboto">the Roboto font</a></li>
                     <li><a href="https://github.com/KyleAMathews/typefaces/tree/master/packages/roboto">typeface-roboto</a></li>
+                    <li><a href="https://github.com/ooade/react-click-away-listener">react-click-away-listener</a></li>
                     <li>other projects</li>
                     and of course, YOU! Thank you!</h3>
             </Section>

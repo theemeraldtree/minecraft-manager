@@ -68,7 +68,7 @@ export default class EditPageVersions extends Component {
         this.reloadCurseVersionsList();
     }
 
-    mcverChange = (version, e) => {
+    mcverChange = (version, cancel) => {
         let { profile } = this.state;
         if(!profile.customVersions.forge && !profile.customVersions.fabric) {
             this.setState({
@@ -76,7 +76,7 @@ export default class EditPageVersions extends Component {
             })
             this.state.profile.changeMCVersion(version);
         }else{
-            e.stopPropagation();
+            cancel();
             this.setState({
                 versionChangeWarning: true,
                 newVersion: version
