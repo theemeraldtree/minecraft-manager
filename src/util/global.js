@@ -27,12 +27,12 @@ const Global = {
         versions: {}
     },
 
-    MCM_VERSION: '2.1.0',
-    MCM_RELEASE_DATE: '12/8/2019',
+    MCM_VERSION: '2.2.0-beta.1',
+    MCM_RELEASE_DATE: '12/17/2019',
 
     checkChangelog() {
         const version = SettingsManager.currentSettings.lastVersion;
-        if(!version || semver.gt(this.MCM_VERSION, version)) {
+        if(!version || semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1) {
             ToastManager.createToast(
                 `Welcome to ${this.MCM_VERSION}!`, 
                 `With a new settings page, graphics update, and more! <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the full changelog</a>`
