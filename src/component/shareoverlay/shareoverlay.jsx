@@ -4,6 +4,7 @@ import Overlay from '../overlay/overlay';
 import Button from '../button/button';
 import fs from 'fs';
 import path from 'path';
+import Checkbox from '../checkbox/checkbox';
 const { dialog } = require('electron').remote;
 const BG = styled.div`
     width: 100%;
@@ -42,19 +43,15 @@ const ExportItem = styled.div`
     border-bottom: 2px solid #222;
     display: flex;
     align-items: center;
+    padding-left: 5px;
     &:last-child {
         border: 0;
     }
 `
 
-const Checkbox = styled.input`
-    width: 20px;
-    height: 20px;
-    display: inline-block;
-`
-
 const Label = styled.p`
     display: inline-block;
+    margin-left: 5px;
 `
 
 const ButtonsContainer = styled.div`
@@ -79,7 +76,7 @@ export default class ShareOverlay extends Component {
 
     enableFolder = (e) => {
         let { exportFolders } = this.state;
-        exportFolders[e.currentTarget.dataset.folder] = !exportFolders[e.currentTarget.dataset.folder];
+        exportFolders[e.currentTarget.dataset.info] = !exportFolders[e.currentTarget.dataset.info];
         this.setState({
             exportFolders: exportFolders
         })
@@ -98,7 +95,7 @@ export default class ShareOverlay extends Component {
                     if(fs.lstatSync(path.join(profile.gameDir, file)).isDirectory()) {
                         exportFolders[file] = false;
                         exportItems.push(<ExportItem key={file}>
-                            <Checkbox data-folder={file} onClick={this.enableFolder} type="checkbox" />
+                            <Checkbox info={file} onClick={this.enableFolder} type="checkbox" />
                             <Label>{file}</Label>
                         </ExportItem>)
                     }
