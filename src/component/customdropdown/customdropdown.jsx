@@ -25,6 +25,7 @@ const Items = styled.div`
     top: 40px;
     display: none;
     z-index: 20;
+    box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.75);
     ${props => props.visible && `
         display: block;
     `}
