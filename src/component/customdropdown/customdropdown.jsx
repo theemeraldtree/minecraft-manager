@@ -18,7 +18,7 @@ const CDropdown = styled.div`
 
 const Items = styled.div`
     position: absolute;
-    max-height: 200px;
+    max-height: 300px;
     background-color: #4f4f4f;
     width: 300px;
     overflow-y: scroll;

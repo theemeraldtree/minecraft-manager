@@ -313,17 +313,19 @@ export default class EditPageVersions extends Component {
                                 <Title>{this.state.updateOverlayText}</Title>
                             </BG>
                         </Overlay>}
-                        <Detail>minecraft version</Detail>
-                        <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} value={mcverValue} />
-                        <OptionBreak />
+                        {!profile.hosts.curse && 
+                        <>
+                            <Detail>minecraft version</Detail>
+                            <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} value={mcverValue} />
+                            <OptionBreak />
+                        </>}
                         {profile.hosts.curse && <>
-                        <Detail>because this is from an online source, you can only choose versions available online</Detail>
+                        <Detail>profile version</Detail>
                         {hostVersionValues && <CustomDropdown value={curseVerValue} onChange={this.curseVersionChange} items={hostVersionValues} />}
                         </>}
     
-                        <Detail>version timestamp: {profile.version.timestamp}</Detail>
                         <OptionBreak />
-                        <Detail>custom versions</Detail>
+                        <Detail>modloaders</Detail>
                         <CustomVersions>
                             <Detail>forge</Detail>
                             {!profile.customVersions.forge && !forgeIsInstalling &&

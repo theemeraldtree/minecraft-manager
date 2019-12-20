@@ -5,6 +5,7 @@ import ProfilesManager from '../../../manager/profilesManager';
 import EditContainer from '../components/editcontainer'; 
 import Button from '../../../component/button/button';
 import { shell } from 'electron';
+import Detail from '../../../component/detail/detail';
 export default class EditPageAdvanced extends PureComponent {
     constructor(props) {
         super(props);
@@ -33,6 +34,9 @@ export default class EditPageAdvanced extends PureComponent {
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
                 <EditContainer profile={profile}>
                     <Button onClick={this.viewProfileFolder} color='red'>View Profile Folder</Button>
+                    <Detail>internal id: {profile.id}</Detail>
+                    <Detail>version-safe name: {profile.safename}</Detail>
+                    <Detail>version timestamp: {profile.version.timestamp}</Detail>
                 </EditContainer>
             </Page>
         )   

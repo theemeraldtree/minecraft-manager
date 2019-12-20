@@ -13,16 +13,17 @@ import InputContainer from '../components/inputcontainer';
 import Global from '../../../util/global';
 const { dialog } = require('electron').remote;
 const DescContainer = styled.div`
-    margin-top: 40px;
+    margin-top: 20px;
+    width: 100%;
 `
 const LongDesc = styled(TextBox)`
     height: 400px;
-    width: 70%;
-    max-width: 500px;
+    width: 100%;
+    max-width: 780px;
 `
 const IconWrapper = styled.div`
-    width: 80px;
-    height: 80px;
+    width: 150px;
+    height: 150px;
     background-color: #404040;
     display: flex;
     align-items: center;
@@ -39,16 +40,41 @@ const IconWrapper = styled.div`
 `
 
 const ResetIconButton = styled(Button)`
-    width: 57px;
+    width: 150px;
+    padding: 11.5px 0;
     text-align: center;
 `
 const Icon = styled.img`
     width: auto;
     height: auto;
-    max-width: 80px;
-    max-height: 80px;
+    max-width: 150px;
+    max-height: 150px;
     flex-shrink: 0;
 `;
+
+const AboutContainer = styled.div`
+    display: flex;
+`
+
+const AboutRight = styled.div` 
+    margin-left: 30px;
+
+    > div:nth-child(2) {
+        margin-top: 10px;
+        width: 100vw;
+        max-width: 600px;
+    }
+
+    textarea {
+        width: 100%;
+        max-height: 107px;
+    }
+
+    input {
+        width: 100%;
+    }
+`
+
 export default withRouter(class EditPageGeneral extends PureComponent {
     constructor(props) {
         super(props);
@@ -128,23 +154,31 @@ export default withRouter(class EditPageGeneral extends PureComponent {
             <Page>
                 <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
                 <EditContainer profile={profile}>
-                    <Detail>profile icon</Detail>
-                    <IconWrapper onClick={this.changeIcon}>
-                        <Icon src={`${profile.iconpath}#${new Date().getTime()}`} />
-                    </IconWrapper>
-                    <ResetIconButton onClick={this.resetIcon} color='green'>reset</ResetIconButton>
-                    <Detail>profile name</Detail>
-                    <InputContainer>
-                        <TextInput value={nameValue} onChange={this.nameChange} placeholder="Enter a name" />
-                        <Button onClick={this.confirmNameChange} disabled={nameDisabled} color='green'>change</Button>
-                    </InputContainer>
-                    <Detail>internal id: {profile.id}</Detail>
-                    <Detail>version-safe name: {profile.safename}</Detail>
+                    <AboutContainer>
+                        <div>
+                            <Detail>profile icon</Detail>
+                            <IconWrapper onClick={this.changeIcon}>
+                                <Icon src={`${profile.iconpath}#${new Date().getTime()}`} />
+                            </IconWrapper>
+                            <ResetIconButton onClick={this.resetIcon} color='green'>reset</ResetIconButton>
+                        </div>
+                        <AboutRight>
+                            <div>
+                                <Detail>profile name</Detail>
+                                <InputContainer>
+                                    <TextInput value={nameValue} onChange={this.nameChange} placeholder="Enter a name" />
+                                    <Button onClick={this.confirmNameChange} disabled={nameDisabled} color='green'>change</Button>
+                                </InputContainer>
+                            </div>
+                            <div>
+                                <DescContainer>
+                                    <Detail>blurb</Detail>
+                                    <TextBox defaultValue={profile.blurb} onChange={this.blurbChange} placeholder="Enter a short description" />
+                                </DescContainer>
+                            </div>
+                        </AboutRight>
+                    </AboutContainer>
 
-                    <DescContainer>
-                        <Detail>short description</Detail>
-                        <TextBox defaultValue={profile.blurb} onChange={this.blurbChange} placeholder="Enter a short description" />
-                    </DescContainer>
 
                     <DescContainer>
                         <Detail>long description</Detail>
