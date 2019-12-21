@@ -18,7 +18,6 @@ const DescContainer = styled.div`
 `
 const LongDesc = styled(TextBox)`
     height: 400px;
-    width: 100%;
     max-width: 780px;
 `
 const IconWrapper = styled.div`
@@ -57,7 +56,8 @@ const AboutContainer = styled.div`
 `
 
 const AboutRight = styled.div` 
-    margin-left: 30px;
+    overflow-x: hidden;
+    margin-left: 20px;
 
     > div:nth-child(2) {
         margin-top: 10px;
@@ -66,12 +66,14 @@ const AboutRight = styled.div`
     }
 
     textarea {
-        width: 100%;
+        width: calc(100vw - 450px);
+        max-width: 600px;
         max-height: 107px;
     }
 
     input {
-        width: 100%;
+        width: calc(100vw - 524px);
+        max-width: 527px;
     }
 `
 
