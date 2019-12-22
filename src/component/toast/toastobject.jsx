@@ -24,6 +24,7 @@ const slideOut = keyframes`
 
 const BG = styled.div`
     width: fit-content;
+    min-width: 200px;
     max-width: 350px;
     height: fit-content;
     min-height: 50px;
