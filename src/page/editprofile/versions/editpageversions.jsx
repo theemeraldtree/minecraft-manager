@@ -7,16 +7,15 @@ import ProfilesManager from '../../../manager/profilesManager';
 import EditContainer from '../components/editcontainer';
 import Detail from '../../../component/detail/detail';
 import OptionBreak from '../components/optionbreak';
-import InputContainer from '../components/inputcontainer';
 import Button from '../../../component/button/button';
 import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import Global from '../../../util/global';
 import ForgeManager from '../../../manager/forgeManager';
-import Confirmation from '../../../component/confirmation/confirmation';
 import Overlay from '../../../component/overlay/overlay';
 import VersionsManager from '../../../manager/versionsManager';
 import Hosts from '../../../host/Hosts';
 import FabricManager from '../../../manager/fabricManager';
+import AlertManager from '../../../manager/alertManager';
 const CustomVersions = styled.div`
     background-color: #2b2b2b;
     width: 350px;
@@ -78,9 +77,15 @@ export default class EditPageVersions extends Component {
         }else{
             cancel();
             this.setState({
-                versionChangeWarning: true,
                 newVersion: version
-            })
+            });
+            AlertManager.alert(
+                `warning`,
+                `changing your minecraft version will remove forge/fabric and all your mods. are you sure you want to change?`,
+                this.confirmVersionChange,
+                `change`,
+                `don't change`
+            );
         }
     }
 
@@ -122,9 +127,12 @@ export default class EditPageVersions extends Component {
                 });
             }else{
                 this.setState({
-                    fabricIsInstalling: false,
-                    noFabricVerAvailable: true
-                })
+                    fabricIsInstalling: false
+                });
+                AlertManager.messageBox(
+                    `no fabric version`,
+                    `there is no fabric version available for minercaft ${profile.minecraftversion}`
+                );
             }
         })
     }
@@ -161,15 +169,20 @@ export default class EditPageVersions extends Component {
                     });
                 }else{
                     this.setState({
-                        forgeIsInstalling: false,
-                        noForgeVerAvailable: true
+                        forgeIsInstalling: false
                     })
+                    AlertManager.messageBox(
+                        `no forge version`,
+                        `there is no forge version available for minecraft ${profile.minecraftversion}`
+                    );
                 }
             })
         }else{
-            this.setState({
-                badForgeVersion: true
-            })
+            AlertManager.messageBox(
+                `uh oh`,
+                `there is currently no suppor for forge in minecraft 1.13+, however it may be implemented in the future
+                <br><a href="https://github.com/stairman06/minecraft-manager/wiki/Forge-1.13-">for why, check out this wiki article</a>`
+            );
         }
 
     }
@@ -187,9 +200,17 @@ export default class EditPageVersions extends Component {
 
     curseVersionChange = (e) => {
         this.setState({
-            versionToChangeTo: e,
-            updateConfirm: true
-        })
+            versionToChangeTo: e
+        });
+
+        AlertManager.alert(
+            `are you sure?`,
+            `updating or changing a profile's verison will modify the current files. a backup will be created of the current files. if you've modified files or added mods, you will need to move then over from the backup
+            <br>
+            <b>the saves folder and options.txt are automatically moved.`,
+            this.confirmCurseVerChange,
+            'i understand, continue'
+        )
     }
 
     reloadCurseVersionsList = async () => {
@@ -250,61 +271,11 @@ export default class EditPageVersions extends Component {
         })
     }
 
-    cancelCurseVerChange = () => {
-        this.setState({
-            updateConfirm: false
-        })
-    }
-
-    closeNoForgeVer = () => {
-        this.setState({
-            noForgeVerAvailable: false
-        })
-    }
-
-    closeNoFabricVer = () => {
-        this.setState({
-            noFabricVerAvailable: false
-        })
-    }
-
     render() {
         let { profile, fabricIsInstalling, forgeIsInstalling, forgeIsUninstalling, mcverValue, curseVerValue, hostVersionValues } = this.state;
         if(profile) {
             return (
                 <Page>
-                    {this.state.updateConfirm && <Overlay>
-                        <BG>
-                            <Title>are you sure?</Title>
-                            <p>Updating or changing a profile's version will modify the current files. A backup will be created of the current files. If you've modified files or added mods, you will need to move them over from the backup. <b>The saves folder and options.txt are automatically moved.</b></p>
-                            
-                            <InputContainer>
-                                <Button onClick={this.cancelCurseVerChange} color='red'>cancel</Button>
-                                <Button onClick={this.confirmCurseVerChange} color='green'>I understand, continue</Button>
-                            </InputContainer>
-                        </BG>
-                    </Overlay>}
-    
-                    {this.state.noForgeVerAvailable && <Overlay>
-                        <BG>
-                            <Title>no forge version</Title>
-                            <p>There is no Forge version available for Minecraft {profile.minecraftversion}</p>
-                            <InputContainer>
-                                <Button color='green' onClick={this.closeNoForgeVer}>ok</Button>
-                            </InputContainer>
-                        </BG>
-                    </Overlay>}
-
-                    {this.state.noFabricVerAvailable && <Overlay>
-                        <BG>
-                            <Title>no fabric version</Title>
-                            <p>There is no Fabric version available for Minecraft {profile.minecraftversion}</p>
-                            <InputContainer>
-                                <Button color='green' onClick={this.closeNoFabricVer}>ok</Button>
-                            </InputContainer>
-                        </BG>
-                    </Overlay>}
-    
                     {!this.state.updateOverlay && <Header title='edit profile' backlink={`/profile/${profile.id}`}/>}
                     {this.state.updateOverlay && <Header title='edit profile' backlink={`'/`}/>}
                     <EditContainer profile={profile}>
@@ -348,13 +319,6 @@ export default class EditPageVersions extends Component {
                             <Button onClick={this.uninstallFabric} color='red'>uninstall fabric</Button>
                             </>}
                         </CustomVersions>
-    
-                        {this.state.badForgeVersion && <Confirmation hideConfirm cancelDelete={this.badForgeVersionClose} cancelText='Close'>
-                            <h1>Error</h1>
-                            <p>There is currently no support for Forge in Minecraft 1.13+, however it may be implemented in the future.</p>
-                            <a href="https://github.com/stairman06/minecraft-manager/wiki/Forge-1.13-">For why, check out this wiki article</a>
-                        </Confirmation> }
-                        {this.state.versionChangeWarning && <Confirmation confirmDelete={this.confirmVersionChange} cancelDelete={this.cancelVersionChange} questionText='Changing your Minecraft version will remove Forge/Fabric and all your mods. Are you sure?' cancelText="Don't change" confirmText='Yes, change it' />}
                     </EditContainer>
                 </Page>
             )

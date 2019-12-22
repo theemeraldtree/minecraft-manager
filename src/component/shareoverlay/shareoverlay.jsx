@@ -153,13 +153,13 @@ export default class ShareOverlay extends Component {
             <Overlay>
                 <BG>
                     {this.state.displayState === 'main' && <>
-                        <Title>Share your profile</Title>
-                        <Subtext>Exporting your profile will export it to the <b>.mcjprofile</b> file format, which can be used in Minecraft Manager or other OMAF-supporting apps</Subtext>
+                        <Title>share your profile</Title>
+                        <Subtext>exporting your profile will export it to the <b>.mcjprofile</b> file format, which can be used in Minecraft Manager or other OMAF-supporting apps</Subtext>
                         <Breaker />
                         {
                             this.state.exportItems && <>
-                                <Title>Choose your folders</Title>
-                                <Subtext>Choose your folders that you'd like to include with your export. If you have mods installed, they are automatically included</Subtext>
+                                <Title>choose your folders</Title>
+                                <Subtext>choose your folders that you'd like to include with your export. if you have mods installed, they are automatically included</Subtext>
                                 <ExportList>
                                     {this.state.exportItems}
                                 </ExportList>        
@@ -171,7 +171,7 @@ export default class ShareOverlay extends Component {
                         </ButtonsContainer>
                     </>}
                     {this.state.displayState === 'progress' && <>
-                        <Title>Exporting...</Title>
+                        <Title>exporting...</Title>
                         <Subtext>{this.state.exportProgress}</Subtext>
                     </>}
                 </BG>

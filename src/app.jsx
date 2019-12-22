@@ -15,6 +15,7 @@ import Global from './util/global';
 import WelcomePage from './page/welcome/welcome';
 import Toast from './component/toast/toast';
 import ErrorBoundary from './errorBoundary';
+import Alert from './component/alert/alert';
 
 const App = () => (
     <div>            
@@ -22,6 +23,7 @@ const App = () => (
         {localStorage.setItem('importDone', false)}
         {SettingsManager.loadSettings()}
         <div>
+            <Alert />
             <Toast />
         </div>
         <Router>

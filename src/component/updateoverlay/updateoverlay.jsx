@@ -106,10 +106,14 @@ export default class UpdateOverlay extends Component {
                         <Button onClick={this.props.cancelClick} color='green'>ok</Button>
                         </>}
                     {displayState === 'main' && <>
-                        {displayState !== 'done' && <Title>Update your profile</Title>}
-                        {!noUpdates && !updateAvailable && <Subtext>Checking for updates...</Subtext>}
-                        {noUpdates && <Subtext>You have the latest version. No update is available</Subtext>}
-                        {updateAvailable && <Subtext>A new version is available. You have version {this.props.profile.version.displayName} and the latest version is {updateVersion.displayName}. Would you like to update?</Subtext>}
+                        {displayState !== 'done' && <Title>update your profile</Title>}
+                        {!noUpdates && !updateAvailable && <Subtext>checking for updates...</Subtext>}
+                        {noUpdates && <Subtext>you have the latest version. no update is available</Subtext>}
+                        {updateAvailable && <Subtext>a new version is available. 
+                            <br />you have: {this.props.profile.version.displayName}
+                            <br />latest version: {updateVersion.displayName}
+                            <br />would you like to update?
+                        </Subtext>}
                         <Breaker />
                         <ButtonsContainer>
                             {updateAvailable && <>
