@@ -88,7 +88,11 @@ const AssetCard = ({asset, onClick, showDelete, progressState, showInstall, disa
         {asset.iconURL && !asset.iconpath && !asset.icon && <Image src={asset.iconURL} />}
         <Details>
             <Title>{asset.name}</Title>
-            <Version buttonShown={showInstall || showDelete}>{!showBlurb && asset.version && asset.version.displayName}{showBlurb && asset.blurb}</Version>
+            <Version 
+                buttonShown={showInstall || showDelete}>
+                {!showBlurb && asset.version && asset.version.displayName}
+                {showBlurb && asset.blurb}
+            </Version>
         </Details>
         <Buttons>
             {showDelete && 

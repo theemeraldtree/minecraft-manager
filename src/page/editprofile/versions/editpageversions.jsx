@@ -180,7 +180,7 @@ export default class EditPageVersions extends Component {
         }else{
             AlertManager.messageBox(
                 `uh oh`,
-                `there is currently no suppor for forge in minecraft 1.13+, however it may be implemented in the future
+                `there is currently no support for forge in minecraft 1.13+, however it may be implemented in the future
                 <br><a href="https://github.com/stairman06/minecraft-manager/wiki/Forge-1.13-">for why, check out this wiki article</a>`
             );
         }

@@ -260,7 +260,14 @@ export default class EditPageMods extends PureComponent {
                                     {mods.map(mod => {
                                         if(this.state.displayState === 'modsList') {
                                             if(mod.name.toLowerCase().includes(this.state.liveSearchTerm.toLowerCase())) {
-                                                return <AssetCard progressState={progressState} key={mod.id} asset={mod} showDelete onClick={this.showInfoClick} deleteClick={this.deleteClick} />;
+                                                return <AssetCard 
+                                                    progressState={progressState} 
+                                                    key={mod.id} 
+                                                    asset={mod} 
+                                                    showDelete 
+                                                    onClick={this.showInfoClick} 
+                                                    deleteClick={this.deleteClick} 
+                                                />;
                                             }
                                         }
                                     })}

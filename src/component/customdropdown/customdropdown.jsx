@@ -39,7 +39,8 @@ const Label = styled.p`
 const Item = styled.div`
     cursor: pointer;
     padding-left: 10px;
-    height: 25px;
+    min-height: 25px;
+    max-height: 65px;
     display: flex;
     align-items: center;
     &:hover {
