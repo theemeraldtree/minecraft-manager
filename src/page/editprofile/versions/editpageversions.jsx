@@ -103,6 +103,7 @@ export default class EditPageVersions extends Component {
 
     confirmVersionChange = () => {
         this.state.profile.changeMCVersion(this.state.newVersion);
+        this.state.profile.progressState = {};
         this.uninstallForge();
         this.uninstallFabric();
         this.setState({

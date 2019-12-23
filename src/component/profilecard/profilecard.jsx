@@ -33,11 +33,17 @@ const BG = styled.div`
     }
 `
 
-const Image = styled.img`
-    width: 100%;
+const Image = styled.div.attrs(props => ({
+        style: {
+            backgroundImage: `url('${props.src}')`
+        }
+}))`
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+    height: 110px;
+    width: 110px;
+    flex-shrink: 0;
 `
 
 const Title = styled.p`

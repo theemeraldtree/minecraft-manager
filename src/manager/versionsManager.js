@@ -44,6 +44,7 @@ const VersionsManager = {
         let obj = defaultVersionFabric;
         obj.libraries = meta.launcherMeta.libraries.common;
         obj.id = versionname;
+        obj.jar = profile.minecraftversion;
         obj.inheritsFrom = profile.minecraftversion;
 
         obj.libraries.push({
@@ -93,6 +94,37 @@ const VersionsManager = {
 
         const oldVersionPath = path.join(this.getVersionsPath(), oldVersionName);
         const newVersionPath = path.join(this.getVersionsPath(), newVersionName);
+
+        let oldJSON = JSON.parse(fs.readFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`)));
+        oldJSON.id = newVersionName;
+
+        // old library method
+        if(oldJSON.libraries[0].name.includes('minecraftmanager:profiles')) {
+            oldJSON.libraries[0].name = `minecraftmanager:profiles:mcm-${Global.createID(newName)}`;
+        }else{
+            oldJSON.libraries[0].name = `minecraftmanager.profiles:mcm-${Global.createID(newName)}:forge`;
+        }
+
+        fs.writeFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`), JSON.stringify(oldJSON));
+
+        fs.renameSync(path.join(oldVersionPath, `/${oldVersionName}.json`), path.join(oldVersionPath, `/${newVersionName}.json`));
+        fs.renameSync(oldVersionPath, newVersionPath);
+    },
+    renameVersionFabric: function(profile, newName) {
+        const oldVersionName = `${profile.safename} [Minecraft Manager]`;
+        const newVersionName = `${newName} [Minecraft Manager]`;
+
+        const oldVersionPath = path.join(this.getVersionsPath(), oldVersionName);
+        const newVersionPath = path.join(this.getVersionsPath(), newVersionName);
+
+        let oldJSON = JSON.parse(fs.readFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`)));
+        oldJSON.id = newVersionName;
+
+        oldJSON.libraries[oldJSON.libraries.length - 1].name = `minecraftmanager.profiles:mcm-${Global.createID(newName)}:fabric-loader`;
+        oldJSON.libraries[oldJSON.libraries.length - 2].name = `minecraftmanager.profiles:mcm-${Global.createID(newName)}:fabric-intermediary`;
+
+        fs.writeFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`), JSON.stringify(oldJSON));
+
         fs.renameSync(path.join(oldVersionPath, `/${oldVersionName}.json`), path.join(oldVersionPath, `/${newVersionName}.json`));
         fs.renameSync(oldVersionPath, newVersionPath);
     },

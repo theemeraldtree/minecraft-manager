@@ -20,7 +20,6 @@ const List = styled.div`
 export default function Help() {
     const [ action, setAction ] = useState('');
     const confirmAction = () => {
-        setShowPopup(false);
         switch(action) {
             case 'clean-launcher-profiles':
                 LauncherManager.cleanMinecraftProfiles();

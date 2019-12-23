@@ -83,6 +83,7 @@ const Hosts = {
 
     async getLatestVersionForMCVersion(host, asset, mcVersion, modloader) {
         if(host === 'curse') {
+            console.log('callin');
             return await Curse.getLatestVersionForMCVersion(asset, mcVersion, modloader);
         }
     },
@@ -150,6 +151,8 @@ const Hosts = {
 
     /* installers */
     async installModToProfile(host, profile, mod) {
+        console.log(`imtp`);
+        console.log(mod);
         if(!mod.name) {
             if(host === 'curse') {
                 mod = await Curse.getFullAsset(mod, 'mod');
@@ -163,6 +166,7 @@ const Hosts = {
             modloader = 'fabric';
         }
 
+        console.log('calling glvfmcv');
         const ver = await this.getLatestVersionForMCVersion(host, mod, profile.minecraftversion, modloader);
         if(!ver) {
             return 'no-version-available';

@@ -40,9 +40,21 @@ const LibrariesManager = {
         })
     },
     renameLibrary: function(profile, newID) {
-        if(profile.customVersions.forge) {
-            fs.renameSync(path.join(this.getMCMLibraries(), `/mcm-${profile.id}/profiles-mcm-${profile.id}.jar`), path.join(this.getMCMLibraries(), `/mcm-${profile.id}/profiles-mcm-${newID}.jar`));
-            fs.renameSync(path.join(this.getMCMLibraries(), `/mcm-${profile.id}`), path.join(this.getMCMLibraries(), `/mcm-${newID}`));
+        if(profile.customVersions.forge || profile.customVersions.fabric) {
+            // old library method check
+            const profileLibrary = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
+            if(fs.existsSync(path.join(profileLibrary, `/profiles-mcm-${profile.id}.jar`))) {
+                fs.renameSync(path.join(profileLibrary, `/profiles-mcm-${profile.id}.jar`), path.join(profileLibrary, `/profiles-mcm-${newID}.jar`));
+            }else{             
+                if(profile.customVersions.fabric) {
+                    fs.renameSync(path.join(profileLibrary, `/fabric-intermediary/mcm-${profile.id}-fabric-intermediary.jar`), path.join(profileLibrary, `/fabric-intermediary/mcm-${newID}-fabric-intermediary.jar`));
+                    fs.renameSync(path.join(profileLibrary, `/fabric-loader/mcm-${profile.id}-fabric-loader.jar`), path.join(profileLibrary, `/fabric-loader/mcm-${newID}-fabric-loader.jar`));
+                }else if(profile.customVersions.forge) {
+                    fs.renameSync(path.join(profileLibrary, `/forge/mcm-${profile.id}-forge.jar`), path.join(profileLibrary, `/forge/mcm-${newID}-forge.jar`));
+                }
+            }
+
+            fs.renameSync(profileLibrary, path.join(this.getMCMLibraries(), `/mcm-${newID}`));
         }
     },
     deleteLibrary: function(profile) {

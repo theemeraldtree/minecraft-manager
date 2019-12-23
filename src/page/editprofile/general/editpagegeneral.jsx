@@ -11,10 +11,17 @@ import TextBox from '../../../component/textbox/textbox';
 import Detail from '../../../component/detail/detail';
 import InputContainer from '../components/inputcontainer';
 import Global from '../../../util/global';
+import Overlay from '../../../component/overlay/overlay';
 const { dialog } = require('electron').remote;
 const DescContainer = styled.div`
     margin-top: 20px;
     width: 100%;
+`
+
+const Renaming = styled.div`
+    background-color: #222;
+    font-size: 21pt;
+    color: white;
 `
 const LongDesc = styled(TextBox)`
     height: 400px;
@@ -138,10 +145,17 @@ export default withRouter(class EditPageGeneral extends PureComponent {
     confirmNameChange = () => {
         const { profile } = this.state;
         this.setState({
-            nameDisabled: true
-        })
-        profile.rename(this.state.nameValue);
-        this.props.history.push(`/edit/general/${Global.createID(this.state.nameValue)}`);
+            nameDisabled: true,
+            renaming: true
+        }, () => {
+            profile.rename(this.state.nameValue).then(profile => {
+                this.props.history.push(`/edit/general/${profile.id}`);
+
+                // *unfortunately* a page reload is required to my knowledge
+                // react-router doesn't want to refresh the page otherwise
+                window.location.reload();
+            });
+        });
     }
 
     resetIcon = () => {
@@ -151,42 +165,51 @@ export default withRouter(class EditPageGeneral extends PureComponent {
     }
 
     render() {
-        let { profile, nameValue, nameDisabled } = this.state;
+        let { profile, nameValue, nameDisabled, renaming } = this.state;
         return (
             <Page>
-                <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
-                <EditContainer profile={profile}>
-                    <AboutContainer>
-                        <div>
-                            <Detail>profile icon</Detail>
-                            <IconWrapper onClick={this.changeIcon}>
-                                <Icon src={`${profile.iconpath}#${new Date().getTime()}`} />
-                            </IconWrapper>
-                            <ResetIconButton onClick={this.resetIcon} color='green'>reset</ResetIconButton>
-                        </div>
-                        <AboutRight>
+                { renaming && <>
+                    <Header title='edit profile' backlink='/' />
+                    <Overlay force>
+                        <Renaming>renaming...</Renaming>
+                    </Overlay> 
+                </>}
+                { !renaming && <>
+                    <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
+                    <EditContainer profile={profile}>
+                        <AboutContainer>
                             <div>
-                                <Detail>profile name</Detail>
-                                <InputContainer>
-                                    <TextInput value={nameValue} onChange={this.nameChange} placeholder="Enter a name" />
-                                    <Button onClick={this.confirmNameChange} disabled={nameDisabled} color='green'>change</Button>
-                                </InputContainer>
+                                <Detail>profile icon</Detail>
+                                <IconWrapper onClick={this.changeIcon}>
+                                    <Icon src={`${profile.iconpath}#${new Date().getTime()}`} />
+                                </IconWrapper>
+                                <ResetIconButton onClick={this.resetIcon} color='green'>reset</ResetIconButton>
                             </div>
-                            <div>
-                                <DescContainer>
-                                    <Detail>blurb</Detail>
-                                    <TextBox defaultValue={profile.blurb} onChange={this.blurbChange} placeholder="Enter a short description" />
-                                </DescContainer>
-                            </div>
-                        </AboutRight>
-                    </AboutContainer>
+                            <AboutRight>
+                                <div>
+                                    <Detail>profile name</Detail>
+                                    <InputContainer>
+                                        <TextInput value={nameValue} onChange={this.nameChange} placeholder="Enter a name" />
+                                        <Button onClick={this.confirmNameChange} disabled={nameDisabled} color='green'>change</Button>
+                                    </InputContainer>
+                                </div>
+                                <div>
+                                    <DescContainer>
+                                        <Detail>blurb</Detail>
+                                        <TextBox defaultValue={profile.blurb} onChange={this.blurbChange} placeholder="Enter a short description" />
+                                    </DescContainer>
+                                </div>
+                            </AboutRight>
+                        </AboutContainer>
 
 
-                    <DescContainer>
-                        <Detail>long description</Detail>
-                        <LongDesc defaultValue={profile.description} onChange={this.descChange} placeholder="Enter a long description" />
-                    </DescContainer>
-                </EditContainer>
+                        <DescContainer>
+                            <Detail>long description</Detail>
+                            <LongDesc defaultValue={profile.description} onChange={this.descChange} placeholder="Enter a long description" />
+                        </DescContainer>
+                    </EditContainer>
+                </>}
+                
             </Page>
         )   
     }

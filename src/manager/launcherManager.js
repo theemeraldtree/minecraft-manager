@@ -52,6 +52,7 @@ const LauncherManager = {
         let oldData = obj.profiles[oldID];
         obj.profiles[`mcm-${newID}`] = oldData;
         delete obj.profiles[oldID];
+        obj.profiles[`mcm-${newID}`].gameDir = path.join(Global.PROFILES_PATH, `/${newID}/files`);
         fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
     },
     setProfileData: function(profile, tag, val) {
