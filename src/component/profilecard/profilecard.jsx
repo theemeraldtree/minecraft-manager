@@ -105,8 +105,8 @@ const Wrapper = styled.div`
 `
 
 const StateOverlay = styled.div`
-    width: 120px;
-    height: 190px;
+    width: 110px;
+    height: 180px;
     position: absolute;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 2;

@@ -5,11 +5,10 @@ import ProgressBar from '../../progressbar/progressbar';
 const BG = styled.div`
     width: 100%;
     height: 70px;
-    background-color: #484848;
+    background-color: #313131;
     color: white;
     padding-top: 2px;
     padding-left: 5px;
-    border-bottom: 2px solid #636363;
     position: relative;
 `
 
@@ -24,7 +23,7 @@ const Progress = styled.p`
 `
 const PBWrapper = styled.div`
     position: absolute;
-    bottom: 2px;
+    bottom: 0;
     height: 5px;
     width: 100%;
     left: 0;

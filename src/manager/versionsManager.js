@@ -28,7 +28,7 @@ const VersionsManager = {
             obj.inheritsFrom = profile.minecraftversion;
             obj.jar = profile.minecraftversion;
             obj.assets = profile.minecraftversion;
-            obj.libraries[0].name = `minecraftmanager.profiles:mcm-${profile.id}`;
+            obj.libraries[0].name = `minecraftmanager.profiles:mcm-${profile.id}:forge`;
         }
         fs.writeFile(path.join(this.getVersionsPath(), versionname, `${versionname}.json`), JSON.stringify(obj), () => {
             profile.setVersion(versionname);

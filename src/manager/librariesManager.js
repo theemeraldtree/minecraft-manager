@@ -19,7 +19,11 @@ const LibrariesManager = {
                 if(!fs.existsSync(libraryPath)) {
                     fs.mkdirSync(libraryPath)
                 }
-                let jarPath = path.join(this.getMCMLibraries(), `/mcm-${profile.id}/profiles-mcm-${profile.id}.jar`);
+                const forgePath = path.join(libraryPath, `/forge`);
+                if(!fs.existsSync(forgePath)) {
+                    fs.mkdirSync(forgePath);
+                }
+                let jarPath = path.join(forgePath, `/mcm-${profile.id}-forge.jar`);
                 fs.writeFile(jarPath, 'Minecraft Manager - Downloading...', () => {
                     const mcversion = profile.minecraftversion;
                     let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.customVersions.forge.version}/forge-${profile.customVersions.forge.version}-universal.jar`;

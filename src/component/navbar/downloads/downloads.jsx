@@ -1,21 +1,48 @@
 import React, { Component } from 'react';
 import DownloadsManager from '../../../manager/downloadsManager';
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import downloadsImg from './downloads.png';
 import DownloadItem from './downloadItem';
+const Wrapper = styled.div`
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    align-items: flex-end;
+`
 const DownloadsButton = styled.div`
     width: 50px;
     height: 50px;
     position: absolute;
-    bottom: 0;
-    margin: 25px;
+    bottom: 23px;
     cursor: pointer;
     z-index: 999;
     background-image: url(${downloadsImg}); 
     background-size: contain;
+    background-position-y: 7px;
+    background-repeat: no-repeat;
     &:hover {
         filter: brightness(0.75);
     }
+`
+
+const Animation = keyframes`
+    0% { background-position: 100% 50% }
+    100% { background-position: 0% 50% }
+`
+
+const AnimationBar = styled.div`
+    width: 50px;
+    height: 4px;
+    background: grey;
+    margin-bottom: 20px;
+    ${props => props.active && css`
+        background: linear-gradient(270deg, #0a993c, #0a993c, #0add53, #0a993c, #0a993c) !important;
+        background-size: 600% 600% !important;
+        animation: ${Animation} 1.5s ease infinite normal !important;
+    `}
 `
 const DownloadsOverlay = styled.div`
     width: 350px;
@@ -84,8 +111,9 @@ export default class Downloads extends Component {
 
     render() {
         return (
-            <>
+            <Wrapper>
                 <DownloadsButton onClick={this.showDownloads} />
+                <AnimationBar active={this.state.downloadsList.length} />
                 {this.state.showOverlay && 
                 <DownloadsOverlay>
                     <Title>downloads</Title>
@@ -93,7 +121,7 @@ export default class Downloads extends Component {
                         {this.state.downloadsList}
                     </List>
                 </DownloadsOverlay>}
-            </>
+            </Wrapper>
                 
         )
     }
