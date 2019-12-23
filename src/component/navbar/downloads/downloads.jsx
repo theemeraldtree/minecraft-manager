@@ -11,6 +11,7 @@ const Wrapper = styled.div`
     position: absolute;
     bottom: 0;
     align-items: flex-end;
+    z-index: 51;
 `
 const DownloadsButton = styled.div`
     width: 50px;
@@ -18,7 +19,6 @@ const DownloadsButton = styled.div`
     position: absolute;
     bottom: 23px;
     cursor: pointer;
-    z-index: 999;
     background-image: url(${downloadsImg}); 
     background-size: contain;
     background-position-y: 7px;
@@ -48,7 +48,7 @@ const DownloadsOverlay = styled.div`
     width: 350px;
     height: 350px;
     background-color: #1D1D1D;
-    z-index: 9999;
+    z-index: 100;
     cursor: default;
     position: absolute;
     left: 120px;

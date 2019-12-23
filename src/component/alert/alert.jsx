@@ -29,7 +29,7 @@ export default class Alert extends PureComponent {
     render() {
         if(this.state.alerts.length) {
             return (
-                <Overlay>
+                <Overlay force>
                     {
                         this.state.alerts.map(alert => 
                             <AlertObject

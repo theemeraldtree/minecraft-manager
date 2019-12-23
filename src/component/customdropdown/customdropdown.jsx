@@ -24,7 +24,7 @@ const Items = styled.div`
     overflow-y: scroll;
     top: 40px;
     display: none;
-    z-index: 20;
+    z-index: 150;
     box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.75);
     ${props => props.visible && `
         display: block;

@@ -150,7 +150,7 @@ export default class ShareOverlay extends Component {
 
     render() {
         return (
-            <Overlay>
+            <Overlay force>
                 <BG>
                     {this.state.displayState === 'main' && <>
                         <Title>share your profile</Title>

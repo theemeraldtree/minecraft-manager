@@ -98,7 +98,7 @@ export default class UpdateOverlay extends Component {
     render() {
         const { noUpdates, updateAvailable, updateVersion, displayState } = this.state;
         return (
-            <Overlay>
+            <Overlay force>
                 <BG>
                     {displayState === 'done' && <>
                         <Title>done</Title>
