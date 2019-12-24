@@ -52,8 +52,7 @@ ipcMain.on('download-file', (event, url, dest, id) => {
     req.on('error', () => {
         ws.end();
     });
-})
-
+});
 
 function checkForUpdates() {
     autoUpdater.checkForUpdates();
@@ -88,6 +87,18 @@ checkForUpdates();
 
 let dev = require('process').execPath.includes('electron');
 let mainWindow;
+
+ipcMain.on('start-progress', () => {
+    if(mainWindow) {
+        mainWindow.setProgressBar(2);
+    }
+});
+
+ipcMain.on('stop-progress', () => {
+    if(mainWindow) {
+        mainWindow.setProgressBar(0);
+    }
+});
 
 function createWindow() {
     mainWindow = new BrowserWindow({width: 800, height: 800, frame: false, backgroundColor: '#222', webPreferences: {webSecurity: false}, titleBarStyle: 'hidden'});

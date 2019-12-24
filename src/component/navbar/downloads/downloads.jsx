@@ -3,6 +3,7 @@ import DownloadsManager from '../../../manager/downloadsManager';
 import styled, { keyframes, css } from 'styled-components';
 import downloadsImg from './downloads.png';
 import DownloadItem from './downloadItem';
+import { ipcRenderer } from 'electron';
 const Wrapper = styled.div`
     width: 100px;
     height: 100px;
@@ -88,6 +89,7 @@ export default class Downloads extends Component {
         DownloadsManager.registerDownloadsViewer((downloads) => {
             let list = [];
             if(downloads.length >= 1) {
+                ipcRenderer.send('start-progress');
                 for(let download of downloads) {
                     list.push(<DownloadItem key={download.name} download={download} />);
                     this.setState({
@@ -95,6 +97,7 @@ export default class Downloads extends Component {
                     });
                 }
             }else{
+                ipcRenderer.send('stop-progress');
                 this.setState({
                     downloadsList: []
                 })

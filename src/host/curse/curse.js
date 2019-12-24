@@ -279,10 +279,7 @@ const Curse = {
 
     // gets the latest version of the asset available for a specific minecraft version
     async getLatestVersionForMCVersion(asset, mcVersion, modloader) {
-        console.log(asset);
-        console.log(asset.hosts.curse.localValues);
         if(asset.hosts.curse.localValues && asset.hosts.curse.localValues.gameVerLatestFiles) {
-            console.log('inside if');
             // curse does a terrible job indicating whether a file is forge or fabric
             // we have to make a bunch of guesses
                 
@@ -307,7 +304,6 @@ const Curse = {
 
 
 
-        console.log('outside if');
 
         return await this.getLatestVersionForMCVersion(await this.getFullAsset(asset), mcVersion, modloader);
     },
