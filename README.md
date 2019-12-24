@@ -1,10 +1,12 @@
 # [Minecraft Manager](https://theemeraldtree.net/mcm/)
-## app for minecraft mod/modpack installation and management
+## the easiest way to manage minecraft mods/modpacks
 
-Minecraft Manager is an app used for installation of Minecraft mods/modpacks and more.
+Minecraft Manager is a program used for installation of Minecraft mods/modpacks and more.
+
+[theemeraldtree.net/mcm](https://theemeraldtree.net/mcm)
 
 ## Getting Started
-If you'd like an already built version, [you can download it from the website here](https://theemeraldtree.net/mcm/download)
+If you'd like prebuilt version, [you can download it from the website here](https://theemeraldtree.net/mcm/download)
 
 If you would like to build it and run it for yourself, it is very easy.
 ### Clone the repo & install packages
@@ -38,8 +40,4 @@ for electron-builder
 
 
 ### Credits
-Credits are viewable in the Settings menu of Minecraft Manager, however I've also listed them here.
-- [Electron](https://electronjs.org)
-- [React](https://reactjs.org)
-- [Webpack](https://webpack.js.org)
-- Google Roboto Font
+Credits are viewable in the Settings menu of Minecraft Manager
