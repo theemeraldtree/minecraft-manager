@@ -170,6 +170,7 @@ Profile.prototype.setForgeVersion = function(newver) {
     this.save();
 }
 
+
 Profile.prototype.setForgeInstalled = function(installed) {
     if(!this.customVersions.forge && installed) {
         this.customVersions.forge = {};
@@ -179,6 +180,17 @@ Profile.prototype.setForgeInstalled = function(installed) {
     this.save();
 }
 
+
+
+// FABRIC
+Profile.prototype.setFabricVersion = function(newver) {
+    if(!this.customVersions.fabric) {
+        this.customVersions.fabric = {};
+    }
+
+    this.customVersions.fabric.version = newver;
+    this.save();
+}
 Profile.prototype.setHostId = function(host, id) {
     if(!this.hosts[host]) {
         this.hosts[host] = {}
@@ -371,25 +383,34 @@ Profile.prototype.changeCurseVersion = function(versionToChangeTo, onUpdate) {
 }
 
 Profile.prototype.rename = function(newName) {
-    const newID = Global.createID(newName);
-    const safeName = Global.createSafeName(newName);
-    if(!LauncherManager.profileExists(this)) {
-        LauncherManager.createProfile(this);
-    }
-    LauncherManager.setProfileData(this, 'name', newName);
-    LauncherManager.renameProfile(this, newID);
-    if(this.customVersions.curse) {
-        LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
-        VersionsManager.renameVersion(this, safeName);
-        LibrariesManager.renameLibrary(this, newID);
-    }
+    return new Promise(resolve => {
 
-    this.id = newID;
-    this.name = newName;
-    this.versionname = this.safename;
-
-    fs.renameSync(this.folderpath, path.join(Global.PROFILES_PATH, `/${newID}/`));
-    this.initLocalValues();
-    this.save();
+        const newID = Global.createID(newName);
+        const safeName = Global.createSafeName(newName);
+        if(!LauncherManager.profileExists(this)) {
+            LauncherManager.createProfile(this);
+        }
+        LauncherManager.setProfileData(this, 'name', newName);
+        LauncherManager.renameProfile(this, newID);
+        if(this.customVersions.forge || this.customVersions.fabric) {
+            LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
+            if(this.customVersions.forge) {
+                VersionsManager.renameVersion(this, safeName);
+            }else if(this.customVersions.fabric) {
+                VersionsManager.renameVersionFabric(this, safeName);
+            }
+            LibrariesManager.renameLibrary(this, newID);
+        }
+    
+        this.id = newID;
+        this.name = newName;
+        this.versionname = this.safename;
+        this.save().then(() => {
+            fs.renameSync(this.folderpath, path.join(Global.PROFILES_PATH, `/${newID}/`));
+            this.initLocalValues();
+            this.save();
+            resolve(this);
+        });
+    });
 }
 export default Profile;

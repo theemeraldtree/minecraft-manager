@@ -27,15 +27,45 @@ const Global = {
         versions: {}
     },
 
-    MCM_VERSION: '2.1.0',
-    MCM_RELEASE_DATE: '12/8/2019',
+    MCM_VERSION: '2.2.0',
+    MCM_RELEASE_DATE: '12/23/2019',
 
+    dateMatches(d1) {
+        let d2 = new Date(); 
+        return d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate();
+    },
+    async checkToastNews() {
+        try {
+            let req = await HTTPRequest.get(`https://theemeraldtree.net/toastnews.json`);
+            let news = JSON.parse(req);
+    
+            if(SettingsManager.currentSettings.lastToastNewsID === undefined) {
+                SettingsManager.setLastToastNewsID(-1);
+            }
+
+            if((SettingsManager.currentSettings.lastToastNewsID < news.id || news.repeat ) && this.dateMatches(new Date(news.dateToShow))) {
+                ToastManager.createToast(
+                    news.title,
+                    news.message
+                );
+    
+                SettingsManager.setLastToastNewsID(news.id);
+            }
+        }catch(e) {
+            ToastManager.createToast(
+                `Error`,
+                `Error checking for MCM news: ${e.toString()}`
+            );
+        }
+    },
     checkChangelog() {
         const version = SettingsManager.currentSettings.lastVersion;
-        if(!version || semver.gt(this.MCM_VERSION, version)) {
+        if(!version || semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1) {
             ToastManager.createToast(
                 `Welcome to ${this.MCM_VERSION}!`, 
-                `With a new settings page, graphics update, and more! <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the full changelog</a>`
+                `With Fabric support, a revamped UI, bugfixes, and more! <a href="https://theemeraldtree.net/mcm/changelogs/2.2.0">View the changelog.</a>`
             );
             SettingsManager.setLastVersion(this.MCM_VERSION);
         }
@@ -48,7 +78,7 @@ const Global = {
                 this.parseVersionsJSON(JSON.parse(fs.readFileSync(path.join(this.MCM_PATH, '/mcvercache.json'))));
             }
         }catch(e) {
-            ToastManager.createToast(`Just a quick note`, `There's a corrupt Minecraft verison cache. However this probably won't continue in the future.`);
+            ToastManager.createToast(`Just a quick note`, `There's a corrupt Minecraft version cache. However this probably won't continue in the future.`);
         }
 
         try {

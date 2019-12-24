@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 const BG = styled.div`
     min-height: 60px;
-    background-color: #262626;
+    background-color: #2b2b2b;
     display: flex;
     align-items: center;
 `
@@ -13,7 +13,7 @@ const Title = styled.p`
     margin: 0;
     margin-left: 10px;
     font-size: 32pt;
-    font-weight: 300;
+    font-weight: 900;
 `
 
 const BackButton = styled.div`
@@ -41,8 +41,8 @@ const Items = styled.div`
 
 const Header = ({title, backlink, backClick, children, showBackButton}) => (
     <BG>
-        {showBackButton && <BackButton onClick={backClick ? backClick : window.history.back}>back</BackButton>}
-        {backlink && <BackButton><Link to={backlink}>back</Link></BackButton>}
+        {showBackButton && <BackButton onClick={backClick ? backClick : window.history.back}>←</BackButton>}
+        {backlink && <BackButton><Link to={backlink}>←</Link></BackButton>}
         <Title>{title}</Title>
         <Items>
             {children}

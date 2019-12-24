@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import os from 'os';
 import ActionButtons from './action-buttons';
-
+import logo from '../../img/logo-sm.png';
 const Wrapper = styled.div`
     flex: 0 1 29px;
     height: 29px;
@@ -12,6 +12,11 @@ const Wrapper = styled.div`
     z-index: 1000;
     display: block;
     user-select: none;
+    img {
+        margin-top: 4px;
+        margin-left: 3px;
+        width: 20px;
+    }
     ${os.platform() === 'darwin' && `
         height: 23px;
         flex: 0 1 23px;
@@ -25,10 +30,10 @@ const Title = styled.p`
     position: absolute;
     color: white;
     top: 5px;
-    left: 5px;
+    left: 25px;
     font-weight: thin;
     margin: 0;
-    width: 150px;
+    width: 180px;
     -webkit-app-region: drag;
     cursor: default;
     ${os.platform() === 'darwin' && `
@@ -41,7 +46,10 @@ const Title = styled.p`
 
 let WindowBar = () => (
     <Wrapper>
-        <Title>Minecraft Manager</Title>
+        <img src={logo} />
+        <Title>
+            Minecraft Manager
+        </Title>
         <ActionButtons />
     </Wrapper>
 )

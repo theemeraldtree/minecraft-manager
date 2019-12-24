@@ -6,27 +6,55 @@ import rimraf from 'rimraf';
 import ProfilesManager from './profilesManager';
 import LogManager from './logManager';
 const defaultVersion = require('../assets/defaultVersion.json');
+const defaultVersionFabric = require('../assets/defaultVersionFabric.json');
 const version1710 = require('../assets/1710version.json');
 const semver = require('semver');
 const VersionsManager = {
     getVersionsPath: function() {
         return path.join(Global.getMCPath(), '/versions')
     },
-    createVersion: function(profile) {
+    createVersion: function(profile, type) {
         let versionname = `${profile.safename} [Minecraft Manager]`;
         if(!fs.existsSync(path.join(this.getVersionsPath(), versionname))) {
             fs.mkdirSync(path.join(this.getVersionsPath(), versionname));
         }
-        let obj = defaultVersion;
-        if(this.checkIs1710OrLower(profile)) {
-            obj = version1710;
+        let obj;
+        if(type === 'forge') {
+            obj = defaultVersion;
+            if(this.checkIs1710OrLower(profile)) {
+                obj = version1710;
+            }
+            obj.id = versionname;
+            obj.inheritsFrom = profile.minecraftversion;
+            obj.jar = profile.minecraftversion;
+            obj.assets = profile.minecraftversion;
+            obj.libraries[0].name = `minecraftmanager.profiles:mcm-${profile.id}:forge`;
         }
-        obj.id = versionname;
-        obj.inheritsFrom = profile.minecraftversion;
-        obj.jar = profile.minecraftversion;
-        obj.assets = profile.minecraftversion;
-        obj.libraries[0].name = `minecraftmanager:profiles:mcm-${profile.id}`;
+        fs.writeFile(path.join(this.getVersionsPath(), versionname, `${versionname}.json`), JSON.stringify(obj), () => {
+            profile.setVersion(versionname);
+            LauncherManager.setProfileData(profile, 'lastVersionId', versionname);
+        });
+    },
+    createVersionFabric: function(profile, meta) {
 
+        let versionname = `${profile.safename} [Minecraft Manager]`;
+        if(!fs.existsSync(path.join(this.getVersionsPath(), versionname))) {
+            fs.mkdirSync(path.join(this.getVersionsPath(), versionname));
+        }
+        let obj = defaultVersionFabric;
+        obj.libraries = meta.launcherMeta.libraries.common;
+        obj.id = versionname;
+        obj.jar = profile.minecraftversion;
+        obj.inheritsFrom = profile.minecraftversion;
+
+        obj.libraries.push({
+            name: `minecraftmanager.profiles:mcm-${profile.id}:fabric-intermediary`,
+            url: `https://maven.fabricmc.net`
+        });
+        obj.libraries.push({
+            name: `minecraftmanager.profiles:mcm-${profile.id}:fabric-loader`,
+            url: `https://maven.fabricmc.net`
+        });
         fs.writeFile(path.join(this.getVersionsPath(), versionname, `${versionname}.json`), JSON.stringify(obj), () => {
             profile.setVersion(versionname);
             LauncherManager.setProfileData(profile, 'lastVersionId', versionname);
@@ -66,6 +94,37 @@ const VersionsManager = {
 
         const oldVersionPath = path.join(this.getVersionsPath(), oldVersionName);
         const newVersionPath = path.join(this.getVersionsPath(), newVersionName);
+
+        let oldJSON = JSON.parse(fs.readFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`)));
+        oldJSON.id = newVersionName;
+
+        // old library method
+        if(oldJSON.libraries[0].name.includes('minecraftmanager:profiles')) {
+            oldJSON.libraries[0].name = `minecraftmanager:profiles:mcm-${Global.createID(newName)}`;
+        }else{
+            oldJSON.libraries[0].name = `minecraftmanager.profiles:mcm-${Global.createID(newName)}:forge`;
+        }
+
+        fs.writeFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`), JSON.stringify(oldJSON));
+
+        fs.renameSync(path.join(oldVersionPath, `/${oldVersionName}.json`), path.join(oldVersionPath, `/${newVersionName}.json`));
+        fs.renameSync(oldVersionPath, newVersionPath);
+    },
+    renameVersionFabric: function(profile, newName) {
+        const oldVersionName = `${profile.safename} [Minecraft Manager]`;
+        const newVersionName = `${newName} [Minecraft Manager]`;
+
+        const oldVersionPath = path.join(this.getVersionsPath(), oldVersionName);
+        const newVersionPath = path.join(this.getVersionsPath(), newVersionName);
+
+        let oldJSON = JSON.parse(fs.readFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`)));
+        oldJSON.id = newVersionName;
+
+        oldJSON.libraries[oldJSON.libraries.length - 1].name = `minecraftmanager.profiles:mcm-${Global.createID(newName)}:fabric-loader`;
+        oldJSON.libraries[oldJSON.libraries.length - 2].name = `minecraftmanager.profiles:mcm-${Global.createID(newName)}:fabric-intermediary`;
+
+        fs.writeFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`), JSON.stringify(oldJSON));
+
         fs.renameSync(path.join(oldVersionPath, `/${oldVersionName}.json`), path.join(oldVersionPath, `/${newVersionName}.json`));
         fs.renameSync(oldVersionPath, newVersionPath);
     },

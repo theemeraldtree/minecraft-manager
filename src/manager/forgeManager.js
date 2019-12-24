@@ -6,7 +6,7 @@ import LauncherManager from "./launcherManager";
 const ForgeManager = {
     setupForge: (profile) => {
         return new Promise((resolve) => {
-            VersionsManager.createVersion(profile);
+            VersionsManager.createVersion(profile, 'forge');
             LibrariesManager.createForgeLibrary(profile).then(() => {
                 profile.setForgeInstalled(true);
                 resolve();

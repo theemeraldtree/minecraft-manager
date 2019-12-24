@@ -10,21 +10,21 @@ import Confirmation from '../../component/confirmation/confirmation';
 import ShareOverlay from '../../component/shareoverlay/shareoverlay';
 import UpdateOverlay from '../../component/updateoverlay/updateoverlay';
 const Image = styled.img`
-    min-width: 150px;
-    height: 150px;
+    min-width: 193px;
+    height: 193px;
 `
 
 const Title = styled.p`
     font-size: 26pt;
     color: white;
-    font-weight: bolder;
+    font-weight: 900;
     display: inline-block;
     margin: 0;
 `
 
 const Blurb = styled.p`
     font-size: 18pt;
-    color: white;
+    color: #dddbdd;
     margin: 0;
 `
 
@@ -32,7 +32,7 @@ const ProfileHeader = styled.div`
     margin: 10px;
     display: flex;
     align-items: center;
-    min-height: 150px;
+    min-height: 193px;
 `
 
 const PHSide = styled.div`
@@ -43,10 +43,11 @@ const PHSide = styled.div`
 
 const MiddlePanel = styled.div`
     display: flex;
-    align-items: center;
-    padding-left: 10px;
+    align-items: flex-start;
     flex: 0 1 auto;
     min-height: 230px;
+    padding: 10px;
+    height: 100%;
 `
 
 const CustomButton = styled(Button)`
@@ -60,22 +61,12 @@ const ButtonGroup = styled.div`
     }
 `
 
-const Specs = styled.div`
-    background-color: #717171;
-    flex: 0 1 auto;
-    width: 100%;
-    height: 230px;
-    margin: 12px;
-    p {
-        color: white;
-        margin: 5px 5px 5px 5px;
-    }
-`
-
 const Description = styled.div`
     overflow-y: scroll;
-    background-color: #717171;
-    margin: 10px;
+    background-color: #404040;
+    margin:  0 10px;
+    flex: 1 1 auto;
+    height: 100%;
 `
 class ViewProfilePage extends PureComponent {
     constructor(props) {
@@ -174,15 +165,10 @@ class ViewProfilePage extends PureComponent {
                             <CustomButton onClick={this.showShare} color='blue'>share</CustomButton>
                             <CustomButton onClick={this.deleteClick} color='red'>delete</CustomButton>
                         </ButtonGroup>
-                        <Specs>
-                            <p>internal id: {profile.id}</p>
-                            <p>version safe name: {profile.safename}</p>
-                            <p>version timestamp: {profile.version.timestamp}</p>
-                        </Specs>
+                        <Description>
+                            <SanitizedHTML html={profile.description} />
+                        </Description>
                     </MiddlePanel>
-                    <Description>
-                        <SanitizedHTML html={profile.description} />
-                    </Description>
                     {this.state.showShareOverlay && <ShareOverlay cancelClick={this.hideShare} profile={profile} />}
                     {this.state.showUpdateOverlay && <UpdateOverlay cancelClick={this.hideUpdate} profile={profile} />}
                 </Page>

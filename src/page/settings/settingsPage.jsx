@@ -9,7 +9,7 @@ import Help from './pages/help';
 const Sidebar = styled.div`
     height: 100%;
     position: absolute;
-    background-color: #505050;
+    background-color: #2b2b2b;
     width: 120px;
 `;
 

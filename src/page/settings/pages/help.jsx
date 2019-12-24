@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import NeedHelp from '../components/needhelp';
 import Section from '../components/section';
 import Button from '../../../component/button/button';
-import Confirmation from '../../../component/confirmation/confirmation';
 import LibrariesManager from '../../../manager/librariesManager';
 import VersionsManager from '../../../manager/versionsManager';
 import LauncherManager from '../../../manager/launcherManager';
+import AlertManager from '../../../manager/alertManager';
 const List = styled.div`
     display: flex;
     flex-flow: column;
@@ -18,10 +18,8 @@ const List = styled.div`
 `
 
 export default function Help() {
-    const [ showPopup, setShowPopup ] = useState(false);
     const [ action, setAction ] = useState('');
     const confirmAction = () => {
-        setShowPopup(false);
         switch(action) {
             case 'clean-launcher-profiles':
                 LauncherManager.cleanMinecraftProfiles();
@@ -36,15 +34,14 @@ export default function Help() {
     }
     const prepareAction = (action) => {
         setAction(action);
-        setShowPopup(true);
+        AlertManager.alert(
+            `this can be dangerous!`,
+            `are you sure? this is a potentially dangerous operation that can screw up your game!`,
+            confirmAction
+        );
     }
     return (
         <>
-            
-            {showPopup && <Confirmation cancelDelete={() => setShowPopup(false)} confirmDelete={confirmAction}>
-                <h1>This can be dangerous!</h1>
-                <h3>Are you sure? This is a potentially dangerous operation that can screw up your game!</h3>
-            </Confirmation>}
             <NeedHelp />
             <Section>
                 <h2>Advanced Troubleshooting Functions</h2>

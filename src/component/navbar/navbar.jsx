@@ -6,7 +6,7 @@ const BG = styled.div`
     width: 100px;
     min-width: 100px;
     height: 100%;
-    background-color: #373737;
+    background-color: #1c1c1c;
     flex: 0 1 auto;
 `
 

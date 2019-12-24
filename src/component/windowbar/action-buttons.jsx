@@ -23,7 +23,7 @@ const ActionButton = styled.div`
     cursor: pointer;
     -webkit-app-region: no-drag;
     &:hover {
-        filter: brightness(0.5);
+        background-color: black;
     }
 `
 

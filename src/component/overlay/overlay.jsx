@@ -9,6 +9,9 @@ const Overlay = styled.div`
     align-items: center;
     top: 0;
     left: 0;
-    z-index: 99;
+
+    ${props => props.force && `
+        z-index: 20;
+    `}
 `
 export default Overlay;

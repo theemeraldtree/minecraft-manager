@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 const Section = styled.div`
     max-width: 680px;
-    background-color: #717171;
+    background-color: #404040;
     margin: 10px;
     padding: 10px;
     h2 {

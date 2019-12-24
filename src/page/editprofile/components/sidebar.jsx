@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom';
 const BG = styled.div`
     height: 100%;
     position: absolute;
-    background-color: #505050;
+    background-color: #2b2b2b;
     width: 120px;
 `
 
@@ -23,7 +23,7 @@ const Item = styled(NavLink)`
     }
     &.active, &.active:hover {
         filter: brightness(1.0);
-        font-weight: bolder;
+        font-weight: 900;
     }
     margin-bottom: 15px;
 `

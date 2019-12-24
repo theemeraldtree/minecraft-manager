@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import ProfilesManager from '../../../manager/profilesManager';
 import ProfileCard from '../../../component/profilecard/profilecard';
 import styled from 'styled-components';
-import Confirmation from '../../../component/confirmation/confirmation';
 import ShareOverlay from '../../../component/shareoverlay/shareoverlay';
 import UpdateOverlay from '../../../component/updateoverlay/updateoverlay';
+import AlertManager from '../../../manager/alertManager';
 const BG = styled.div`
     overflow-y: scroll;
     flex: 1 1 auto;
@@ -67,36 +67,29 @@ export default class ProfileGrid extends Component {
 
     showDeletion = (profile) => {
         this.setState({
-            showDelete: true,
             deletingProfile: profile
-        })
-    }
+        });
 
-    cancelDelete = () => {
-        this.setState({
-            showDelete: false
-        })
+        AlertManager.alert(
+            `are you sure?`,
+            '',
+            this.confirmDelete,
+            'delete'
+        )
     }
 
     confirmDelete = () => {
         let { deletingProfile } = this.state;
-        ProfilesManager.deleteProfile(deletingProfile).then(() => {
-            this.setState({
-                showDelete: false
-            })
-        })
+        ProfilesManager.deleteProfile(deletingProfile);
     }
 
     render() {
-        const { showShare, showUpdate, showDelete, activeProfile, profiles } = this.state;
+        const { showShare, showUpdate, activeProfile, profiles } = this.state;
         const { searchTerm } = this.props;
         return (
             <BG>
                 {showShare && <ShareOverlay profile={activeProfile} cancelClick={this.cancelShare} />}
                 {showUpdate && <UpdateOverlay profile={activeProfile} cancelClick={this.cancelUpdate} />}
-                {showDelete && 
-                    <Confirmation questionText='are you sure?' cancelDelete={this.cancelDelete} confirmDelete={this.confirmDelete} />
-                }
                 {
                     profiles.length >= 1 && profiles.map(profile => {
                         if(profile) {

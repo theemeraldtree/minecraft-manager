@@ -11,7 +11,7 @@ const Container = styled.div`
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    z-index: 99;
+    z-index: 99999;
     pointer-events: none;
     overflow: hidden;
 `

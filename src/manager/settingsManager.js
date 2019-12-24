@@ -36,11 +36,16 @@ const SettingsManager = {
         this.currentSettings.lastVersion = version;
         this.save();
     },
+    setLastToastNewsID: function(id) {
+        this.currentSettings.lastToastNewsID = id;
+        this.save();
+    },
     createSettings: function() {
         let obj = {
             homeDirectory: '',
             dedicatedRam: 2,
-            mcExe: ''
+            mcExe: '',
+            lastToastNewsID: -1
         }
 
         fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(obj));

@@ -22,7 +22,7 @@ const Wrapper = styled.div`
     overflow: hidden;
 `
 const Container = styled.div`
-    background-color: #505050;
+    background-color: #2b2b2b;
     overflow: hidden;
     padding: 10px;
     display: flex;
@@ -45,7 +45,7 @@ const Search = styled(TextInput)`
 const SearchContainer = styled(InputContainer)`
     margin-top: 10px;
     flex-shrink: 0;
-    background-color: #717171;
+    background-color: #404040;
 `
 
 
@@ -150,15 +150,27 @@ export default class EditPageMods extends PureComponent {
             version: `temp-${new Date().getTime()}`
         }
         this.updateProgressStates();
-        try {
-           await Hosts.installModToProfile('curse', this.state.profile, mod);
-           this.updateProgressStates();
-        }catch(err) {
-            if(err === 'no-version-available') {
-                profile.progressState[id].progress = 'notavailable';
-                this.updateProgressStates();
-                ToastManager.createToast(`Error`, `There is no Minecraft ${profile.minecraftversion} version of ${mod.name} available.`);
+        const m = await Hosts.installModToProfile('curse', this.state.profile, mod);
+        this.updateProgressStates();
+        if(m === 'no-version-available') {
+            let modloader;
+            if(profile.customVersions.forge) {
+                modloader = 'Forge';
+            }else if(profile.customVersions.fabric) {
+                modloader = 'Fabric';
+            }else{
+                modloader = 'none';
             }
+
+            if(modloader !== 'none') {
+                profile.progressState[id].progress = 'notavailable';
+                ToastManager.createToast(`Unavailable`, `There is no ${modloader}-compatible Minecraft ${profile.minecraftversion} version of ${mod.name} available.`);
+            }else{
+                profile.progressState[id].progress = '';
+                ToastManager.createToast(`No modloader`, `You don't have a modloader installed. Install one in the versions tab first.`);
+            }
+
+            this.updateProgressStates();
         }
     }
 
@@ -248,7 +260,14 @@ export default class EditPageMods extends PureComponent {
                                     {mods.map(mod => {
                                         if(this.state.displayState === 'modsList') {
                                             if(mod.name.toLowerCase().includes(this.state.liveSearchTerm.toLowerCase())) {
-                                                return <AssetCard progressState={progressState} key={mod.id} asset={mod} showDelete onClick={this.showInfoClick} deleteClick={this.deleteClick} />;
+                                                return <AssetCard 
+                                                    progressState={progressState} 
+                                                    key={mod.id} 
+                                                    asset={mod} 
+                                                    showDelete 
+                                                    onClick={this.showInfoClick} 
+                                                    deleteClick={this.deleteClick} 
+                                                />;
                                             }
                                         }
                                     })}

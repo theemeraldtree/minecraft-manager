@@ -22,7 +22,7 @@ const LauncherManager = {
     },
     updateVersion: function(profile) {
         let verId;
-        if(profile.customVersions.forge) {
+        if(profile.customVersions.forge || profile.customVersions.fabric) {
             verId = `${profile.safename} [Minecraft Manager]`
         }else{
             verId = profile.minecraftversion;
@@ -52,6 +52,7 @@ const LauncherManager = {
         let oldData = obj.profiles[oldID];
         obj.profiles[`mcm-${newID}`] = oldData;
         delete obj.profiles[oldID];
+        obj.profiles[`mcm-${newID}`].gameDir = path.join(Global.PROFILES_PATH, `/${newID}/files`);
         fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
     },
     setProfileData: function(profile, tag, val) {

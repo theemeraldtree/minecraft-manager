@@ -6,7 +6,7 @@ import ImportOverlay from '../component/importoverlay/importoverlay';
 import ProfilesManager from '../manager/profilesManager';
 const app = require('electron').remote;
 const BG = styled.div`
-    background-color: #444444;
+    background-color: #212121;
     height: 100vh;
     width: 100vw;
     display: flex;
