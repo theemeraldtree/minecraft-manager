@@ -27,8 +27,8 @@ const Global = {
         versions: {}
     },
 
-    MCM_VERSION: '2.2.0',
-    MCM_RELEASE_DATE: '12/23/2019',
+    MCM_VERSION: '2.2.1',
+    MCM_RELEASE_DATE: '12/26/2019',
 
     dateMatches(d1) {
         let d2 = new Date(); 

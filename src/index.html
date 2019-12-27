@@ -61,34 +61,146 @@
         color: white;
         outline: none;
         z-index: 999;
-    }
+      }
 
-    .react-contextmenu-item {
+      .react-contextmenu-item {
+          color: white;
+          cursor: pointer;
+          padding: 5px 10px;
+          outline: none;
+      }
+
+      .react-contextmenu-item:hover {
+        background-color: #6b6b6b;
+      }
+
+      .react-contextmenu-item--divider {
+        border-top: 2px solid #505050;
+        margin-top: 7px;
+        cursor: inherit;
+      }
+      .react-contextmenu-item--divider:hover {
+          background-color: transparent;
+      }
+
+      .react-contextmenu-wrapper {
+        width: 100%;
+      }
+
+      .loading {
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .loading .windowbar {
+        width: 100vw;
+        background-color: #1D1D1D;
+        -webkit-app-region: drag;
+        user-select: none;
+        height: 29px;
+      }
+
+      .loading .center {
+        width: 100%;
+        height: 100%;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 900;
+        text-align: center;
+        position: relative;
+      }
+
+      .loading .toolong {
+        height: 20px;
+        font-size: 10pt;
+        position: absolute;
+        bottom: 100px;
+        font-weight: normal;
+      }
+
+      .loading .content {
+        display: flex;
+        height: 100%;
+      }
+
+      .loading .forceclose {
+        position: absolute;
+        bottom: 40px;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      .phantom-sidebar {
+        width: 100px;
+        height: 100%;
+        background-color: #1c1c1c;
+        flex-shrink: 0;
+      }
+
+      .phantom-header {
+        height: 60px;
+        background-color: #2b2b2b;
+        position: absolute;
+        top: 0;
+        width: 100%;
+      }
+
+      .loading button {
+        border: 0;
+        outline: none;
+        background-color: #8a1111;
         color: white;
         cursor: pointer;
-        padding: 5px 10px;
-        outline: none;
-    }
+        padding: 11.5px;
+      }
 
-    .react-contextmenu-item:hover {
-      background-color: #6b6b6b;
-    }
-
-    .react-contextmenu-item--divider {
-      border-top: 2px solid #505050;
-      margin-top: 7px;
-      cursor: inherit;
-    }
-    .react-contextmenu-item--divider:hover {
-        background-color: transparent;
-    }
-
-    .react-contextmenu-wrapper {
-      width: 100%;
-    }
+      .loading button:hover {
+        filter: brightness(0.75);
+      }
     </style>
   </head>
   <body>
-      <div id="app"></div>
+      <div id="app">
+        <div class='loading'>
+          <div class='windowbar'></div>
+          <div class='content'>
+            <div class='phantom-sidebar'></div>
+            <div class='center'>
+              <div class='phantom-header'></div>
+              <p>loading...</p>
+              <div id='toolong' class='toolong hide'>
+                <p><i>this seems to be taking a while. <a href='https://theemeraldtree.net/mcm/issues'>file a bug report?</a></i></p>
+              </div>
+              <div id='forceclose' class='forceclose hide'>
+                <button onclick='forceClose();'>close this window</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        const { remote } = require('electron');
+        const currentWindow = remote.getCurrentWindow();
+
+        window.setTimeout(() => {
+          if(document.getElementById('toolong')) {
+            document.getElementById('toolong').className = 'toolong';
+          }
+        }, 10000);
+
+        window.setTimeout(() => {
+          if(document.getElementById('foreclose')) {
+            document.getElementById('forceclose').className = 'forceclose';
+          }
+        }, 15000);
+
+        function forceClose() {
+          currentWindow.close();
+        }
+      </script>
   </body>
 </html>
