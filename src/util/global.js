@@ -64,8 +64,8 @@ const Global = {
         const version = SettingsManager.currentSettings.lastVersion;
         if(!version || semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1) {
             ToastManager.createToast(
-                `Welcome to ${this.MCM_VERSION}!`, 
-                `With Fabric support, a revamped UI, bugfixes, and more! <a href="https://theemeraldtree.net/mcm/changelogs/2.2.0">View the changelog.</a>`
+                `Welcome to ${this.MCM_VERSION}`, 
+                `With two small additions. <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`
             );
             SettingsManager.setLastVersion(this.MCM_VERSION);
         }
