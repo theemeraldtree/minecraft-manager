@@ -108,6 +108,14 @@ Profile.prototype.toJSON = function() {
         if(this.version.cachedID) {
             this.version.cachedID = undefined;
         }
+
+        if(this.version.hosts) {
+            if(this.version.hosts.curse) {
+                if(this.version.hosts.curse.localValues) {
+                    copy.version.hosts.curse.localValues = undefined;
+                }
+            }
+        }
     }
     return JSON.stringify(copy);
 }

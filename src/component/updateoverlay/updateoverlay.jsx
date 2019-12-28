@@ -105,6 +105,9 @@ export default class UpdateOverlay extends Component {
 
     render() {
         const { noUpdates, updateAvailable, updateVersion, displayState, noConnection } = this.state;
+        console.log(noUpdates);
+        console.log(noConnection);
+        console.log(noUpdates || noConnection);
         return (
             <Overlay force>
                 <BG>
@@ -129,7 +132,7 @@ export default class UpdateOverlay extends Component {
                             <Button onClick={this.props.cancelClick} color='red'>cancel</Button>
                             <Button onClick={this.updateClick} color='green'>update</Button>
                             </>}
-                            {noUpdates || noConnection && <Button color='green' onClick={this.props.cancelClick}>close</Button>}
+                            {(noUpdates || noConnection) && <Button color='green' onClick={this.props.cancelClick}>close</Button>}
                         </ButtonsContainer>
                     </>}
                     {this.state.displayState === 'progress' && <>

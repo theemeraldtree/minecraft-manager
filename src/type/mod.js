@@ -77,7 +77,20 @@ Mod.prototype.cleanObject = function() {
         if(this.version.TEMP) {
             this.version.TEMP = undefined;
         }
+        
+        if(this.version.hosts) {
+            if(this.version.hosts.curse) {
+                if(this.version.hosts.curse.localValues) {
+                    copy.version.hosts.curse.localValues = undefined;
+                }
+            }
+        }
+
+        if(this.version.cachedID) {
+            copy.version.cachedID = undefined;
+        }
     }
+    
     if(this.hosts) {
         if(this.hosts.curse) {
             if(this.hosts.curse.localValues) {
