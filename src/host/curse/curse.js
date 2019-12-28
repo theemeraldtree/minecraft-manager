@@ -330,16 +330,22 @@ const Curse = {
                 const manifest = JSON.parse(fs.readFileSync(path.join(extractPath, 'manifest.json')));
     
                 const list = manifest.files.map(file => {
-                    const mod = new Mod({
-                        hosts: {
-                            curse: {
-                                id: file.projectID,
-                                fileID: file.fileID
-                            }
-                        },
-                        cachedID: `curse-mod-install-${file.projectID}`
-                    });
-                    return mod;
+
+                    // i'm not sure why required is an option in the manifest...
+                    // afaik the twitch app only downloads mods marked as required
+                    // there also was a bug with a modpack caused by not checking for required
+                    if(file.required) {
+                        const mod = new Mod({
+                            hosts: {
+                                curse: {
+                                    id: file.projectID,
+                                    fileID: file.fileID
+                                }
+                            },
+                            cachedID: `curse-mod-install-${file.projectID}`
+                        });
+                        return mod;
+                    }
                 });
                 resolve(list);
             })
