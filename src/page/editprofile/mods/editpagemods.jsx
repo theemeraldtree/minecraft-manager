@@ -174,9 +174,8 @@ export default class EditPageMods extends PureComponent {
         }
     }
 
-    deleteClick = (e) => {
-        e.stopPropagation();
-        let mod = this.state.profile.getModFromID(e.currentTarget.parentElement.parentElement.dataset.assetid);
+    deleteClick = (assetid) => {
+        let mod = this.state.profile.getModFromID(assetid);
         this.state.profile.deleteMod(mod).then(() => {
             this.setState({
                 mods: this.state.profile.mods

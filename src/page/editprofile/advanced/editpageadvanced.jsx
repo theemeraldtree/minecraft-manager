@@ -4,7 +4,6 @@ import Header from '../../../component/header/header';
 import ProfilesManager from '../../../manager/profilesManager';
 import EditContainer from '../components/editcontainer'; 
 import Button from '../../../component/button/button';
-import { shell } from 'electron';
 import Detail from '../../../component/detail/detail';
 export default class EditPageAdvanced extends PureComponent {
     constructor(props) {
@@ -18,7 +17,7 @@ export default class EditPageAdvanced extends PureComponent {
 
     viewProfileFolder = () => {
         let { profile } = this.state;
-        shell.openItem(profile.gameDir);
+        profile.openGameDir();
     }
 
     static getDerivedStateFromProps(props) {

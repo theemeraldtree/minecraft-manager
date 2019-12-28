@@ -8,6 +8,7 @@ import LibrariesManager from "../manager/librariesManager";
 import ToastManager from "../manager/toastManager";
 import ErrorManager from "../manager/errorManager";
 import Hosts from "../host/Hosts";
+import { remote } from 'electron';
 const archiver = require('archiver');
 const path = require('path');
 const fs = require('fs');
@@ -413,4 +414,9 @@ Profile.prototype.rename = function(newName) {
         });
     });
 }
+
+Profile.prototype.openGameDir = function() {
+    remote.shell.openExternal(this.gameDir);
+}
+
 export default Profile;

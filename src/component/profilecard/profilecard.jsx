@@ -7,6 +7,7 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
 import Global from '../../util/global';
 import edit from './img/edit.png';
 import launch from './img/launch.png';
+import { shell } from 'electron';
 
 const BG = styled.div`
     width: 110px;
@@ -145,15 +146,25 @@ const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) =>
         <ContextMenu holdToDisplay={-1} id={`profilecard${profile.id}`}>
             {
                 !profile.error && profile.state !== 'installing' && <>
-                    <MenuItem onClick={() => {profile.launch()}}>Launch</MenuItem>
-                    <MenuItem onClick={() => {history.push(`/edit/general/${profile.id}`)}}>Edit</MenuItem>
-                    <MenuItem onClick={() => {showUpdate(profile)}}>Update</MenuItem>
-                    <MenuItem onClick={() => {showShare(profile)}}>Share</MenuItem>
-                    <MenuItem divider />            
+                    <MenuItem onClick={() => profile.launch()}>Launch</MenuItem>
+                    <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>Edit</MenuItem>
+                    <MenuItem onClick={() => showUpdate(profile)}>Update</MenuItem>
+                    <MenuItem onClick={() => showShare(profile)}>Share</MenuItem>
                 </>
             }
             {
                 profile.state !== 'installing' && <MenuItem onClick={() => {showDeletion(profile)}}>Delete</MenuItem>
+            }
+            {
+                !profile.error && profile.state !== 'installing' && <>
+                    <MenuItem divider />
+                    <MenuItem onClick={() => profile.openGameDir()}>Open Profile Folder</MenuItem>
+                </>
+            }
+            {
+                !profile.error && profile.state !== 'installing' && profile.hosts.curse && <>
+                    <MenuItem onClick={() => shell.openExternal(`https://curseforge.com/minecraft/modpacks/${profile.hosts.curse.slug}`)}>View on CurseForge</MenuItem>
+                </>
             }
         </ContextMenu>
     </Wrapper>

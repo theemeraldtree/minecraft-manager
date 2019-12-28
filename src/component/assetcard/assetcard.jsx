@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
+import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu';
+import { shell } from 'electron';
 const BG = styled.div`
     margin-top: 5px;
     width: 100%;
@@ -83,37 +85,48 @@ const Details = styled.div`
 `
 
 const AssetCard = ({asset, onClick, showDelete, progressState, showInstall, disableHover, installed, installClick, deleteClick, showBlurb}) => (
-    <BG disableHover={disableHover} data-cachedid={asset.cachedID} data-assetid={asset.id} onClick={onClick}>
-        {asset.icon || asset.iconpath && <Image src={asset.iconpath} />}
-        {asset.iconURL && !asset.iconpath && !asset.icon && <Image src={asset.iconURL} />}
-        <Details>
-            <Title>{asset.name}</Title>
-            <Version 
-                buttonShown={showInstall || showDelete}>
-                {!showBlurb && asset.version && asset.version.displayName}
-                {showBlurb && asset.blurb}
-            </Version>
-        </Details>
-        <Buttons>
-            {showDelete && 
-            <Button onClick={deleteClick} color='red'>delete</Button>
-            }
+    <>
+    <ContextMenuTrigger holdToDisplay={-1} id={`assetcard${asset.id}`}>
+        <BG disableHover={disableHover} data-cachedid={asset.cachedID} data-assetid={asset.id} onClick={onClick}>
+            {asset.icon || asset.iconpath && <Image src={asset.iconpath} />}
+            {asset.iconURL && !asset.iconpath && !asset.icon && <Image src={asset.iconURL} />}
+            <Details>
+                <Title>{asset.name}</Title>
+                <Version 
+                    buttonShown={showInstall || showDelete}>
+                    {!showBlurb && asset.version && asset.version.displayName}
+                    {showBlurb && asset.blurb}
+                </Version>
+            </Details>
+            <Buttons>
+                {showDelete && 
+                <Button onClick={e => {e.stopPropagation(); deleteClick(asset.id)}} color='red'>delete</Button>
+                }
 
-            {showInstall && (installed || progressState.progress === 'installed') &&
-            <Button disabled color='green'>installed</Button>
-            }
+                {showInstall && (installed || progressState.progress === 'installed') &&
+                <Button disabled color='green'>installed</Button>
+                }
 
-            {showInstall && !installed && !progressState.progress &&
-            <Button color='green' onClick={installClick}>install</Button>
-            }
-    
-            {showInstall && !installed && progressState.progress === 'notavailable' &&
-            <Button color='green' disabled>not available</Button>
-            }
+                {showInstall && !installed && !progressState.progress &&
+                <Button color='green' onClick={installClick}>install</Button>
+                }
+        
+                {showInstall && !installed && progressState.progress === 'notavailable' &&
+                <Button color='green' disabled>not available</Button>
+                }
 
-            {progressState.progress === 'installing' && !installed && showInstall && <Button color='green' disabled>installing</Button>}
-        </Buttons>
-    </BG>
+                {progressState.progress === 'installing' && !installed && showInstall && <Button color='green' disabled>installing</Button>}
+            </Buttons>
+        </BG>
+    </ContextMenuTrigger>
+    <ContextMenu holdToDisplay={-1} id={`assetcard${asset.id}`}>
+        {
+            asset.hosts.curse && <>
+                <MenuItem onClick={() => shell.openExternal(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)}>View on CurseForge</MenuItem>
+            </>
+        }
+    </ContextMenu>
+    </>
 )
 
 export default AssetCard;

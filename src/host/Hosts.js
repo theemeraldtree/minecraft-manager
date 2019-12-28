@@ -179,10 +179,12 @@ const Hosts = {
     async installDependencies(host, profile, asset) {
         if(asset.dependencies) {
             for(let depend of asset.dependencies) {
-                if(depend.hosts.curse && depend.hosts.curse.fileID) {
-                    this.installModVersionToProfile(host, profile, depend);
-                }else{
-                    this.installModToProfile(host, profile, depend);
+                if(depend) {
+                    if(depend.hosts.curse && depend.hosts.curse.fileID) {
+                        this.installModVersionToProfile(host, profile, depend);
+                    }else{
+                        this.installModToProfile(host, profile, depend);
+                    }
                 }
             }
         }
