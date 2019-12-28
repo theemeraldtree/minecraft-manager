@@ -16,6 +16,7 @@ import VersionsManager from '../../../manager/versionsManager';
 import Hosts from '../../../host/Hosts';
 import FabricManager from '../../../manager/fabricManager';
 import AlertManager from '../../../manager/alertManager';
+import ToastManager from '../../../manager/toastManager';
 const CustomVersions = styled.div`
     background-color: #2b2b2b;
     width: 350px;
@@ -135,6 +136,10 @@ export default class EditPageVersions extends Component {
                     `there is no fabric version available for minercaft ${profile.minecraftversion}`
                 );
             }
+        }).catch(() => {
+            this.setState({
+                fabricIsInstalling: false
+            })
         })
     }
 
@@ -158,24 +163,31 @@ export default class EditPageVersions extends Component {
                 forgeIsInstalling: true
             });
             ForgeManager.getForgePromotions().then((promos) => {
-                let obj = JSON.parse(promos);
-                let verObj = obj.promos[`${profile.minecraftversion}-latest`];
-                if(verObj) {
-                    let version = `${profile.minecraftversion}-${verObj.version}`;
-                    profile.setForgeVersion(version);
-                    ForgeManager.setupForge(profile).then(() => {
+                if(promos) {
+                    let obj = JSON.parse(promos);
+                    let verObj = obj.promos[`${profile.minecraftversion}-latest`];
+                    if(verObj) {
+                        let version = `${profile.minecraftversion}-${verObj.version}`;
+                        profile.setForgeVersion(version);
+                        ForgeManager.setupForge(profile).then(() => {
+                            this.setState({
+                                forgeIsInstalling: false
+                            })
+                        });
+                    }else{
                         this.setState({
                             forgeIsInstalling: false
                         })
-                    });
+                        AlertManager.messageBox(
+                            `no forge version`,
+                            `there is no forge version available for minecraft ${profile.minecraftversion}`
+                        );
+                    }
                 }else{
                     this.setState({
                         forgeIsInstalling: false
-                    })
-                    AlertManager.messageBox(
-                        `no forge version`,
-                        `there is no forge version available for minecraft ${profile.minecraftversion}`
-                    );
+                    });
+                    ToastManager.createToast(`Error`, `We can't reach the Forge servers. Check your internet connection, and try again.`);
                 }
             })
         }else{

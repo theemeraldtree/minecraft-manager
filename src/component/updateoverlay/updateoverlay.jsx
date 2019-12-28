@@ -45,7 +45,8 @@ export default class UpdateOverlay extends Component {
         super(props);
         this.state = {
             displayState: 'main',
-            exportProgress: 'Waiting...'
+            exportProgress: 'Waiting...',
+            noConnection: false
         }
     }
 
@@ -62,10 +63,17 @@ export default class UpdateOverlay extends Component {
         if(profile.hosts.curse) {
             const update = await Hosts.checkForAssetUpdates('curse', profile);
             if(update) {
-                this.setState({
-                    updateAvailable: true,
-                    updateVersion: update
-                })
+                if(update === 'no-connection')  {
+                    this.setState({
+                        noConnection: true,
+                        updateAvailable: false
+                    })
+                }else{
+                    this.setState({
+                        updateAvailable: true,
+                        updateVersion: update
+                    })
+                }
             }else{
                 this.setState({
                     noUpdates: true
@@ -96,7 +104,7 @@ export default class UpdateOverlay extends Component {
     }
 
     render() {
-        const { noUpdates, updateAvailable, updateVersion, displayState } = this.state;
+        const { noUpdates, updateAvailable, updateVersion, displayState, noConnection } = this.state;
         return (
             <Overlay force>
                 <BG>
@@ -107,8 +115,9 @@ export default class UpdateOverlay extends Component {
                         </>}
                     {displayState === 'main' && <>
                         {displayState !== 'done' && <Title>update your profile</Title>}
-                        {!noUpdates && !updateAvailable && <Subtext>checking for updates...</Subtext>}
-                        {noUpdates && <Subtext>you have the latest version. no update is available</Subtext>}
+                        {!noUpdates && !updateAvailable && !noConnection && <Subtext>checking for updates...</Subtext>}
+                        {noUpdates && !noConnection && <Subtext>you have the latest version. no update is available</Subtext>}
+                        {noConnection && <Subtext>Unable to connect.</Subtext>}
                         {updateAvailable && <Subtext>a new version is available. 
                             <br />you have: {this.props.profile.version.displayName}
                             <br />latest version: {updateVersion.displayName}
@@ -120,7 +129,7 @@ export default class UpdateOverlay extends Component {
                             <Button onClick={this.props.cancelClick} color='red'>cancel</Button>
                             <Button onClick={this.updateClick} color='green'>update</Button>
                             </>}
-                            {noUpdates && <Button color='green' onClick={this.props.cancelClick}>close</Button>}
+                            {noUpdates || noConnection && <Button color='green' onClick={this.props.cancelClick}>close</Button>}
                         </ButtonsContainer>
                     </>}
                     {this.state.displayState === 'progress' && <>

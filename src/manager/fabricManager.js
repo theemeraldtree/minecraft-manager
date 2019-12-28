@@ -5,6 +5,7 @@ import LibrariesManager from "./librariesManager";
 import path from 'path';
 import fs from 'fs';
 import LauncherManager from "./launcherManager";
+import ToastManager from "./toastManager";
 
 const FabricManager = {
     setupFabric: (profile) => {
@@ -52,9 +53,14 @@ const FabricManager = {
         })
     },
     getFabricLoaderVersions: (mcversion) =>     {
-        return new Promise(resolve => {
+        return new Promise((resolve, reject) => {
             HTTPRequest.httpGet(`https://meta.fabricmc.net/v2/versions/loader/${mcversion}`).then(versions => {
-                resolve(JSON.parse(versions));
+                if(versions) {
+                    resolve(JSON.parse(versions));
+                }else{
+                    reject();
+                    ToastManager.createToast(`Error`, `We can't reach the Fabric servers. Check your internet connection, and try again.`);
+                }
             });
         })
     }

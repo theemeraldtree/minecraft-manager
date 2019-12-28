@@ -385,10 +385,14 @@ const Curse = {
     async checkForAssetUpdates(asset) {
         const versions = await Hosts.getVersions('curse', asset);
         let newver;
-        for(let ver of versions.slice().reverse()) {
-            if(new Date(ver.timestamp).getTime() > asset.version.timestamp) {
-                newver = ver;
+        if(versions) {
+            for(let ver of versions.slice().reverse()) {
+                if(new Date(ver.timestamp).getTime() > asset.version.timestamp) {
+                    newver = ver;
+                }
             }
+        }else{
+            return 'no-connection';
         }
         return newver;
     }
