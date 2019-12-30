@@ -27,8 +27,8 @@ const Global = {
         versions: {}
     },
 
-    MCM_VERSION: '2.2.1',
-    MCM_RELEASE_DATE: '12/26/2019',
+    MCM_VERSION: '2.2.2',
+    MCM_RELEASE_DATE: '12/29/2019',
 
     dateMatches(d1) {
         let d2 = new Date(); 
@@ -65,7 +65,7 @@ const Global = {
         if(!version || semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1) {
             ToastManager.createToast(
                 `Welcome to ${this.MCM_VERSION}`, 
-                `With two small additions. <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`
+                `With a few fixes. <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`
             );
             SettingsManager.setLastVersion(this.MCM_VERSION);
         }
