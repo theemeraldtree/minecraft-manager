@@ -6,7 +6,7 @@ const TextBox = styled.textarea`
     color: white;
     height: 250px;
     font-size: 17pt;
-    padding-left: 10px;
+    padding-left: 3px;
     resize: none;
     &::placeholder {
         color: white;

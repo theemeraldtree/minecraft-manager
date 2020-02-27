@@ -1,9 +1,6 @@
-import React, { PureComponent } from 'react';
+import React, { useState, useReducer } from 'react';
 import { withRouter } from 'react-router-dom';
-import Page from '../../page';
-import Header from '../../../component/header/header';
 import ProfilesManager from '../../../manager/profilesManager';
-import EditContainer from '../components/editcontainer';
 import Button from '../../../component/button/button';
 import styled from 'styled-components';
 import TextInput from '../../../component/textinput/textinput';
@@ -25,7 +22,8 @@ const Renaming = styled.div`
 `
 const LongDesc = styled(TextBox)`
     height: 400px;
-    max-width: 780px;
+    width: calc(100vw - 285px);
+    max-width: 770px;
 `
 const IconWrapper = styled.div`
     width: 150px;
@@ -60,6 +58,7 @@ const Icon = styled.img`
 
 const AboutContainer = styled.div`
     display: flex;
+    margin-right: 10px;
 `
 
 const AboutRight = styled.div` 
@@ -84,48 +83,36 @@ const AboutRight = styled.div`
     }
 `
 
-export default withRouter(class EditPageGeneral extends PureComponent {
-    constructor(props) {
-        super(props);
-        let profile = ProfilesManager.getProfileFromID(props.match.params.id);
-        this.state = {
-            profile: profile,
-            nameValue: profile.name,
-            nameDisabled: true
-        }
-    }
+export default withRouter(function EditPageGeneral({ id, history }) {
 
-    static getDerivedStateFromProps(props) {
-        let profile = ProfilesManager.getProfileFromID(props.match.params.id);
-        return {
-            profile: profile,
-            iconsrc: profile.iconpath
-        }
-    }
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
+    const [ profile ] = useState(ProfilesManager.getProfileFromID(id));
+    const [ nameValue, setNameValue ] = useState(profile.name);
+    const [ nameDisabled, setNameDisabled ] = useState(true);
+    const [ renaming, setRenaming ] = useState(false);
 
 
-    
-    nameChange = (e) => {
+    const nameChange = (e) => {
         let newName = e.target.value;
         let namedisable = true;
-        if(newName != this.state.profile.name && newName.trim() !== '' && !ProfilesManager.containsProfileWithName(newName)) {
+        if(newName != profile.name && newName.trim() !== '' && !ProfilesManager.containsProfileWithName(newName)) {
             namedisable = false;
         }
-        this.setState({
-            nameValue: e.target.value,
-            nameDisabled: namedisable
-        });
+        setNameValue(e.target.value);
+        setNameDisabled(namedisable);
     }
 
-    blurbChange = (e) => {
-        this.state.profile.changeBlurb(e.target.value);
+    const blurbChange = (e) => {
+        profile.blurb = e.target.value;
+        profile.save();
     }
 
-    descChange = (e) => {
-        this.state.profile.changeDescription(e.target.value);
+    const descChange = (e) => {
+        profile.description = e.target.value;
+        profile.save();
     }
 
-    changeIcon = () => {
+    const changeIcon = () => {
         let p = dialog.showOpenDialog({
             title: 'Select your image file',
             buttonLabel: 'Choose image',
@@ -133,85 +120,74 @@ export default withRouter(class EditPageGeneral extends PureComponent {
             properties: ['openFile']
         });
 
-        const img = p[0];
-        if(img) {
-            this.state.profile.changeIcon(img);
-            this.forceUpdate();
-            ProfilesManager.updateProfile(this.state.profile);
+        if(p && p[0]) {
+            const img = p[0];
+            profile.setIcon(img);
+            ProfilesManager.updateProfile(profile);
             Global.updateCache();
+            forceUpdate();
         }
     }
 
-    confirmNameChange = () => {
-        const { profile } = this.state;
-        this.setState({
-            nameDisabled: true,
-            renaming: true
-        }, () => {
-            profile.rename(this.state.nameValue).then(profile => {
-                this.props.history.push(`/edit/general/${profile.id}`);
+    const confirmNameChange = () => {
+        setNameDisabled(true);
+        setRenaming(true);
+        profile.rename(nameValue).then(profile => {
+            history.push(`/edit/general/${profile.id}`);
 
-                // *unfortunately* a page reload is required to my knowledge
-                // react-router doesn't want to refresh the page otherwise
-                window.location.reload();
-            });
+            // *unfortunately* a page reload is required to my knowledge
+            // react-router doesn't want to refresh the page otherwise
+            window.location.reload();
         });
     }
 
-    resetIcon = () => {
-        this.state.profile.resetIcon();
-        this.forceUpdate();
-        ProfilesManager.updateProfile(this.state.profile);
+    const resetIcon = () => {
+        profile.resetIcon();
+        ProfilesManager.updateProfile(profile);
+        forceUpdate();
     }
 
-    render() {
-        let { profile, nameValue, nameDisabled, renaming } = this.state;
-        return (
-            <Page>
-                { renaming && <>
-                    <Header title='edit profile' backlink='/' />
-                    <Overlay force>
-                        <Renaming>renaming...</Renaming>
-                    </Overlay> 
-                </>}
-                { !renaming && <>
-                    <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
-                    <EditContainer profile={profile}>
-                        <AboutContainer>
+    return (
+        <>
+            { renaming && <>
+                <Overlay force>
+                    <Renaming>renaming...</Renaming>
+                </Overlay> 
+            </>}
+            { !renaming && <>
+                <>
+                    <AboutContainer>
+                        <div>
+                            <Detail>profile icon</Detail>
+                            <IconWrapper onClick={changeIcon}>
+                                <Icon src={`${profile.iconPath}#${new Date().getTime()}`} />
+                            </IconWrapper>
+                            <ResetIconButton onClick={resetIcon} color='green'>reset</ResetIconButton>
+                        </div>
+                        <AboutRight>
                             <div>
-                                <Detail>profile icon</Detail>
-                                <IconWrapper onClick={this.changeIcon}>
-                                    <Icon src={`${profile.iconpath}#${new Date().getTime()}`} />
-                                </IconWrapper>
-                                <ResetIconButton onClick={this.resetIcon} color='green'>reset</ResetIconButton>
+                                <Detail>profile name</Detail>
+                                <InputContainer>
+                                    <TextInput value={nameValue} onChange={nameChange} placeholder="Enter a name" />
+                                    <Button onClick={confirmNameChange} disabled={nameDisabled} color='green'>change</Button>
+                                </InputContainer>
                             </div>
-                            <AboutRight>
-                                <div>
-                                    <Detail>profile name</Detail>
-                                    <InputContainer>
-                                        <TextInput value={nameValue} onChange={this.nameChange} placeholder="Enter a name" />
-                                        <Button onClick={this.confirmNameChange} disabled={nameDisabled} color='green'>change</Button>
-                                    </InputContainer>
-                                </div>
-                                <div>
-                                    <DescContainer>
-                                        <Detail>blurb</Detail>
-                                        <TextBox defaultValue={profile.blurb} onChange={this.blurbChange} placeholder="Enter a short description" />
-                                    </DescContainer>
-                                </div>
-                            </AboutRight>
-                        </AboutContainer>
+                            <div>
+                                <DescContainer>
+                                    <Detail>blurb</Detail>
+                                    <TextBox defaultValue={profile.blurb} onChange={blurbChange} placeholder="Enter a short description" />
+                                </DescContainer>
+                            </div>
+                        </AboutRight>
+                    </AboutContainer>
 
 
-                        <DescContainer>
-                            <Detail>long description</Detail>
-                            <LongDesc defaultValue={profile.description} onChange={this.descChange} placeholder="Enter a long description" />
-                        </DescContainer>
-                    </EditContainer>
-                </>}
-                
-            </Page>
-        )   
-    }
-
+                    <DescContainer>
+                        <Detail>long description</Detail>
+                        <LongDesc defaultValue={profile.description} onChange={descChange} placeholder="Enter a long description" />
+                    </DescContainer>
+                </>
+            </>}
+        </>
+    )   
 })

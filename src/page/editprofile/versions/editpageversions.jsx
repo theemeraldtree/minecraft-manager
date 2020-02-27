@@ -1,22 +1,19 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect, useContext, useReducer } from 'react';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
-import Page from '../../page';
-import Header from '../../../component/header/header';
 import ProfilesManager from '../../../manager/profilesManager';
-import EditContainer from '../components/editcontainer';
 import Detail from '../../../component/detail/detail';
 import OptionBreak from '../components/optionbreak';
 import Button from '../../../component/button/button';
 import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import Global from '../../../util/global';
-import ForgeManager from '../../../manager/forgeManager';
 import Overlay from '../../../component/overlay/overlay';
-import VersionsManager from '../../../manager/versionsManager';
 import Hosts from '../../../host/Hosts';
-import FabricManager from '../../../manager/fabricManager';
 import AlertManager from '../../../manager/alertManager';
 import ToastManager from '../../../manager/toastManager';
+import NavContext from '../../../navContext';
+import ForgeFramework from '../../../framework/forge/forgeFramework';
+import FabricFramework from '../../../framework/fabric/fabricFramework';
 const CustomVersions = styled.div`
     background-color: #2b2b2b;
     width: 350px;
@@ -25,7 +22,7 @@ const CustomVersions = styled.div`
 const BG = styled.div`
     width: 100%;
     height: fit-content;
-    max-width: 600px;
+    max-width: 400px;
     max-height: 500px;
     background-color: #222;
     padding: 10px;
@@ -38,196 +35,141 @@ const Title = styled.p`
     font-weight: 200;
     font-size: 21pt;
 `
-export default class EditPageVersions extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            profile: {
-                name: 'Loading'
-            },
-            mcverValue: '',
-            curseVerValue: '',
-            updateOverlay: false,
-            updateOverlayText: 'Getting things ready...',
-            updateConfirm: false,
-            badForgeVersion: false
-        }
-    }
+export default function EditPageVersions({ id }) {
 
-    static getDerivedStateFromProps(props) {
-        return {
-            profile: ProfilesManager.getProfileFromID(props.match.params.id)
-        }
-    }
-    
-    async componentDidMount() {
-        this.setState({
-            mcverValue: this.state.profile.minecraftversion
-        });
+    const [, forceUpdate] = useReducer(x => x + 1, 0);
 
-        this.reloadCurseVersionsList();
-    }
+    const { header } = useContext(NavContext);
 
-    mcverChange = (version, cancel) => {
-        let { profile } = this.state;
-        if(!profile.customVersions.forge && !profile.customVersions.fabric) {
-            this.setState({
-                mcverValue: version
-            })
-            this.state.profile.changeMCVersion(version);
+    const [ profile, setProfile ] = useState(ProfilesManager.getProfileFromID(id));
+    const [ newVersion, setNewVersion ] = useState('');
+    const [ mcverValue, setMCVerValue ] = useState('');
+    const [ curseVerValue, setCurseVerValue ] = useState('');
+    const [ hostVersionValues, setHostVersionValues ] = useState(undefined);
+
+
+    const [ updateOverlay, setUpdateOverlay ] = useState(false);
+    const [ updateOverlayText, setUpdateOverlayText ] = useState('getting things ready...');
+
+    const [ fabricIsInstalling, setFabricIsInstalling ] = useState(false);
+    const [ fabricIsUninstalling, setFabricIsUninstalling ] = useState(false);
+
+    const [ forgeIsInstalling, setForgeIsInstalling ] = useState(false);
+    const [ forgeIsUninstalling, setForgeIsUninstalling ] = useState(false);
+
+    useEffect(() => {
+        setMCVerValue(profile.version.minecraft.version);
+        reloadCurseVersionsList();
+    }, [])
+
+    const mcverChange = (version, cancel) => {
+        if(!profile.hasFramework()) {
+            setMCVerValue(version);
+            profile.progressState = {};
+            profile.changeMCVersion(version);
         }else{
             cancel();
-            this.setState({
-                newVersion: version
-            });
+            setNewVersion(version)
             AlertManager.alert(
                 `warning`,
                 `changing your minecraft version will remove forge/fabric and all your mods. are you sure you want to change?`,
-                this.confirmVersionChange,
+                confirmVersionChange,
                 `change`,
                 `don't change`
             );
         }
     }
 
-    badForgeVersionClose = () => {
-        this.setState({
-            badForgeVersion: false
-        })
+    const confirmVersionChange = () => {
+        profile.changeMCVersion(newVersion);
+        profile.progressState = {};
+        uninstallForge();
+        uninstallFabric();
+
+        setMCVerValue(newVersion);
     }
 
-    cancelVersionChange = () => {
-        this.setState({
-            versionChangeWarning: false
-        })
-    }
-
-    confirmVersionChange = () => {
-        this.state.profile.changeMCVersion(this.state.newVersion);
-        this.state.profile.progressState = {};
-        this.uninstallForge();
-        this.uninstallFabric();
-        this.setState({
-            versionChangeWarning: false,
-            mcverValue: this.state.newVersion
-        })
-    }
-
-    downloadFabric = () => {
-        let { profile } = this.state;
-        this.setState({
-            fabricIsInstalling: true
-        });
-        FabricManager.getFabricLoaderVersions(profile.minecraftversion).then(versions => {
+    const downloadFabric = () => {
+        setFabricIsInstalling(true);
+        FabricFramework.getFabricLoaderVersions(profile.version.minecraft.version).then(versions => {
             const version = versions[0];
             if(version) {
-                profile.setFabricVersion(version.loader.version);
-                FabricManager.setupFabric(profile).then(() => {
-                    this.setState({
-                        fabricIsInstalling: false
-                    })
+                profile.setFrameworkVersion('fabric', version.loader.version);
+                FabricFramework.setupFabric(profile).then(() => {
+                    setFabricIsInstalling(false);
                 });
             }else{
-                this.setState({
-                    fabricIsInstalling: false
-                });
+                setFabricIsInstalling(false);
                 AlertManager.messageBox(
                     `no fabric version`,
-                    `there is no fabric version available for minercaft ${profile.minecraftversion}`
+                    `there is no fabric version available for minercaft ${profile.version.minecraft.version}`
                 );
             }
         }).catch(() => {
-            this.setState({
-                fabricIsInstalling: false
-            })
+            setFabricIsInstalling(false);
         })
     }
 
-    uninstallFabric = () => {
-        let { profile } = this.state;
-        this.setState({
-            fabricIsUninstalling: true
+    const uninstallFabric = () => {
+        setFabricIsUninstalling(true);
+        FabricFramework.uninstallFabric(profile).then(() => {
+            setFabricIsUninstalling(false);
         });
-        FabricManager.uninstallFabric(profile).then(() => {
-            this.setState({
-                fabricIsUninstalling: false
-            })
-        })
-       
     }
 
-    downloadForge = () => {
-        let { profile } = this.state;
-        if(!VersionsManager.checkIs113OrHigher(profile)) {
-            this.setState({
-                forgeIsInstalling: true
-            });
-            ForgeManager.getForgePromotions().then((promos) => {
-                if(promos) {
-                    let obj = JSON.parse(promos);
-                    let verObj = obj.promos[`${profile.minecraftversion}-latest`];
-                    if(verObj) {
-                        let version = `${profile.minecraftversion}-${verObj.version}`;
-                        profile.setForgeVersion(version);
-                        ForgeManager.setupForge(profile).then(() => {
-                            this.setState({
-                                forgeIsInstalling: false
-                            })
-                        });
-                    }else{
-                        this.setState({
-                            forgeIsInstalling: false
-                        })
-                        AlertManager.messageBox(
-                            `no forge version`,
-                            `there is no forge version available for minecraft ${profile.minecraftversion}`
-                        );
-                    }
-                }else{
-                    this.setState({
-                        forgeIsInstalling: false
+    const downloadForge = () => {
+        setForgeIsInstalling(true);
+        ForgeFramework.getForgePromotions().then((promos) => {
+            if(promos) {
+                let obj = JSON.parse(promos);
+                let verObj = obj.promos[`${profile.version.minecraft.version}-latest`];
+                if(verObj) {
+                    let version = `${profile.version.minecraft.version}-${verObj.version}`;
+                    profile.setFrameworkVersion('forge', version);
+                    ForgeFramework.setupForge(profile).then(() => {
+                        setForgeIsInstalling(false);
                     });
-                    ToastManager.createToast(`Error`, `We can't reach the Forge servers. Check your internet connection, and try again.`);
+                }else{
+                    setForgeIsInstalling(false);
+                    AlertManager.messageBox(
+                        `no forge version`,
+                        `there is no forge version available for minecraft ${profile.version.minecraft.version}`
+                    );
                 }
-            })
-        }else{
-            AlertManager.messageBox(
-                `uh oh`,
-                `there is currently no support for forge in minecraft 1.13+, however it may be implemented in the future
-                <br><a href="https://github.com/stairman06/minecraft-manager/wiki/Forge-1.13-">for why, check out this wiki article</a>`
-            );
-        }
-
-    }
-
-    uninstallForge = () => {
-        this.setState({
-            forgeIsUninstalling: true
-        });
-        ForgeManager.uninstallForge(this.state.profile).then(() => {
-            this.setState({
-                forgeIsUninstalling: false
-            });
+            }else{
+                setForgeIsInstalling(false);
+                ToastManager.createToast(`Error`, `We can't reach the Forge servers. Check your internet connection, and try again.`);
+    
+            }
         })
     }
 
-    curseVersionChange = (e) => {
-        this.setState({
-            versionToChangeTo: e
-        });
+    const uninstallForge = () => {
+        setForgeIsUninstalling(true);
+        ForgeFramework.uninstallForge(profile).then(() => {
+            setForgeIsUninstalling(false);
+        })
+    }
 
+    const curseVersionChange = (e) => {
+        profile.temp = {};
+        profile.temp.versionToChangeTo = e;
+        forceUpdate();
         AlertManager.alert(
             `are you sure?`,
-            `updating or changing a profile's verison will modify the current files. a backup will be created of the current files. if you've modified files or added mods, you will need to move then over from the backup
+            `updating or changing a profile's version will modify the current files. a backup will be created of the current files. if you've modified files or added mods, you will need to move then over from the backup
             <br>
             <b>the saves folder and options.txt are automatically moved.`,
-            this.confirmCurseVerChange,
+            confirmCurseVerChange,
             'i understand, continue'
         )
     }
 
-    reloadCurseVersionsList = async () => {
-        const { profile } = this.state;
+    useEffect(() => {
+        reloadCurseVersionsList();
+    }, [ profile ]);
+
+    const reloadCurseVersionsList = async () => {
         if(profile.hosts) {
             if(profile.hosts.curse) {
                 const versions = await Hosts.getVersions('curse', profile);
@@ -248,98 +190,94 @@ export default class EditPageVersions extends Component {
                     })
                 }
 
-                this.setState({
-                    hostVersionValues: nameArray,
-                    curseVerValue: profile.version.hosts.curse.fileID
-                })
+                setHostVersionValues(nameArray);
+                setCurseVerValue(profile.version.hosts.curse.fileID);
             }
         }
     }
 
-    confirmCurseVerChange = async () => {
-        const{ profile, versionToChangeTo } = this.state;
-        this.setState({
-            updateConfirm: false,
-            updateOverlay: true
-        })
-        profile.changeCurseVersion(versionToChangeTo, (updtext) => {
-            this.setState({
-                updateOverlayText: updtext
-            })
+    const confirmCurseVerChange = async () => {
+        setUpdateOverlay(true);
+        header.setBackLink('/');
+        profile.changeHostVersion('curse', profile.temp.versionToChangeTo, updtext => {
+            setUpdateOverlayText(updtext);
         }).then((newprofile) => {
-            this.setState({
-                profile: newprofile,
-                updateConfirm: false,
-                updateOverlay: false
-            }, () => {
-                this.reloadCurseVersionsList();
+            setProfile({
+                name: 'hang on...',
+                hosts: {},
+                frameworks: {}
             });
+            setProfile(newprofile);
+            setUpdateOverlay(false);
+            header.setBackLink(`/profile/${profile.id}`);
         }).catch(() => {
-            this.setState({
-                updateConfirm: false,
-                updateOverlay: false
-            }, () => {
-                this.reloadCurseVersionsList();
-            })
+            setUpdateOverlay(false);
+            header.setBackLink(`/profile/${profile.id}`);
+            reloadCurseVersionsList();
         })
     }
 
-    render() {
-        let { profile, fabricIsInstalling, forgeIsInstalling, forgeIsUninstalling, mcverValue, curseVerValue, hostVersionValues } = this.state;
-        if(profile) {
-            return (
-                <Page>
-                    {!this.state.updateOverlay && <Header title='edit profile' backlink={`/profile/${profile.id}`}/>}
-                    {this.state.updateOverlay && <Header title='edit profile' backlink={`'/`}/>}
-                    <EditContainer profile={profile}>
-                        {this.state.updateOverlay && <Overlay>
-                            <BG>
-                                <Title>{this.state.updateOverlayText}</Title>
-                            </BG>
-                        </Overlay>}
-                        {!profile.hosts.curse && 
-                        <>
-                            <Detail>minecraft version</Detail>
-                            <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} value={mcverValue} />
-                            <OptionBreak />
-                        </>}
-                        {profile.hosts.curse && <>
-                        <Detail>profile version</Detail>
-                        {hostVersionValues && <CustomDropdown value={curseVerValue} onChange={this.curseVersionChange} items={hostVersionValues} />}
-                        </>}
-    
-                        <OptionBreak />
-                        <Detail>modloaders</Detail>
-                        <CustomVersions>
-                            <Detail>forge</Detail>
-                            {!profile.customVersions.forge && !forgeIsInstalling &&
-                            <Button onClick={this.downloadForge} color='green'>install forge</Button>
-                            }
-                            {forgeIsInstalling && <p>Forge is installing. To check progress, open the Downloads viewer in the sidebar</p>}
-                            {forgeIsUninstalling && <p>Forge is being removed. To check progress, open the Downloads viewer in the sidebar</p>}
-                            {profile.customVersions.forge && !forgeIsUninstalling && <>
-                            <p>Version: {profile.customVersions.forge.version}</p>
-                            <Button onClick={this.uninstallForge} color='red'>uninstall forge</Button>
-                            </>}
-                        </CustomVersions>
-                        <CustomVersions>
-                            <Detail>fabric</Detail>
-                            {!profile.customVersions.fabric && !fabricIsInstalling &&
-                            <Button onClick={this.downloadFabric} color='green'>install fabric</Button>}
-                            {fabricIsInstalling && <p>Fabric is installing. To check progress, open the Downloads viewer in the sidebar</p>}
-                            {profile.customVersions.fabric && <>
-                            <p>Version: {profile.customVersions.fabric.version}</p>
-                            <Button onClick={this.uninstallFabric} color='red'>uninstall fabric</Button>
-                            </>}
-                        </CustomVersions>
-                    </EditContainer>
-                </Page>
-            )
-        }else{
-            return (
-                <Redirect to='/' />
-            )
-        }
-    }
+    if(profile) {
+        return (
+            <>
+                {updateOverlay && <Overlay force>
+                    <BG>
+                        <Title>{updateOverlayText}</Title>
+                        <p>To check progress, open the Downloads viewer in the sidebar.</p>
+                    </BG>
+                </Overlay>}
+                {!profile.hosts.curse && 
+                <>
+                    <Detail>minecraft version</Detail>
+                    <CustomDropdown 
+                        onChange={mcverChange} 
+                        items={Global.MC_VERSIONS} 
+                        value={mcverValue} 
+                        disabled={forgeIsInstalling || fabricIsInstalling}
+                    />
+                    <OptionBreak />
+                </>}
+                {profile.hosts.curse && <>
+                <Detail>profile version</Detail>
+                {hostVersionValues && <CustomDropdown 
+                    value={curseVerValue} 
+                    onChange={curseVersionChange} 
+                    items={hostVersionValues} 
+                    disabled={forgeIsInstalling || fabricIsInstalling}
+                />}
+                </>}
 
+                <OptionBreak />
+                <Detail>modloaders</Detail>
+                {!profile.frameworks.fabric && !fabricIsInstalling && <CustomVersions>
+                    <Detail>forge</Detail>
+                    {!profile.frameworks.forge && !forgeIsInstalling &&
+                    <Button onClick={downloadForge} color='green'>install forge</Button>
+                    }
+                    {forgeIsInstalling && <p>Forge is installing. To check progress, open the Downloads viewer in the sidebar</p>}
+                    {forgeIsUninstalling && <p>Forge is being removed...</p>}
+                    {profile.frameworks.forge && !forgeIsUninstalling && <>
+                    <p>Version: {profile.frameworks.forge.version}</p>
+                    <Button onClick={uninstallForge} color='red'>uninstall forge</Button>
+                    </>}
+                </CustomVersions>}
+                {!profile.frameworks.forge && !forgeIsInstalling && <CustomVersions>
+                    <Detail>fabric</Detail>
+                    {!profile.frameworks.fabric && !fabricIsInstalling &&
+                    <Button onClick={downloadFabric} color='green'>install fabric</Button>}
+                    {fabricIsInstalling && <p>Fabric is installing. To check progress, open the Downloads viewer in the sidebar</p>}
+                    {fabricIsUninstalling && <p>Fabric is being removed...</p>}
+                    {profile.frameworks.fabric && <>
+                    <p>Version: {profile.frameworks.fabric.version}</p>
+                    <Button onClick={uninstallFabric} color='red'>uninstall fabric</Button>
+                    </>}
+                </CustomVersions>}
+            </>
+        )
+    }else{
+        return (
+            <Redirect to='/' />
+        )
+    
+    }
 }

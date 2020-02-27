@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
+import transition from 'styled-transition-group';
+import NavContext from '../../navContext';
+
 const BG = styled.div`
     min-height: 60px;
     background-color: #2b2b2b;
@@ -14,9 +17,10 @@ const Title = styled.p`
     margin-left: 10px;
     font-size: 32pt;
     font-weight: 900;
+    transition: 150ms;
 `
 
-const BackButton = styled.div`
+const BackButton = transition.div`
     color: white;
     font-weight: 900;
     text-decoration: none;
@@ -31,23 +35,80 @@ const BackButton = styled.div`
         text-decoration: none;
         color: white;
     }
+    &:enter {
+        margin-left: -35px
+    }
+    &:enter-active {
+        margin-left: 10px;
+        transition: 150ms;
+    }
+    &:exit {
+        margin-left: 10px;
+    }
+    &:exit-active {
+        margin-left: -35px;
+        transition: 150ms;
+    }
 `
 
-const Items = styled.div`
+const Items = transition.div`
     display: flex;
     align-items: center;
     padding-right: 10px;
+    opacity: 1;
+    &:enter {
+        position: relative;
+        left: 50px;
+        opacity: 0;
+    }
+    &:enter-active {
+        position: relative;
+        left: 0;
+        opacity: 1;
+        transition: 150ms;
+    }
+    &:exit {
+        position: relative;
+        opacity: 1;
+    }
+    &:exit-active {
+        position: relative;
+        left: 50px;
+        opacity: 0;
+        transition: 150ms;
+    }
 `
 
-const Header = ({title, backlink, backClick, children, showBackButton}) => (
-    <BG>
-        {showBackButton && <BackButton onClick={backClick ? backClick : window.history.back}>←</BackButton>}
-        {backlink && <BackButton><Link to={backlink}>←</Link></BackButton>}
-        <Title>{title}</Title>
-        <Items>
-            {children}
-        </Items>
-    </BG>
-)
+export default withRouter(function Header({ history }) {
 
-export default Header;
+    const context = useContext(NavContext);
+
+    const { title, children, backLink, showBackButton, showChildren, onBackClick } = context.header;
+
+    const click = () => {
+        if(!backLink) {
+            onBackClick ? onBackClick() : history.goBack();
+        }
+    }
+    return (
+        <BG>
+            <BackButton 
+                unmountOnExit
+                in={showBackButton}
+                timeout={150}
+                onClick={click}
+            >
+                {!backLink && `←`}
+                {backLink && <Link to={backLink}>←</Link>}
+            </BackButton>
+            <Title>{title}</Title>
+            <Items
+                unmountOnExit
+                in={showChildren}
+                timeout={150}
+            >
+                {children}
+            </Items>
+        </BG>
+        )
+});

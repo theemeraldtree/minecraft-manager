@@ -1,13 +1,15 @@
-import Global from "../util/global";
-import LogManager from "./logManager";
-import Profile from "../type/profile";
-import LauncherManager from "./launcherManager";
-import LibrariesManager from "./librariesManager";
-import VersionsManager from "./versionsManager";
-import DownloadsManager from "./downloadsManager";
-import ForgeManager from "./forgeManager";
-import ToastManager from "./toastManager";
-import Hosts from "../host/Hosts";
+import Global from '../util/global';
+import LogManager from './logManager';
+import Profile from '../type/profile';
+import LauncherManager from './launcherManager';
+import LibrariesManager from './librariesManager';
+import VersionsManager from './versionsManager';
+import DownloadsManager from './downloadsManager';
+import ToastManager from './toastManager';
+import Hosts from '../host/Hosts';
+import ErrorManager from './errorManager';
+import ForgeFramework from '../framework/forge/forgeFramework';
+import FabricFramework from '../framework/fabric/fabricFramework';
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
@@ -87,16 +89,20 @@ const ProfilesManager = {
             if(fs.existsSync(profPath)) {
                 throw `There is already a profile with the name: ${obj.name}`;
             }
+            fs.mkdirSync(path.join(extractPath, `/_mcm`));
+            fs.mkdirSync(path.join(extractPath, `/_mcm/icons`));
+            fs.mkdirSync(path.join(extractPath, `/_mcm/icons/mods`));
+
             Global.copyDirSync(extractPath, profPath);
     
             stateChange('Reloading profiles...');
             LogManager.log('info', `[ProfilesManager] (ProfileImport) Reloading profiles`);
             this.getProfiles().then(() => {
                 const profile = this.getProfileFromID(obj.id);
-                profile.setCurrentState('importing...');
+                profile.state = 'importing...';
     
                 const importComplete = () => {
-                    profile.setCurrentState('');
+                    profile.state = '';
 
                     LogManager.log('info', `[ProfilesManager] (ProfileImport) Updating profile for ${profile.id}`);
                     ProfilesManager.updateProfile(profile);
@@ -140,12 +146,18 @@ const ProfilesManager = {
                                 stateChange('Creating launcher profile...');
                                 LogManager.log('info', `[ProfilesManager] (ProfileImport) Creating launcher profile for ${profile.id}`);
                                 LauncherManager.createProfile(profile);
-                                if(profile.customVersions.forge) {
+                                if(profile.frameworks.forge) {
                                     LogManager.log('info', `[ProfilesManager] (ProfileImport) Installing Forge for ${profile.id}`);
-                                    stateChange('Installing forge...');
-                                    ForgeManager.setupForge(profile).then(() => {
+                                    stateChange('Installing Forge...');
+                                    ForgeFramework.setupForge(profile).then(() => {
                                         importComplete();
                                     });
+                                }else if(profile.frameworks.fabric) {
+                                    LogManager.log('info', `[ProfilesManager] (ProfileImport) Installing Fabric for ${profile.id}`);
+                                    stateChange('Installing Fabric...');
+                                    FabricFramework.setupFabric(profile).then(() => {
+                                        importComplete();
+                                    })
                                 }else{
                                     importComplete();
                                 }
@@ -223,22 +235,33 @@ const ProfilesManager = {
             LogManager.log('info', `[ProfilesManager] (CreateProfile) Creating profile directories`);
             fs.mkdirSync(path.join(Global.PROFILES_PATH, id));
             fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/files'));
+            fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm'));
+            fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/icons'));
+            fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/icons/mods'));
+            fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_omaf'));
+            fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_omaf/subAssets'));
 
             LogManager.log('info', `[ProfilesManager] Copying default logo to profile`);
             let profile = new Profile({
+                type: 'profile',
                 id: id,
                 name: name,
-                minecraftversion: mcversion,
                 icon: 'icon.png',
-                omafVersion: '0.1.3',
-                fpath: path.join(Global.PROFILES_PATH, id),
-                installed: true,
+                omafVersion: Global.OMAF_VERSION,
+                description: 'Minecraft Manager Profile',
+                blurb: 'Minecraft Manager Profile',
                 version: {
-                    timestamp: new Date().getTime()
+                    displayName: '1.0.0',
+                    timestamp: new Date().getTime(),
+                    minecraft: {
+                        version: mcversion
+                    }
                 }
             });
 
             profile.resetIcon();
+            
+            profile.applyDefaults();
             
             LogManager.log('info', `[ProfilesManager] (CreateProfile) Creating launcher profile`);
             LauncherManager.createProfile(profile);
@@ -252,7 +275,7 @@ const ProfilesManager = {
 
                     LogManager.log('info', `[ProfilesManager] (CreateProfile) Completed profile creation for ${profile.id}`);
                     resolve(profile);
-                })
+                });
             });
         });
     },
@@ -268,8 +291,11 @@ const ProfilesManager = {
             LauncherManager.deleteProfile(profile);
 
             LogManager.log('info', `[ProfilesManager] (DeleteProfile) Removing profile folder from ${profile.id}`);
-            rimraf(profile.folderpath, () => {
-
+            rimraf(profile.profilePath, (err) => {
+                if(err) {
+                    ToastManager.createToast(`Error`, `Error deleting profile: ${ErrorManager.makeReadable(err)}`);
+                    return;
+                }
                 LogManager.log('info', `[ProfilesManager] (DeleteProfile) Removing library from ${profile.id}`);
                 LibrariesManager.deleteLibrary(profile).then(() => {
                     LogManager.log('info', `[ProfilesManager] (DeleteProfile) Removing version from ${profile.id}`);

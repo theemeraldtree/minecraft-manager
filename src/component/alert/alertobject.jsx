@@ -1,24 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
-
-const BG = styled.div`
-    width: 100%;
-    height: fit-content;
-    max-width: 350px;
-    max-height: 200px;
-    margin: 10px;
-    background-color: #222;
-    color: white;
-    position: relative;
-    padding: 10px;
-    padding-bottom: 70px;
-    h1 {
-        margin: 0;
-        font-weight: 200;
-        font-size: 21pt;
-    }
-`;
+import AlertBackground from './alertbackground';
 
 const InputContainer = styled.div`
     position: absolute;
@@ -33,7 +16,7 @@ const InputContainer = styled.div`
 
 export default function AlertObject({ children, buttons }) {
     return (
-        <BG>
+        <AlertBackground>
             <div dangerouslySetInnerHTML={{ __html: children }} />
             
             <InputContainer>
@@ -47,6 +30,6 @@ export default function AlertObject({ children, buttons }) {
                     </Button>
                 ))}
             </InputContainer>
-        </BG>
+        </AlertBackground>
     )
 }

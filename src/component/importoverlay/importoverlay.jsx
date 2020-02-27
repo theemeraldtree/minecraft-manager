@@ -4,17 +4,18 @@ import styled from 'styled-components';
 import Button from '../button/button';
 import ProfilesManager from '../../manager/profilesManager';
 import path from 'path';
+import AlertBackground from '../alert/alertbackground';
 const { dialog } = require('electron').remote;
-const BG = styled.div`
+const BG = styled(AlertBackground)`
     width: 100%;
     height: fit-content;
     max-width: 600px;
     max-height: 500px;
-    background-color: #222;
     padding: 10px;
     color: white;
     display: flex;
     flex-flow: column;
+    min-height: 100px;
 `
 const Title = styled.p`
     margin: 0;
@@ -31,7 +32,14 @@ const BTN = styled(Button)`
 `
 
 const ButtonContainer = styled.div`
-    width: fit-content;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    div {
+        margin: 2px;
+    }
+    display: flex;
+    align-items: center;
 `
 export default class ImportOverlay extends Component {
     constructor(props) {
@@ -82,7 +90,7 @@ export default class ImportOverlay extends Component {
         const { updateState, showError, error } = this.state;
         const { cancelClick, file } = this.props;
         return (
-            <Overlay>
+            <Overlay in={this.props.in}>
                 <BG>
                     {!updateState && !showError && !file && <>
                     <Title>import a profile</Title>

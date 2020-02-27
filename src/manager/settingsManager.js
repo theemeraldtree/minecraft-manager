@@ -14,6 +14,12 @@ const SettingsManager = {
         let parsed = JSON.parse(fs.readFileSync(this.SETTINGS_PATH));
         this.MC_HOME = parsed.homeDirectory;
         this.currentSettings = parsed;
+        if(!this.currentSettings.defaultsShowTutorial) {
+            this.currentSettings.defaultsShowTutorial = false;
+        }
+        if(!this.currentSettings.defaultsAutoJump) {
+            this.currentSettings.defaultsAutoJump = false;
+        }
     },
     save: function() {
         fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(this.currentSettings));

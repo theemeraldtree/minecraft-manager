@@ -1,44 +1,29 @@
-import React, { PureComponent } from 'react';
-import Page from '../../page';
-import Header from '../../../component/header/header';
+import React from 'react';
+import styled from 'styled-components';
 import ProfilesManager from '../../../manager/profilesManager';
-import EditContainer from '../components/editcontainer'; 
 import Button from '../../../component/button/button';
 import Detail from '../../../component/detail/detail';
-export default class EditPageAdvanced extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            profile: {
-                name: 'Loading'
-            }
-        }
-    }
+import path from 'path';
 
-    viewProfileFolder = () => {
-        let { profile } = this.state;
-        profile.openGameDir();
-    }
+import { remote } from 'electron';
 
-    static getDerivedStateFromProps(props) {
-        return {
-            profile: ProfilesManager.getProfileFromID(props.match.params.id)
-        }
+const BG = styled.div`
+    div {
+        margin-bottom: 5px;
+        display: block;
     }
-    
-    render() {
-        let { profile } = this.state;
-        return (
-            <Page>
-                <Header title='edit profile' backlink={`/profile/${profile.id}`}/>
-                <EditContainer profile={profile}>
-                    <Button onClick={this.viewProfileFolder} color='red'>View Profile Folder</Button>
-                    <Detail>internal id: {profile.id}</Detail>
-                    <Detail>version-safe name: {profile.safename}</Detail>
-                    <Detail>version timestamp: {profile.version.timestamp}</Detail>
-                </EditContainer>
-            </Page>
-        )   
-    }
+`
 
+export default function EditPageAdvanced({ id }) {
+    const profile = ProfilesManager.getProfileFromID(id);
+
+    return (
+        <BG>
+            <Button color='red' onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/profile.json'))}>Open profile.json</Button>
+            <Button color='red' onClick={profile.openGameDir}>View Profile Folder</Button>
+            <Detail>internal id: {profile.id}</Detail>
+            <Detail>version-safe name: {profile.safename}</Detail>
+            <Detail>version timestamp: {profile.version.timestamp}</Detail>
+        </BG>
+    )   
 }

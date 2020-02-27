@@ -5,7 +5,7 @@ const BG = styled.div`
     height: 100%;
     position: absolute;
     background-color: #2b2b2b;
-    width: 120px;
+    width: 160px;
 `
 
 const Item = styled(NavLink)`
@@ -26,13 +26,15 @@ const Item = styled(NavLink)`
         font-weight: 900;
     }
     margin-bottom: 15px;
+    transition: font-weight 150ms;
 `
-const Sidebar = ({profile}) => (
+const Sidebar = ({ id }) => (
     <BG>
-        <Item to={`/edit/general/${profile.id}`} activeClassName='active'>general</Item>
-        <Item to={`/edit/versions/${profile.id}`}  activeClassName='active'>versions</Item>
-        <Item to={`/edit/mods/${profile.id}`}  activeClassName='active'>mods</Item>
-        <Item to={`/edit/advanced/${profile.id}`}  activeClassName='active'>advanced</Item>
+        <Item to={`/edit/general/${id}`} activeClassName='active'>general</Item>
+        <Item to={`/edit/versions/${id}`}  activeClassName='active'>versions</Item>
+        <Item to={`/edit/mods/${id}`}  activeClassName='active'>mods</Item>
+        <Item to={`/edit/resourcepacks/${id}`}  activeClassName='active'>resource packs</Item>
+        <Item to={`/edit/advanced/${id}`}  activeClassName='active'>advanced</Item>
     </BG>
 )
 

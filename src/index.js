@@ -9,6 +9,7 @@ import SettingsManager from "./manager/settingsManager";
 import HTTPRequest from "./host/httprequest";
 import ToastManager from "./manager/toastManager";
 import ErrorManager from "./manager/errorManager";
+import LibrariesManager from "./manager/librariesManager";
 const { remote, shell, ipcRenderer } = require('electron');
 const { dialog } = require('electron').remote;
 const request = require('request');
@@ -59,6 +60,7 @@ async function load() {
   try {
     if(fs.existsSync(Global.PROFILES_PATH)) {
 
+      LibrariesManager.checkExist();
       Global.checkMinecraftVersions();
       Global.checkMinecraftProfiles();
       Global.checkMinecraftLibraries();
@@ -66,6 +68,10 @@ async function load() {
       Global.checkChangelog();
       // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
       Global.checkMigration();
+
+      Global.scanProfiles();
+
+      ProfilesManager.updateReloadListeners();
     }
   }catch(e) {
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));

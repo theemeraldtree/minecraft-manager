@@ -73,7 +73,7 @@ export default function ToastObject({id, title, body, error, dismiss, slideOut, 
             {error && <Body>
                 {body}
                 <br />
-                <a href={`https://github.com/stairman06/minecraft-manager/wiki/Error-Codes#${error}`}>Error Code: {error}</a>
+                <a href={`https://github.com/theemeraldtree/minecraft-manager/wiki/Error-Codes#${error}`}>Error Code: {error}</a>
             </Body>}
         </BG>
     )

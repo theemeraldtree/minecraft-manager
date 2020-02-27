@@ -7,6 +7,7 @@ import DownloadsManager from "../../manager/downloadsManager";
 import fs from 'fs';
 import path from 'path';
 import rimraf from 'rimraf';
+import GenericAsset from "../../type/genericAsset";
 
 const admzip = require('adm-zip');
 
@@ -22,7 +23,6 @@ const Curse = {
             name: asset.name,
             id: id,
             blurb: asset.summary,
-            url: asset.websiteUrl,
             authors: asset.authors.map(author => ({ name: author.name })),
             cachedID: `curse-cached-${id}`,
             type: this.getTypeFromCurseID(asset.categorySection.gameCategoryId),
@@ -47,8 +47,9 @@ const Curse = {
         if(asset.attachments && asset.attachments.length) {
             let attachment = asset.attachments.find(a => a.isDefault);
             if(attachment) {
+                obj.icon = attachment.url;
+                obj.iconPath = attachment.url;
                 obj.iconURL = attachment.url;
-                obj.iconpath = attachment.url;
             }
         }
 
@@ -92,9 +93,11 @@ const Curse = {
                 obj = new Profile(omaf);
             }else if(type === 'mod') {
                 obj = new Mod(omaf);
+            }else if(type === 'resourcepack') {
+                obj = new GenericAsset(omaf);
             }
 
-            Global.cacheImage(obj.iconURL);
+            Global.cacheImage(obj.icon);
 
             Hosts.cache.assets[omaf.cachedID] = omaf;
 
@@ -119,7 +122,9 @@ const Curse = {
         const obj = {
             displayName: ver.displayName,
             timestamp: new Date(ver.fileDate).getTime(),
-            minecraftversions: ver.gameVersion,
+            minecraft: {
+                supportedVersions: ver.gameVersion
+            },
             cachedID: cacheID,
             TEMP: {
                 downloadUrl: ver.downloadUrl,
@@ -194,7 +199,7 @@ const Curse = {
             gameId: 432,
             sectionId: this.getCurseIDFromType(type),
             categoryId: 0,
-            sort: 0,
+            sort: 1,
             pageSize: 20,
             index: 0
         });
@@ -287,9 +292,17 @@ const Curse = {
 
             const versions = await this.getVersions(asset);
             const file = versions.find(ver => {
+                let modloaderEqual = false;
+                if(asset.type === 'mod' || asset instanceof Mod) {
+                    if(ver.hosts.curse.localValues.inferredModloader === modloader) {
+                        modloaderEqual = true;
+                    }
+                }else{
+                    modloaderEqual = true;
+                }
                 return (
-                    ver.minecraftversions.includes(mcVersion) &&
-                    ver.hosts.curse.localValues.inferredModloader === modloader
+                    ver.minecraft.supportedVersions.includes(mcVersion) &&
+                    modloaderEqual
                 );
             });
             
@@ -319,7 +332,6 @@ const Curse = {
 
             const modpack = mp;
             const infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`);
-            
             DownloadsManager.startFileDownload(`${modpack.name}\n_A_Info`, downloadUrl, infoDownload).then(async () => {
                 const zip = new admzip(infoDownload);
     
@@ -336,6 +348,7 @@ const Curse = {
                     // there also was a bug with a modpack caused by not checking for required
                     if(file.required) {
                         const mod = new Mod({
+                            type: 'mod',
                             hosts: {
                                 curse: {
                                     id: file.projectID,
@@ -378,7 +391,9 @@ const Curse = {
     // gets the forge version from the extractpath
     getForgeVersionForModpackInstall(profile) {
         const manifest = JSON.parse(fs.readFileSync(path.join(Global.MCM_TEMP, `${profile.id}-install/manifest.json`)));
-        return `${manifest.minecraft.version}-${manifest.minecraft.modLoaders[0].id.substring(6)}`;
+        if(manifest.minecraft.modLoaders[0]) {
+            return `${manifest.minecraft.version}-${manifest.minecraft.modLoaders[0].id.substring(6)}`;
+        }
     },
 
     // gets the minecraft version from the extractpath

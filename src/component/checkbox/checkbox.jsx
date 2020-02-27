@@ -8,6 +8,7 @@ const Input = styled.input`
     z-index: 10;
     opacity: 0;
     cursor: pointer;
+    margin: 0;
 
     &:disabled {
         cursor: not-allowed;
@@ -41,6 +42,10 @@ const BG = styled.div`
         filter: brightness(2.5);
     }
 
+    ${props => props.lighter && css`
+        background-color: #404040;
+    `}
+
     ${props => props.disabled && css`
         cursor: not-allowed;
         filter: brightness(0.5);
@@ -54,14 +59,16 @@ const BG = styled.div`
 
 `;
 
-const Checkbox = ({ onClick, info, checked, disabled }) => (
+const Checkbox = ({ onClick, info, lighter, checked, disabled }) => (
     <BG
         disabled={disabled}
+        lighter={lighter}
+        className='checkbox'
     >
         <Input 
             type='checkbox' 
             data-info={info}
-            onClick={onClick}
+            onChange={onClick}
             checked={checked}
             disabled={disabled}
         />

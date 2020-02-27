@@ -54,6 +54,9 @@ ipcMain.on('download-file', (event, url, dest, id) => {
     });
 });
 
+let dev = require('process').execPath.includes('electron');
+
+
 function checkForUpdates() {
     autoUpdater.checkForUpdates();
     autoUpdater.on('checking-for-update', () => {
@@ -75,7 +78,11 @@ function checkForUpdates() {
     })
 
     autoUpdater.on('error', (error) => {
-        mainWindow.webContents.send('error', error);
+        if(dev) {
+            mainWindow.webContents.send('in-dev');
+        }else{
+            mainWindow.webContents.send('error', error);
+        }
     })
 }
 
@@ -85,7 +92,6 @@ ipcMain.on('check-for-updates', function() {
 
 checkForUpdates();
 
-let dev = require('process').execPath.includes('electron');
 let mainWindow;
 
 ipcMain.on('start-progress', () => {
@@ -153,7 +159,7 @@ function createWindow() {
 
 
 function navigation(event, url) {
-    if(url.substring(0, 22) !== 'http://localhost:9483/' || url.substring(21, 29) === '/linkout') {
+    if(url.substring(0, 22) !== 'http://localhost:9483/' || url.substring(21, 29) === '/linkout' || url.substring(32, 40) === '/linkout') {
         let finalUrl = url;
 
 
@@ -163,6 +169,12 @@ function navigation(event, url) {
 
             // Curse encodes the URI's twice for some reason
             finalUrl = decodeURIComponent(decodeURI(url.substring(40)));
+        }
+
+        // linkout for minecraft.curseforge.com
+        if(url.substring(32, 40) === '/linkout') {
+
+            finalUrl = url.substring(51);
         }
 
         event.preventDefault();

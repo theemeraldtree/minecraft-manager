@@ -8,6 +8,9 @@ import VersionsManager from '../manager/versionsManager';
 import LauncherManager from '../manager/launcherManager';
 import LibrariesManager from '../manager/librariesManager';
 import ErrorManager from '../manager/errorManager';
+import LogManager from '../manager/logManager';
+import AdmZip from 'adm-zip';
+import GenericAsset from '../type/genericAsset';
 
 const semver = require('semver');
 const remote = require('electron').remote;
@@ -27,9 +30,11 @@ const Global = {
         versions: {}
     },
 
-    MCM_VERSION: '2.2.2',
-    MCM_RELEASE_DATE: '12/29/2019',
+    MCM_VERSION: '2.3.0',
+    MCM_RELEASE_DATE: '2/27/2020',
 
+    OMAF_VERSION: '1.0.0',
+    
     dateMatches(d1) {
         let d2 = new Date(); 
         return d1.getFullYear() === d2.getFullYear() &&
@@ -65,7 +70,7 @@ const Global = {
         if(!version || semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1) {
             ToastManager.createToast(
                 `Welcome to ${this.MCM_VERSION}`, 
-                `With a few fixes. <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`
+                `With Forge 1.13+ support, Resource Packs, UI Tweaks, and more. <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`
             );
             SettingsManager.setLastVersion(this.MCM_VERSION);
         }
@@ -134,6 +139,8 @@ const Global = {
                 }
             }
         });
+
+        LibrariesManager.checkMissingLibraries();
 
         if(totalCount) {
             ToastManager.createToast('Warning', `There are ${totalCount} Minecraft-Manager-related launcher libraries in your Minecraft installation that do not need to exist!`, 'EXTRA-MINECRAFT-LIBRARIES');
@@ -229,15 +236,157 @@ const Global = {
             const stats = exists && fs.statSync(src);
             const isDirectory = exists && stats.isDirectory();
             if(exists && isDirectory) {
-                fs.mkdirSync(dest);
+                if(!fs.existsSync(dest)) {
+                    fs.mkdirSync(dest);
+                }
                 fs.readdirSync(src).forEach((childItem) => {
                     this.copyDirSync(path.join(src, childItem), path.join(dest, childItem));
                 })
             }else{
-                fs.linkSync(src, dest);
+                if(!fs.existsSync(dest)) {
+                    fs.linkSync(src, dest);
+                }
             }
         }catch(e) {
             ToastManager.createToast('Error', ErrorManager.makeReadable(e));
+        }
+    },
+    
+    // why does this function exist? you ask
+    // well...... sometimes people like to mess with stuff they shouldn't mess with
+    // they delete jar files, add resourcepacks, without letting minecraft manager know
+    // (not using minecraft manager to do it)
+    // this function scans all the profiles, looking to see if the user has made any changes
+    // if it finds them, it attempts to understand it and sync minecraft manager's subassets
+    // with those that the user has changed
+    scanProfiles: function() {
+        for(let profile of ProfilesManager.loadedProfiles) {
+            fs.readdir(path.join(profile.gameDir, `/resourcepacks`), (err, files) => {
+                if(files) {
+                    if(files.length !== profile.resourcepacks.length) {
+                        files.forEach(file => {
+                            const fullPath = path.join(profile.gameDir, `/resourcepacks/${file}`);
+                            let doesExist = profile.resourcepacks.find(
+                                rp => path.join(profile.gameDir, rp.getMainFile().path) === fullPath
+                            );
+                            if(!doesExist) {
+                                if(path.extname(file) === '.zip') {
+                                    const zip = new AdmZip(fullPath);
+                                    const entries = zip.getEntries();
+                                    let iconPath, description;
+                                    entries.forEach(entry => {
+                                        if(entry.entryName === 'pack.mcmeta') {
+                                            const parsed = JSON.parse(entry.getData().toString('utf8'));
+                                            if(parsed && parsed.pack) {
+                                                if(parsed.pack.description) {
+                                                    description = parsed.pack.description;
+                                                }
+                                            }
+                                        }
+    
+                                        if(entry.entryName === 'pack.png') {
+                                            fs.writeFileSync(path.join(profile.profilePath, `/_mcm/icons/resourcepacks/${file}`), entry.getData());
+                                            iconPath = `/_mcm/icons/resourcepacks/${file}`;
+                                        }
+                                    })
+    
+                                    LogManager.log(`info`, `[scan] {${profile.name}} Found resource pack ${file} which does not exist in subassets file. Adding it...`);
+                                    profile.resourcepacks.push(new GenericAsset({
+                                        icon: iconPath,
+                                        id: Global.createID(path.parse(file).name),
+                                        name: path.parse(file).name,
+                                        version: {
+                                            displayName: file,
+                                            minecraft: {
+                                                supportedVersions: [
+                                                    'unknown'
+                                                ]
+                                            }
+                                        },
+                                        blurb: description,
+                                        description: `Imported from ${file}`,
+                                        hosts: {},
+                                        files: [
+                                            {
+                                                displayName: 'Main File',
+                                                type: 'resourcepackzip',
+                                                priority: 'mainFile',
+                                                path: `resourcepacks/${file}`
+                                            }
+                                        ],
+                                        dependencies: []
+                                    }));
+                                    profile.save();
+                                }
+                            }
+                        })
+                    }
+                }
+            });
+
+            profile.resourcepacks.forEach(rp => {
+                if(!(rp instanceof GenericAsset)) {
+                    rp = new GenericAsset(rp);
+                }
+
+                if(!fs.existsSync(path.join(profile.gameDir, rp.getMainFile().path))) {
+                    LogManager.log('info', `[scan] {${profile.id}} Found resource pack ${rp.name} where the main file is missing. Removing it from the profile...`);
+                    profile.deleteSubAsset('resourcepack', rp);
+                }
+            });
+
+            fs.readdir(path.join(profile.gameDir, `/mods`), (err, files) => {
+                if(files) {
+                    if(files.length !== profile.mods.length) {
+                        files.forEach(file => {
+                            const fullPath = path.join(profile.gameDir, `/mods/${file}`);
+                            let doesExist = profile.mods.find(
+                                mod => path.join(profile.gameDir, mod.getJARFile().path) === fullPath
+                            );
+                            if(!doesExist) {
+                                LogManager.log(`info`, `[scan] {${profile.id}} Found mod file ${file} which does not exist in subassets file. Adding it...`);
+                                profile.mods.push(new Mod({
+                                    icon: '',
+                                    id: Global.createID(path.parse(file).name),
+                                    name: path.parse(file).name,
+                                    version: {
+                                        displayName: file,
+                                        minecraft: {
+                                            supportedVersions: [
+                                                'unknown'
+                                            ]
+                                        }
+                                    },
+                                    blurb: `Imported from ${file}`,
+                                    description: `Imported from ${file}`,
+                                    hosts: {},
+                                    files: [
+                                        {
+                                            displayName: 'Main JAR File',
+                                            type: 'jar',
+                                            priority: 'mainFile',
+                                            path: `mods/${file}`
+                                        }
+                                    ],
+                                    dependencies: []
+                                }));
+                                profile.save();
+                            }
+                        })
+                    }  
+                }
+            });
+
+            profile.mods.forEach(mod => {
+                if(!(mod instanceof Mod)) {
+                    mod = new Mod(mod);
+                }
+
+                if(!fs.existsSync(path.join(profile.gameDir, mod.getJARFile().path))) {
+                    LogManager.log('info', `[scan] {${profile.id}} Found mod ${mod.name} where the main file is missing. Removing it from the profile...`);
+                    profile.deleteSubAsset('mod', mod);
+                }
+            });
         }
     },
     checkMigration: function() {
@@ -294,6 +443,65 @@ const Global = {
                     profile.save();
 
                     showMigrationmessage = true;
+                }else if(profile.omafVersion === '0.1.3') {
+                    LogManager.log('info', `[GLOBAL] Running migration on ${profile.name}`);
+                    if(!fs.existsSync(path.join(profile.profilePath, '/_mcm'))) {
+                        fs.mkdirSync(path.join(profile.profilePath, '/_mcm'));
+                        fs.mkdirSync(path.join(profile.profilePath, '/_mcm/icons'));
+                        fs.mkdirSync(path.join(profile.profilePath, '/_mcm/icons/mods'));
+                    }
+                    if(!fs.existsSync(path.join(profile.profilePath, '/_omaf'))) {
+                        fs.mkdirSync(path.join(profile.profilePath, '/_omaf'));
+                        fs.mkdirSync(path.join(profile.profilePath, '/_omaf/subAssets'));
+                    }
+
+                    if(profile.minecraftversion) {
+                        profile.version.minecraft = {};
+                        profile.version.minecraft.version = profile.minecraftversion;
+                    }
+
+                    for(let mod of profile.mods) {
+                        if(mod.version.minecraftversions) {
+                            mod.version.minecraft = {
+                                supportedVersions: mod.version.minecraftversions
+                            }
+
+                            mod.version.minecraftversions = undefined;
+                        }
+
+                        
+                        if(mod.version.hosts) {
+                            mod.version.hosts = undefined;
+                        }
+
+                        if(mod.iconURL) {
+                            mod.icon = mod.iconURL;
+                            mod.iconURL = undefined;
+                        }
+
+                        if(mod.files) {
+                            if(mod.files[0]) {
+                                mod.files[0].path = `mods/${mod.files[0].path}`;
+                            }
+                        }
+
+                        if(mod.url) {
+                            mod.url = undefined;
+                        }
+
+                        mod.omafVersion = '1.0.0';
+                    }
+
+
+                    if(profile.version.minecraftversions) {
+                        profile.version.minecraftversions = undefined;
+                    }
+                    
+                    if(profile.customVersions) {
+                        profile.frameworks = profile.customVersions;
+                        profile.customVersions = undefined;
+                    }
+                    profile.save();
                 }
             }
         }
@@ -310,6 +518,12 @@ const Global = {
     cacheImage: function(image) {
         const img = new Image();
         img.src = image;
+    },
+    getJavaPath: function() {
+        if(os.platform() === 'win32') {
+            // this is where it is on my system, hope others are the same
+            return `C:\\Program Files (x86)\\Minecraft Launcher\\runtime\\jre-x64\\bin\\java.exe`
+        }
     }
 }
 

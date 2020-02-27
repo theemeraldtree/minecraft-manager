@@ -1,6 +1,4 @@
-import React, { PureComponent } from 'react';
-import Page from '../page';
-import Header from '../../component/header/header';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import TextInput from '../../component/textinput/textinput';
 import Button from '../../component/button/button';
@@ -13,6 +11,7 @@ import path from 'path';
 import LibrariesManager from '../../manager/librariesManager';
 import os from 'os';
 import logo from '../../img/logo-sm.png';
+import NavContext from '../../navContext';
 const { dialog }  = require('electron').remote;
 const Title = styled.p`
     color: white;
@@ -73,41 +72,41 @@ const AutofillText = styled.p`
     font-size: 10pt;
     color: white;
 `
-export default withRouter(class WelcomePage extends PureComponent {
-    constructor() {
-        super();
-        this.state = {
-            mcHome: Global.getDefaultMinecraftPath(),
-            mcExe: Global.getDefaultMCExePath(),
-            step: 0,
-            title: 'welcome'
-        }
+export default withRouter(function WelcomePage({ history }) {
+
+    const nav = useContext(NavContext);
+
+    const [ mcHome, setMCHome ] = useState(Global.getDefaultMinecraftPath());
+    const [ mcExe, setMCExe ] = useState(Global.getDefaultMCExePath());
+    const [ step, setStep ] = useState(0);
+    const [ preparing, setPreparing ] = useState(false);
+
+    useEffect(() => {
+        nav.header.setTitle('welcome');
+        nav.header.setShowChildren(false);   
+    })
+
+
+    const nextStep = () => {
+        setStep(step + 1);
     }
 
-    nextStep = () => {
-        this.setState({
-            step: this.state.step + 1
-        })
-    }
-
-    chooseHomeDirectory = () => {
+    const chooseHomeDirectory = () => {
         let p = dialog.showOpenDialog({
             title: 'Choose your Minecraft Home Directory',
             defaultPath: Global.getDefaultMinecraftPath(),
             buttonLabel: 'Select Directory',
             properties: ['openDirectory', 'showHiddenFiles']
         });
-        this.setState({
-            mcHome: p[0]
-        })
+        if(p[0]) {
+            setMCHome(p[0]);
+        }
     }
 
-    start = async () => {
-        this.setState({
-            preparing: true
-        });
-        SettingsManager.setHomeDirectory(this.state.mcHome);
-        SettingsManager.setMCExe(this.state.mcExe)
+    const start = async () => {
+        setPreparing(true);
+        SettingsManager.setHomeDirectory(mcHome);
+        SettingsManager.setMCExe(mcExe)
         let mcl = path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager');
         if(!fs.existsSync(mcl)) {
             fs.mkdirSync(mcl);
@@ -120,18 +119,16 @@ export default withRouter(class WelcomePage extends PureComponent {
 
         let result = await Global.updateMCVersions(true);
         if(result === 'no-connection') {
-            this.setState({
-                preparing: false
-            })
+            setPreparing(false);
         }else{
             if(!fs.existsSync(Global.PROFILES_PATH)) {
                 fs.mkdirSync(Global.PROFILES_PATH);
             }
-            this.props.history.push('/');
+            history.push('/');
         }
     }
 
-    chooseMCExe = () => {
+    const chooseMCExe = () => {
         let properties;
         if(os.platform() === 'win32') {
             properties = ['openFile', 'showHiddenFiles']
@@ -144,89 +141,85 @@ export default withRouter(class WelcomePage extends PureComponent {
             buttonLabel: 'Select File',
             properties: properties
         });
-        this.setState({
-            mcExe: p[0]
-        })
+        if(p[0]) {
+            setMCExe(p[0]);
+        }
     }
-    render() {
-        let { preparing, step, title } = this.state;
-        return (
-            <Page noNavbar>
-                <Header title={title} />
-                <Content>
-                    <Spacing />
-                    {
-                        !preparing && <>
-                            {
-                            step === 0 && <>
-                                <WelcomeBox>
-                                    <Logo />
-                                    <Title>Welcome to Minecraft Manager</Title>
-                                    <Subtext>the easiest way to manage minecraft mods and modpacks</Subtext>
-                                </WelcomeBox>
-                                <GB onClick={this.nextStep} color='green'>Continue</GB>
-                            </>
-                            }
 
-                            {
-                                step === 1 && <>
-                                    <Spacing />
-                                    <Title>Is this where your .minecraft folder is?</Title>
-                                
-                                    <IH>
-                                        <div>
-                                            <TI disabled value={this.state.mcHome} />
-                                            <Button onClick={this.chooseHomeDirectory} color='green'>change</Button>
-                                        </div>
-                                    </IH>
-                                    <AutofillText>Most people will not have changed this. However if you have, please update it accordingly.</AutofillText>
+    return (
+        <>
+            <Content>
+                <Spacing />
+                {
+                    !preparing && <>
+                        {
+                        step === 0 && <>
+                            <WelcomeBox>
+                                <Logo />
+                                <Title>Welcome to Minecraft Manager</Title>
+                                <Subtext>the easiest way to manage minecraft mods and modpacks</Subtext>
+                            </WelcomeBox>
+                            <GB onClick={nextStep} color='green'>Continue</GB>
+                        </>
+                        }
 
-                                    <GB onClick={this.nextStep} color='green'>Continue</GB>
-                                </>
-                            }
-
+                        {
+                            step === 1 && <>
+                                <Spacing />
+                                <Title>Is this where your .minecraft folder is?</Title>
                             
-                            {
-                                step === 2 && <>
-                                    <Spacing />
-                                    <Title>Is this where your Minecraft Executable is?</Title>
+                                <IH>
+                                    <div>
+                                        <TI disabled value={mcHome} />
+                                        <Button onClick={chooseHomeDirectory} color='green'>change</Button>
+                                    </div>
+                                </IH>
+                                <AutofillText>Most people will not have changed this. However if you have, please update it accordingly.</AutofillText>
+
+                                <GB onClick={nextStep} color='green'>Continue</GB>
+                            </>
+                        }
+
+                        
+                        {
+                            step === 2 && <>
+                                <Spacing />
+                                <Title>Is this where your Minecraft Executable is?</Title>
+                            
+                                <IH>
+                                    <div>
+                                        <TI disabled value={mcExe} />
+                                        <Button onClick={chooseMCExe} color='green'>change</Button>
+                                    </div>
+                                </IH>
+                                <AutofillText>Most people will not have changed this. However if you have, please update it accordingly.</AutofillText>
+
+                                <GB onClick={nextStep} color='green'>Continue</GB>
+                            </>
+                        }
+
+                        {
+                            step === 3 && <>
+                                <Spacing />
+                                <Title>You're all set!</Title>
                                 
-                                    <IH>
-                                        <div>
-                                            <TI disabled value={this.state.mcExe} />
-                                            <Button onClick={this.chooseMCExe} color='green'>change</Button>
-                                        </div>
-                                    </IH>
-                                    <AutofillText>Most people will not have changed this. However if you have, please update it accordingly.</AutofillText>
+                                <Subtext>You're done setting up Minecraft Manager.</Subtext>
+                                <Subtext>If you need help, <a href='https://theemeraldtree.net/mcm/wiki'>check out the Minecraft Manager wiki.</a></Subtext>
 
-                                    <GB onClick={this.nextStep} color='green'>Continue</GB>
-                                </>
-                            }
+                                <GB onClick={start} color='green'>Finish Setup</GB>
+                            </>
+                        }
 
-                            {
-                                step === 3 && <>
-                                    <Spacing />
-                                    <Title>You're all set!</Title>
-                                    
-                                    <Subtext>You're done setting up Minecraft Manager.</Subtext>
-                                    <Subtext>If you need help, <a href='https://theemeraldtree.net/mcm/wiki'>check out the Minecraft Manager wiki.</a></Subtext>
+                    </>
+                }
 
-                                    <GB onClick={this.start} color='green'>Finish Setup</GB>
-                                </>
-                            }
-
-                        </>
-                    }
-
-                    {
-                        preparing && <>
-                            <Title>performing first time setup</Title>
-                            <Subtext>this should only take a minute...</Subtext>
-                        </>
-                    }
-                </Content>
-            </Page>
-        )
-    }
-
+                {
+                    preparing && <>
+                        <Title>performing first time setup</Title>
+                        <Subtext>this should only take a minute...</Subtext>
+                    </>
+                }
+            </Content>
+        </>
+    )
 });

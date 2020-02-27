@@ -55,12 +55,18 @@
       }
 
       .react-contextmenu {
+        opacity: 0;
+      }
+
+      .react-contextmenu--visible {
         background-color: #282828;
         border: 1px solid rgba(0,0,0,.15);
         min-width: 150px;
         color: white;
         outline: none;
         z-index: 999;
+        transition: opacity 75ms;
+        opacity: 1;
       }
 
       .react-contextmenu-item {
@@ -68,6 +74,7 @@
           cursor: pointer;
           padding: 5px 10px;
           outline: none;
+          white-space: nowrap;
       }
 
       .react-contextmenu-item:hover {
@@ -86,10 +93,24 @@
 
       .react-contextmenu-item--disabled {
         filter: brightness(0.5);
+        cursor: not-allowed;
       }
 
       .react-contextmenu-item--disabled:hover {
         background-color: transparent;
+      }
+
+      .react-contextmenu-item.react-contextmenu-submenu {
+        padding: 0;
+      }
+
+      .react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item:after {
+        content: "▶";
+        display: inline-block;
+        position: absolute;
+        right: 7px;
+        font-size: 9pt;
+        top: 8px;
       }
 
       .react-contextmenu-wrapper {

@@ -3,7 +3,8 @@ import styled from 'styled-components';
 import Overlay from '../overlay/overlay';
 import Button from '../button/button';
 import Hosts from '../../host/Hosts';
-const BG = styled.div`
+import AlertBackground from '../alert/alertbackground';
+const BG = styled(AlertBackground)`
     width: 100%;
     height: fit-content;
     max-width: 600px;
@@ -92,7 +93,7 @@ export default class UpdateOverlay extends Component {
         this.setState({
             displayState: 'progress'
         })
-        profile.changeCurseVersion(updateVersion.hosts.curse.fileID, (progress) => {
+        profile.changeHostVersion('curse', updateVersion.hosts.curse.fileID, (progress) => {
             this.setState({
                 updateProgress: progress
             })
@@ -105,11 +106,8 @@ export default class UpdateOverlay extends Component {
 
     render() {
         const { noUpdates, updateAvailable, updateVersion, displayState, noConnection } = this.state;
-        console.log(noUpdates);
-        console.log(noConnection);
-        console.log(noUpdates || noConnection);
         return (
-            <Overlay force>
+            <Overlay force in={this.props.in}>
                 <BG>
                     {displayState === 'done' && <>
                         <Title>done</Title>

@@ -27,6 +27,7 @@ const Link = styled(NavLink)`
         font-weight: 900;
     }
     margin-bottom: 15px;
+    transition: font-weight 150ms;
 `
 
 const Links = styled.div`

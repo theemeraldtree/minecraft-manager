@@ -5,13 +5,13 @@ import Button from '../button/button';
 import fs from 'fs';
 import path from 'path';
 import Checkbox from '../checkbox/checkbox';
+import AlertBackground from '../alert/alertbackground';
 const { dialog } = require('electron').remote;
-const BG = styled.div`
+const BG = styled(AlertBackground)`
     width: 100%;
     height: fit-content;
     max-width: 600px;
     max-height: 500px;
-    background-color: #222;
     padding: 10px;
     color: white;
     display: flex;

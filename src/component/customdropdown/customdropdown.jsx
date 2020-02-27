@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import transition from 'styled-transition-group';
 import arrow from './img/arrow.png';
 import ClickAwayListener from 'react-click-away-listener';
 const CDropdown = styled.div`
@@ -11,24 +12,48 @@ const CDropdown = styled.div`
     display: flex;
     align-items: center;
     cursor: pointer;
+    transition: 150ms;
     &:hover {
-        background-color: #2e2e2e;
+        background-color: #5b5b5b;
     }
+    ${props => props.active && `
+        &:hover {
+            background-color: #404040;
+        }
+    `}
+    ${props => props.disabled && `
+        cursor: not-allowed;
+        background-color: #2e2e2e;
+        &:hover {
+            background-color: #2e2e2e;
+        }
+    `}
 `
 
-const Items = styled.div`
+const Items = transition.div`
     position: absolute;
+    height: auto;
     max-height: 300px;
     background-color: #4f4f4f;
     width: 300px;
     overflow-y: scroll;
     top: 40px;
-    display: none;
+    display: block;
     z-index: 150;
-    box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.75);
-    ${props => props.visible && `
-        display: block;
-    `}
+    &:enter {
+        height: 0;
+    }
+    &:enter-active {
+        height: 100vh;
+        transition: height 350ms;
+    }
+    &:exit {
+        height: 100vh;
+    }
+    &:exit-active {
+        height: 0;
+        transition: height 350ms;
+    }
 `;
 
 const Label = styled.p`
@@ -43,6 +68,7 @@ const Item = styled.div`
     max-height: 65px;
     display: flex;
     align-items: center;
+    transition: 150ms;
     &:hover {
         background: #363636;
     }
@@ -56,6 +82,10 @@ const Arrow = styled.img`
     position: absolute;
     right: 5px;
     width: 10px;
+    transition: 150ms;
+    ${props => props.flip && `
+        transform: scaleY(-1);
+    `}
 `;
 
 export default class CustomDropdown extends Component {
@@ -151,13 +181,16 @@ export default class CustomDropdown extends Component {
     }
 
     openDropdown = () => {
-        this.setState({
-            dropdownOpen: !this.state.dropdownOpen
-        }, () => {
-            if(this.itemsRef) {
-                this.itemsRef.current.scrollTop = this.state.scrollPos;
-            }
-        })
+        if(!this.props.disabled) {
+
+            this.setState({
+                dropdownOpen: !this.state.dropdownOpen
+            }, () => {
+                if(this.itemsRef) {
+                    this.itemsRef.current.scrollTop = this.state.scrollPos;
+                }
+            })
+        }
     }
 
     selectItem = (e) => {
@@ -201,12 +234,12 @@ export default class CustomDropdown extends Component {
         const { dropdownOpen, currentName } = this.state;
         return (
             <ClickAwayListener onClickAway={this.clickAway}>
-                <CDropdown onClick={this.openDropdown}>
+                <CDropdown disabled={this.props.disabled} active={dropdownOpen} onClick={this.openDropdown}>
                     <Label>{currentName}</Label>
-                    <Arrow src={arrow} />
-                    <Items visible={dropdownOpen} ref={this.itemsRef}>
+                    <Arrow flip={dropdownOpen} src={arrow} />
+                    {!this.props.disabled && <Items timeout={350} in={dropdownOpen} unmountOnExit ref={this.itemsRef}>
                         {this.state.items}
-                    </Items>
+                    </Items>}
                 </CDropdown>
             </ClickAwayListener>
         )

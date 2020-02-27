@@ -69,13 +69,26 @@ const DownloadsManager = {
         download.setProgressPercent(progress);
         this.downloadUpdate();
     },
-    startModDownload: function(profile, mod, url, modpack) {
+    startAssetDownload: function(profile, mod, type, url, modpack) {
         return new Promise((resolve) => {
-            if(!fs.existsSync(path.join(profile.gameDir, '/mods'))) {
-                fs.mkdirSync(path.join(profile.gameDir, '/mods'));
+            let downloadPath;
+            if(type === 'mod') {
+                if(!fs.existsSync(path.join(profile.gameDir, '/mods'))) {
+                    fs.mkdirSync(path.join(profile.gameDir, '/mods'));
+                }
+                downloadPath = path.join(profile.modsPath, `/${Global.createID(mod.name)}.jar`);
+            }else if(type === 'resourcepack') {
+                if(!fs.existsSync(path.join(profile.gameDir, `/resourcepacks`))) {
+                    fs.mkdirSync(path.join(profile.gameDir, `/resourcepacks`));
+                }
+                downloadPath = path.join(profile.gameDir, `/resourcepacks/${Global.createID(mod.name)}.zip`);
             }
             if(modpack === false) {
-                this.startFileDownload(`${mod.name}\n_A_${profile.name}`, url, path.join(profile.modsPath, `/${Global.createID(mod.name)}.jar`)).then(() => {
+                this.startFileDownload(
+                    `${mod.name}\n_A_${profile.name}`, 
+                    url, 
+                    downloadPath
+                    ).then(() => {
                     resolve();
                 })
             }

@@ -13,6 +13,10 @@ const BG = styled.div`
     flex-flow: column;
     user-select: none;
 
+    ${props => props.hideFramework && `
+        height: 55px;
+    `}
+
     ${props => props.extraInfo && `
         height: 310px;
     `}
@@ -23,7 +27,7 @@ const BG = styled.div`
 `
 
 const InfoSection = styled.div`
-    margin-top: 30px;
+    margin-top: 35px;
     flex: 1 1 auto;
     position: relative;
     padding-bottom: 10px;
@@ -33,7 +37,7 @@ const InfoSection = styled.div`
 const Title = styled.p`
     color: white;
     font-weight: bolder;
-    font-size: 18pt;
+    font-size: 15pt;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -108,7 +112,7 @@ export default class VersionCard extends PureComponent {
 
     render() {
         const { showMoreInfo, changelog } = this.state;
-        const { hideButtons, version, badMCVer, progressState, disableMcVer, installClick, allowVersionReinstallation } = this.props;
+        const { hideButtons, hideFramework, version, badMCVer, progressState, disableMcVer, installClick, allowVersionReinstallation } = this.props;
 
         let progress = '';
         if(progressState) {
@@ -132,11 +136,11 @@ export default class VersionCard extends PureComponent {
 
         const freeToInstall = progress !== 'installing' && progress !== 'disable-install';
         return (
-            <BG extraInfo={showMoreInfo}>
+            <BG extraInfo={showMoreInfo} hideFramework={hideFramework}>
                 <Details>
                     <Title>{version.displayName}</Title>
-                    {version.hosts.curse && <Modloader>
-                        {version.hosts.curse.localValues.inferredModloader}
+                    {version.hosts.curse && !hideFramework && <Modloader>
+                        framework: {version.hosts.curse.localValues.inferredModloader}
                     </Modloader>}
                 </Details>
                 {!hideButtons && 

@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
-import { ContextMenu, ContextMenuTrigger, MenuItem } from 'react-contextmenu';
-import { shell } from 'electron';
+import { ContextMenu, ContextMenuTrigger, MenuItem, SubMenu } from 'react-contextmenu';
+import { shell, clipboard } from 'electron';
 const BG = styled.div`
-    margin-top: 5px;
+    margin-top: 2px;
     width: 100%;
     height: 90px;
     background-color: #404040;
@@ -37,7 +37,7 @@ const Image = styled.div.attrs(props => ({
 const Title = styled.p`
     color: white;
     font-weight: bolder;
-    font-size: 22pt;
+    font-size: 18pt;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -52,8 +52,7 @@ const Title = styled.p`
 
 const Version = styled.p`
     color: white;
-    font-weight: bolder;
-    font-size: 13pt;
+    font-size: 11pt;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -71,8 +70,8 @@ const Version = styled.p`
 const Buttons = styled.div`
     display: flex;
     flex-flow: row;
-    right: 10px;
-    bottom: 10px;
+    right: 3px;
+    bottom: 3px;
     position: absolute;
 `
 
@@ -88,8 +87,7 @@ const AssetCard = ({asset, onClick, showDelete, progressState, showInstall, disa
     <>
     <ContextMenuTrigger holdToDisplay={-1} id={`assetcard${asset.id}`}>
         <BG disableHover={disableHover} data-cachedid={asset.cachedID} data-assetid={asset.id} onClick={onClick}>
-            {asset.icon || asset.iconpath && <Image src={asset.iconpath} />}
-            {asset.iconURL && !asset.iconpath && !asset.icon && <Image src={asset.iconURL} />}
+            {asset.iconPath && <Image src={asset.iconPath} />}
             <Details>
                 <Title>{asset.name}</Title>
                 <Version 
@@ -120,11 +118,50 @@ const AssetCard = ({asset, onClick, showDelete, progressState, showInstall, disa
         </BG>
     </ContextMenuTrigger>
     <ContextMenu holdToDisplay={-1} id={`assetcard${asset.id}`}>
+        <>
+        {
+            showDelete && <MenuItem 
+                onClick={e => {e.stopPropagation(); deleteClick(asset.id)}} 
+            >
+                Delete
+            </MenuItem>
+        }
+        {
+            showInstall && !installed && !progressState.progress && <MenuItem
+                onClick={installClick}
+            >
+                Install
+            </MenuItem>
+        }
         {
             asset.hosts.curse && <>
-                <MenuItem onClick={() => shell.openExternal(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)}>View on CurseForge</MenuItem>
+                <SubMenu hoverDelay={0} title='CurseForge'>
+
+                    <MenuItem
+                        onClick={
+                            () => clipboard.writeText(
+                                
+                                `${asset.name} on CurseForge:\n${asset.blurb}\nhttps://minecraft.curseforge.com/projects/${asset.hosts.curse.id}\n\nTry it with Minecraft Manager, the easiest way to manage Minecraft Mods and Modpacks (is.gd/mcmtet)`
+                            )
+                        }
+                    >
+                        Copy with Info
+                    </MenuItem>
+                    <MenuItem 
+                        onClick={() => shell.openExternal(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)}
+                    >
+                        View
+                    </MenuItem>
+
+                    <MenuItem 
+                        onClick={() => clipboard.writeText(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)}
+                        >
+                            Copy Link
+                    </MenuItem>
+                </SubMenu>
             </>
         }
+        </>
     </ContextMenu>
     </>
 )

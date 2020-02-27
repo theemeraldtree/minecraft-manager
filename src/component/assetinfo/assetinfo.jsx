@@ -8,6 +8,7 @@ import Detail from '../detail/detail';
 import Global from '../../util/global';
 import CustomDropdown from '../customdropdown/customdropdown';
 import Hosts from '../../host/Hosts';
+import ToastManager from '../../manager/toastManager';
 const LoadingText = styled.div`
     font-size: 23pt;
     display: flex;
@@ -21,22 +22,31 @@ const LoadingText = styled.div`
 const Description = styled.div`
     overflow-y: scroll;
     background-color: #404040;
-    margin-top: 10px;
+    margin-top: 3px;
     margin-bottom: 10px;
 `
 
 const HeaderButtons = styled.div`
-    margin-top: 5px;
+    min-height: 46px;
 `
 
 const HB = styled(Button)`
     background-color: #404040;
-    ${props => props.active && `
+    &:hover {
+        filter: brightness(1.0);
+        background-color: #5b5b5b;
         border-bottom: 2px solid #08b20b;
+    }
+    ${props => props.active && `
+        border-bottom: 4px solid #08b20b;
+        &:hover {
+            border-bottom: 4px solid #08b20b !important;
+        }
     `}
     ${props => !props.active && `
-        border-bottom: 2px solid #404040;
+        border-bottom: 0px solid #08b20b;
     `}
+    transition: 150ms;
     margin-right: 3px;
 `
 
@@ -91,17 +101,26 @@ export default class AssetInfo extends Component {
     showDescription = async () => {
         const { host } = this.props;
         const { activeAsset } = this.state;
-        const newAsset = await Hosts.addMissingInfo(host, 'description', activeAsset);
-        if(newAsset.description) {
-            this.setState({
-                activeAsset: newAsset,
-                description: true
-            })
+        if(activeAsset.hosts.curse) {
+            const newAsset = await Hosts.addMissingInfo(host, 'description', activeAsset);
+            if(newAsset.description) {
+                this.setState({
+                    activeAsset: newAsset,
+                    description: true
+                })
+            }else{
+                this.setState({
+                    description: false,
+                    cantConnect: true
+                })
+            }
         }else{
-            this.setState({
-                description: false,
-                cantConnect: true
-            })
+            if(activeAsset.description) {
+                this.setState({
+                    activeAsset: activeAsset,
+                    description: true
+                })
+            }
         }
     }
 
@@ -150,7 +169,7 @@ export default class AssetInfo extends Component {
             if(versions) {
                 let final = [];
                 for(let version of versions) {
-                    if(version.minecraftversions.includes(mcVerFilter) || mcVerFilter === 'All') {
+                    if(version.minecraft.supportedVersions.includes(mcVerFilter) || mcVerFilter === 'All') {
                         let ps = this.props.progressState;
                         if(this.props.disableVersionInstall && ps.progress !== 'installing') {
                             ps.progress = 'disable-install';
@@ -158,14 +177,15 @@ export default class AssetInfo extends Component {
                         const forceVerFilter = this.props.forceVersionFilter && (mcVerFilter !== this.props.mcVerFilter);
                         final.push(<VersionCard 
                             allowVersionReinstallation={allowVersionReinstallation}
-                            badMCVer={specificMCVer ? !version.minecraftversions.includes(specificMCVer) : false}
+                            badMCVer={specificMCVer ? !version.minecraft.supportedVersions.includes(specificMCVer) : false}
                             key={version.displayName}
                             progressState={ps} 
                             installClick={this.versionInstall} 
                             asset={activeAsset}
                             host={host}
                             disableMcVer={forceVerFilter}
-                            version={version} />);
+                            version={version}
+                            hideFramework={activeAsset.type !== 'mod'} />);
                     }
                 }
         
@@ -175,7 +195,9 @@ export default class AssetInfo extends Component {
                 this.setState({
                     versions: final
                 }, () => {
-                    this.versionsListRef.current.scrollTop = this.state.scrollPosition
+                    if(this.versionsListRef.current) {
+                        this.versionsListRef.current.scrollTop = this.state.scrollPosition
+                    }
                 })
             }else{
                 this.setState({
@@ -192,6 +214,19 @@ export default class AssetInfo extends Component {
 
     versionInstall = (e) => {
         const version = Global.cached.versions[e.currentTarget.dataset.version];
+        if(this.props.forceFramework) {
+            if(version.hosts.curse) {
+                if(version.hosts.curse.localValues && version.hosts.curse.localValues.inferredModloader) {
+                    if(version.hosts.curse.localValues.inferredModloader !== this.props.forceFramework) {
+                        ToastManager.createToast(
+                            `Uh oh`,
+                            `It seems you're trying to install a version that's built for ${version.hosts.curse.localValues.inferredModloader}, not for ${this.props.forceFramework}`
+                        );
+                        return;
+                    }
+                }
+            }
+        }
         this.setState({
             scrollPosition: this.versionsListRef.current.scrollTop
         })
@@ -248,8 +283,8 @@ export default class AssetInfo extends Component {
                 <AssetCard progressState={progressState} installed={displayState[activeAsset.id] === 'installed'} disableHover showInstall={!localAsset} installClick={installClick} asset={activeAsset} showBlurb />
                 <HeaderButtons>
                     <HB active={displayState === 'description'} onClick={this.displayStateSwitch} data-state='description'>Description</HB>
-                    {<HB active={displayState === 'versions'} onClick={this.displayStateSwitch} data-state='versions'>Versions</HB>}
-                    {type === 'mod' && <HB active={displayState === 'dependencies'} onClick={this.displayStateSwitch} data-state='dependencies'>Dependencies</HB>}
+                    {activeAsset.hosts.curse && <HB active={displayState === 'versions'} onClick={this.displayStateSwitch} data-state='versions'>Versions</HB>}
+                    {activeAsset.hosts.curse && type === 'mod' && <HB active={displayState === 'dependencies'} onClick={this.displayStateSwitch} data-state='dependencies'>Dependencies</HB>}
                 </HeaderButtons>
                     {displayState === 'description' && <>
                         {description && <Description>

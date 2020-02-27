@@ -7,7 +7,9 @@ import DownloadsManager from "../manager/downloadsManager";
 import Mod from "../type/mod";
 import Global from "../util/global";
 import ProfilesManager from "../manager/profilesManager";
-import ForgeManager from "../manager/forgeManager";
+import GenericAsset from "../type/genericAsset";
+import ForgeFramework from "../framework/forge/forgeFramework";
+import FabricFramework from "../framework/fabric/fabricFramework";
 
 const Hosts = {
 
@@ -139,7 +141,7 @@ const Hosts = {
                 this.downloadModList(host, profile, list2, callback, onUpdate);
             }else{
                 this.concurrentDownloads.push(item.cachedID);
-                const mod = await this.installModVersionToProfile(host, profile, item, false);
+                const mod = await this.installAssetVersionToProfile(host, profile, item, 'unknown', false);
                 this.cache.assets[item.cachedID] = mod;
                 onUpdate();
                 list.shift();
@@ -149,56 +151,97 @@ const Hosts = {
     },
 
     /* installers */
-    async installModToProfile(host, profile, mod) {
-        if(!mod.name) {
+    async installAssetToProfile(host, profile, asset, type) {
+        if(!asset.name) {
             if(host === 'curse') {
-                mod = await Curse.getFullAsset(mod, 'mod');
+                asset = await Curse.getFullAsset(asset, type);
             }
         }
 
         let modloader;
-        if(profile.customVersions.forge) {
+        if(profile.frameworks.forge) {
             modloader = 'forge';
-        }else if(profile.customVersions.fabric) {
+        }else if(profile.frameworks.fabric) {
             modloader = 'fabric';
         }
 
-        const ver = await this.getLatestVersionForMCVersion(host, mod, profile.minecraftversion, modloader);
+        const ver = await this.getLatestVersionForMCVersion(
+            host, 
+            asset, 
+            profile.version.minecraft.version, 
+            modloader
+        );
+        
         if(!ver) {
             return 'no-version-available';
         }
 
         let newMod;
         if(host === 'curse') {
-            newMod = await Curse.addFileInfo(mod, ver.projectFileId);
+            newMod = await Curse.addFileInfo(asset, ver.projectFileId);
         }
 
-        return await this.installModVersionToProfile(host, profile, newMod, true);
+        return await this.installAssetVersionToProfile(host, profile, newMod, type, true);
     },
 
-    async installDependencies(host, profile, asset) {
+    async installDependencies(host, profile, asset, type) {
         if(asset.dependencies) {
             for(let depend of asset.dependencies) {
                 if(depend) {
                     if(depend.hosts.curse && depend.hosts.curse.fileID) {
-                        this.installModVersionToProfile(host, profile, depend);
+                        this.installAssetVersionToProfile(host, profile, depend, type);
                     }else{
-                        this.installModToProfile(host, profile, depend);
+                        this.installAssetToProfile(host, profile, depend, type);
                     }
                 }
             }
         }
     },
 
-    async installModVersionToProfile(host, profile, mod, dependencies) {
+    async installAssetVersionToProfile(host, profile, mod, type, dependencies) {
         return new Promise(async resolve => {
-            if(!fs.existsSync(path.join(profile.gameDir, `/mods/${mod.id}.jar`))) {
-                if(!mod.name) {
+            let pathroot, extension;
+            if(type === 'mod') {
+                pathroot = `/mods/`;
+                extension = 'jar';
+            }else if(type === 'resourcepack') {
+                pathroot = `/resourcepacks/`;
+                extension = 'zip';
+            }
+            if(!fs.existsSync(path.join(profile.gameDir, `${pathroot}${mod.id}.${extension}`))) {
+                if(!mod.name || mod.icon.substring(0, 4) !== 'http') {
                     if(host === 'curse') {
-                        let newm = await Curse.getFullAsset(mod, 'mod');
+                        let newm = await Curse.getFullAsset(mod, type);
                         newm.hosts.curse.fileID = mod.hosts.curse.fileID;
                         mod = newm;
                     }
+                }
+
+                if(host === 'curse') {
+                    if(!mod.version || !mod.version.hosts.curse) {
+                        mod = await Curse.addFileInfo(mod, mod.hosts.curse.fileID);
+                    }
+
+                    if(profile.hasFramework()) {
+                        if(profile.frameworks.forge) {
+                            if(mod.version.hosts.curse.localValues.inferredModloader !== 'forge') {
+                                resolve('no-version-available');
+                                return;
+                            }
+                        }else if(profile.frameworks.fabric) {
+                            if(mod.version.hosts.curse.localValues.inferredModloader !== 'fabric') {
+                                resolve('no-version-available');
+                                return;
+                            }
+                        }
+                    }else{
+                        resolve('no-version-available');
+                        return;
+                    }
+                }
+
+                if(type === 'unknown'){
+                    type = mod.type;
                 }
     
                 DownloadsManager.createProgressiveDownload(`${mod.name}\n_A_`).then(async download => {
@@ -215,12 +258,26 @@ const Hosts = {
                         }
                     }
     
-                    const modObj = new Mod(mod);
+                    let modObj;
+                    if(type === 'mod') {
+                        modObj = new Mod(mod);
+                    }else if(type === 'resourcepack') {
+                        modObj = new GenericAsset(mod);
+                    }
     
-                    DownloadsManager.startModDownload(profile, mod, mod.downloadTemp, false).then(async () => {
-                        modObj.setJARFile(`${mod.id}.jar`);
-                        if(!profile.getModFromID(mod.id)) {
-                            profile.addMod(modObj);
+                    DownloadsManager.startAssetDownload(profile, mod, type, mod.downloadTemp, false).then(async () => {
+                        if(type === 'mod') {
+                            modObj.setJARFile(`${mod.id}.jar`);
+                            modObj.icon = `_mcm/icons/mods/${mod.id}${path.extname(mod.iconPath)}`;
+                        }else if(type === 'resourcepack') {
+                            modObj.setMainFile('resourcepacks', 'resourcepackzip', `${mod.id}.zip`);
+                            modObj.icon = `_mcm/icons/resourcepacks/${mod.id}${path.extname(mod.iconPath)}`
+                        }
+
+                        DownloadsManager.startFileDownload(`${mod.name} Icon\n_A_${profile.name}`, mod.iconPath, path.join(profile.profilePath, modObj.icon));
+                        
+                        if(!profile.getSubAssetFromID(type, mod.id)) {
+                            profile.addSubAsset(type, modObj);
                         }
     
                         if(profile.progressState[mod.id]) {
@@ -279,23 +336,29 @@ const Hosts = {
                     }
                 }
                 profile.hosts = modpack.hosts;
+
+                profile.temp = {};
                 profile.iconURL = modpack.iconURL;
+                profile.iconPath = modpack.iconPath;
                 profile.blurb = modpack.blurb;
                 profile.description = modpack.description;
 
-                profile.setProfileVersion(verObj);
+                profile.version = verObj;
+                profile.save();
                 profile.changeMCVersion(minecraftVersion);
-                profile.setForgeInstalled(true);
                 if(host === 'curse') {
                     profile.hosts.curse.fullyInstalled = false;
                     profile.hosts.curse.fileID = verObj.id;
                     profile.hosts.curse.fileName = version.fileName;
-                    profile.setForgeVersion(Curse.getForgeVersionForModpackInstall(modpack));
+
+                    let forgeVersion = Curse.getForgeVersionForModpackInstall(modpack);
+                    if(forgeVersion) {
+                        profile.setFrameworkVersion('forge', forgeVersion);
+                    }
                 }
 
                 profile.save();
-                profile.setCurrentState('installing');
-                
+                profile.state = 'installing';
                 ProfilesManager.updateProfile(profile);
                 DownloadsManager.createProgressiveDownload(`Mods\n_A_${modpack.name}`).then(download => {
                     let numberDownloaded = 0;
@@ -309,9 +372,12 @@ const Hosts = {
                                 await Curse.copyModpackOverrides(profile);
                             }
 
-                            ForgeManager.setupForge(profile).then(() => {
-                                DownloadsManager.startFileDownload(`Icon\n_A_${profile.name}`, profile.iconURL, path.join(profile.folderpath, '/icon.png')).then(async () => {
-                                    if(host === 'curse') {
+                            const final = () => {
+                                DownloadsManager.startFileDownload(
+                                    `Icon\n_A_${profile.name}`, 
+                                    profile.iconURL, 
+                                    path.join(profile.profilePath, `/icon${path.extname(profile.iconURL)}`)).then(async () => {
+                                        if(host === 'curse') {
                                         await Curse.cleanupModpackInstall(profile);
                                         profile.hosts.curse.fullyInstalled = true;
                                     }
@@ -329,7 +395,14 @@ const Hosts = {
                                     ProfilesManager.profilesBeingInstalled.splice(ProfilesManager.profilesBeingInstalled.indexOf(modpack.id), 1);
                                     resolve(profile);
                                 })
-                            })
+                            }
+                            if(profile.frameworks.forge) {
+                                ForgeFramework.setupForge(profile).then(final);
+                            }else if(profile.frameworks.fabric) {
+                                FabricFramework.setupFabric(profile).then(final);
+                            }else{
+                                final();
+                            }
                         }
                     }, () => {
                         numberDownloaded++;

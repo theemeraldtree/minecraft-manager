@@ -22,10 +22,10 @@ const LauncherManager = {
     },
     updateVersion: function(profile) {
         let verId;
-        if(profile.customVersions.forge || profile.customVersions.fabric) {
+        if(profile.hasFramework()) {
             verId = `${profile.safename} [Minecraft Manager]`
         }else{
-            verId = profile.minecraftversion;
+            verId = profile.version.minecraft.version;
         }
         this.setProfileData(profile, 'lastVersionId', verId);
     },
@@ -35,7 +35,7 @@ const LauncherManager = {
             name: profile.name,
             type: "custom",
             gameDir: path.join(profile.gameDir),
-            lastVersionId: profile.minecraftversion,
+            lastVersionId: profile.version.minecraft.version,
             lastUsed: new Date().toISOString(),
             javaArgs: `-Xmx${SettingsManager.currentSettings.dedicatedRam}G ${this.DEFAULT_JAVA_ARGS}`
         }

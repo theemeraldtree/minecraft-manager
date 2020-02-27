@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../button/button';
@@ -131,7 +130,7 @@ const ProfileCard = ({profile, history, showDeletion, showShare, showUpdate}) =>
             {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && <StateOverlay><b>ERROR</b>   <br />Unfinished Curse Profile Install</StateOverlay>}
             {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
             <BG onClick={() => {history.push(`/profile/${profile.id}`)}}>
-                <Image src={`${profile.iconpath}#${Global.cacheUpdateTime}`} />
+                <Image src={`${profile.iconPath}#${Global.cacheUpdateTime}`} />
                 <Title>{profile.name}</Title>
                 <Buttons className='buttons'>
                     <LaunchButton color='green' onClick={(e) => {e.stopPropagation();profile.launch();}}>

@@ -6,12 +6,12 @@ Minecraft Manager is a program used for installation of Minecraft mods/modpacks 
 [theemeraldtree.net/mcm](https://theemeraldtree.net/mcm)
 
 ## Getting Started
-If you'd like prebuilt version, [you can download it from the website here](https://theemeraldtree.net/mcm/download)
+If you'd like a prebuilt version, [you can download it from the website here](https://theemeraldtree.net/mcm/download)
 
 If you would like to build it and run it for yourself, it is very easy.
 ### Clone the repo & install packages
 ```
-git clone https://github.com/stairman06/minecraft-manager.git
+git clone https://github.com/theemeraldtree/minecraft-manager.git
 cd minecraft-manager
 yarn
 ```

@@ -2,24 +2,7 @@ import React, { Component } from 'react';
 import styled from 'styled-components';
 import Overlay from '../overlay/overlay';
 import Button from '../button/button';
-
-const DelConfirm = styled.div`
-    width: 100%;
-    height: fit-content;
-    max-width: 350px;
-    max-height: 200px;
-    margin: 10px;
-    background-color: #222;
-    color: white;
-    position: relative;
-    padding: 10px;
-    padding-bottom: 70px;
-    h1 {
-        margin: 0;
-        font-weight: 200;
-        font-size: 21pt;
-    }
-`
+import AlertBackground from '../alert/alertbackground';
 
 const DelButtons = styled.div`
     position: absolute;
@@ -35,14 +18,14 @@ export default class Confirmation extends Component {
         let { cancelDelete, confirmDelete } = this.props;
         return (
             <Overlay>
-                <DelConfirm>
+                <AlertBackground>
                     {this.props.questionText && <h1>{this.props.questionText}</h1>}
                     {this.props.children && this.props.children}
                     <DelButtons>
                         <Button onClick={cancelDelete} color='green'>{this.props.cancelText}</Button>
                         {!this.props.hideConfirm && <Button onClick={confirmDelete} color='red'>{this.props.confirmText}</Button>}
                     </DelButtons>
-                </DelConfirm>
+                </AlertBackground>
             </Overlay>
         )
     }

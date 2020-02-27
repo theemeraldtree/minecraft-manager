@@ -1,8 +1,7 @@
-import React, { PureComponent } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import Page from '../page';
-import Header from '../../component/header/header';
 import SearchBox from '../../component/searchbox/searchbox';
 import Button from '../../component/button/button';
 import ProfileGrid from './components/profilegrid';
@@ -13,7 +12,9 @@ import Overlay from '../../component/overlay/overlay';
 import CustomDropdown from '../../component/customdropdown/customdropdown';
 import Global from '../../util/global';
 import ImportOverlay from '../../component/importoverlay/importoverlay';
-const CreateBG = styled.div`
+import NavContext from '../../navContext';
+import AlertBackground from '../../component/alert/alertbackground';
+const CreateBG = styled(AlertBackground)`
     max-width: 600px;
     max-height: 400px;
     width: 100%;
@@ -39,105 +40,91 @@ const CreateControls = styled.div`
         margin: 2px;
     }
 `
-export default withRouter(class HomePage extends PureComponent {
-    constructor() {
-        super();
-        this.state = {
-            searchTerm: '',
-            showCreate: false,
-            createName: '',
-            mcVersion: Global.MC_VERSIONS[0],
-            showImport: false
-        }
-    }
+export default withRouter(function HomePage({ history }) {
+    const [ searchTerm, setSearchTerm ] = useState('');
+    const [ showCreate, setShowCreate ] = useState(false);
+    const [ createName, setCreateName ] = useState('');
+    const [ nameEntered, setNameEntered ] = useState(false);
+    const [ mcVersion, setMCCVersion ] = useState(Global.MC_VERSIONS[0]);
+    const [ showImport, setShowImport ] = useState(false);
     
-    searchChange = (e) => {
-        this.setState({
-            searchTerm: e.target.value.toLowerCase()
-        })
-    }
+    const { header } = useContext(NavContext);
 
-    createCancel = () => {
-        this.setState({
-            showCreate: false
-        });
-    }
+    useEffect(() => {
+        header.setShowBackButton(false);
+        header.setTitle('profiles');
+        header.setShowChildren(true);
+        header.setChildren(
+            <>
+                <SearchBox 
+                    onChange={e => setSearchTerm(e.target.value.toLowerCase())}
+                    placeholder='search'
+                />
+                <Button 
+                    onClick={() => setShowImport(true)}
+                    color='purple'
+                >
+                    import
+                </Button>
+                <Button
+                    onClick={() => setShowCreate(true)}
+                    color='green'
+                >
+                    create
+                </Button>
+            </>
+        )
+    }, [])
 
-    showCreate = () => {
-        this.setState({
-            showCreate: true
-        })
-    }
-
-    createNameChange = (e) => {
+    const createNameChange = (e) => {
         const input = e.target.value;
         const names = ProfilesManager.loadedProfiles.map(prof => prof.id);
         if(input.trim() !== '' && !names.includes(Global.createID(input))) {
-            this.setState({
-                nameEntered: true
-            })
+            setNameEntered(true);
         }else{
+            setNameEntered(false);
             this.setState({
                 nameEntered: false
             })
         }
-        this.setState({
-            createName: input
+        setCreateName(input);
+    }
+
+    const create = () => {
+        ProfilesManager.createProfile(createName, mcVersion).then(() => {
+            history.push(`/profile/${Global.createID(createName)}`);
         })
     }
 
-    create = () => {
-        ProfilesManager.createProfile(this.state.createName, this.state.mcVersion).then(() => {
-            this.props.history.push(`/profile/${Global.createID(this.state.createName)}`);
-        })
-    }
+    return (
+        <Page>              
+            <ProfileGrid searchTerm={searchTerm} />
+            <ImportOverlay in={showImport} cancelClick={() => setShowImport(false)} />}
+            <Overlay in={showCreate}>
+                <CreateBG>
+                    <Title>create a new profile</Title>
+                    <Detail>profile name</Detail>
+                    <TextInput onChange={createNameChange} />
+                    <Detail>minecraft version</Detail>
+                    <CustomDropdown 
+                        onChange={ver => setMCCVersion(ver)} 
+                        items={Global.MC_VERSIONS} 
+                    />
 
-    mcverChange = (val) => {
-        this.setState({
-            mcVersion: val
-        })
-    }
-    
-    importClick = () => {
-        this.setState({
-            showImport: true
-        })
-    }
-
-    importCancel = () => {
-        this.setState({
-            showImport: false
-        })
-    }
-    render() {
-        let { searchTerm, showCreate, showImport } = this.state;
-        return (
-            <Page>              
-                <Header title='profiles'>
-                    <SearchBox onChange={this.searchChange} placeholder='search' />
-                    <Button onClick={this.importClick} color='purple'>import</Button>
-                    <Button onClick={this.showCreate} color='green'>create</Button>
-                </Header>
-                <ProfileGrid searchTerm={searchTerm} />
-                {showImport && <ImportOverlay cancelClick={this.importCancel} />}
-                {showCreate && 
-                <Overlay>
-                    <CreateBG>
-                        <Title>create a new profile</Title>
-                        <Detail>profile name</Detail>
-                        <TextInput onChange={this.createNameChange} />
-                        <Detail>minecraft version</Detail>
-                        <CustomDropdown onChange={this.mcverChange} items={Global.MC_VERSIONS} />
-
-                        <Detail>looking to download a modpack? head to the discover section on the sidebar</Detail>
-                        <CreateControls>
-                            <Button onClick={this.createCancel} color='red'>cancel</Button>
-                            <Button disabled={!this.state.nameEntered} onClick={this.create} color='green'>create</Button>
-                        </CreateControls>
-                    </CreateBG>
-                </Overlay>}
-            </Page>
-        )
-    }
-
+                    <Detail>looking to download a modpack? head to the discover section on the sidebar</Detail>
+                    <CreateControls>
+                        <Button 
+                            onClick={() => setShowCreate(false)} 
+                            color='red'
+                        >cancel</Button>
+                        <Button 
+                            disabled={!nameEntered} 
+                            onClick={create} 
+                            color='green'
+                        >create</Button>
+                    </CreateControls>
+                </CreateBG>
+            </Overlay>
+        </Page>
+    )
 });

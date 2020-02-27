@@ -1,12 +1,11 @@
-export default function Mod(rawoamf) {
-    Object.assign(this, rawoamf);
+export default function GenericAsset(rawomaf) {
+    Object.assign(this, rawomaf);
 
     this.localValues = [
         'installed',
         'iconPath',
         'iconURL'
     ]
-
     this.checkMissing = function() {
         if(!this.hosts) {
             this.hosts = {};
@@ -19,7 +18,29 @@ export default function Mod(rawoamf) {
 
     this.checkMissing();
 
-    // useful functions
+    this.setMainFile = function(pathroot, type, mainFile) {
+        let existing = this.files.find(file => file.priority === 'mainFile');
+
+        if(existing) {
+            existing.path = `${pathroot}/${mainFile}`;
+        }else{
+            this.files.push({
+                displayName: 'Main File',
+                type: type,
+                priority: 'mainFile',
+                path: `${pathroot}/${mainFile}`
+            })
+        }
+    }
+
+    this.getMainFile = function() {
+        let p = this.files.find(file => file.priority === 'mainFile');
+        if(p) { return p }
+        
+        return {
+            path: undefined
+        }
+    }
 
     this.cleanObject = function() {
         let copy = Object.assign({}, this);
@@ -53,32 +74,7 @@ export default function Mod(rawoamf) {
         return copy;
     }
 
-    this.setJARFile = function(newJARFile) {
-        let existing = this.files.find(file => file.type === 'jar' && file.priority === 'mainFile');
     
-        if(existing) {
-            existing.path = `mods/${newJARFile}`;
-        }else{
-            this.files.push({
-                displayName: 'Main JAR File',
-                type: 'jar',
-                priority: 'mainFile',
-                path: `mods/${newJARFile}`
-            });
-        }
-    }
-
-    this.getJARFile = function() {
-        for(let file of this.files) {
-            if(file.type === 'jar' && file.priority === 'mainFile') {
-                return file;
-            }
-        }
-        return {
-            path: undefined
-        }
-    }
-
     // ugh.. hosts...
     this.getPrimaryHost = function() {
         if(this.hosts.curse) {

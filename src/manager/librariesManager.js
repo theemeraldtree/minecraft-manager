@@ -1,10 +1,11 @@
 import path from 'path';
 import Global from '../util/global';
 import fs from 'fs';
-import DownloadsManager from './downloadsManager';
 import rimraf from 'rimraf';
 import ProfilesManager from './profilesManager';
 import LogManager from './logManager';
+import DownloadsManager from './downloadsManager';
+import mkdirp from 'mkdirp';
 const LibrariesManager = {
     getLibrariesPath: function() {
         return path.join(Global.getMCPath(), '/libraries/')
@@ -12,44 +13,35 @@ const LibrariesManager = {
     getMCMLibraries: function() {
         return path.join(this.getLibrariesPath(), '/minecraftmanager/profiles/');
     },
-    createForgeLibrary: function(profile) {
-        return new Promise((resolve) => {
-            if(profile.customVersions.forge.version) {
-                const libraryPath = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
-                if(!fs.existsSync(libraryPath)) {
-                    fs.mkdirSync(libraryPath)
-                }
-                const forgePath = path.join(libraryPath, `/forge`);
-                if(!fs.existsSync(forgePath)) {
-                    fs.mkdirSync(forgePath);
-                }
-                let jarPath = path.join(forgePath, `/mcm-${profile.id}-forge.jar`);
-                fs.writeFile(jarPath, 'Minecraft Manager - Downloading...', () => {
-                    const mcversion = profile.minecraftversion;
-                    let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.customVersions.forge.version}/forge-${profile.customVersions.forge.version}-universal.jar`;
-                    if(mcversion === '1.7.10') {
-                        downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.customVersions.forge.version}-1.7.10/forge-${profile.customVersions.forge.version}-1.7.10-universal.jar`
-                    }else if(mcversion === '1.8.9' || mcversion === '1.8.8' || mcversion === '1.8') {
-                        downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.customVersions.forge.version}-${mcversion}/forge-${profile.customVersions.forge.version}-${mcversion}-universal.jar`
-                    }
-                    DownloadsManager.startFileDownload(`Minecraft Forge ${profile.customVersions.forge.version}\n_A_${profile.name}`, downloadURL, jarPath).then(() => {
-                        resolve();
-                    });
-                });
-            }
-        })
+    createLibraryPath: function(profile) {
+        this.checkExist();
+        const p = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
+        if(!fs.existsSync(p)) {
+            fs.mkdirSync(p);
+        }
+
+        return p;
+    },
+    checkExist: function() {
+        let mcmpath = path.join(this.getLibrariesPath(), `/minecraftmanager`);
+        if(!fs.existsSync(mcmpath)) {
+            fs.mkdirSync(mcmpath);
+        }
+        if(!fs.existsSync(this.getMCMLibraries())) {
+            fs.mkdirSync(this.getMCMLibraries());
+        }
     },
     renameLibrary: function(profile, newID) {
-        if(profile.customVersions.forge || profile.customVersions.fabric) {
+        if(profile.frameworks.forge || profile.frameworks.fabric) {
             // old library method check
             const profileLibrary = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
             if(fs.existsSync(path.join(profileLibrary, `/profiles-mcm-${profile.id}.jar`))) {
                 fs.renameSync(path.join(profileLibrary, `/profiles-mcm-${profile.id}.jar`), path.join(profileLibrary, `/profiles-mcm-${newID}.jar`));
             }else{             
-                if(profile.customVersions.fabric) {
+                if(profile.frameworks.fabric) {
                     fs.renameSync(path.join(profileLibrary, `/fabric-intermediary/mcm-${profile.id}-fabric-intermediary.jar`), path.join(profileLibrary, `/fabric-intermediary/mcm-${newID}-fabric-intermediary.jar`));
                     fs.renameSync(path.join(profileLibrary, `/fabric-loader/mcm-${profile.id}-fabric-loader.jar`), path.join(profileLibrary, `/fabric-loader/mcm-${newID}-fabric-loader.jar`));
-                }else if(profile.customVersions.forge) {
+                }else if(profile.frameworks.forge) {
                     fs.renameSync(path.join(profileLibrary, `/forge/mcm-${profile.id}-forge.jar`), path.join(profileLibrary, `/forge/mcm-${newID}-forge.jar`));
                 }
             }
@@ -79,6 +71,18 @@ const LibrariesManager = {
                 }
             }
         })
+    },
+    // sometimes there are missing libraries
+    checkMissingLibraries: function() {
+        let akkaactorpath = path.join(this.getLibrariesPath(), `/com/typesafe/akka/akka-actor_2.11/2.3.3/akka-actor_2.11-2.3.3.jar`);
+        mkdirp.sync(path.dirname(akkaactorpath));
+        if(!fs.existsSync(akkaactorpath)) {
+            DownloadsManager.startFileDownload(
+                `Missing essential library akka-actor`,
+                `https://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.11/2.3.3/akka-actor_2.11-2.3.3.jar`,
+                akkaactorpath
+            )
+        }
     }
 }
 

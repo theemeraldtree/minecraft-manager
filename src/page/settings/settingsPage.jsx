@@ -1,11 +1,11 @@
-import React, { PureComponent } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Page from '../page';
-import Header from '../../component/header/header';
 import styled from 'styled-components';
-import SettingsManager from '../../manager/settingsManager';
 import About from './pages/about';
 import General from './pages/general';
+import Defaults from './pages/Defaults';
 import Help from './pages/help';
+import NavContext from '../../navContext';
 const Sidebar = styled.div`
     height: 100%;
     position: absolute;
@@ -34,6 +34,7 @@ const Item = styled.p`
         }
     `}
     margin-bottom: 15px;
+    transition: font-weight 150ms
 `;
 
 const Container = styled.div`
@@ -44,51 +45,40 @@ const Container = styled.div`
     height: 100%;
 `;
 
-
-
 const Wrapper = styled.div`
     overflow: hidden;
     height: 100%;
 `
-export default class SettingsPage extends PureComponent {
-    constructor(props) {
-        super(props);
-        this.state = {
-            mcHome: SettingsManager.MC_HOME,
-            mcExe: SettingsManager.currentSettings.mcExe,
-            dedicatedRam: SettingsManager.currentSettings.dedicatedRam,
-            ramChangeDisabled: true,
-            updateText: 'check for updates',
-            updateDisabled: false,
-            settingsPage: 'about'
-        }
-    }
-    
-    switchPage = (page) => {
-        this.setState({
-            settingsPage: page
-        })
-    }
 
-    render() {
-        const { settingsPage } = this.state;
-        return (
-            <Page>
-                <Header showBackButton title='settings' />
-                <Wrapper>
-                    <Sidebar>
-                        <Item onClick={() => this.switchPage('about')} active={settingsPage === 'about'}>about</Item>
-                        <Item onClick={() => this.switchPage('general')} active={settingsPage === 'general'}>general</Item>
-                        <Item onClick={() => this.switchPage('help')} active={settingsPage === 'help'}>help</Item>
-                    </Sidebar>
-                    <Container>
-                        {settingsPage === 'about' && <About />}
-                        {settingsPage === 'general' && <General />}
-                        {settingsPage === 'help' && <Help />}
-                    </Container>
-                </Wrapper>
-            </Page>
-        )
-    }
+export default function SettingsPage() {
+    const { header } = useContext(NavContext);
 
+    const [ settingsPage, setSettingsPage ] = useState('about');
+
+    useEffect(() => {
+        header.setTitle('settings');
+        header.setShowBackButton(true);
+        header.setShowChildren(false);
+        header.setBackLink(undefined);
+        header.setOnBackClick(undefined);
+    }, []);
+
+    return (
+        <Page>
+            <Wrapper>
+                <Sidebar>
+                    <Item onClick={() => setSettingsPage('about')} active={settingsPage === 'about'}>about</Item>
+                    <Item onClick={() => setSettingsPage('general')} active={settingsPage === 'general'}>general</Item>
+                    <Item onClick={() => setSettingsPage('defaults')} active={settingsPage === 'defaults'}>defaults</Item>
+                    <Item onClick={() => setSettingsPage('help')} active={settingsPage === 'help'}>help</Item>
+                </Sidebar>
+                <Container>
+                    {settingsPage === 'about' && <About />}
+                    {settingsPage === 'general' && <General />}
+                    {settingsPage === 'defaults' && <Defaults />}
+                    {settingsPage === 'help' && <Help />}
+                </Container>
+            </Wrapper>
+        </Page>
+    )
 }

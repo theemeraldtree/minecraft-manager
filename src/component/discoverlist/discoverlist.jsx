@@ -202,7 +202,7 @@ export default class DiscoverList extends Component {
 
     render() {
         let { displayState, assets, loading, activeAsset, progressState, cantConnect } = this.state;
-        let { type, installClick, versionInstall, allowVersionReinstallation, host, mcVerFilter, forceVersionFilter, specificMCVer } = this.props;
+        let { type, forceFramework, installClick, versionInstall, allowVersionReinstallation, host, mcVerFilter, forceVersionFilter, specificMCVer } = this.props;
         return (
             <>
                 {displayState === 'browseAssets' && <>
@@ -236,7 +236,19 @@ export default class DiscoverList extends Component {
                         </LoadingText>
                     </>}
                 </>}
-                {displayState === 'viewAsset' && <AssetInfo host={host} allowVersionReinstallation={allowVersionReinstallation} specificMCVer={specificMCVer} versionInstall={versionInstall} progressState={progressState[activeAsset.id]} localAsset={false} forceVersionFilter={forceVersionFilter} mcVerFilter={mcVerFilter} asset={activeAsset} installClick={installClick} type={type} />}
+                {displayState === 'viewAsset' && <AssetInfo 
+                host={host} 
+                allowVersionReinstallation={allowVersionReinstallation} 
+                specificMCVer={specificMCVer} 
+                versionInstall={versionInstall} 
+                progressState={progressState[activeAsset.id]} 
+                localAsset={false} 
+                forceVersionFilter={forceVersionFilter} 
+                mcVerFilter={mcVerFilter} 
+                asset={activeAsset} 
+                installClick={installClick} 
+                type={type} 
+                forceFramework={forceFramework}/>}
             </>
         )
     }

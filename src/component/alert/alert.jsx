@@ -27,27 +27,20 @@ export default class Alert extends PureComponent {
     }
 
     render() {
-        if(this.state.alerts.length) {
-            return (
-                <Overlay force>
-                    {
-                        this.state.alerts.map(alert => 
-                            <AlertObject
-                                key={alert.id}
-                                dismiss={this.dismiss}
-                                id={alert.id}
-                                buttons={alert.buttons}
-                            >
-                                {alert.html}
-                            </AlertObject>)
-                    }
-                </Overlay>
-            )
-        }
-
         return (
-            <>
-            </>
+            <Overlay in={this.state.alerts.length >= 1} force>
+                {
+                    this.state.alerts.map(alert => 
+                        <AlertObject
+                            key={alert.id}
+                            dismiss={this.dismiss}
+                            id={alert.id}
+                            buttons={alert.buttons}
+                        >
+                            {alert.html}
+                        </AlertObject>)
+                }
+            </Overlay>
         )
     }
 }

@@ -83,7 +83,13 @@ export default function About() {
             ipcRenderer.on('error', () => {
                 setUpdateDisabled(false);
                 setUpdateText('check for updates');
-                setUpdateSubText('Error checking for updates');
+                setUpdateSubText(`Error checking for updates`);
+            });
+
+            ipcRenderer.on('in-dev', () => {
+                setUpdateDisabled(true);
+                setUpdateText('in dev');
+                setUpdateSubText(`cannot update while in dev mode`);
             })
 
             ipcRenderer.on('update-not-available', () => {
@@ -113,9 +119,10 @@ export default function About() {
                     </div>
                 </AboutTop>
                 <AboutBottom>
-                    <h3><a href="https://github.com/stairman06/minecraft-manager/blob/master/LICENSE">Minecraft Manager is licensed under the GNU General Public License v3</a></h3>
-                    <h3><a title="Minecraft Manager Source Code" href="https://github.com/stairman06/minecraft-manager">Minecraft Manager is an open source project created by stairman06</a></h3>
-                    <h3><a title="OMAF Wiki and Documentation" href="https://github.com/stairman06/omaf/wiki">Minecraft Manager uses the open-source OMAF standard</a></h3>
+                    <h3><a href="https://github.com/theemeraldtree/minecraft-manager/blob/master/LICENSE">Minecraft Manager is licensed under the GNU General Public License v3</a></h3>
+                    <h3><a title="Minecraft Manager Source Code" href="https://github.com/theemeraldtree/minecraft-manager">Minecraft Manager is an open source project created by theemeraldtree and stairman06</a></h3>
+                    <h3><a title="theemeraldtree website" href="https://theemeraldtree.net">Visit theemeraldtree's website for more cool stuff</a></h3>
+                    <h3><a title="OMAF Wiki and Documentation" href="https://github.com/theemeraldtree/omaf/wiki">Minecraft Manager uses the open-source OMAF standard</a></h3>
                 </AboutBottom>
             </Section>
             <NeedHelp />
@@ -125,6 +132,7 @@ export default function About() {
                     <li><a href="https://electronjs.org/">Electron</a></li>
                     <li><a href="https://reactjs.org/">React</a></li> 
                     <li><a href="https://www.styled-components.com/">styled-components</a></li>
+                    <li><a href="https://github.com/gabiseabra/styled-transition-group">styled-transition-group</a></li>
                     <li><a href="https://babeljs.io/">Babel</a></li>
                     <li><a href="https://webpack.js.org">Webpack</a></li>
                     <li><a href="https://eslint.org/">eslint</a></li>
@@ -141,6 +149,15 @@ export default function About() {
                     <li><a href="https://github.com/ooade/react-click-away-listener">react-click-away-listener</a></li>
                     <li>other projects</li>
                     and of course, YOU! Thank you!</h3>
+                <h3>Also, huge credit to <a href="https://github.com/robotbrain/ForgeTheSane">robotbrain's ForgeTheSane</a> and <a href="https://github.com/Stonebound/ForgeTheSane">Stonebound's fork</a>. Because of these open source projects, we have Forge 1.13+ support!</h3>
+            </Section>
+            <Section>
+                <h2>Other things to check out</h2>
+                <h3>
+                    <li><a href="https://stopmodreposts.org">#StopModReposts - stopmodreposts.org</a></li>
+                    <li><a href="https://fabricmc.net">FabricMC website</a></li>
+                    <li><a href="https://minecraftforge.net">MinecraftForge website</a></li>
+                </h3>
             </Section>
         </>
     )
