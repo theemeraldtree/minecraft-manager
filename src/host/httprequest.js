@@ -14,9 +14,9 @@ const HTTPRequest = {
           {
             url,
             headers: {
-              'User-Agent': 'Minecraft-Manager',
+              'User-Agent': 'Minecraft-Manager'
             },
-            followAllRedirects: true,
+            followAllRedirects: true
           },
           (error, response, body) => {
             resolve(body, response);
@@ -32,14 +32,14 @@ const HTTPRequest = {
     return new Promise((resolve, reject) => {
       this.httpGet(url)
         .then(response => {
-          if (response == undefined) {
+          if (response === undefined) {
             this.cheerioRequest(url);
           }
 
           if (response) {
             resolve(cheerio.load(response.replace(/\s\s+/g, ' ')));
           } else {
-            reject('response-not-found', tries);
+            reject(new Error('response-not-found'), tries);
           }
         })
         .catch(err => {
@@ -53,7 +53,7 @@ const HTTPRequest = {
       const id = `${url}-${dest}`;
       this.fileDownloads[id] = {
         onProgress,
-        onFinish: resolve,
+        onFinish: resolve
       };
       ipcRenderer.send('download-file', url, dest, id);
     });
@@ -72,13 +72,13 @@ const HTTPRequest = {
   },
 
   async get(url, qs) {
-    return await req({
+    return req({
       uri: url,
       method: 'GET',
       qs,
       headers: {
-        'User-Agent': 'MinecraftManagerClient',
-      },
+        'User-Agent': 'MinecraftManagerClient'
+      }
     });
   },
 
@@ -89,10 +89,10 @@ const HTTPRequest = {
       body: JSON.stringify(body),
       headers: {
         'content-type': 'application/json',
-        'User-Agent': 'MinecraftManagerClient',
-      },
+        'User-Agent': 'MinecraftManagerClient'
+      }
     });
-  },
+  }
 };
 
 export default HTTPRequest;

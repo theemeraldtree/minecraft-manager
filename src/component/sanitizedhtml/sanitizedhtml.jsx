@@ -67,16 +67,16 @@ const SanitizedHTML = ({ html, small }) => (
           'h5',
           'h6',
           'ul',
-          'li',
+          'li'
         ],
         allowedAttributes: {
           '*': ['style'],
           a: ['href'],
           iframe: ['src'],
-          img: ['src', 'width', 'height'],
+          img: ['src', 'width', 'height']
         },
-        allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com'],
-      }),
+        allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com']
+      })
     }}
   />
 );

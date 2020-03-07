@@ -52,11 +52,11 @@ const SettingsManager = {
       homeDirectory: '',
       dedicatedRam: 2,
       mcExe: '',
-      lastToastNewsID: -1,
+      lastToastNewsID: -1
     };
 
     fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(obj));
-  },
+  }
 };
 
 export default SettingsManager;

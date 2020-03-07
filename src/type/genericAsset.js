@@ -24,7 +24,7 @@ export default function GenericAsset(rawomaf) {
         displayName: 'Main File',
         type,
         priority: 'mainFile',
-        path: `${pathroot}/${mainFile}`,
+        path: `${pathroot}/${mainFile}`
       });
     }
   };
@@ -36,7 +36,7 @@ export default function GenericAsset(rawomaf) {
     }
 
     return {
-      path: undefined,
+      path: undefined
     };
   };
 

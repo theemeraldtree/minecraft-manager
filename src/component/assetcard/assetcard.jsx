@@ -1,13 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Button from '../button/button';
-import {
-  ContextMenu,
-  ContextMenuTrigger,
-  MenuItem,
-  SubMenu,
-} from 'react-contextmenu';
+import { ContextMenu, ContextMenuTrigger, MenuItem, SubMenu } from 'react-contextmenu';
 import { shell, clipboard } from 'electron';
+import Button from '../button/button';
+
 const BG = styled.div`
   margin-top: 2px;
   width: 100%;
@@ -32,8 +29,8 @@ const BG = styled.div`
 
 const Image = styled.div.attrs(props => ({
   style: {
-    backgroundImage: `url('${props.src}')`,
-  },
+    backgroundImage: `url('${props.src}')`
+  }
 }))`
   width: 90px;
   height: 90px;
@@ -104,22 +101,13 @@ const AssetCard = ({
   installed,
   installClick,
   deleteClick,
-  showBlurb,
+  showBlurb
 }) => (
   <>
     <ContextMenuTrigger holdToDisplay={-1} id={`assetcard${asset.id}`}>
-      <BG
-        disableHover={disableHover}
-        data-cachedid={asset.cachedID}
-        data-assetid={asset.id}
-        onClick={onClick}
-      >
+      <BG disableHover={disableHover} data-cachedid={asset.cachedID} data-assetid={asset.id} onClick={onClick}>
         {asset.iconPath && (
-          <Image
-            src={`${asset.iconPath.substring(0, 1) === '/' ? 'file:///' : ''}${
-              asset.iconPath
-            }`}
-          />
+          <Image src={`${asset.iconPath.substring(0, 1) === '/' ? 'file:///' : ''}${asset.iconPath}`} />
         )}
         <Details>
           <Title>{asset.name}</Title>
@@ -141,12 +129,11 @@ const AssetCard = ({
             </Button>
           )}
 
-          {showInstall &&
-            (installed || progressState.progress === 'installed') && (
-              <Button disabled color="green">
-                installed
-              </Button>
-            )}
+          {showInstall && (installed || progressState.progress === 'installed') && (
+            <Button disabled color="green">
+              installed
+            </Button>
+          )}
 
           {showInstall && !installed && !progressState.progress && (
             <Button color="green" onClick={installClick}>
@@ -154,21 +141,17 @@ const AssetCard = ({
             </Button>
           )}
 
-          {showInstall &&
-            !installed &&
-            progressState.progress === 'notavailable' && (
-              <Button color="green" disabled>
-                not available
-              </Button>
-            )}
+          {showInstall && !installed && progressState.progress === 'notavailable' && (
+            <Button color="green" disabled>
+              not available
+            </Button>
+          )}
 
-          {progressState.progress === 'installing' &&
-            !installed &&
-            showInstall && (
-              <Button color="green" disabled>
-                installing
-              </Button>
-            )}
+          {progressState.progress === 'installing' && !installed && showInstall && (
+            <Button color="green" disabled>
+              installing
+            </Button>
+          )}
         </Buttons>
       </BG>
     </ContextMenuTrigger>
@@ -184,9 +167,7 @@ const AssetCard = ({
             Delete
           </MenuItem>
         )}
-        {showInstall && !installed && !progressState.progress && (
-          <MenuItem onClick={installClick}>Install</MenuItem>
-        )}
+        {showInstall && !installed && !progressState.progress && <MenuItem onClick={installClick}>Install</MenuItem>}
         {asset.hosts.curse && (
           <>
             <SubMenu hoverDelay={0} title="CurseForge">
@@ -200,21 +181,13 @@ const AssetCard = ({
                 Copy with Info
               </MenuItem>
               <MenuItem
-                onClick={() =>
-                  shell.openExternal(
-                    `https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`
-                  )
-                }
+                onClick={() => shell.openExternal(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)}
               >
                 View
               </MenuItem>
 
               <MenuItem
-                onClick={() =>
-                  clipboard.writeText(
-                    `https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`
-                  )
-                }
+                onClick={() => clipboard.writeText(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)}
               >
                 Copy Link
               </MenuItem>
@@ -225,5 +198,18 @@ const AssetCard = ({
     </ContextMenu>
   </>
 );
+
+AssetCard.propTypes = {
+  asset: PropTypes.object,
+  onClick: PropTypes.func,
+  showDelete: PropTypes.bool,
+  progressState: PropTypes.object,
+  showInstall: PropTypes.bool,
+  disableHover: PropTypes.bool,
+  installed: PropTypes.bool,
+  installClick: PropTypes.func,
+  deleteClick: PropTypes.func,
+  showBlurb: PropTypes.bool
+};
 
 export default AssetCard;

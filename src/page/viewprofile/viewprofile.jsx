@@ -110,9 +110,7 @@ export default withRouter(function ViewProfilePage({ match, history }) {
           />
         )}
         <ProfileHeader>
-          <Image
-            src={`file:///${profile.iconPath}#${Global.cacheUpdateTime}`}
-          />
+          <Image src={`file:///${profile.iconPath}#${Global.cacheUpdateTime}`} />
           <PHSide>
             <Title>{profile.name}</Title>
             <Blurb>{profile.blurb}</Blurb>
@@ -127,16 +125,10 @@ export default withRouter(function ViewProfilePage({ match, history }) {
             <CustomButton onClick={editProfile} color="yellow">
               edit
             </CustomButton>
-            <CustomButton
-              onClick={() => setShowUpdateOverlay(true)}
-              color="purple"
-            >
+            <CustomButton onClick={() => setShowUpdateOverlay(true)} color="purple">
               update
             </CustomButton>
-            <CustomButton
-              onClick={() => setShowShareOverlay(true)}
-              color="blue"
-            >
+            <CustomButton onClick={() => setShowShareOverlay(true)} color="blue">
               share
             </CustomButton>
             <CustomButton onClick={() => setShowDelete(true)} color="red">
@@ -147,18 +139,8 @@ export default withRouter(function ViewProfilePage({ match, history }) {
             <SanitizedHTML html={profile.description} />
           </Description>
         </MiddlePanel>
-        {showShareOverlay && (
-          <ShareOverlay
-            cancelClick={() => setShowShareOverlay(false)}
-            profile={profile}
-          />
-        )}
-        {showUpdateOverlay && (
-          <UpdateOverlay
-            cancelClick={() => setShowUpdateOverlay(false)}
-            profile={profile}
-          />
-        )}
+        {showShareOverlay && <ShareOverlay cancelClick={() => setShowShareOverlay(false)} profile={profile} />}
+        {showUpdateOverlay && <UpdateOverlay cancelClick={() => setShowUpdateOverlay(false)} profile={profile} />}
       </Page>
     );
   } else {

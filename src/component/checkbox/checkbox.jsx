@@ -1,6 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import checkmark from './checkmark.png';
+
 const Input = styled.input`
   width: 20px;
   height: 20px;
@@ -61,15 +63,17 @@ const BG = styled.div`
 
 const Checkbox = ({ onClick, info, lighter, checked, disabled }) => (
   <BG disabled={disabled} lighter={lighter} className="checkbox">
-    <Input
-      type="checkbox"
-      data-info={info}
-      onChange={onClick}
-      checked={checked}
-      disabled={disabled}
-    />
+    <Input type="checkbox" data-info={info} onChange={onClick} checked={checked} disabled={disabled} />
     <Check className="check" />
   </BG>
 );
+
+Checkbox.propTypes = {
+  onClick: PropTypes.func,
+  info: PropTypes.any,
+  lighter: PropTypes.bool,
+  checked: PropTypes.bool,
+  disabled: PropTypes.bool
+};
 
 export default Checkbox;

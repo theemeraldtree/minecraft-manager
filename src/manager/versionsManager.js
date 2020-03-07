@@ -37,7 +37,7 @@ const VersionsManager = {
       obj.time = undefined;
       obj.releaseTime = undefined;
       obj.libraries[0] = {
-        name: `minecraftmanager.profiles:mcm-${profile.id}:forge`,
+        name: `minecraftmanager.profiles:mcm-${profile.id}:forge`
       };
       obj.id = versionname;
       obj.jar = profile.version.minecraft.version;
@@ -50,20 +50,16 @@ const VersionsManager = {
 
       obj.libraries.push({
         name: `minecraftmanager.profiles:mcm-${profile.id}:fabric-intermediary`,
-        url: 'https://maven.fabricmc.net',
+        url: 'https://maven.fabricmc.net'
       });
       obj.libraries.push({
         name: `minecraftmanager.profiles:mcm-${profile.id}:fabric-loader`,
-        url: 'https://maven.fabricmc.net',
+        url: 'https://maven.fabricmc.net'
       });
     }
-    fs.writeFile(
-      path.join(this.getVersionsPath(), versionname, `${versionname}.json`),
-      JSON.stringify(obj),
-      () => {
-        LauncherManager.setProfileData(profile, 'lastVersionId', versionname);
-      }
-    );
+    fs.writeFile(path.join(this.getVersionsPath(), versionname, `${versionname}.json`), JSON.stringify(obj), () => {
+      LauncherManager.setProfileData(profile, 'lastVersionId', versionname);
+    });
   },
   checkIs1710OrLower(profile) {
     const ver = profile.version.minecraft.version;
@@ -101,39 +97,26 @@ const VersionsManager = {
     const newVersionPath = path.join(this.getVersionsPath(), newVersionName);
 
     if (fs.existsSync(oldVersionPath)) {
-      const oldJSON = JSON.parse(
-        fs.readFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`))
-      );
+      const oldJSON = JSON.parse(fs.readFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`)));
       oldJSON.id = newVersionName;
 
       if (type === 'forge' || type === 'forgeComplex') {
         // old library method
         if (oldJSON.libraries[0].name.includes('minecraftmanager:profiles')) {
-          oldJSON.libraries[0].name = `minecraftmanager:profiles:mcm-${Global.createID(
-            newName
-          )}`;
+          oldJSON.libraries[0].name = `minecraftmanager:profiles:mcm-${Global.createID(newName)}`;
         } else {
-          oldJSON.libraries[0].name = `minecraftmanager.profiles:mcm-${Global.createID(
-            newName
-          )}:forge`;
+          oldJSON.libraries[0].name = `minecraftmanager.profiles:mcm-${Global.createID(newName)}:forge`;
         }
       } else if (type === 'fabric') {
-        oldJSON.libraries[
-          oldJSON.libraries.length - 1
-        ].name = `minecraftmanager.profiles:mcm-${Global.createID(
+        oldJSON.libraries[oldJSON.libraries.length - 1].name = `minecraftmanager.profiles:mcm-${Global.createID(
           newName
         )}:fabric-loader`;
-        oldJSON.libraries[
-          oldJSON.libraries.length - 2
-        ].name = `minecraftmanager.profiles:mcm-${Global.createID(
+        oldJSON.libraries[oldJSON.libraries.length - 2].name = `minecraftmanager.profiles:mcm-${Global.createID(
           newName
         )}:fabric-intermediary`;
       }
 
-      fs.writeFileSync(
-        path.join(oldVersionPath, `/${oldVersionName}.json`),
-        JSON.stringify(oldJSON)
-      );
+      fs.writeFileSync(path.join(oldVersionPath, `/${oldVersionName}.json`), JSON.stringify(oldJSON));
 
       fs.renameSync(
         path.join(oldVersionPath, `/${oldVersionName}.json`),
@@ -144,49 +127,26 @@ const VersionsManager = {
   },
   deleteVersion(profile) {
     return new Promise(resolve => {
-      if (
-        fs.existsSync(
-          path.join(
-            this.getVersionsPath(),
-            `${profile.safename} [Minecraft Manager]`
-          )
-        )
-      ) {
-        rimraf(
-          path.join(
-            this.getVersionsPath(),
-            `${profile.safename} [Minecraft Manager]`
-          ),
-          () => {
-            resolve();
-          }
-        );
+      if (fs.existsSync(path.join(this.getVersionsPath(), `${profile.safename} [Minecraft Manager]`))) {
+        rimraf(path.join(this.getVersionsPath(), `${profile.safename} [Minecraft Manager]`), () => {
+          resolve();
+        });
       } else {
         resolve();
       }
     });
   },
   cleanVersions() {
-    LogManager.log(
-      'info',
-      '[VersionsManager] [CleanVersions] Cleaning Launcher Versions...'
-    );
+    LogManager.log('info', '[VersionsManager] [CleanVersions] Cleaning Launcher Versions...');
     fs.readdirSync(this.getVersionsPath()).forEach(file => {
       if (file.indexOf('[Minecraft Manager]') !== -1) {
-        if (
-          !ProfilesManager.loadedProfiles.find(
-            prof => prof.versionname === file
-          )
-        ) {
+        if (!ProfilesManager.loadedProfiles.find(prof => prof.versionname === file)) {
           rimraf.sync(path.join(this.getVersionsPath(), file));
-          LogManager.log(
-            'info',
-            `[VersionsManager] [CleanVersions] Removed version ${file}`
-          );
+          LogManager.log('info', `[VersionsManager] [CleanVersions] Removed version ${file}`);
         }
       }
     });
-  },
+  }
 };
 
 export default VersionsManager;

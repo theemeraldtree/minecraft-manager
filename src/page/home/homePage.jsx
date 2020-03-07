@@ -56,10 +56,7 @@ export default withRouter(function HomePage({ history }) {
     header.setShowChildren(true);
     header.setChildren(
       <>
-        <SearchBox
-          onChange={e => setSearchTerm(e.target.value.toLowerCase())}
-          placeholder="search"
-        />
+        <SearchBox onChange={e => setSearchTerm(e.target.value.toLowerCase())} placeholder="search" />
         <Button onClick={() => setShowImport(true)} color="purple">
           import
         </Button>
@@ -78,7 +75,7 @@ export default withRouter(function HomePage({ history }) {
     } else {
       setNameEntered(false);
       this.setState({
-        nameEntered: false,
+        nameEntered: false
       });
     }
     setCreateName(input);
@@ -100,15 +97,9 @@ export default withRouter(function HomePage({ history }) {
           <Detail>profile name</Detail>
           <TextInput onChange={createNameChange} />
           <Detail>minecraft version</Detail>
-          <CustomDropdown
-            onChange={ver => setMCCVersion(ver)}
-            items={Global.MC_VERSIONS}
-          />
+          <CustomDropdown onChange={ver => setMCCVersion(ver)} items={Global.MC_VERSIONS} />
 
-          <Detail>
-            looking to download a modpack? head to the discover section on the
-            sidebar
-          </Detail>
+          <Detail>looking to download a modpack? head to the discover section on the sidebar</Detail>
           <CreateControls>
             <Button onClick={() => setShowCreate(false)} color="red">
               cancel

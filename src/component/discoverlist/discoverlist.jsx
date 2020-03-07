@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import AssetCard from '../assetcard/assetcard';
 import AssetInfo from '../assetinfo/assetinfo';
@@ -36,6 +37,7 @@ const Persists = styled.p`
   text-align: center;
   color: white;
 `;
+
 export default class DiscoverList extends Component {
   constructor(props) {
     super(props);
@@ -45,35 +47,14 @@ export default class DiscoverList extends Component {
       assets: [],
       loading: true,
       cantConnect: false,
-      isSearching: false,
+      isSearching: false
     };
   }
-
-  browseAssets = async () => {
-    const { host, type } = this.props;
-    this.setState({
-      displayState: 'browseAssets',
-      isSearching: false,
-      cantConnect: false,
-    });
-
-    const assets = await Hosts.getTopAssets(host, type);
-    if (assets) {
-      this.setState({
-        assets: assets,
-        loading: false,
-      });
-    } else {
-      this.setState({
-        cantConnect: true,
-      });
-    }
-  };
 
   static getDerivedStateFromProps(props) {
     return {
       displayState: props.state,
-      progressState: props.progressState,
+      progressState: props.progressState
     };
   }
 
@@ -97,27 +78,46 @@ export default class DiscoverList extends Component {
     }
   }
 
-  updateProgressStates = () => {
+  browseAssets = async () => {
+    const { host, type } = this.props;
     this.setState({
-      psUpdatePending: true,
+      displayState: 'browseAssets',
+      isSearching: false,
+      cantConnect: false
     });
+
+    const assets = await Hosts.getTopAssets(host, type);
+    if (assets) {
+      this.setState({
+        assets,
+        loading: false
+      });
+    } else {
+      this.setState({
+        cantConnect: true
+      });
+    }
+  };
+
+  updateProgressStates = () => {
+    this.setState({});
   };
 
   showAsset = e => {
-    let { displayState } = this.state;
+    const { displayState } = this.state;
     if (displayState === 'browseAssets') {
-      let scrollPos = undefined;
+      let scrollPos;
       if (this.listRef) {
         scrollPos = this.listRef.current.scrollTop;
       }
-      let mod = Hosts.cache.assets[e.currentTarget.dataset.cachedid];
+
+      const mod = Hosts.cache.assets[e.currentTarget.dataset.cachedid];
       this.props.stateChange('viewAsset');
       this.setState({
         previousState: 'browseAssets',
         displayState: 'viewAsset',
-        previewState: 'description',
         activeAsset: mod,
-        scrollPos: scrollPos,
+        scrollPos
       });
     }
   };
@@ -132,7 +132,7 @@ export default class DiscoverList extends Component {
   };
 
   goBack = () => {
-    let { displayState, previousState } = this.state;
+    const { displayState, previousState } = this.state;
     let newState;
     switch (displayState) {
       case 'browseAssets':
@@ -146,37 +146,30 @@ export default class DiscoverList extends Component {
     }
 
     this.setState({
-      displayState: newState,
+      displayState: newState
     });
   };
 
   showDescription = async () => {
     const { activeAsset } = this.state;
     const { host } = this.props;
-    const newAsset = await Hosts.addMissingInfo(
-      host,
-      'description',
-      activeAsset
-    );
+    const newAsset = await Hosts.addMissingInfo(host, 'description', activeAsset);
     this.setState({
-      activeAsset: newAsset,
-      description: true,
+      activeAsset: newAsset
     });
   };
 
   previewStateSwitch = e => {
-    let newState = e.currentTarget.dataset.state;
+    const newState = e.currentTarget.dataset.state;
 
-    this.setState({
-      previewState: newState,
-    });
     if (newState === 'description') {
       this.showDescription();
     }
   };
 
   tryAgain = () => {
-    let { displayState, isSearching } = this.state;
+    const { displayState, isSearching } = this.state;
+
     if (displayState === 'browseAssets' && !isSearching) {
       this.browseAssets();
     } else if (isSearching) {
@@ -185,20 +178,21 @@ export default class DiscoverList extends Component {
   };
 
   renderSearch = async () => {
-    let { displayState } = this.state;
-    let { searchTerm, type, host } = this.props;
+    const { displayState } = this.state;
+    const { searchTerm, type, host } = this.props;
+
     this.setState({
       assets: [],
       loading: true,
       isSearching: true,
-      cantConnect: false,
+      cantConnect: false
     });
     if (displayState === 'browseAssets') {
       if (searchTerm.trim() !== '') {
         const res = await Hosts.searchAssets(host, type, searchTerm);
         this.setState({
           assets: res,
-          loading: false,
+          loading: false
         });
       } else {
         this.browseAssets();
@@ -207,15 +201,8 @@ export default class DiscoverList extends Component {
   };
 
   render() {
-    let {
-      displayState,
-      assets,
-      loading,
-      activeAsset,
-      progressState,
-      cantConnect,
-    } = this.state;
-    let {
+    const { displayState, assets, loading, activeAsset, progressState, cantConnect } = this.state;
+    const {
       type,
       forceFramework,
       installClick,
@@ -224,7 +211,7 @@ export default class DiscoverList extends Component {
       host,
       mcVerFilter,
       forceVersionFilter,
-      specificMCVer,
+      specificMCVer
     } = this.props;
     return (
       <>
@@ -250,9 +237,7 @@ export default class DiscoverList extends Component {
                     />
                   );
                 })}
-              {assets && assets.length === 0 && !loading && (
-                <LoadingText key="none">No Results</LoadingText>
-              )}
+              {assets && assets.length === 0 && !loading && <LoadingText key="none">No Results</LoadingText>}
             </List>
             {loading && !cantConnect && <LoadingText>loading...</LoadingText>}
             {cantConnect && (
@@ -271,10 +256,7 @@ export default class DiscoverList extends Component {
                   <br />
                   <TryAgain onClick={this.tryAgain}>try again</TryAgain>
                   <Persists>
-                    problem persists?{' '}
-                    <a href="https://theemeraldtree.net/mcm/issues">
-                      report it here
-                    </a>
+                    problem persists? <a href="https://theemeraldtree.net/mcm/issues">report it here</a>
                   </Persists>
                 </LoadingText>
               </>
@@ -302,6 +284,26 @@ export default class DiscoverList extends Component {
   }
 }
 
+DiscoverList.propTypes = {
+  host: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  progressState: PropTypes.object,
+
+  forceFramework: PropTypes.bool,
+  forceVersionFilter: PropTypes.bool,
+  mcVerFilter: PropTypes.string,
+  allowVersionReinstallation: PropTypes.bool,
+  specificMCVer: PropTypes.string,
+
+  installClick: PropTypes.func,
+  versionInstall: PropTypes.func,
+  stateChange: PropTypes.func,
+
+  searchTerm: PropTypes.string,
+
+  state: PropTypes.string
+};
+
 DiscoverList.defaultProps = {
-  progressState: {},
+  progressState: {}
 };

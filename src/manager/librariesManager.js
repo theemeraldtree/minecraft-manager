@@ -35,39 +35,20 @@ const LibrariesManager = {
   renameLibrary(profile, newID) {
     if (profile.frameworks.forge || profile.frameworks.fabric) {
       // old library method check
-      const profileLibrary = path.join(
-        this.getMCMLibraries(),
-        `/mcm-${profile.id}`
-      );
-      if (
-        fs.existsSync(
-          path.join(profileLibrary, `/profiles-mcm-${profile.id}.jar`)
-        )
-      ) {
+      const profileLibrary = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
+      if (fs.existsSync(path.join(profileLibrary, `/profiles-mcm-${profile.id}.jar`))) {
         fs.renameSync(
           path.join(profileLibrary, `/profiles-mcm-${profile.id}.jar`),
           path.join(profileLibrary, `/profiles-mcm-${newID}.jar`)
         );
       } else if (profile.frameworks.fabric) {
         fs.renameSync(
-          path.join(
-            profileLibrary,
-            `/fabric-intermediary/mcm-${profile.id}-fabric-intermediary.jar`
-          ),
-          path.join(
-            profileLibrary,
-            `/fabric-intermediary/mcm-${newID}-fabric-intermediary.jar`
-          )
+          path.join(profileLibrary, `/fabric-intermediary/mcm-${profile.id}-fabric-intermediary.jar`),
+          path.join(profileLibrary, `/fabric-intermediary/mcm-${newID}-fabric-intermediary.jar`)
         );
         fs.renameSync(
-          path.join(
-            profileLibrary,
-            `/fabric-loader/mcm-${profile.id}-fabric-loader.jar`
-          ),
-          path.join(
-            profileLibrary,
-            `/fabric-loader/mcm-${newID}-fabric-loader.jar`
-          )
+          path.join(profileLibrary, `/fabric-loader/mcm-${profile.id}-fabric-loader.jar`),
+          path.join(profileLibrary, `/fabric-loader/mcm-${newID}-fabric-loader.jar`)
         );
       } else if (profile.frameworks.forge) {
         fs.renameSync(
@@ -76,18 +57,12 @@ const LibrariesManager = {
         );
       }
 
-      fs.renameSync(
-        profileLibrary,
-        path.join(this.getMCMLibraries(), `/mcm-${newID}`)
-      );
+      fs.renameSync(profileLibrary, path.join(this.getMCMLibraries(), `/mcm-${newID}`));
     }
   },
   deleteLibrary(profile) {
     return new Promise(resolve => {
-      const libraryPath = path.join(
-        this.getMCMLibraries(),
-        `/mcm-${profile.id}`
-      );
+      const libraryPath = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
       if (fs.existsSync(libraryPath)) {
         rimraf(libraryPath, () => {
           resolve();
@@ -98,22 +73,12 @@ const LibrariesManager = {
     });
   },
   cleanLibraries() {
-    LogManager.log(
-      'info',
-      '[LibrariesManager] [CleanLibraries] Starting clean libraries...'
-    );
+    LogManager.log('info', '[LibrariesManager] [CleanLibraries] Starting clean libraries...');
     fs.readdirSync(this.getMCMLibraries()).forEach(file => {
       if (file.substring(0, 4) === 'mcm-') {
-        if (
-          !ProfilesManager.loadedProfiles.find(
-            prof => file === `mcm-${prof.id}`
-          )
-        ) {
+        if (!ProfilesManager.loadedProfiles.find(prof => file === `mcm-${prof.id}`)) {
           rimraf.sync(path.join(this.getMCMLibraries(), file));
-          LogManager.log(
-            'info',
-            `[LibrariesManager] [CleanLibraries] Removed library ${file}`
-          );
+          LogManager.log('info', `[LibrariesManager] [CleanLibraries] Removed library ${file}`);
         }
       }
     });
@@ -132,7 +97,7 @@ const LibrariesManager = {
         akkaactorpath
       );
     }
-  },
+  }
 };
 
 export default LibrariesManager;

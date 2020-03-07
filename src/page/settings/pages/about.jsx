@@ -118,11 +118,7 @@ export default function About() {
             <h3>released {Global.MCM_RELEASE_DATE}</h3>
 
             <Updates>
-              <Button
-                onClick={checkForUpdates}
-                disabled={updateDisabled}
-                color="green"
-              >
+              <Button onClick={checkForUpdates} disabled={updateDisabled} color="green">
                 {updateText}
               </Button>
               <h3>{updateSubText}</h3>
@@ -132,17 +128,12 @@ export default function About() {
         <AboutBottom>
           <h3>
             <a href="https://github.com/theemeraldtree/minecraft-manager/blob/master/LICENSE">
-              Minecraft Manager is licensed under the GNU General Public License
-              v3
+              Minecraft Manager is licensed under the GNU General Public License v3
             </a>
           </h3>
           <h3>
-            <a
-              title="Minecraft Manager Source Code"
-              href="https://github.com/theemeraldtree/minecraft-manager"
-            >
-              Minecraft Manager is an open source project created by
-              theemeraldtree and stairman06
+            <a title="Minecraft Manager Source Code" href="https://github.com/theemeraldtree/minecraft-manager">
+              Minecraft Manager is an open source project created by theemeraldtree and stairman06
             </a>
           </h3>
           <h3>
@@ -151,10 +142,7 @@ export default function About() {
             </a>
           </h3>
           <h3>
-            <a
-              title="OMAF Wiki and Documentation"
-              href="https://github.com/theemeraldtree/omaf/wiki"
-            >
+            <a title="OMAF Wiki and Documentation" href="https://github.com/theemeraldtree/omaf/wiki">
               Minecraft Manager uses the open-source OMAF standard
             </a>
           </h3>
@@ -175,9 +163,7 @@ export default function About() {
             <a href="https://www.styled-components.com/">styled-components</a>
           </li>
           <li>
-            <a href="https://github.com/gabiseabra/styled-transition-group">
-              styled-transition-group
-            </a>
+            <a href="https://github.com/gabiseabra/styled-transition-group">styled-transition-group</a>
           </li>
           <li>
             <a href="https://babeljs.io/">Babel</a>
@@ -192,9 +178,7 @@ export default function About() {
             <a href="https://github.com/isaacs/rimraf">rimraf</a>
           </li>
           <li>
-            <a href="https://github.com/request/request-promise">
-              request-promise
-            </a>
+            <a href="https://github.com/request/request-promise">request-promise</a>
           </li>
           <li>
             <a href="https://github.com/cthackers/adm-zip">adm-zip</a>
@@ -203,60 +187,40 @@ export default function About() {
             <a href="https://github.com/archiverjs/node-archiver">archiver</a>
           </li>
           <li>
-            <a href="https://github.com/vkbansal/react-contextmenu">
-              react-contextmenu
-            </a>
+            <a href="https://github.com/vkbansal/react-contextmenu">react-contextmenu</a>
           </li>
           <li>
-            <a href="https://reacttraining.com/react-router/">
-              react-router & react-router-dom
-            </a>
+            <a href="https://reacttraining.com/react-router/">react-router & react-router-dom</a>
           </li>
           <li>
             <a href="https://github.com/oliver-moran/jimp">jimp</a>
           </li>
           <li>
-            <a href="https://github.com/apostrophecms/sanitize-html">
-              sanitize-html
-            </a>
+            <a href="https://github.com/apostrophecms/sanitize-html">sanitize-html</a>
           </li>
           <li>
-            <a href="https://fonts.google.com/specimen/Roboto">
-              the Roboto font
-            </a>
+            <a href="https://fonts.google.com/specimen/Roboto">the Roboto font</a>
           </li>
           <li>
-            <a href="https://github.com/KyleAMathews/typefaces/tree/master/packages/roboto">
-              typeface-roboto
-            </a>
+            <a href="https://github.com/KyleAMathews/typefaces/tree/master/packages/roboto">typeface-roboto</a>
           </li>
           <li>
-            <a href="https://github.com/ooade/react-click-away-listener">
-              react-click-away-listener
-            </a>
+            <a href="https://github.com/ooade/react-click-away-listener">react-click-away-listener</a>
           </li>
           <li>other projects</li>
           and of course, YOU! Thank you!
         </h3>
         <h3>
-          Also, huge credit to{' '}
-          <a href="https://github.com/robotbrain/ForgeTheSane">
-            robotbrain's ForgeTheSane
-          </a>{' '}
-          and{' '}
-          <a href="https://github.com/Stonebound/ForgeTheSane">
-            Stonebound's fork
-          </a>
-          . Because of these open source projects, we have Forge 1.13+ support!
+          Also, huge credit to <a href="https://github.com/robotbrain/ForgeTheSane">robotbrain's ForgeTheSane</a> and{' '}
+          <a href="https://github.com/Stonebound/ForgeTheSane">Stonebound's fork</a>. Because of these open source
+          projects, we have Forge 1.13+ support!
         </h3>
       </Section>
       <Section>
         <h2>Other things to check out</h2>
         <h3>
           <li>
-            <a href="https://stopmodreposts.org">
-              #StopModReposts - stopmodreposts.org
-            </a>
+            <a href="https://stopmodreposts.org">#StopModReposts - stopmodreposts.org</a>
           </li>
           <li>
             <a href="https://fabricmc.net">FabricMC website</a>

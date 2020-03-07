@@ -29,11 +29,7 @@ const ForgeFramework = {
         let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-universal.jar`;
         if (mcversion === '1.7.10') {
           downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-1.7.10/forge-${profile.frameworks.forge.version}-1.7.10-universal.jar`;
-        } else if (
-          mcversion === '1.8.9' ||
-          mcversion === '1.8.8' ||
-          mcversion === '1.8'
-        ) {
+        } else if (mcversion === '1.8.9' || mcversion === '1.8.8' || mcversion === '1.8') {
           downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-${mcversion}/forge-${profile.frameworks.forge.version}-${mcversion}-universal.jar`;
         }
 
@@ -50,11 +46,7 @@ const ForgeFramework = {
     new Promise(resolve => {
       LibrariesManager.deleteLibrary(profile).then(() => {
         VersionsManager.deleteVersion(profile).then(() => {
-          LauncherManager.setProfileData(
-            profile,
-            'lastVersionId',
-            profile.version.minecraft.version
-          );
+          LauncherManager.setProfileData(profile, 'lastVersionId', profile.version.minecraft.version);
           profile.removeFramework('forge');
           resolve();
         });
@@ -62,12 +54,12 @@ const ForgeFramework = {
     }),
   getForgePromotions: () =>
     new Promise(resolve => {
-      HTTPRequest.httpGet(
-        'https://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions.json'
-      ).then(promotions => {
-        resolve(promotions);
-      });
-    }),
+      HTTPRequest.httpGet('https://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions.json').then(
+        promotions => {
+          resolve(promotions);
+        }
+      );
+    })
 };
 
 export default ForgeFramework;

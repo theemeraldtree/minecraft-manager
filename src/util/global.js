@@ -29,7 +29,7 @@ const Global = {
   ALL_VERSIONS: [],
   cacheUpdateTime: new Date().getTime(),
   cached: {
-    versions: {},
+    versions: {}
   },
 
   MCM_VERSION: '2.3.0',
@@ -39,17 +39,11 @@ const Global = {
 
   dateMatches(d1) {
     const d2 = new Date();
-    return (
-      d1.getFullYear() === d2.getFullYear() &&
-      d1.getMonth() === d2.getMonth() &&
-      d1.getDate() === d2.getDate()
-    );
+    return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
   },
   async checkToastNews() {
     try {
-      const req = await HTTPRequest.get(
-        'https://theemeraldtree.net/toastnews.json'
-      );
+      const req = await HTTPRequest.get('https://theemeraldtree.net/toastnews.json');
       const news = JSON.parse(req);
 
       if (SettingsManager.currentSettings.lastToastNewsID === undefined) {
@@ -57,8 +51,7 @@ const Global = {
       }
 
       if (
-        (SettingsManager.currentSettings.lastToastNewsID < news.id ||
-          news.repeat) &&
+        (SettingsManager.currentSettings.lastToastNewsID < news.id || news.repeat) &&
         this.dateMatches(new Date(news.dateToShow))
       ) {
         ToastManager.createToast(news.title, news.message);
@@ -66,19 +59,12 @@ const Global = {
         SettingsManager.setLastToastNewsID(news.id);
       }
     } catch (e) {
-      ToastManager.createToast(
-        'Error',
-        `Error checking for MCM news: ${e.toString()}`
-      );
+      ToastManager.createToast('Error', `Error checking for MCM news: ${e.toString()}`);
     }
   },
   checkChangelog() {
     const version = SettingsManager.currentSettings.lastVersion;
-    if (
-      !version ||
-      (semver.gt(this.MCM_VERSION, version) &&
-        this.MCM_VERSION.indexOf('beta') === -1)
-    ) {
+    if (!version || (semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1)) {
       ToastManager.createToast(
         `Welcome to ${this.MCM_VERSION}`,
         `With Forge 1.13+ support, Resource Packs, UI Tweaks, and more. <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`
@@ -91,11 +77,7 @@ const Global = {
     let req;
     try {
       if (fs.existsSync(path.join(this.MCM_PATH, '/mcvercache.json'))) {
-        this.parseVersionsJSON(
-          JSON.parse(
-            fs.readFileSync(path.join(this.MCM_PATH, '/mcvercache.json'))
-          )
-        );
+        this.parseVersionsJSON(JSON.parse(fs.readFileSync(path.join(this.MCM_PATH, '/mcvercache.json'))));
       }
     } catch (e) {
       ToastManager.createToast(
@@ -105,9 +87,7 @@ const Global = {
     }
 
     try {
-      req = await HTTPRequest.get(
-        'https://launchermeta.mojang.com/mc/game/version_manifest.json'
-      );
+      req = await HTTPRequest.get('https://launchermeta.mojang.com/mc/game/version_manifest.json');
     } catch (e) {
       req = undefined;
     }
@@ -129,11 +109,7 @@ const Global = {
     let totalCount = 0;
     fs.readdirSync(VersionsManager.getVersionsPath()).forEach(file => {
       if (file.indexOf('[Minecraft Manager]') !== -1) {
-        if (
-          !ProfilesManager.loadedProfiles.find(
-            prof => prof.versionname === file
-          )
-        ) {
+        if (!ProfilesManager.loadedProfiles.find(prof => prof.versionname === file)) {
           totalCount++;
         }
       }
@@ -147,15 +123,11 @@ const Global = {
     }
   },
   checkMinecraftProfiles() {
-    const obj = JSON.parse(
-      fs.readFileSync(LauncherManager.getLauncherProfiles())
-    );
+    const obj = JSON.parse(fs.readFileSync(LauncherManager.getLauncherProfiles()));
     let totalCount = 0;
     Object.keys(obj.profiles).forEach(key => {
       if (key.substring(0, 4) === 'mcm-') {
-        if (
-          !ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)
-        ) {
+        if (!ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)) {
           totalCount++;
         }
       }
@@ -173,11 +145,7 @@ const Global = {
     let totalCount = 0;
     fs.readdirSync(LibrariesManager.getMCMLibraries()).forEach(file => {
       if (file.substring(0, 4) === 'mcm-') {
-        if (
-          !ProfilesManager.loadedProfiles.find(
-            prof => file === `mcm-${prof.id}`
-          )
-        ) {
+        if (!ProfilesManager.loadedProfiles.find(prof => file === `mcm-${prof.id}`)) {
           totalCount++;
         }
       }
@@ -202,10 +170,7 @@ const Global = {
         this.MC_VERSIONS.push(ver.id);
       }
     }
-    fs.writeFileSync(
-      path.join(this.MCM_PATH, '/mcvercache.json'),
-      JSON.stringify(versionsJSON)
-    );
+    fs.writeFileSync(path.join(this.MCM_PATH, '/mcvercache.json'), JSON.stringify(versionsJSON));
   },
   getMCFilterOptions() {
     const copy = this.MC_VERSIONS.slice(0);
@@ -269,9 +234,7 @@ const Global = {
   },
   getDefaultMCExePath: () => {
     if (os.platform() === 'win32') {
-      const def = path.join(
-        'C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe'
-      );
+      const def = path.join('C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe');
       if (fs.existsSync(def)) {
         return def;
       }
@@ -295,10 +258,7 @@ const Global = {
           fs.mkdirSync(dest);
         }
         fs.readdirSync(src).forEach(childItem => {
-          this.copyDirSync(
-            path.join(src, childItem),
-            path.join(dest, childItem)
-          );
+          this.copyDirSync(path.join(src, childItem), path.join(dest, childItem));
         });
       } else if (!fs.existsSync(dest)) {
         fs.linkSync(src, dest);
@@ -321,13 +281,9 @@ const Global = {
         if (files) {
           if (files.length !== profile.resourcepacks.length) {
             files.forEach(file => {
-              const fullPath = path.join(
-                profile.gameDir,
-                `/resourcepacks/${file}`
-              );
+              const fullPath = path.join(profile.gameDir, `/resourcepacks/${file}`);
               const doesExist = profile.resourcepacks.find(
-                rp =>
-                  path.join(profile.gameDir, rp.getMainFile().path) === fullPath
+                rp => path.join(profile.gameDir, rp.getMainFile().path) === fullPath
               );
               if (!doesExist) {
                 if (path.extname(file) === '.zip') {
@@ -337,9 +293,7 @@ const Global = {
                   let description;
                   entries.forEach(entry => {
                     if (entry.entryName === 'pack.mcmeta') {
-                      const parsed = JSON.parse(
-                        entry.getData().toString('utf8')
-                      );
+                      const parsed = JSON.parse(entry.getData().toString('utf8'));
                       if (parsed && parsed.pack) {
                         if (parsed.pack.description) {
                           description = parsed.pack.description;
@@ -349,10 +303,7 @@ const Global = {
 
                     if (entry.entryName === 'pack.png') {
                       fs.writeFileSync(
-                        path.join(
-                          profile.profilePath,
-                          `/_mcm/icons/resourcepacks/${file}`
-                        ),
+                        path.join(profile.profilePath, `/_mcm/icons/resourcepacks/${file}`),
                         entry.getData()
                       );
                       iconPath = `/_mcm/icons/resourcepacks/${file}`;
@@ -371,8 +322,8 @@ const Global = {
                       version: {
                         displayName: file,
                         minecraft: {
-                          supportedVersions: ['unknown'],
-                        },
+                          supportedVersions: ['unknown']
+                        }
                       },
                       blurb: description,
                       description: `Imported from ${file}`,
@@ -382,10 +333,10 @@ const Global = {
                           displayName: 'Main File',
                           type: 'resourcepackzip',
                           priority: 'mainFile',
-                          path: `resourcepacks/${file}`,
-                        },
+                          path: `resourcepacks/${file}`
+                        }
                       ],
-                      dependencies: [],
+                      dependencies: []
                     })
                   );
                   profile.save();
@@ -416,8 +367,7 @@ const Global = {
             files.forEach(file => {
               const fullPath = path.join(profile.gameDir, `/mods/${file}`);
               const doesExist = profile.mods.find(
-                mod =>
-                  path.join(profile.gameDir, mod.getJARFile().path) === fullPath
+                mod => path.join(profile.gameDir, mod.getJARFile().path) === fullPath
               );
               if (!doesExist) {
                 LogManager.log(
@@ -432,8 +382,8 @@ const Global = {
                     version: {
                       displayName: file,
                       minecraft: {
-                        supportedVersions: ['unknown'],
-                      },
+                        supportedVersions: ['unknown']
+                      }
                     },
                     blurb: `Imported from ${file}`,
                     description: `Imported from ${file}`,
@@ -443,10 +393,10 @@ const Global = {
                         displayName: 'Main JAR File',
                         type: 'jar',
                         priority: 'mainFile',
-                        path: `mods/${file}`,
-                      },
+                        path: `mods/${file}`
+                      }
                     ],
-                    dependencies: [],
+                    dependencies: []
                   })
                 );
                 profile.save();
@@ -516,7 +466,7 @@ const Global = {
         if (!(profile.version instanceof Object)) {
           profile.version = {
             displayname: profile.version,
-            timestamp: profile.versionTimestamp,
+            timestamp: profile.versionTimestamp
           };
 
           profile.versionTimestamp = undefined;
@@ -545,7 +495,7 @@ const Global = {
         for (const mod of profile.mods) {
           if (mod.version.minecraftversions) {
             mod.version.minecraft = {
-              supportedVersions: mod.version.minecraftversions,
+              supportedVersions: mod.version.minecraftversions
             };
 
             mod.version.minecraftversions = undefined;
@@ -604,12 +554,11 @@ const Global = {
   },
   getJavaPath() {
     const platforms = {
-      win32:
-        'C:\\Program Files (x86)\\Minecraft Launcher\\runtime\\jre-x64\\bin\\java.exe',
+      win32: 'C:\\Program Files (x86)\\Minecraft Launcher\\runtime\\jre-x64\\bin\\java.exe'
     };
 
     return platforms[os.platform()];
-  },
+  }
 };
 
 export default Global;

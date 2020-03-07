@@ -11,5 +11,5 @@ export default function EditPageMods({ id }) {
 }
 
 EditPageMods.propTypes = {
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired
 };

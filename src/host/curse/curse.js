@@ -9,7 +9,7 @@ import LogManager from '../../manager/logManager';
 import DownloadsManager from '../../manager/downloadsManager';
 import GenericAsset from '../../type/genericAsset';
 
-const admzip = require('adm-zip');
+const ADMZip = require('adm-zip');
 
 // the curse object is used as a sort of "translator" to convert curse's data format to work with OMAF
 const Curse = {
@@ -37,10 +37,10 @@ const Curse = {
           dateModified: asset.dateModified,
 
           localValues: {
-            gameVerLatestFiles: asset.gameVersionLatestFiles,
-          },
-        },
-      },
+            gameVerLatestFiles: asset.gameVersionLatestFiles
+          }
+        }
+      }
     };
 
     if (asset.attachments && asset.attachments.length) {
@@ -65,6 +65,8 @@ const Curse = {
         return 'resourcepack';
       case 17:
         return 'world';
+      default:
+        return undefined;
     }
   },
 
@@ -78,15 +80,15 @@ const Curse = {
         return 12;
       case 'world':
         return 17;
+      default:
+        return undefined;
     }
   },
 
   // read a list of curse assets (typically returned by a search function)
   readAssetList(list) {
     return list.map(asset => {
-      const type = this.getTypeFromCurseID(
-        asset.categorySection.gameCategoryId
-      );
+      const type = this.getTypeFromCurseID(asset.categorySection.gameCategoryId);
 
       const omaf = this.convertToOMAF(asset);
       let obj;
@@ -107,12 +109,9 @@ const Curse = {
   },
 
   async getDescription(asset) {
-    return await Hosts.HTTPGet(
-      `${this.URL_BASE}/${asset.hosts.curse.id}/description`,
-      {
-        addonID: asset.hosts.curse.id,
-      }
-    );
+    return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/description`, {
+      addonID: asset.hosts.curse.id
+    });
   },
 
   convertCurseVersion(ver) {
@@ -127,20 +126,20 @@ const Curse = {
       displayName: ver.displayName,
       timestamp: new Date(ver.fileDate).getTime(),
       minecraft: {
-        supportedVersions: ver.gameVersion,
+        supportedVersions: ver.gameVersion
       },
       cachedID: cacheID,
       TEMP: {
-        downloadUrl: ver.downloadUrl,
+        downloadUrl: ver.downloadUrl
       },
       hosts: {
         curse: {
           fileID: ver.id,
           localValues: {
-            inferredModloader,
-          },
-        },
-      },
+            inferredModloader
+          }
+        }
+      }
     };
 
     Global.cached.versions[cacheID] = obj;
@@ -148,14 +147,13 @@ const Curse = {
   },
 
   async getFileInfo(asset, fileID) {
-    const res = await Hosts.HTTPGet(
-      `${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}`
-    );
+    const res = await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}`);
     if (res) return JSON.parse(res);
     return undefined;
   },
 
-  async addFileInfo(asset, fileID) {
+  async addFileInfo(assetT, fileID) {
+    const asset = assetT;
     const info = await this.getFileInfo(asset, fileID);
 
     if (info) {
@@ -169,11 +167,13 @@ const Curse = {
           return {
             hosts: {
               curse: {
-                id: dependency.addonId,
-              },
-            },
+                id: dependency.addonId
+              }
+            }
           };
         }
+
+        return undefined;
       });
 
       Hosts.cache.assets[asset.cachedID] = asset;
@@ -184,9 +184,7 @@ const Curse = {
   },
 
   async getInfo(asset) {
-    return JSON.parse(
-      await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}`)
-    );
+    return JSON.parse(await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}`));
   },
 
   async getFullAsset(asset, type) {
@@ -209,7 +207,7 @@ const Curse = {
       categoryId: 0,
       sort: 1,
       pageSize: 20,
-      index: 0,
+      index: 0
     });
 
     if (result) return this.readAssetList(JSON.parse(result));
@@ -217,7 +215,8 @@ const Curse = {
   },
 
   // add potentially missing info (e.g. description) to an asset
-  async addMissingInfo(info, asset) {
+  async addMissingInfo(info, assetT) {
+    const asset = assetT;
     if (info === 'description') {
       const desc = await this.getDescription(asset);
       asset.description = desc;
@@ -227,6 +226,8 @@ const Curse = {
       Hosts.cache.assets[asset.cachedID] = asset;
       return asset;
     }
+
+    return undefined;
   },
 
   // gets the popular assets for a certain asset type (e.g. mod)
@@ -241,7 +242,8 @@ const Curse = {
   },
 
   // gets the dependencies required for an asset
-  async getDependencies(asset) {
+  async getDependencies(assetT) {
+    const asset = assetT;
     let newAsset;
     if (!asset.installed) {
       newAsset = await this.addFileInfo(asset, asset.hosts.curse.latestFileID);
@@ -250,10 +252,7 @@ const Curse = {
     }
 
     if (newAsset) {
-      const final = [];
-      for (const dependency of newAsset.dependencies) {
-        final.push(await this.getFullAsset(dependency));
-      }
+      const final = newAsset.dependencies.map(async dependency => this.getFullAsset(dependency));
 
       if (!asset.cachedID) {
         asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
@@ -266,17 +265,13 @@ const Curse = {
   },
 
   // gets the versions for an asset
-  async getVersions(asset) {
-    const req = await Hosts.HTTPGet(
-      `${this.URL_BASE}/${asset.hosts.curse.id}/files`
-    );
+  async getVersions(assetT) {
+    const asset = assetT;
+    const req = await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/files`);
     if (req) {
       const results = JSON.parse(req);
-      const sorted = results.sort(
-        (a, b) =>
-          new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime()
-      );
-      const final = sorted.map(ver => (ver = this.convertCurseVersion(ver)));
+      const sorted = results.sort((a, b) => new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime());
+      const final = sorted.map(ver => this.convertCurseVersion(ver));
 
       if (!asset.cachedID) {
         asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
@@ -295,10 +290,7 @@ const Curse = {
 
   // gets the latest version of the asset available for a specific minecraft version
   async getLatestVersionForMCVersion(asset, mcVersion, modloader) {
-    if (
-      asset.hosts.curse.localValues &&
-      asset.hosts.curse.localValues.gameVerLatestFiles
-    ) {
+    if (asset.hosts.curse.localValues && asset.hosts.curse.localValues.gameVerLatestFiles) {
       // curse does a terrible job indicating whether a file is forge or fabric
       // we have to make a bunch of guesses
 
@@ -314,9 +306,7 @@ const Curse = {
         } else {
           modloaderEqual = true;
         }
-        return (
-          ver.minecraft.supportedVersions.includes(mcVersion) && modloaderEqual
-        );
+        return ver.minecraft.supportedVersions.includes(mcVersion) && modloaderEqual;
       });
 
       if (file) {
@@ -327,45 +317,27 @@ const Curse = {
       return undefined;
     }
 
-    return await this.getLatestVersionForMCVersion(
-      await this.getFullAsset(asset),
-      mcVersion,
-      modloader
-    );
+    return this.getLatestVersionForMCVersion(await this.getFullAsset(asset), mcVersion, modloader);
   },
 
   // gets the changelog from a file id
   async getFileChangelog(asset, fileID) {
-    return await Hosts.HTTPGet(
-      `${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}/changelog`
-    );
+    return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}/changelog`);
   },
 
   // downloads, extracts, and reads the version of a modpack to get the mods list
   async downloadModsListFromModpack(mp, downloadUrl) {
     return new Promise(resolve => {
       const modpack = mp;
-      const infoDownload = path.join(
-        Global.MCM_TEMP,
-        `${modpack.id}-install.zip`
-      );
-      DownloadsManager.startFileDownload(
-        `${modpack.name}\n_A_Info`,
-        downloadUrl,
-        infoDownload
-      ).then(async () => {
-        const zip = new admzip(infoDownload);
+      const infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`);
+      DownloadsManager.startFileDownload(`${modpack.name}\n_A_Info`, downloadUrl, infoDownload).then(async () => {
+        const zip = new ADMZip(infoDownload);
 
-        const extractPath = path.join(
-          Global.MCM_TEMP,
-          `${modpack.id}-install/`
-        );
+        const extractPath = path.join(Global.MCM_TEMP, `${modpack.id}-install/`);
         zip.extractAllTo(extractPath, false);
         fs.unlinkSync(infoDownload);
 
-        const manifest = JSON.parse(
-          fs.readFileSync(path.join(extractPath, 'manifest.json'))
-        );
+        const manifest = JSON.parse(fs.readFileSync(path.join(extractPath, 'manifest.json')));
 
         const list = manifest.files.map(file => {
           // i'm not sure why required is an option in the manifest...
@@ -377,13 +349,15 @@ const Curse = {
               hosts: {
                 curse: {
                   id: file.projectID,
-                  fileID: file.fileID,
-                },
+                  fileID: file.fileID
+                }
               },
-              cachedID: `curse-mod-install-${file.projectID}`,
+              cachedID: `curse-mod-install-${file.projectID}`
             });
             return mod;
           }
+
+          return undefined;
         });
         resolve(list);
       });
@@ -398,16 +372,10 @@ const Curse = {
       fs.readdirSync(overridesFolder).forEach(file => {
         if (file === 'mods') {
           fs.readdirSync(path.join(overridesFolder, file)).forEach(f => {
-            Global.copyDirSync(
-              path.join(overridesFolder, file, f),
-              path.join(profile.gameDir, file, f)
-            );
+            Global.copyDirSync(path.join(overridesFolder, file, f), path.join(profile.gameDir, file, f));
           });
         } else {
-          Global.copyDirSync(
-            path.join(overridesFolder, file),
-            path.join(profile.gameDir, file)
-          );
+          Global.copyDirSync(path.join(overridesFolder, file), path.join(profile.gameDir, file));
         }
       });
     }
@@ -421,25 +389,17 @@ const Curse = {
 
   // gets the forge version from the extractpath
   getForgeVersionForModpackInstall(profile) {
-    const manifest = JSON.parse(
-      fs.readFileSync(
-        path.join(Global.MCM_TEMP, `${profile.id}-install/manifest.json`)
-      )
-    );
+    const manifest = JSON.parse(fs.readFileSync(path.join(Global.MCM_TEMP, `${profile.id}-install/manifest.json`)));
     if (manifest.minecraft.modLoaders[0]) {
-      return `${
-        manifest.minecraft.version
-      }-${manifest.minecraft.modLoaders[0].id.substring(6)}`;
+      return `${manifest.minecraft.version}-${manifest.minecraft.modLoaders[0].id.substring(6)}`;
     }
+
+    return undefined;
   },
 
   // gets the minecraft version from the extractpath
   getMinecraftVersionFromModpackInstall(modpack) {
-    const manifest = JSON.parse(
-      fs.readFileSync(
-        path.join(Global.MCM_TEMP, `${modpack.id}-install/manifest.json`)
-      )
-    );
+    const manifest = JSON.parse(fs.readFileSync(path.join(Global.MCM_TEMP, `${modpack.id}-install/manifest.json`)));
     return manifest.minecraft.version;
   },
 
@@ -448,6 +408,7 @@ const Curse = {
     const versions = await Hosts.getVersions('curse', asset);
     let newver;
     if (versions) {
+      // eslint-disable-next-line no-restricted-syntax
       for (const ver of versions.slice().reverse()) {
         if (new Date(ver.timestamp).getTime() > asset.version.timestamp) {
           newver = ver;
@@ -457,7 +418,7 @@ const Curse = {
       return 'no-connection';
     }
     return newver;
-  },
+  }
 };
 
 export default Curse;

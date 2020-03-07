@@ -50,9 +50,7 @@ export default function Mod(rawoamf) {
   };
 
   this.setJARFile = function(newJARFile) {
-    const existing = this.files.find(
-      file => file.type === 'jar' && file.priority === 'mainFile'
-    );
+    const existing = this.files.find(file => file.type === 'jar' && file.priority === 'mainFile');
 
     if (existing) {
       existing.path = `mods/${newJARFile}`;
@@ -61,7 +59,7 @@ export default function Mod(rawoamf) {
         displayName: 'Main JAR File',
         type: 'jar',
         priority: 'mainFile',
-        path: `mods/${newJARFile}`,
+        path: `mods/${newJARFile}`
       });
     }
   };
@@ -73,7 +71,7 @@ export default function Mod(rawoamf) {
       }
     }
     return {
-      path: undefined,
+      path: undefined
     };
   };
 

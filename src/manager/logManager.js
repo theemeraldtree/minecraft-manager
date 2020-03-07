@@ -17,7 +17,7 @@ const LogManager = {
         console.error(`!!! ERROR MISSING SEVERITY !!! ${message}`);
         break;
     }
-  },
+  }
 };
 
 export default LogManager;

@@ -83,14 +83,7 @@ const Items = transition.div`
 const Header = ({ history }) => {
   const { header } = useContext(NavContext);
 
-  const {
-    title,
-    children,
-    backLink,
-    showBackButton,
-    showChildren,
-    onBackClick,
-  } = header;
+  const { title, children, backLink, showBackButton, showChildren, onBackClick } = header;
 
   const click = () => {
     if (!backLink) {
@@ -100,12 +93,7 @@ const Header = ({ history }) => {
   };
   return (
     <BG>
-      <BackButton
-        unmountOnExit
-        in={showBackButton}
-        timeout={150}
-        onClick={click}
-      >
+      <BackButton unmountOnExit in={showBackButton} timeout={150} onClick={click}>
         {!backLink && '←'}
         {backLink && <Link to={backLink}>←</Link>}
       </BackButton>
@@ -118,7 +106,7 @@ const Header = ({ history }) => {
 };
 
 Header.propTypes = {
-  history: PropTypes.node.isRequired,
+  history: PropTypes.node.isRequired
 };
 
 export default withRouter(Header);

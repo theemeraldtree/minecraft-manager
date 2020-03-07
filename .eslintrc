@@ -24,6 +24,13 @@
     "react/destructuring-assignment": "off",
     "react/require-default-props": "off",
     "react/no-unescaped-entities": "off",
-    "react/jsx-props-no-spreading": "off"
+    "react/jsx-props-no-spreading": "off",
+    "react/jsx-curly-newline": "off",
+    "react/no-danger": "off",
+    "import/no-cycle": "off",
+    "no-async-promise-executor": "off",
+    "prefer-destructuring": "off",
+    "no-plusplus": "off",
+    "radix": "off"
   }
 }

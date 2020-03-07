@@ -38,7 +38,7 @@ const LauncherManager = {
       gameDir: path.join(profile.gameDir),
       lastVersionId: profile.version.minecraft.version,
       lastUsed: new Date().toISOString(),
-      javaArgs: `-Xmx${SettingsManager.currentSettings.dedicatedRam}G ${this.DEFAULT_JAVA_ARGS}`,
+      javaArgs: `-Xmx${SettingsManager.currentSettings.dedicatedRam}G ${this.DEFAULT_JAVA_ARGS}`
     };
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
   },
@@ -53,10 +53,7 @@ const LauncherManager = {
     const oldData = obj.profiles[oldID];
     obj.profiles[`mcm-${newID}`] = oldData;
     delete obj.profiles[oldID];
-    obj.profiles[`mcm-${newID}`].gameDir = path.join(
-      Global.PROFILES_PATH,
-      `/${newID}/files`
-    );
+    obj.profiles[`mcm-${newID}`].gameDir = path.join(Global.PROFILES_PATH, `/${newID}/files`);
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
   },
   setProfileData(profile, tag, val) {
@@ -85,41 +82,24 @@ const LauncherManager = {
   },
   setDedicatedRam(amount) {
     for (const profile of ProfilesManager.loadedProfiles) {
-      this.setLaunchArguments(
-        profile,
-        `-Xmx${amount}G ${this.DEFAULT_JAVA_ARGS}`
-      );
+      this.setLaunchArguments(profile, `-Xmx${amount}G ${this.DEFAULT_JAVA_ARGS}`);
     }
   },
   cleanMinecraftProfiles() {
-    LogManager.log(
-      'info',
-      '[LauncherManager] [CleanMinecraftProfiles] Starting clean...'
-    );
+    LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Starting clean...');
     const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
     Object.keys(obj.profiles).forEach(key => {
       if (key.substring(0, 4) === 'mcm-') {
-        if (
-          !ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)
-        ) {
+        if (!ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)) {
           delete obj.profiles[key];
-          LogManager.log(
-            'info',
-            `[LauncherManager] [CleanMinecraftProfiles] Removed profile key ${key}`
-          );
+          LogManager.log('info', `[LauncherManager] [CleanMinecraftProfiles] Removed profile key ${key}`);
         }
       }
     });
-    LogManager.log(
-      'info',
-      '[LauncherManager] [CleanMinecraftProfiles] Writing changes...'
-    );
+    LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Writing changes...');
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
-    LogManager.log(
-      'info',
-      '[LauncherManager] [CleanMinecraftProfiles] Successfully written'
-    );
-  },
+    LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Successfully written');
+  }
 };
 
 export default LauncherManager;

@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import path from 'path';
 import Button from '../button/button';
 import ProfilesManager from '../../manager/profilesManager';
-import path from 'path';
 import Overlay from '../overlay/overlay';
 import AlertBackground from '../alert/alertbackground';
+
 const { dialog } = require('electron').remote;
 
 const BG = styled(AlertBackground)`
@@ -18,11 +20,13 @@ const BG = styled(AlertBackground)`
   flex-flow: column;
   min-height: 100px;
 `;
+
 const Title = styled.p`
   margin: 0;
   font-weight: 200;
   font-size: 21pt;
 `;
+
 const Subtext = styled.p`
   margin: 0;
 `;
@@ -42,6 +46,7 @@ const ButtonContainer = styled.div`
   display: flex;
   align-items: center;
 `;
+
 export default class ImportOverlay extends Component {
   constructor(props) {
     super(props);
@@ -50,8 +55,9 @@ export default class ImportOverlay extends Component {
       error: ''
     };
   }
+
   chooseFile = () => {
-    let p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialog({
       title: 'Choose a file to import',
       buttonLabel: 'Import',
       filters: [
@@ -67,11 +73,13 @@ export default class ImportOverlay extends Component {
         .catch(this.error);
     }
   };
+
   stateChange = stateChange => {
     this.setState({
       updateState: stateChange
     });
   };
+
   done = () => {
     ProfilesManager.getProfiles().then(() => {
       this.props.cancelClick();
@@ -80,17 +88,20 @@ export default class ImportOverlay extends Component {
       });
     });
   };
+
   error = err => {
     this.setState({
       showError: true,
       error: err.toString()
     });
   };
+
   importFile = () => {
     ProfilesManager.importProfile(this.props.file, this.stateChange)
       .then(this.done)
       .catch(this.error);
   };
+
   render() {
     const { updateState, showError, error } = this.state;
     const { cancelClick, file } = this.props;
@@ -152,3 +163,9 @@ export default class ImportOverlay extends Component {
     );
   }
 }
+
+ImportOverlay.propTypes = {
+  cancelClick: PropTypes.func.isRequired,
+  file: PropTypes.object,
+  in: PropTypes.bool
+};

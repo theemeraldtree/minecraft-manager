@@ -7,9 +7,10 @@ export default class Alert extends PureComponent {
   constructor() {
     super();
     this.state = {
-      alerts: [],
+      alerts: []
     };
   }
+
   componentDidMount() {
     AlertManager.registerHandler(this.updateAlerts);
   }
@@ -17,7 +18,7 @@ export default class Alert extends PureComponent {
   updateAlerts = () => {
     this.setState(
       {
-        alerts: AlertManager.alerts,
+        alerts: AlertManager.alerts
       },
       () => {
         this.forceUpdate();
@@ -33,12 +34,7 @@ export default class Alert extends PureComponent {
     return (
       <Overlay in={this.state.alerts.length >= 1} force>
         {this.state.alerts.map(alert => (
-          <AlertObject
-            key={alert.id}
-            dismiss={this.dismiss}
-            id={alert.id}
-            buttons={alert.buttons}
-          >
+          <AlertObject key={alert.id} dismiss={this.dismiss} id={alert.id} buttons={alert.buttons}>
             {alert.html}
           </AlertObject>
         ))}

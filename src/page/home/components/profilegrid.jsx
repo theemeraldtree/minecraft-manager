@@ -20,7 +20,7 @@ export default class ProfileGrid extends Component {
     super(props);
     this.state = {
       profiles: [],
-      showDelete: false,
+      showDelete: false
     };
   }
 
@@ -35,39 +35,39 @@ export default class ProfileGrid extends Component {
 
   updateProfiles = () => {
     this.setState({
-      profiles: ProfilesManager.loadedProfiles,
+      profiles: ProfilesManager.loadedProfiles
     });
   };
 
   showUpdate = profile => {
     this.setState({
       showUpdate: true,
-      activeProfile: profile,
+      activeProfile: profile
     });
   };
 
   cancelUpdate = () => {
     this.setState({
-      showUpdate: false,
+      showUpdate: false
     });
   };
 
   showShare = profile => {
     this.setState({
       showShare: true,
-      activeProfile: profile,
+      activeProfile: profile
     });
   };
 
   cancelShare = () => {
     this.setState({
-      showShare: false,
+      showShare: false
     });
   };
 
   showDeletion = profile => {
     this.setState({
-      deletingProfile: profile,
+      deletingProfile: profile
     });
 
     AlertManager.alert(`are you sure?`, '', this.confirmDelete, 'delete');
@@ -83,25 +83,12 @@ export default class ProfileGrid extends Component {
     const { searchTerm } = this.props;
     return (
       <BG>
-        {showShare && (
-          <ShareOverlay
-            profile={activeProfile}
-            cancelClick={this.cancelShare}
-          />
-        )}
-        {showUpdate && (
-          <UpdateOverlay
-            profile={activeProfile}
-            cancelClick={this.cancelUpdate}
-          />
-        )}
+        {showShare && <ShareOverlay profile={activeProfile} cancelClick={this.cancelShare} />}
+        {showUpdate && <UpdateOverlay profile={activeProfile} cancelClick={this.cancelUpdate} />}
         {profiles.length >= 1 &&
           profiles.map(profile => {
             if (profile) {
-              if (
-                !profile.hideFromClient &&
-                profile.name.toLowerCase().includes(searchTerm)
-              ) {
+              if (!profile.hideFromClient && profile.name.toLowerCase().includes(searchTerm)) {
                 return (
                   <ProfileCard
                     showUpdate={this.showUpdate}
@@ -119,8 +106,8 @@ export default class ProfileGrid extends Component {
         {profiles.length === 0 && (
           <>
             <NoProfileText>
-              Looks like you have no profiles! Create one using the create
-              button, or download one from the discover tab!
+              Looks like you have no profiles! Create one using the create button, or download one from the discover
+              tab!
             </NoProfileText>
           </>
         )}

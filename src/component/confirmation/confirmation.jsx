@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Overlay from '../overlay/overlay';
 import Button from '../button/button';
@@ -13,31 +14,48 @@ const DelButtons = styled.div`
   }
 `;
 
-export default class Confirmation extends Component {
-  render() {
-    let { cancelDelete, confirmDelete } = this.props;
-    return (
-      <Overlay>
-        <AlertBackground>
-          {this.props.questionText && <h1>{this.props.questionText}</h1>}
-          {this.props.children && this.props.children}
-          <DelButtons>
-            <Button onClick={cancelDelete} color="green">
-              {this.props.cancelText}
-            </Button>
-            {!this.props.hideConfirm && (
-              <Button onClick={confirmDelete} color="red">
-                {this.props.confirmText}
-              </Button>
-            )}
-          </DelButtons>
-        </AlertBackground>
-      </Overlay>
-    );
-  }
-}
+const Confirmation = ({
+  cancelDelete,
+  confirmDelete,
+  cancelText,
+  confirmText,
+  questionText,
+  children,
+  hideConfirm
+}) => (
+  <Overlay>
+    <AlertBackground>
+      {questionText && <h1>{questionText}</h1>}
+      {children && children}
+      <DelButtons>
+        <Button onClick={cancelDelete} color="green">
+          {cancelText}
+        </Button>
+        {!hideConfirm && (
+          <Button onClick={confirmDelete} color="red">
+            {confirmText}
+          </Button>
+        )}
+      </DelButtons>
+    </AlertBackground>
+  </Overlay>
+);
+
+Confirmation.propTypes = {
+  cancelDelete: PropTypes.func,
+  confirmDelete: PropTypes.func,
+
+  cancelText: PropTypes.string,
+  confirmText: PropTypes.string,
+  questionText: PropTypes.string,
+
+  children: PropTypes.node,
+  hideConfirm: PropTypes.bool
+};
 
 Confirmation.defaultProps = {
   cancelText: 'cancel',
-  confirmText: 'confirm',
+  confirmText: 'confirm'
 };
+
+export default Confirmation;

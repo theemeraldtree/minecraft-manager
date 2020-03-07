@@ -17,10 +17,7 @@ const FabricFramework = {
       );
       VersionsManager.createVersion(profile, 'fabric', versionMeta);
 
-      const libraryPath = path.join(
-        LibrariesManager.getMCMLibraries(),
-        `/mcm-${profile.id}`
-      );
+      const libraryPath = path.join(LibrariesManager.getMCMLibraries(), `/mcm-${profile.id}`);
 
       if (!fs.existsSync(libraryPath)) {
         fs.mkdirSync(libraryPath);
@@ -32,19 +29,13 @@ const FabricFramework = {
       DownloadsManager.startFileDownload(
         `Fabric Intermediary\n_A_${profile.name}`,
         `https://maven.fabricmc.net/net/fabricmc/intermediary/${profile.version.minecraft.version}/intermediary-${profile.version.minecraft.version}.jar`,
-        path.join(
-          libraryPath,
-          `fabric-intermediary/mcm-${profile.id}-fabric-intermediary.jar`
-        )
+        path.join(libraryPath, `fabric-intermediary/mcm-${profile.id}-fabric-intermediary.jar`)
       );
 
       DownloadsManager.startFileDownload(
         `Fabric Loader\n_A_${profile.name}`,
         `https://maven.fabricmc.net/net/fabricmc/fabric-loader/${profile.frameworks.fabric.version}/fabric-loader-${profile.frameworks.fabric.version}.jar`,
-        path.join(
-          libraryPath,
-          `fabric-loader/mcm-${profile.id}-fabric-loader.jar`
-        )
+        path.join(libraryPath, `fabric-loader/mcm-${profile.id}-fabric-loader.jar`)
       );
 
       resolve();
@@ -53,11 +44,7 @@ const FabricFramework = {
     new Promise(resolve => {
       LibrariesManager.deleteLibrary(profile).then(() => {
         VersionsManager.deleteVersion(profile).then(() => {
-          LauncherManager.setProfileData(
-            profile,
-            'lastVersionId',
-            profile.version.minecraft.version
-          );
+          LauncherManager.setProfileData(profile, 'lastVersionId', profile.version.minecraft.version);
           profile.removeFramework('fabric');
           resolve();
         });
@@ -65,9 +52,7 @@ const FabricFramework = {
     }),
   getFabricLoaderVersions: mcversion =>
     new Promise((resolve, reject) => {
-      HTTPRequest.httpGet(
-        `https://meta.fabricmc.net/v2/versions/loader/${mcversion}`
-      ).then(versions => {
+      HTTPRequest.httpGet(`https://meta.fabricmc.net/v2/versions/loader/${mcversion}`).then(versions => {
         if (versions) {
           resolve(JSON.parse(versions));
         } else {
@@ -78,7 +63,7 @@ const FabricFramework = {
           );
         }
       });
-    }),
+    })
 };
 
 export default FabricFramework;

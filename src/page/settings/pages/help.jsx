@@ -45,26 +45,17 @@ export default function Help() {
       <Section>
         <h2>Advanced Troubleshooting Functions</h2>
         <h3>
-          <b>Warning!</b> These are advanced functions that, if used wrong, can
-          seriously screw up your game! Proceed with caution!
+          <b>Warning!</b> These are advanced functions that, if used wrong, can seriously screw up your game! Proceed
+          with caution!
         </h3>
         <List>
-          <Button
-            onClick={() => prepareAction('clean-launcher-profiles')}
-            color="red"
-          >
+          <Button onClick={() => prepareAction('clean-launcher-profiles')} color="red">
             clean launcher profiles
           </Button>
-          <Button
-            onClick={() => prepareAction('clean-launcher-libraries')}
-            color="red"
-          >
+          <Button onClick={() => prepareAction('clean-launcher-libraries')} color="red">
             clean launcher libraries
           </Button>
-          <Button
-            onClick={() => prepareAction('clean-launcher-versions')}
-            color="red"
-          >
+          <Button onClick={() => prepareAction('clean-launcher-versions')} color="red">
             clean launcher versions
           </Button>
         </List>

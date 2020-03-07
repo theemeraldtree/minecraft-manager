@@ -20,10 +20,7 @@ const DownloadsManager = {
           this.handleDownloadProgress(download, progress);
         })
           .then(() => {
-            this.activeDownloads.splice(
-              this.activeDownloads.indexOf(download),
-              1
-            );
+            this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
             this.downloadUpdate();
             resolve();
           })
@@ -31,10 +28,7 @@ const DownloadsManager = {
             if (tries === 3) {
               reject('try-limit');
             } else {
-              this.activeDownloads.splice(
-                this.activeDownloads.indexOf(download),
-                1
-              );
+              this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
               this.startFileDownload(downloadName, file, path, tries++)
                 .then(res => {
                   resolve(res);
@@ -47,10 +41,7 @@ const DownloadsManager = {
             }
           });
       } else {
-        LogManager.log(
-          'severe',
-          '[DownloadsManager] [StartFileDownload] Missing file download path!'
-        );
+        LogManager.log('severe', '[DownloadsManager] [StartFileDownload] Missing file download path!');
       }
     });
   },
@@ -72,9 +63,7 @@ const DownloadsManager = {
     });
   },
   setDownloadProgress(downloadName, progress) {
-    const download = this.activeDownloads.find(
-      item => downloadName === item.name
-    );
+    const download = this.activeDownloads.find(item => downloadName === item.name);
     this.handleDownloadProgress(download, progress);
   },
   handleDownloadProgress(download, progress) {
@@ -89,25 +78,15 @@ const DownloadsManager = {
         if (!fs.existsSync(path.join(profile.gameDir, '/mods'))) {
           fs.mkdirSync(path.join(profile.gameDir, '/mods'));
         }
-        downloadPath = path.join(
-          profile.modsPath,
-          `/${Global.createID(mod.name)}.jar`
-        );
+        downloadPath = path.join(profile.modsPath, `/${Global.createID(mod.name)}.jar`);
       } else if (type === 'resourcepack') {
         if (!fs.existsSync(path.join(profile.gameDir, '/resourcepacks'))) {
           fs.mkdirSync(path.join(profile.gameDir, '/resourcepacks'));
         }
-        downloadPath = path.join(
-          profile.gameDir,
-          `/resourcepacks/${Global.createID(mod.name)}.zip`
-        );
+        downloadPath = path.join(profile.gameDir, `/resourcepacks/${Global.createID(mod.name)}.zip`);
       }
       if (modpack === false) {
-        this.startFileDownload(
-          `${mod.name}\n_A_${profile.name}`,
-          url,
-          downloadPath
-        ).then(() => {
+        this.startFileDownload(`${mod.name}\n_A_${profile.name}`, url, downloadPath).then(() => {
           resolve();
         });
       }
@@ -119,7 +98,7 @@ const DownloadsManager = {
   registerDownloadsViewer(downloadUpdate) {
     this.downloadUpdateFunc = downloadUpdate;
     this.downloadUpdate(this.activeDownloads);
-  },
+  }
 };
 
 export default DownloadsManager;

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+
 function getColor(name) {
   switch (name) {
     case 'purple':
@@ -11,12 +12,15 @@ function getColor(name) {
       return '#185F95';
     case 'red':
       return '#8a1111';
+    default:
+      return '#138c0a';
   }
 }
+
 const Button = styled.div.attrs(props => ({
   style: {
-    backgroundColor: getColor(props.color),
-  },
+    backgroundColor: getColor(props.color)
+  }
 }))`
   padding: 11.5px;
   color: white;

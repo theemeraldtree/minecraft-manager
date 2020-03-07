@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../button/button';
 import AlertBackground from './alertbackground';
@@ -21,11 +22,7 @@ export default function AlertObject({ children, buttons }) {
 
       <InputContainer>
         {buttons.map(button => (
-          <Button
-            key={button.text}
-            onClick={button.onClick}
-            color={button.color}
-          >
+          <Button key={button.text} onClick={button.onClick} color={button.color}>
             {button.text}
           </Button>
         ))}
@@ -33,3 +30,8 @@ export default function AlertObject({ children, buttons }) {
     </AlertBackground>
   );
 }
+
+AlertObject.propTypes = {
+  children: PropTypes.node.isRequired,
+  buttons: PropTypes.array
+};

@@ -52,7 +52,7 @@ export default function EditPage({ match }) {
 EditPage.propTypes = {
   match: PropTypes.shape({
     params: {
-      page: PropTypes.string,
-    },
-  }).isRequired,
+      page: PropTypes.string
+    }
+  }).isRequired
 };

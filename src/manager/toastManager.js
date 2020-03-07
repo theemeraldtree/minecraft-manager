@@ -25,10 +25,10 @@ const ToastManager = {
         .substring(6)}`,
       title,
       body,
-      error,
+      error
     });
     this.updateHandler();
-  },
+  }
 };
 
 export default ToastManager;

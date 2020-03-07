@@ -34,12 +34,7 @@ export default function DiscoverPage() {
 
   useEffect(() => {
     header.setChildren(
-      <SearchBox
-        value={searchValue}
-        onChange={searchChange}
-        onKeyPress={searchChange}
-        placeholder="search"
-      />
+      <SearchBox value={searchValue} onChange={searchChange} onKeyPress={searchChange} placeholder="search" />
     );
   }, [searchValue]);
 
@@ -66,7 +61,7 @@ export default function DiscoverPage() {
     let modpack = Hosts.cache.assets[cachedID];
     ProfilesManager.progressState[modpack.id] = {
       progress: 'installing',
-      version: `temp-${new Date().getTime()}`,
+      version: `temp-${new Date().getTime()}`
     };
     updateProgressStates();
     await Hosts.installModpack('curse', modpack);
@@ -78,7 +73,7 @@ export default function DiscoverPage() {
   const versionInstall = async (version, mp) => {
     ProfilesManager.progressState[mp.id] = {
       progress: 'installing',
-      version: version.displayName,
+      version: version.displayName
     };
     updateProgressStates();
     await Hosts.installModpackVersion('curse', mp, version.hosts.curse.fileID);

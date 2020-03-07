@@ -25,9 +25,7 @@ const PathInput = styled(TextInput)`
 export default function General() {
   const [mcHome, setMCHome] = useState(SettingsManager.MC_HOME);
   const [mcExe, setMCExe] = useState(SettingsManager.currentSettings.mcExe);
-  const [dedicatedRam, setDedicatedRam] = useState(
-    SettingsManager.currentSettings.dedicatedRam
-  );
+  const [dedicatedRam, setDedicatedRam] = useState(SettingsManager.currentSettings.dedicatedRam);
   const [ramChangeDisabled, setRamChangeDisabled] = useState(true);
   const [warningMessage, setWarningMessage] = useState('');
   const chooseHomeDirectory = () => {
@@ -35,7 +33,7 @@ export default function General() {
       title: 'Choose your Minecraft Home Directory',
       defaultPath: Global.getDefaultMinecraftPath(),
       buttonLabel: 'Select Directory',
-      properties: ['openDirectory', 'showHiddenFiles'],
+      properties: ['openDirectory', 'showHiddenFiles']
     });
     SettingsManager.setHomeDirectory(p[0]);
     setMCHome(p[0]);
@@ -46,17 +44,13 @@ export default function General() {
     if (os.platform() === 'win32') {
       properties = ['openFile', 'showHiddenFiles'];
     } else if (os.platform() === 'darwin') {
-      properties = [
-        'openDirectory',
-        'showHiddenFiles',
-        'treatPackageAsDirectory',
-      ];
+      properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory'];
     }
     let p = dialog.showOpenDialog({
       title: 'Choose your Minecraft Executable',
       defaultPath: Global.getDefaultMCExePath(),
       buttonLabel: 'Select File',
-      properties: properties,
+      properties: properties
     });
     SettingsManager.setMCExe(p[0]);
     setMCExe(p[0]);
@@ -71,9 +65,7 @@ export default function General() {
       setDedicatedRam(newAmount);
       let intAmount = parseInt(newAmount);
       if (intAmount >= Math.ceil(os.totalmem() / 1073741824)) {
-        setWarningMessage(
-          `That is equal to or higher than your available RAM! Please set it lower!`
-        );
+        setWarningMessage(`That is equal to or higher than your available RAM! Please set it lower!`);
       } else if (newAmount === '') {
         setWarningMessage(`Please enter a value`);
       } else if (intAmount === 0) {
@@ -117,11 +109,7 @@ export default function General() {
           <Detail>dedicated ram (gb)</Detail>
           <div>
             <TextInput onChange={ramAmountChange} value={dedicatedRam} />
-            <Button
-              disabled={ramChangeDisabled}
-              onClick={changeRAM}
-              color="green"
-            >
+            <Button disabled={ramChangeDisabled} onClick={changeRAM} color="green">
               change
             </Button>
           </div>

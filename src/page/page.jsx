@@ -9,7 +9,7 @@ export default class Page extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      hideOverlay: false,
+      hideOverlay: false
     };
   }
 
@@ -17,7 +17,7 @@ export default class Page extends PureComponent {
     localStorage.setItem('importDone', true);
     ProfilesManager.getProfiles().then(() => {
       this.setState({
-        hideOverlay: true,
+        hideOverlay: true
       });
     });
   };
@@ -32,10 +32,7 @@ export default class Page extends PureComponent {
           app.process.argv[1] &&
           !hideOverlay &&
           localStorage.getItem('importDone') === 'false' && (
-            <ImportOverlay
-              file={app.process.argv[1]}
-              cancelClick={this.importCancel}
-            />
+            <ImportOverlay file={app.process.argv[1]} cancelClick={this.importCancel} />
           )}
         {children}
       </>
@@ -44,5 +41,5 @@ export default class Page extends PureComponent {
 }
 
 Page.propTypes = {
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node.isRequired
 };

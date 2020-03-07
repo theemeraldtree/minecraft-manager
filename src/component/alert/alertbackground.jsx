@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components';
+
 const INTRO = keyframes`
     from {
         opacity: 0;

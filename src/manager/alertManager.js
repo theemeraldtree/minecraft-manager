@@ -40,7 +40,7 @@ const AlertManager = {
         {
           text: cancel,
           onClick: () => AlertManager.dismissAlert(id),
-          color: 'red',
+          color: 'red'
         },
         {
           text: confirm,
@@ -48,9 +48,9 @@ const AlertManager = {
             AlertManager.dismissAlert(id);
             onConfirm();
           },
-          color: 'green',
-        },
-      ],
+          color: 'green'
+        }
+      ]
     });
 
     this.updateHandler();
@@ -68,13 +68,13 @@ const AlertManager = {
         {
           text: 'close',
           onClick: () => AlertManager.dismissAlert(id),
-          color: 'green',
-        },
-      ],
+          color: 'green'
+        }
+      ]
     });
 
     this.updateHandler();
-  },
+  }
 };
 
 export default AlertManager;

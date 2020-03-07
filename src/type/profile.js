@@ -37,7 +37,7 @@ export default function Profile(rawomaf) {
     'error',
     'state',
     'temp',
-    'iconURL',
+    'iconURL'
   ];
 
   this.initLocalValues = function() {
@@ -63,9 +63,7 @@ export default function Profile(rawomaf) {
         this.iconPath = this.icon;
       } else {
         // backslashes are replaced with forward slashes because they are being used as escape characters
-        this.iconPath = path
-          .join(this.profilePath, this.icon)
-          .replace(/\\/g, '/');
+        this.iconPath = path.join(this.profilePath, this.icon).replace(/\\/g, '/');
       }
     }
 
@@ -103,9 +101,7 @@ export default function Profile(rawomaf) {
     }
 
     if (this.installed) {
-      if (
-        !fs.existsSync(path.join(this.profilePath, '/_mcm/icons/resourcepacks'))
-      ) {
+      if (!fs.existsSync(path.join(this.profilePath, '/_mcm/icons/resourcepacks'))) {
         fs.mkdirSync(path.join(this.profilePath, '/_mcm/icons/resourcepacks'));
       }
     }
@@ -115,9 +111,7 @@ export default function Profile(rawomaf) {
     const { currentSettings } = SettingsManager;
     const options = `
             autoJump:${currentSettings.defaultsAutoJump}\n
-            tutorialStep:${
-              currentSettings.defaultsShowTutorial ? 'movement' : 'none'
-            }
+            tutorialStep:${currentSettings.defaultsShowTutorial ? 'movement' : 'none'}
         `
       .replace(/ /g, '')
       .replace(/(^[ \t]*\n)/gm, '');
@@ -129,9 +123,7 @@ export default function Profile(rawomaf) {
     // read a sub asset (such as mods), and place it's info into us
 
     LogManager.log('info', `{${this.id}} Reading sub-asset ${subAsset}`);
-    const json = JSON.parse(
-      fs.readFileSync(path.join(this.subAssetsPath, subAsset))
-    );
+    const json = JSON.parse(fs.readFileSync(path.join(this.subAssetsPath, subAsset)));
 
     let index;
     if (json.assetType === 'mod' || json.assetType === 'mods') {
@@ -152,9 +144,7 @@ export default function Profile(rawomaf) {
         if (assetObj.icon.substring(0, 4) === 'http') {
           assetObj.iconPath = assetObj.icon;
         } else {
-          assetObj.iconPath = path
-            .join(this.profilePath, assetObj.icon)
-            .replace(/\\/g, '/');
+          assetObj.iconPath = path.join(this.profilePath, assetObj.icon).replace(/\\/g, '/');
 
           if (!fs.existsSync(assetObj.iconPath)) {
             if (assetObj.iconURL) {
@@ -169,7 +159,7 @@ export default function Profile(rawomaf) {
       // set a progress state (for us) for each
       this.progressState[asset.id] = {
         progress: 'installed',
-        version: asset.version.displayName,
+        version: asset.version.displayName
       };
 
       // set it installed
@@ -261,50 +251,43 @@ export default function Profile(rawomaf) {
   this.save = function() {
     LogManager.log('info', `{${this.id}} saving...`);
     return new Promise(resolve => {
-      fs.writeFile(
-        path.join(this.profilePath, 'profile.json'),
-        this.toJSON(),
-        () => {
-          if (this.mods) {
-            const modOut = this.mods.map(mod => {
-              if (!(mod instanceof Mod)) {
-                mod = new Mod(mod);
-              }
-              return mod.cleanObject();
-            });
-            fs.writeFileSync(
-              path.join(this.profilePath, '/_omaf/subAssets/mods.json'),
-              JSON.stringify({
-                omafVersion: Global.OMAF_VERSION,
-                assetType: 'mod',
-                assets: modOut,
-              })
-            );
-          }
-
-          if (this.resourcepacks) {
-            const rpOut = this.resourcepacks.map(rp => {
-              if (!(rp instanceof GenericAsset)) {
-                rp = new GenericAsset(rp);
-              }
-              return rp.cleanObject();
-            });
-
-            fs.writeFileSync(
-              path.join(
-                this.profilePath,
-                '/_omaf/subAssets/resourcepacks.json'
-              ),
-              JSON.stringify({
-                omafVersion: Global.OMAF_VERSION,
-                assetType: 'resourcepack',
-                assets: rpOut,
-              })
-            );
-          }
-          resolve();
+      fs.writeFile(path.join(this.profilePath, 'profile.json'), this.toJSON(), () => {
+        if (this.mods) {
+          const modOut = this.mods.map(mod => {
+            if (!(mod instanceof Mod)) {
+              mod = new Mod(mod);
+            }
+            return mod.cleanObject();
+          });
+          fs.writeFileSync(
+            path.join(this.profilePath, '/_omaf/subAssets/mods.json'),
+            JSON.stringify({
+              omafVersion: Global.OMAF_VERSION,
+              assetType: 'mod',
+              assets: modOut
+            })
+          );
         }
-      );
+
+        if (this.resourcepacks) {
+          const rpOut = this.resourcepacks.map(rp => {
+            if (!(rp instanceof GenericAsset)) {
+              rp = new GenericAsset(rp);
+            }
+            return rp.cleanObject();
+          });
+
+          fs.writeFileSync(
+            path.join(this.profilePath, '/_omaf/subAssets/resourcepacks.json'),
+            JSON.stringify({
+              omafVersion: Global.OMAF_VERSION,
+              assetType: 'resourcepack',
+              assets: rpOut
+            })
+          );
+        }
+        resolve();
+      });
     });
   };
 
@@ -370,10 +353,7 @@ export default function Profile(rawomaf) {
   this.export = function(output, exportFolders, exportProgress) {
     return new Promise((resolve, reject) => {
       try {
-        const tempPath = path.join(
-          Global.MCM_TEMP,
-          `/profileexport-${this.id}/`
-        );
+        const tempPath = path.join(Global.MCM_TEMP, `/profileexport-${this.id}/`);
         if (fs.existsSync(tempPath)) {
           rimraf.sync(tempPath);
         }
@@ -394,18 +374,13 @@ export default function Profile(rawomaf) {
         }
 
         exportProgress('Cleaning up properties...');
-        const obj = JSON.parse(
-          fs.readFileSync(path.join(tempPath, '/profile.json'))
-        );
+        const obj = JSON.parse(fs.readFileSync(path.join(tempPath, '/profile.json')));
         if (obj.hideFromClient) {
           obj.hideFromClient = undefined;
           delete obj.hideFromClient;
         }
 
-        fs.writeFileSync(
-          path.join(tempPath, '/profile.json'),
-          JSON.stringify(obj)
-        );
+        fs.writeFileSync(path.join(tempPath, '/profile.json'), JSON.stringify(obj));
         rimraf.sync(path.join(tempPath, '/_mcm'));
         exportProgress('Removing non-chosen folders...');
         fs.readdir(path.join(tempPath, '/files'), (err, files) => {
@@ -421,10 +396,7 @@ export default function Profile(rawomaf) {
           const archive = archiver('zip');
 
           archive.pipe(fs.createWriteStream(output)).on('error', e => {
-            ToastManager.createToast(
-              'Error archiving',
-              ErrorManager.makeReadable(e)
-            );
+            ToastManager.createToast('Error archiving', ErrorManager.makeReadable(e));
             reject();
           });
           archive.directory(tempPath, false);
@@ -502,25 +474,18 @@ export default function Profile(rawomaf) {
         if (!(asset instanceof Mod)) {
           asset = new Mod(asset);
         }
-        if (
-          asset &&
-          asset instanceof Mod &&
-          asset.getJARFile().path !== undefined
-        ) {
+        if (asset && asset instanceof Mod && asset.getJARFile().path !== undefined) {
           this.mods.splice(this.mods.indexOf(asset), 1);
           this.progressState[asset.id] = undefined;
-          fs.unlink(
-            path.join(this.gameDir, `/${asset.getJARFile().path}`),
-            () => {
-              if (asset.icon) {
-                if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
-                  fs.unlinkSync(path.join(this.profilePath, asset.icon));
-                }
+          fs.unlink(path.join(this.gameDir, `/${asset.getJARFile().path}`), () => {
+            if (asset.icon) {
+              if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
+                fs.unlinkSync(path.join(this.profilePath, asset.icon));
               }
-              this.save();
-              resolve();
             }
-          );
+            this.save();
+            resolve();
+          });
         } else {
           resolve();
         }
@@ -529,37 +494,21 @@ export default function Profile(rawomaf) {
         if (!(asset instanceof GenericAsset)) {
           asset = new GenericAsset(asset);
         }
-        if (
-          asset &&
-          asset instanceof GenericAsset &&
-          asset.getMainFile().path !== undefined
-        ) {
-          this.resourcepacks.splice(
-            this.resourcepacks.indexOf(
-              this.resourcepacks.find(a => a.id === asset.id)
-            ),
-            1
-          );
+        if (asset && asset instanceof GenericAsset && asset.getMainFile().path !== undefined) {
+          this.resourcepacks.splice(this.resourcepacks.indexOf(this.resourcepacks.find(a => a.id === asset.id)), 1);
           this.progressState[asset.id] = undefined;
-          if (
-            fs.existsSync(
-              path.join(this.gameDir, `/${asset.getMainFile().path}`)
-            )
-          ) {
-            fs.unlink(
-              path.join(this.gameDir, `/${asset.getMainFile().path}`),
-              () => {
-                if (asset.icon) {
-                  if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
-                    fs.unlinkSync(path.join(this.profilePath, asset.icon));
-                  }
+          if (fs.existsSync(path.join(this.gameDir, `/${asset.getMainFile().path}`))) {
+            fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), () => {
+              if (asset.icon) {
+                if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
+                  fs.unlinkSync(path.join(this.profilePath, asset.icon));
                 }
-
-                this.save();
-
-                resolve();
               }
-            );
+
+              this.save();
+
+              resolve();
+            });
           } else {
             this.save();
             resolve();
@@ -580,10 +529,7 @@ export default function Profile(rawomaf) {
         this.hideFromClient = true;
         await this.save();
         onUpdate('Moving old folder...');
-        const oldpath = path.join(
-          Global.PROFILES_PATH,
-          `/${this.id}-update-${new Date().getTime()}`
-        );
+        const oldpath = path.join(Global.PROFILES_PATH, `/${this.id}-update-${new Date().getTime()}`);
         const oldgamedir = path.join(oldpath, '/files');
         fs.rename(this.profilePath, oldpath, async e => {
           if (e) {
@@ -591,25 +537,15 @@ export default function Profile(rawomaf) {
             reject(e);
           } else {
             onUpdate('Installing modpack...');
-            const newprofile = await Hosts.installModpackVersion(
-              'curse',
-              this,
-              versionToChangeTo
-            );
+            const newprofile = await Hosts.installModpackVersion('curse', this, versionToChangeTo);
             newprofile.hideFromClient = false;
             newprofile.save();
             if (fs.existsSync(path.join(oldgamedir, '/saves'))) {
-              Global.copyDirSync(
-                path.join(oldgamedir, '/saves'),
-                path.join(this.gameDir, '/saves')
-              );
+              Global.copyDirSync(path.join(oldgamedir, '/saves'), path.join(this.gameDir, '/saves'));
             }
 
             if (fs.existsSync(path.join(oldgamedir, '/options.txt'))) {
-              fs.copyFileSync(
-                path.join(oldgamedir, '/options.txt'),
-                path.join(this.gameDir, '/options.txt')
-              );
+              fs.copyFileSync(path.join(oldgamedir, '/options.txt'), path.join(this.gameDir, '/options.txt'));
             }
 
             rimraf.sync(oldpath);
@@ -633,11 +569,7 @@ export default function Profile(rawomaf) {
       LauncherManager.setProfileData(this, 'name', newName);
       LauncherManager.renameProfile(this, newID);
       if (this.hasFramework()) {
-        LauncherManager.setProfileData(
-          this,
-          'lastVersionId',
-          `${safeName} [Minecraft Manager]`
-        );
+        LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
         if (this.frameworks.forge) {
           VersionsManager.renameVersion(this, safeName);
         } else if (this.frameworks.fabric) {
@@ -650,10 +582,7 @@ export default function Profile(rawomaf) {
       this.name = newName;
       this.versionname = this.safename;
       this.save().then(() => {
-        fs.renameSync(
-          this.profilePath,
-          path.join(Global.PROFILES_PATH, `/${newID}/`)
-        );
+        fs.renameSync(this.profilePath, path.join(Global.PROFILES_PATH, `/${newID}/`));
         this.initLocalValues();
         this.save();
         resolve(this);

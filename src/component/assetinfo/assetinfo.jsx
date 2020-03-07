@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../button/button';
 import AssetCard from '../assetcard/assetcard';
@@ -9,6 +10,7 @@ import Global from '../../util/global';
 import CustomDropdown from '../customdropdown/customdropdown';
 import Hosts from '../../host/Hosts';
 import ToastManager from '../../manager/toastManager';
+
 const LoadingText = styled.div`
   font-size: 23pt;
   display: flex;
@@ -81,27 +83,30 @@ export default class AssetInfo extends Component {
     this.versionsListRef = React.createRef();
     this.state = {
       activeAsset: {
-        name: 'Loading',
+        name: 'Loading'
       },
       displayState: 'description',
-      description: false,
+      description: false
+    };
+  }
+
+  static getDerivedStateFromProps(props) {
+    return {
+      activeAsset: props.asset
     };
   }
 
   componentDidMount() {
     if (!this.state.mcVerFilter) {
       this.setState({
-        mcVerFilter: this.props.mcVerFilter,
+        mcVerFilter: this.props.mcVerFilter
       });
     }
     this.showDescription();
   }
 
   componentDidUpdate(prevProps) {
-    if (
-      prevProps.progressState !== this.props.progressState &&
-      this.state.displayState === 'versions'
-    ) {
+    if (prevProps.progressState !== this.props.progressState && this.state.displayState === 'versions') {
       this.showVersions();
     }
   }
@@ -110,38 +115,32 @@ export default class AssetInfo extends Component {
     const { host } = this.props;
     const { activeAsset } = this.state;
     if (activeAsset.hosts.curse) {
-      const newAsset = await Hosts.addMissingInfo(
-        host,
-        'description',
-        activeAsset
-      );
+      const newAsset = await Hosts.addMissingInfo(host, 'description', activeAsset);
       if (newAsset.description) {
         this.setState({
           activeAsset: newAsset,
-          description: true,
+          description: true
         });
       } else {
         this.setState({
           description: false,
-          cantConnect: true,
+          cantConnect: true
         });
       }
-    } else {
-      if (activeAsset.description) {
-        this.setState({
-          activeAsset: activeAsset,
-          description: true,
-        });
-      }
+    } else if (activeAsset.description) {
+      this.setState({
+        activeAsset,
+        description: true
+      });
     }
   };
 
   showDependencies = async () => {
     const { host } = this.props;
     const { activeAsset } = this.state;
-    const newAsset = Object.assign({}, activeAsset);
+    const newAsset = { ...activeAsset };
     this.setState({
-      assetDependencies: [<LoadingText key="loading">loading...</LoadingText>],
+      assetDependencies: [<LoadingText key="loading">loading...</LoadingText>]
     });
 
     const res = await Hosts.getDependencies(host, activeAsset);
@@ -150,31 +149,21 @@ export default class AssetInfo extends Component {
 
       let newDependList = [];
       if (res.length >= 1) {
-        for (let asset of res) {
-          newDependList.push(
-            <AssetCard
-              progressState={{}}
-              disableHover
-              key={asset.id}
-              showBlurb={true}
-              asset={asset}
-            />
-          );
-        }
+        newDependList = res.map(asset => (
+          <AssetCard progressState={{}} disableHover key={asset.id} showBlurb asset={asset} />
+        ));
       } else {
-        newDependList.push(
-          <LoadingText key="none2">No Dependencies</LoadingText>
-        );
+        newDependList.push(<LoadingText key="none2">No Dependencies</LoadingText>);
       }
 
       this.setState({
         activeAsset: newAsset,
-        assetDependencies: newDependList,
+        assetDependencies: newDependList
       });
     } else {
       this.setState({
         cantConnect: true,
-        assetDependencies: [],
+        assetDependencies: []
       });
     }
   };
@@ -184,36 +173,21 @@ export default class AssetInfo extends Component {
     const { specificMCVer, allowVersionReinstallation, host } = this.props;
     if (activeAsset.hosts.curse) {
       this.setState({
-        versions: [<LoadingText key="loading1">loading</LoadingText>],
+        versions: [<LoadingText key="loading1">loading</LoadingText>]
       });
       const versions = await Hosts.getVersions(host, activeAsset);
       if (versions) {
-        let final = [];
-        for (let version of versions) {
-          if (
-            version.minecraft.supportedVersions.includes(mcVerFilter) ||
-            mcVerFilter === 'All'
-          ) {
-            let ps = this.props.progressState;
-            if (
-              this.props.disableVersionInstall &&
-              ps.progress !== 'installing'
-            ) {
+        const final = versions.map(version => {
+          if (version.minecraft.supportedVersions.includes(mcVerFilter) || mcVerFilter === 'All') {
+            const ps = this.props.progressState;
+            if (this.props.disableVersionInstall && ps.progress !== 'installing') {
               ps.progress = 'disable-install';
             }
-            const forceVerFilter =
-              this.props.forceVersionFilter &&
-              mcVerFilter !== this.props.mcVerFilter;
-            final.push(
+            const forceVerFilter = this.props.forceVersionFilter && mcVerFilter !== this.props.mcVerFilter;
+            return (
               <VersionCard
                 allowVersionReinstallation={allowVersionReinstallation}
-                badMCVer={
-                  specificMCVer
-                    ? !version.minecraft.supportedVersions.includes(
-                        specificMCVer
-                      )
-                    : false
-                }
+                badMCVer={specificMCVer ? !version.minecraft.supportedVersions.includes(specificMCVer) : false}
                 key={version.displayName}
                 progressState={ps}
                 installClick={this.versionInstall}
@@ -225,14 +199,17 @@ export default class AssetInfo extends Component {
               />
             );
           }
-        }
+
+          return <></>;
+        });
 
         if (final.length === 0) {
           final.push(<LoadingText key="none1">no versions found</LoadingText>);
         }
+
         this.setState(
           {
-            versions: final,
+            versions: final
           },
           () => {
             if (this.versionsListRef.current) {
@@ -242,16 +219,12 @@ export default class AssetInfo extends Component {
         );
       } else {
         this.setState({
-          cantConnect: true,
+          cantConnect: true
         });
       }
     } else {
       this.setState({
-        versions: [
-          <LoadingText key="none2">
-            no versions found, as this is a local file
-          </LoadingText>,
-        ],
+        versions: [<LoadingText key="none2">no versions found, as this is a local file</LoadingText>]
       });
     }
   };
@@ -260,16 +233,10 @@ export default class AssetInfo extends Component {
     const version = Global.cached.versions[e.currentTarget.dataset.version];
     if (this.props.forceFramework) {
       if (version.hosts.curse) {
-        if (
-          version.hosts.curse.localValues &&
-          version.hosts.curse.localValues.inferredModloader
-        ) {
-          if (
-            version.hosts.curse.localValues.inferredModloader !==
-            this.props.forceFramework
-          ) {
+        if (version.hosts.curse.localValues && version.hosts.curse.localValues.inferredModloader) {
+          if (version.hosts.curse.localValues.inferredModloader !== this.props.forceFramework) {
             ToastManager.createToast(
-              `Uh oh`,
+              'Uh oh',
               `It seems you're trying to install a version that's built for ${version.hosts.curse.localValues.inferredModloader}, not for ${this.props.forceFramework}`
             );
             return;
@@ -278,17 +245,17 @@ export default class AssetInfo extends Component {
       }
     }
     this.setState({
-      scrollPosition: this.versionsListRef.current.scrollTop,
+      scrollPosition: this.versionsListRef.current.scrollTop
     });
     this.props.versionInstall(version, this.state.activeAsset);
   };
 
   displayStateSwitch = e => {
-    let newState = e.currentTarget.dataset.state;
+    const newState = e.currentTarget.dataset.state;
 
     this.setState({
       displayState: newState,
-      cantConnect: false,
+      cantConnect: false
     });
 
     if (newState === 'description') {
@@ -300,16 +267,10 @@ export default class AssetInfo extends Component {
     }
   };
 
-  static getDerivedStateFromProps(props) {
-    return {
-      activeAsset: props.asset,
-    };
-  }
-
   mcVerChange = ver => {
     this.setState(
       {
-        mcVerFilter: ver,
+        mcVerFilter: ver
       },
       () => {
         this.showVersions();
@@ -321,21 +282,14 @@ export default class AssetInfo extends Component {
     this.displayStateSwitch({
       currentTarget: {
         dataset: {
-          state: this.state.displayState,
-        },
-      },
+          state: this.state.displayState
+        }
+      }
     });
   };
 
   render() {
-    const {
-      displayState,
-      description,
-      versions,
-      activeAsset,
-      assetDependencies,
-      cantConnect,
-    } = this.state;
+    const { displayState, description, versions, activeAsset, assetDependencies, cantConnect } = this.state;
     const { type, installClick, localAsset, progressState } = this.props;
     return (
       <>
@@ -349,28 +303,16 @@ export default class AssetInfo extends Component {
           showBlurb
         />
         <HeaderButtons>
-          <HB
-            active={displayState === 'description'}
-            onClick={this.displayStateSwitch}
-            data-state="description"
-          >
+          <HB active={displayState === 'description'} onClick={this.displayStateSwitch} data-state="description">
             Description
           </HB>
           {activeAsset.hosts.curse && (
-            <HB
-              active={displayState === 'versions'}
-              onClick={this.displayStateSwitch}
-              data-state="versions"
-            >
+            <HB active={displayState === 'versions'} onClick={this.displayStateSwitch} data-state="versions">
               Versions
             </HB>
           )}
           {activeAsset.hosts.curse && type === 'mod' && (
-            <HB
-              active={displayState === 'dependencies'}
-              onClick={this.displayStateSwitch}
-              data-state="dependencies"
-            >
+            <HB active={displayState === 'dependencies'} onClick={this.displayStateSwitch} data-state="dependencies">
               Dependencies
             </HB>
           )}
@@ -382,9 +324,7 @@ export default class AssetInfo extends Component {
                 <SanitizedHTML html={activeAsset.description} />
               </Description>
             )}
-            {!description && !cantConnect && (
-              <LoadingText>loading...</LoadingText>
-            )}
+            {!description && !cantConnect && <LoadingText>loading...</LoadingText>}
           </>
         )}
 
@@ -420,3 +360,19 @@ export default class AssetInfo extends Component {
     );
   }
 }
+
+AssetInfo.propTypes = {
+  asset: PropTypes.object,
+  mcVerFilter: PropTypes.string,
+  progressState: PropTypes.object,
+  host: PropTypes.string,
+  specificMCVer: PropTypes.string,
+  allowVersionReinstallation: PropTypes.bool,
+  disableVersionInstall: PropTypes.bool,
+  forceVersionFilter: PropTypes.bool,
+  versionInstall: PropTypes.func,
+  forceFramework: PropTypes.bool,
+  installClick: PropTypes.func,
+  localAsset: PropTypes.bool,
+  type: PropTypes.string
+};

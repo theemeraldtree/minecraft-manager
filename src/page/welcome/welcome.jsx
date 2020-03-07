@@ -94,7 +94,7 @@ export default withRouter(function WelcomePage({ history }) {
       title: 'Choose your Minecraft Home Directory',
       defaultPath: Global.getDefaultMinecraftPath(),
       buttonLabel: 'Select Directory',
-      properties: ['openDirectory', 'showHiddenFiles'],
+      properties: ['openDirectory', 'showHiddenFiles']
     });
     if (p[0]) {
       setMCHome(p[0]);
@@ -105,10 +105,7 @@ export default withRouter(function WelcomePage({ history }) {
     setPreparing(true);
     SettingsManager.setHomeDirectory(mcHome);
     SettingsManager.setMCExe(mcExe);
-    let mcl = path.join(
-      LibrariesManager.getLibrariesPath(),
-      '/minecraftmanager'
-    );
+    let mcl = path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager');
     if (!fs.existsSync(mcl)) {
       fs.mkdirSync(mcl);
     }
@@ -133,17 +130,13 @@ export default withRouter(function WelcomePage({ history }) {
     if (os.platform() === 'win32') {
       properties = ['openFile', 'showHiddenFiles'];
     } else if (os.platform() === 'darwin') {
-      properties = [
-        'openDirectory',
-        'showHiddenFiles',
-        'treatPackageAsDirectory',
-      ];
+      properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory'];
     }
     let p = dialog.showOpenDialog({
       title: 'Choose your Minecraft Executable',
       defaultPath: Global.getDefaultMCExePath(),
       buttonLabel: 'Select File',
-      properties: properties,
+      properties: properties
     });
     if (p[0]) {
       setMCExe(p[0]);
@@ -161,9 +154,7 @@ export default withRouter(function WelcomePage({ history }) {
                 <WelcomeBox>
                   <Logo />
                   <Title>Welcome to Minecraft Manager</Title>
-                  <Subtext>
-                    the easiest way to manage minecraft mods and modpacks
-                  </Subtext>
+                  <Subtext>the easiest way to manage minecraft mods and modpacks</Subtext>
                 </WelcomeBox>
                 <GB onClick={nextStep} color="green">
                   Continue
@@ -185,8 +176,7 @@ export default withRouter(function WelcomePage({ history }) {
                   </div>
                 </IH>
                 <AutofillText>
-                  Most people will not have changed this. However if you have,
-                  please update it accordingly.
+                  Most people will not have changed this. However if you have, please update it accordingly.
                 </AutofillText>
 
                 <GB onClick={nextStep} color="green">
@@ -209,8 +199,7 @@ export default withRouter(function WelcomePage({ history }) {
                   </div>
                 </IH>
                 <AutofillText>
-                  Most people will not have changed this. However if you have,
-                  please update it accordingly.
+                  Most people will not have changed this. However if you have, please update it accordingly.
                 </AutofillText>
 
                 <GB onClick={nextStep} color="green">
@@ -227,9 +216,7 @@ export default withRouter(function WelcomePage({ history }) {
                 <Subtext>You're done setting up Minecraft Manager.</Subtext>
                 <Subtext>
                   If you need help,{' '}
-                  <a href="https://theemeraldtree.net/mcm/wiki">
-                    check out the Minecraft Manager wiki.
-                  </a>
+                  <a href="https://theemeraldtree.net/mcm/wiki">check out the Minecraft Manager wiki.</a>
                 </Subtext>
 
                 <GB onClick={start} color="green">

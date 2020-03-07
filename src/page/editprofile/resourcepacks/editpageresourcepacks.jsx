@@ -11,5 +11,5 @@ export default function EditPageResourcePacks({ id }) {
 }
 
 EditPageResourcePacks.propTypes = {
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired
 };

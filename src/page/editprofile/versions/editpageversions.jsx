@@ -52,9 +52,7 @@ export default function EditPageVersions({ id }) {
   const [hostVersionValues, setHostVersionValues] = useState(undefined);
 
   const [updateOverlay, setUpdateOverlay] = useState(false);
-  const [updateOverlayText, setUpdateOverlayText] = useState(
-    'getting things ready...'
-  );
+  const [updateOverlayText, setUpdateOverlayText] = useState('getting things ready...');
 
   const [fabricIsInstalling, setFabricIsInstalling] = useState(false);
   const [fabricIsUninstalling, setFabricIsUninstalling] = useState(false);
@@ -78,7 +76,7 @@ export default function EditPageVersions({ id }) {
 
           return {
             name,
-            id,
+            id
           };
         });
 
@@ -99,7 +97,7 @@ export default function EditPageVersions({ id }) {
         setProfile({
           name: 'hang on...',
           hosts: {},
-          frameworks: {},
+          frameworks: {}
         });
         setProfile(newprofile);
         setUpdateOverlay(false);
@@ -181,8 +179,7 @@ export default function EditPageVersions({ id }) {
     ForgeFramework.getForgePromotions().then(promos => {
       if (promos) {
         const obj = JSON.parse(promos);
-        const verObj =
-          obj.promos[`${profile.version.minecraft.version}-latest`];
+        const verObj = obj.promos[`${profile.version.minecraft.version}-latest`];
         if (verObj) {
           const version = `${profile.version.minecraft.version}-${verObj.version}`;
           profile.setFrameworkVersion('forge', version);
@@ -236,9 +233,7 @@ export default function EditPageVersions({ id }) {
           <Overlay force>
             <BG>
               <Title>{updateOverlayText}</Title>
-              <p>
-                To check progress, open the Downloads viewer in the sidebar.
-              </p>
+              <p>To check progress, open the Downloads viewer in the sidebar.</p>
             </BG>
           </Overlay>
         )}
@@ -279,10 +274,7 @@ export default function EditPageVersions({ id }) {
               </Button>
             )}
             {forgeIsInstalling && (
-              <p>
-                Forge is installing. To check progress, open the Downloads
-                viewer in the sidebar
-              </p>
+              <p>Forge is installing. To check progress, open the Downloads viewer in the sidebar</p>
             )}
             {forgeIsUninstalling && <p>Forge is being removed...</p>}
             {profile.frameworks.forge && !forgeIsUninstalling && (
@@ -304,10 +296,7 @@ export default function EditPageVersions({ id }) {
               </Button>
             )}
             {fabricIsInstalling && (
-              <p>
-                Fabric is installing. To check progress, open the Downloads
-                viewer in the sidebar
-              </p>
+              <p>Fabric is installing. To check progress, open the Downloads viewer in the sidebar</p>
             )}
             {fabricIsUninstalling && <p>Fabric is being removed...</p>}
             {profile.frameworks.fabric && (
@@ -328,5 +317,5 @@ export default function EditPageVersions({ id }) {
 }
 
 EditPageVersions.propTypes = {
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired
 };

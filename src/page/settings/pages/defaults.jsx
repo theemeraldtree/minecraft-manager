@@ -8,9 +8,7 @@ export default function Defaults() {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   const toggleItem = function(item) {
-    SettingsManager.currentSettings[item] = !SettingsManager.currentSettings[
-      item
-    ];
+    SettingsManager.currentSettings[item] = !SettingsManager.currentSettings[item];
     SettingsManager.save();
     forceUpdate();
   };
@@ -18,8 +16,7 @@ export default function Defaults() {
   return (
     <>
       <p>
-        The following are default settings that are used for <b>new</b> profiles
-        only
+        The following are default settings that are used for <b>new</b> profiles only
       </p>
       <InputContainer>
         <Checkbox

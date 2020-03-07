@@ -1,12 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Button from '../button/button';
 import { withRouter } from 'react-router-dom';
 import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
+import { shell } from 'electron';
 import Global from '../../util/global';
 import edit from './img/edit.png';
 import launch from './img/launch.png';
-import { shell } from 'electron';
+import Button from '../button/button';
 
 const BG = styled.div`
   width: 110px;
@@ -35,8 +36,8 @@ const BG = styled.div`
 
 const Image = styled.div.attrs(props => ({
   style: {
-    backgroundImage: `url('${props.src}')`,
-  },
+    backgroundImage: `url('${props.src}')`
+  }
 }))`
   background-size: contain;
   background-repeat: no-repeat;
@@ -124,23 +125,16 @@ const StateOverlay = styled.div`
   text-align: center;
   flex-flow: column;
 `;
-const ProfileCard = ({
-  profile,
-  history,
-  showDeletion,
-  showShare,
-  showUpdate,
-}) => (
+
+const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate }) => (
   <Wrapper>
     <ContextMenuTrigger holdToDisplay={-1} id={`profilecard${profile.id}`}>
-      {profile.hosts.curse &&
-        !profile.hosts.curse.fullyInstalled &&
-        !profile.state && (
-          <StateOverlay>
-            <b>ERROR</b> <br />
-            Unfinished Curse Profile Install
-          </StateOverlay>
-        )}
+      {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && (
+        <StateOverlay>
+          <b>ERROR</b> <br />
+          Unfinished Curse Profile Install
+        </StateOverlay>
+      )}
       {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
       <BG
         onClick={() => {
@@ -157,7 +151,7 @@ const ProfileCard = ({
               profile.launch();
             }}
           >
-            <img src={launch} />
+            <img alt="Launch" src={launch} />
           </LaunchButton>
           <EditButton
             color="yellow"
@@ -166,7 +160,7 @@ const ProfileCard = ({
               history.push(`/edit/general/${profile.id}`);
             }}
           >
-            <img src={edit} />
+            <img alt="Launch" src={edit} />
           </EditButton>
         </Buttons>
       </BG>
@@ -175,9 +169,7 @@ const ProfileCard = ({
       {!profile.error && profile.state !== 'installing' && (
         <>
           <MenuItem onClick={() => profile.launch()}>Launch</MenuItem>
-          <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>
-            Edit
-          </MenuItem>
+          <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>Edit</MenuItem>
           <MenuItem onClick={() => showUpdate(profile)}>Update</MenuItem>
           <MenuItem onClick={() => showShare(profile)}>Share</MenuItem>
         </>
@@ -194,19 +186,13 @@ const ProfileCard = ({
       {!profile.error && profile.state !== 'installing' && (
         <>
           <MenuItem divider />
-          <MenuItem onClick={() => profile.openGameDir()}>
-            Open Profile Folder
-          </MenuItem>
+          <MenuItem onClick={() => profile.openGameDir()}>Open Profile Folder</MenuItem>
         </>
       )}
       {!profile.error && profile.state !== 'installing' && profile.hosts.curse && (
         <>
           <MenuItem
-            onClick={() =>
-              shell.openExternal(
-                `https://curseforge.com/minecraft/modpacks/${profile.hosts.curse.slug}`
-              )
-            }
+            onClick={() => shell.openExternal(`https://curseforge.com/minecraft/modpacks/${profile.hosts.curse.slug}`)}
           >
             View on CurseForge
           </MenuItem>
@@ -215,5 +201,13 @@ const ProfileCard = ({
     </ContextMenu>
   </Wrapper>
 );
+
+ProfileCard.propTypes = {
+  profile: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
+  showDeletion: PropTypes.bool,
+  showShare: PropTypes.bool,
+  showUpdate: PropTypes.bool
+};
 
 export default withRouter(ProfileCard);
