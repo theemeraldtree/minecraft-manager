@@ -66,7 +66,7 @@ const ButtonGroup = styled.div`
 `;
 
 const Description = styled.div`
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: #404040;
   margin: 0 10px;
   flex: 1 1 auto;

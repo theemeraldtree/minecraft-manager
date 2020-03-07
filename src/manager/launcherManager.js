@@ -30,6 +30,9 @@ const LauncherManager = {
     }
     this.setProfileData(profile, 'lastVersionId', verId);
   },
+  dumpAllProfiles() {
+    return JSON.parse(fs.readFileSync(this.getLauncherProfiles())).profiles;
+  },
   createProfile(profile) {
     const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
     obj.profiles[`mcm-${profile.id}`] = {

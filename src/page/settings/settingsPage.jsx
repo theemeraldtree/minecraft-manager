@@ -44,7 +44,7 @@ const Item = styled.p`
 const Container = styled.div`
   margin-left: 130px;
   color: white;
-  overflow-y: scroll;
+  overflow-y: auto;
   flex: 1 1 auto;
   height: 100%;
 `;

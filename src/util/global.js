@@ -107,15 +107,20 @@ const Global = {
 
     return undefined;
   },
-  checkMinecraftVersions() {
-    let totalCount = 0;
+  checkExtraMinecraftVersions() {
+    const final = [];
     fs.readdirSync(VersionsManager.getVersionsPath()).forEach(file => {
       if (file.indexOf('[Minecraft Manager]') !== -1) {
         if (!ProfilesManager.loadedProfiles.find(prof => prof.versionname === file)) {
-          totalCount++;
+          final.push(file);
         }
       }
     });
+
+    return final;
+  },
+  checkMinecraftVersions() {
+    const totalCount = this.checkExtraMinecraftVersions().length;
     if (totalCount) {
       ToastManager.createToast(
         'Warning',
@@ -124,16 +129,21 @@ const Global = {
       );
     }
   },
-  checkMinecraftProfiles() {
+  checkExtraMinecraftProfiles() {
+    const final = [];
     const obj = JSON.parse(fs.readFileSync(LauncherManager.getLauncherProfiles()));
-    let totalCount = 0;
     Object.keys(obj.profiles).forEach(key => {
       if (key.substring(0, 4) === 'mcm-') {
         if (!ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)) {
-          totalCount++;
+          final.push(key);
         }
       }
     });
+
+    return final;
+  },
+  checkMinecraftProfiles() {
+    const totalCount = this.checkExtraMinecraftProfiles().length;
 
     if (totalCount) {
       ToastManager.createToast(
@@ -143,19 +153,22 @@ const Global = {
       );
     }
   },
-  checkMinecraftLibraries() {
-    let totalCount = 0;
+  checkExtraMinecraftLibraries() {
+    const final = [];
     fs.readdirSync(LibrariesManager.getMCMLibraries()).forEach(file => {
       if (file.substring(0, 4) === 'mcm-') {
         if (!ProfilesManager.loadedProfiles.find(prof => file === `mcm-${prof.id}`)) {
-          totalCount++;
+          final.push(file);
         }
       }
     });
 
+    return final;
+  },
+  checkMinecraftLibraries() {
     LibrariesManager.checkMissingLibraries();
-
-    if (totalCount) {
+    const totalCount = this.checkExtraMinecraftLibraries().length;
+    if (totalCount >= 1) {
       ToastManager.createToast(
         'Warning',
         `There are ${totalCount} Minecraft-Manager-related launcher libraries in your Minecraft installation that do not need to exist!`,

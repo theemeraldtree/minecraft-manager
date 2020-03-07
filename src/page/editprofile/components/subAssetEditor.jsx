@@ -35,7 +35,7 @@ const Container = styled.div`
 
 const List = styled.div`
   flex: 1 1 auto;
-  overflow-y: scroll;
+  overflow-y: auto;
   margin-top: 10px;
   margin-bottom: 20px;
   padding: 10px;

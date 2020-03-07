@@ -77,7 +77,6 @@ const MoreInfo = styled.p`
   cursor: pointer;
   position: absolute;
   bottom: 0;
-  z-index: 2;
 `;
 
 const Changelog = styled.div`

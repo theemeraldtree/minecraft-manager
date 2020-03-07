@@ -23,6 +23,14 @@ const LibrariesManager = {
 
     return p;
   },
+  dumpAllLibraries() {
+    const ret = [];
+    fs.readdirSync(this.getMCMLibraries()).forEach(file => {
+      ret.push(file);
+    });
+
+    return ret;
+  },
   checkExist() {
     const mcmpath = path.join(this.getLibrariesPath(), '/minecraftmanager');
     if (!fs.existsSync(mcmpath)) {

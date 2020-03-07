@@ -124,6 +124,13 @@ const VersionsManager = {
       fs.renameSync(oldVersionPath, newVersionPath);
     }
   },
+  dumpAllVersions() {
+    const final = [];
+    fs.readdirSync(this.getVersionsPath()).forEach(file => {
+      final.push(file);
+    });
+    return final;
+  },
   deleteVersion(profile) {
     return new Promise(resolve => {
       if (fs.existsSync(path.join(this.getVersionsPath(), `${profile.safename} [Minecraft Manager]`))) {
