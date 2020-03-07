@@ -5,7 +5,7 @@
     <title>Minecraft Manager</title>
     <style>
       * {
-        font-family: 'Roboto';
+        font-family: 'Roboto', sans-serif;
         user-select: none;
       }
 
@@ -199,7 +199,7 @@
   <body>
     <div id="app">
       <div class="loading">
-        <div class="windowbar"></div>
+        <div id="loading-windowbar" class="windowbar"></div>
         <div class="content">
           <div class="phantom-sidebar"></div>
           <div class="center">
@@ -224,8 +224,12 @@
     </div>
     <script>
       const { remote } = require('electron');
+      const os = require('os');
       const currentWindow = remote.getCurrentWindow();
 
+      if (os.platform() === 'linux') {
+        document.getElementById('loading-windowbar').className = 'hide';
+      }
       window.setTimeout(() => {
         if (document.getElementById('toolong')) {
           document.getElementById('toolong').className = 'toolong';

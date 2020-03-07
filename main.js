@@ -1,18 +1,14 @@
-const {
-  app,
-  BrowserWindow,
-  shell,
-  ipcMain,
-  Notification,
-} = require('electron');
+const { app, BrowserWindow, shell, ipcMain, Notification } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const url = require('url');
 const path = require('path');
 const fs = require('fs');
 const request = require('request-promise');
+const os = require('os');
+
 // Security warning IS DISABLED because we're loading from localhost.
 // this is only disabled so it doesn't clog the console in dev mode
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 
 ipcMain.on('install-update', () => {
   autoUpdater.quitAndInstall();
@@ -20,29 +16,30 @@ ipcMain.on('install-update', () => {
 
 const downloadProgresses = {};
 
-ipcMain.on('download-file', (event, url, dest, id) => {
+ipcMain.on('download-file', (event, downloadURL, dest, id) => {
   downloadProgresses[id] = 0;
   let progressData = 0;
   let contentLength = 0;
   const ws = fs.createWriteStream(dest);
-  const req = request(url, {
-    url: url,
+  const req = request(downloadURL, {
+    downloadURL,
     headers: {
-      'User-Agent': 'Minecraft-Manager',
+      'User-Agent': 'Minecraft-Manager'
     },
-    followAllRedirects: true,
+    followAllRedirects: true
   });
+
   req.on('data', data => {
     progressData += data.length;
 
-    let prog = Math.trunc((progressData / contentLength) * 100);
+    const prog = Math.trunc((progressData / contentLength) * 100);
     if (prog - downloadProgresses[id] >= 10) {
       downloadProgresses[id] = prog;
       if (event) {
         if (event.sender) {
           event.sender.send('file-download-progress', {
-            id: id,
-            progress: prog,
+            id,
+            progress: prog
           });
         }
       }
@@ -53,7 +50,7 @@ ipcMain.on('download-file', (event, url, dest, id) => {
     res.pipe(ws);
     ws.on('finish', () =>
       event.sender.send('file-download-finish', {
-        id: id,
+        id
       })
     );
   });
@@ -62,48 +59,7 @@ ipcMain.on('download-file', (event, url, dest, id) => {
   });
 });
 
-let dev = require('process').execPath.includes('electron');
-
-function checkForUpdates() {
-  autoUpdater.checkForUpdates();
-  autoUpdater.on('checking-for-update', () => {
-    mainWindow.webContents.send('checking-for-update');
-  });
-
-  autoUpdater.on('update-available', () => {
-    mainWindow.webContents.send('update-available');
-  });
-
-  autoUpdater.on('update-downloaded', () => {
-    const notif = new Notification({
-      title: 'Minecraft Manager',
-      body:
-        'An update is available for Minecraft Manager. It has been downloaded and will be installed next time you start the app.',
-    });
-    notif.show();
-    mainWindow.webContents.send('update-downloaded');
-  });
-
-  autoUpdater.on('update-not-available', () => {
-    mainWindow.webContents.send('update-not-available');
-  });
-
-  autoUpdater.on('error', error => {
-    if (dev) {
-      mainWindow.webContents.send('in-dev');
-    } else {
-      mainWindow.webContents.send('error', error);
-    }
-  });
-}
-
-ipcMain.on('check-for-updates', function() {
-  checkForUpdates();
-});
-
-if (!dev) {
-  checkForUpdates();
-}
+const dev = require('process').execPath.includes('electron');
 
 let mainWindow;
 
@@ -119,6 +75,31 @@ ipcMain.on('stop-progress', () => {
   }
 });
 
+function navigation(event, navURL) {
+  if (
+    navURL.substring(0, 22) !== 'http://localhost:9483/' ||
+    navURL.substring(21, 29) === '/linkout' ||
+    navURL.substring(32, 40) === '/linkout'
+  ) {
+    let finalUrl = navURL;
+
+    // Handle Curse's "You're leaving CurseForge" feature
+    // we redirect straight to the page
+    if (navURL.substring(21, 29) === '/linkout') {
+      // Curse encodes the URI's twice for some reason
+      finalUrl = decodeURIComponent(decodeURI(navURL.substring(40)));
+    }
+
+    // linkout for minecraft.curseforge.com
+    if (navURL.substring(32, 40) === '/linkout') {
+      finalUrl = navURL.substring(51);
+    }
+
+    event.preventDefault();
+    shell.openExternal(finalUrl);
+  }
+}
+
 function createWindow() {
   // why show a frame on linux but hide it on everything else?
   // on linux CSD (client-side decoration) causes a ton of problems without a frame
@@ -127,14 +108,16 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 800,
-    frame: require('os').platform() === 'linux',
+    frame: os.platform() === 'linux',
     backgroundColor: '#222',
     webPreferences: {
       webSecurity: false,
-      experimentalFeatures: true,
+      experimentalFeatures: true
     },
-    titleBarStyle: 'hidden',
+    titleBarStyle: 'hidden'
   });
+
+  mainWindow.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 
   if (dev) {
     // install the react devtools
@@ -157,13 +140,13 @@ function createWindow() {
       protocol: 'http:',
       host: 'localhost:9483',
       pathname: 'index.html',
-      slashes: true,
+      slashes: true
     });
   } else {
     index = url.format({
       protocol: 'file:',
       pathname: path.resolve(__dirname, 'bundles', 'index.html'),
-      slashes: true,
+      slashes: true
     });
   }
   mainWindow.loadURL(index);
@@ -172,46 +155,62 @@ function createWindow() {
     mainWindow.show();
   });
 
-  mainWindow.webContents.on('will-navigate', (event, url) => {
-    navigation(event, url);
+  mainWindow.webContents.on('will-navigate', (event, navURL) => {
+    navigation(event, navURL);
   });
 
-  mainWindow.webContents.on('new-window', (event, url) => {
-    navigation(event, url);
+  mainWindow.webContents.on('new-window', (event, navURL) => {
+    navigation(event, navURL);
   });
 
   autoUpdater.checkForUpdatesAndNotify();
 }
 
-function navigation(event, url) {
-  if (
-    url.substring(0, 22) !== 'http://localhost:9483/' ||
-    url.substring(21, 29) === '/linkout' ||
-    url.substring(32, 40) === '/linkout'
-  ) {
-    let finalUrl = url;
-
-    // Handle Curse's "You're leaving CurseForge" feature
-    // we redirect straight to the page
-    if (url.substring(21, 29) === '/linkout') {
-      // Curse encodes the URI's twice for some reason
-      finalUrl = decodeURIComponent(decodeURI(url.substring(40)));
-    }
-
-    // linkout for minecraft.curseforge.com
-    if (url.substring(32, 40) === '/linkout') {
-      finalUrl = url.substring(51);
-    }
-
-    event.preventDefault();
-    shell.openExternal(finalUrl);
-  }
-}
-
-app.on('window-all-closed', function() {
+app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
+
+function checkForUpdates() {
+  autoUpdater.checkForUpdates();
+  autoUpdater.on('checking-for-update', () => {
+    mainWindow.webContents.send('checking-for-update');
+  });
+
+  autoUpdater.on('update-available', () => {
+    mainWindow.webContents.send('update-available');
+  });
+
+  autoUpdater.on('update-downloaded', () => {
+    const notif = new Notification({
+      title: 'Minecraft Manager',
+      body:
+        'An update is available for Minecraft Manager. It has been downloaded and will be installed next time you start the app.'
+    });
+    notif.show();
+    mainWindow.webContents.send('update-downloaded');
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    mainWindow.webContents.send('update-not-available');
+  });
+
+  autoUpdater.on('error', error => {
+    if (dev) {
+      mainWindow.webContents.send('in-dev');
+    } else {
+      mainWindow.webContents.send('error', error);
+    }
+  });
+}
+
+ipcMain.on('check-for-updates', () => {
+  checkForUpdates();
+});
+
+if (!dev) {
+  checkForUpdates();
+}
 
 app.on('ready', createWindow);

@@ -69,7 +69,7 @@ const AboutContainer = styled.div`
 
 const AboutRight = styled.div`
   overflow-x: hidden;
-  margin-left: 20px;
+  margin-left: 10px;
 
   > div:nth-child(2) {
     margin-top: 10px;

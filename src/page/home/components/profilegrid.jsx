@@ -8,15 +8,17 @@ import UpdateOverlay from '../../../component/updateoverlay/updateoverlay';
 import AlertManager from '../../../manager/alertManager';
 
 const BG = styled.div`
-  overflow-y: scroll;
+  overflow-y: auto;
   flex: 1 1 auto;
   padding-bottom: 10px;
 `;
+
 const NoProfileText = styled.p`
   margin: 20px;
   color: white;
   font-size: 21pt;
 `;
+
 export default class ProfileGrid extends Component {
   constructor(props) {
     super(props);

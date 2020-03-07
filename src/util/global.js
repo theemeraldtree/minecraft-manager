@@ -166,7 +166,13 @@ const Global = {
   parseVersionsJSON(versionsJSON) {
     const { versions } = versionsJSON;
     this.ALL_VERSIONS = versions.map(ver => ver.id);
-    this.MC_VERSIONS = versions.filter(ver => ver.type === 'release');
+    this.MC_VERSIONS = versions.map(ver => {
+      if (ver.type === 'release') return ver.id;
+
+      return undefined;
+    });
+
+    this.MC_VERSIONS = this.MC_VERSIONS.filter(ver => ver !== undefined);
 
     fs.writeFileSync(path.join(this.MCM_PATH, '/mcvercache.json'), JSON.stringify(versionsJSON));
   },
