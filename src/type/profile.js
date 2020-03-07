@@ -197,22 +197,15 @@ export default function Profile(rawomaf) {
     if (this.frameworks.fabric) {
       return 'fabric';
     }
+
+    return 'none';
   };
   this.toJSON = function() {
-    const copy = { ...this };
-    for (const x of Object.keys(copy)) {
-      if (typeof copy[x] === 'function') {
-        copy[x] = undefined;
-      }
+    const copy = { ...this }.map(x => {
+      if (typeof x !== 'function' && !this.localValues.includes(x)) return x;
 
-      if (this.localValues.includes(x)) {
-        copy[x] = undefined;
-      }
-    }
-
-    for (const i of this.localValues) {
-      copy[i] = undefined;
-    }
+      return undefined;
+    });
 
     copy.localValues = undefined;
 
@@ -253,7 +246,8 @@ export default function Profile(rawomaf) {
     return new Promise(resolve => {
       fs.writeFile(path.join(this.profilePath, 'profile.json'), this.toJSON(), () => {
         if (this.mods) {
-          const modOut = this.mods.map(mod => {
+          const modOut = this.mods.map(modT => {
+            let mod = modT;
             if (!(mod instanceof Mod)) {
               mod = new Mod(mod);
             }
@@ -270,7 +264,8 @@ export default function Profile(rawomaf) {
         }
 
         if (this.resourcepacks) {
-          const rpOut = this.resourcepacks.map(rp => {
+          const rpOut = this.resourcepacks.map(rpT => {
+            let rp = rpT;
             if (!(rp instanceof GenericAsset)) {
               rp = new GenericAsset(rp);
             }
@@ -362,16 +357,14 @@ export default function Profile(rawomaf) {
         Global.copyDirSync(this.profilePath, tempPath);
 
         exportProgress('Removing Online Mods...');
-        for (let mod of this.mods) {
-          if (!(mod instanceof Mod)) {
-            mod = new Mod(mod);
-          }
-          if (mod.hosts) {
-            if (mod.hosts.curse) {
-              fs.unlinkSync(path.join(filesPath, mod.getJARFile().path));
-            }
-          }
-        }
+        this.mods = this.mods.map(modT => {
+          let mod = modT;
+          if (!(mod instanceof Mod)) mod = new Mod(mod);
+
+          if (mod.hosts && mod.hosts.curse) fs.unlinkSync(path.join(filesPath, mod.getJARFile().path));
+
+          return mod;
+        });
 
         exportProgress('Cleaning up properties...');
         const obj = JSON.parse(fs.readFileSync(path.join(tempPath, '/profile.json')));
@@ -445,6 +438,8 @@ export default function Profile(rawomaf) {
       }
       return this.resourcepacks.find(rp => rp.id === id);
     }
+
+    return undefined;
   };
 
   this.addSubAsset = function(type, asset) {
@@ -467,8 +462,9 @@ export default function Profile(rawomaf) {
     }
   };
 
-  this.deleteSubAsset = function(type, asset) {
+  this.deleteSubAsset = function(type, assetT) {
     return new Promise(resolve => {
+      let asset = assetT;
       if (type === 'mod') {
         asset = this.mods.find(m => m.id === asset.id);
         if (!(asset instanceof Mod)) {
@@ -556,6 +552,8 @@ export default function Profile(rawomaf) {
         });
       });
     }
+
+    return undefined;
   };
 
   // ugh.. renaming...

@@ -1,24 +1,28 @@
 import React, { useState, useEffect, useContext } from 'react';
+import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 import styled from 'styled-components';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import TextInput from '../../component/textinput/textinput';
 import Button from '../../component/button/button';
 import InputHolder from '../../component/inputholder/inputholder';
 import Global from '../../util/global';
 import SettingsManager from '../../manager/settingsManager';
-import { withRouter } from 'react-router-dom';
-import fs from 'fs';
-import path from 'path';
 import LibrariesManager from '../../manager/librariesManager';
-import os from 'os';
 import logo from '../../img/logo-sm.png';
 import NavContext from '../../navContext';
+
 const { dialog } = require('electron').remote;
+
 const Title = styled.p`
   color: white;
   font-size: 26pt;
   font-weight: 200;
   margin: 0;
 `;
+
 const WelcomeBox = styled.div`
   background-color: #404040;
   max-width: 600px;
@@ -29,6 +33,7 @@ const WelcomeBox = styled.div`
   align-items: center;
   flex-flow: column;
 `;
+
 const Subtext = styled.p`
   color: white;
   margin: 0;
@@ -62,6 +67,7 @@ const IH = styled(InputHolder)`
   max-width: 650px;
   width: 100%;
 `;
+
 const Spacing = styled.div`
   width: 100%;
   height: 30px;
@@ -72,7 +78,8 @@ const AutofillText = styled.p`
   font-size: 10pt;
   color: white;
 `;
-export default withRouter(function WelcomePage({ history }) {
+
+function WelcomePage({ history }) {
   const nav = useContext(NavContext);
 
   const [mcHome, setMCHome] = useState(Global.getDefaultMinecraftPath());
@@ -90,7 +97,7 @@ export default withRouter(function WelcomePage({ history }) {
   };
 
   const chooseHomeDirectory = () => {
-    let p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialog({
       title: 'Choose your Minecraft Home Directory',
       defaultPath: Global.getDefaultMinecraftPath(),
       buttonLabel: 'Select Directory',
@@ -105,7 +112,8 @@ export default withRouter(function WelcomePage({ history }) {
     setPreparing(true);
     SettingsManager.setHomeDirectory(mcHome);
     SettingsManager.setMCExe(mcExe);
-    let mcl = path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager');
+
+    const mcl = path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager');
     if (!fs.existsSync(mcl)) {
       fs.mkdirSync(mcl);
     }
@@ -114,7 +122,8 @@ export default withRouter(function WelcomePage({ history }) {
       fs.mkdirSync(LibrariesManager.getMCMLibraries());
     }
 
-    let result = await Global.updateMCVersions(true);
+    const result = await Global.updateMCVersions(true);
+
     if (result === 'no-connection') {
       setPreparing(false);
     } else {
@@ -132,11 +141,11 @@ export default withRouter(function WelcomePage({ history }) {
     } else if (os.platform() === 'darwin') {
       properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory'];
     }
-    let p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialog({
       title: 'Choose your Minecraft Executable',
       defaultPath: Global.getDefaultMCExePath(),
       buttonLabel: 'Select File',
-      properties: properties
+      properties
     });
     if (p[0]) {
       setMCExe(p[0]);
@@ -236,4 +245,10 @@ export default withRouter(function WelcomePage({ history }) {
       </Content>
     </>
   );
-});
+}
+
+WelcomePage.propTypes = {
+  history: PropTypes.object.isRequired
+};
+
+export default withRouter(WelcomePage);

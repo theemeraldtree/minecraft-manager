@@ -31,6 +31,8 @@
     "no-async-promise-executor": "off",
     "prefer-destructuring": "off",
     "no-plusplus": "off",
-    "radix": "off"
+    "radix": "off",
+    "function-paren-newline": "off",
+    "no-console": "off"
   }
 }

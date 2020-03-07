@@ -7,6 +7,7 @@ import LibrariesManager from '../../../manager/librariesManager';
 import VersionsManager from '../../../manager/versionsManager';
 import LauncherManager from '../../../manager/launcherManager';
 import AlertManager from '../../../manager/alertManager';
+
 const List = styled.div`
   display: flex;
   flex-flow: column;
@@ -18,6 +19,7 @@ const List = styled.div`
 
 export default function Help() {
   const [action, setAction] = useState('');
+
   const confirmAction = () => {
     switch (action) {
       case 'clean-launcher-profiles':
@@ -29,16 +31,20 @@ export default function Help() {
       case 'clean-launcher-versions':
         VersionsManager.cleanVersions();
         break;
+      default:
+        break;
     }
   };
-  const prepareAction = action => {
-    setAction(action);
+
+  const prepareAction = act => {
+    setAction(act);
     AlertManager.alert(
-      `this can be dangerous!`,
-      `are you sure? this is a potentially dangerous operation that can screw up your game!`,
+      'this can be dangerous!',
+      'are you sure? this is a potentially dangerous operation that can screw up your game!',
       confirmAction
     );
   };
+
   return (
     <>
       <NeedHelp />

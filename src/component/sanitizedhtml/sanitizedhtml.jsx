@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
+
 const sanitizeHTML = require('sanitize-html');
 
 const Styling = styled.div`
@@ -44,6 +46,7 @@ const Styling = styled.div`
     }
   `}
 `;
+
 const SanitizedHTML = ({ html, small }) => (
   <Styling
     small={small}
@@ -80,5 +83,10 @@ const SanitizedHTML = ({ html, small }) => (
     }}
   />
 );
+
+SanitizedHTML.propTypes = {
+  html: PropTypes.string.isRequired,
+  small: PropTypes.bool
+};
 
 export default SanitizedHTML;

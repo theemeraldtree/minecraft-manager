@@ -205,9 +205,9 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate }) 
 ProfileCard.propTypes = {
   profile: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
-  showDeletion: PropTypes.bool,
-  showShare: PropTypes.bool,
-  showUpdate: PropTypes.bool
+  showDeletion: PropTypes.func,
+  showShare: PropTypes.func,
+  showUpdate: PropTypes.func
 };
 
 export default withRouter(ProfileCard);

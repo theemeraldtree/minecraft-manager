@@ -10,6 +10,7 @@ const BG = styled.div`
   background-color: #2b2b2b;
   display: flex;
   align-items: center;
+  white-space: nowrap;
 `;
 
 const Title = styled.p`
@@ -106,7 +107,7 @@ const Header = ({ history }) => {
 };
 
 Header.propTypes = {
-  history: PropTypes.node.isRequired
+  history: PropTypes.object.isRequired
 };
 
 export default withRouter(Header);

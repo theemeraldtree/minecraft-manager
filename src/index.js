@@ -11,6 +11,7 @@ import HTTPRequest from './host/httprequest';
 import ToastManager from './manager/toastManager';
 import ErrorManager from './manager/errorManager';
 import LibrariesManager from './manager/librariesManager';
+import './font/fonts.css';
 
 const { remote, shell, ipcRenderer } = require('electron');
 const { dialog } = require('electron').remote;
@@ -19,7 +20,6 @@ const yaml = require('js-yaml');
 const semver = require('semver');
 const os = require('os');
 const { version } = require('../package.json');
-require('typeface-roboto');
 
 async function load() {
   try {
@@ -46,7 +46,7 @@ async function load() {
   await ProfilesManager.getProfiles();
 
   document.addEventListener('keydown', e => {
-    if (e.keyCode == 123) {
+    if (e.keyCode === 123) {
       remote.getCurrentWindow().webContents.toggleDevTools();
     }
   });

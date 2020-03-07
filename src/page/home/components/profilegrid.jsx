@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import styled from 'styled-components';
 import ProfilesManager from '../../../manager/profilesManager';
 import ProfileCard from '../../../component/profilecard/profilecard';
-import styled from 'styled-components';
 import ShareOverlay from '../../../component/shareoverlay/shareoverlay';
 import UpdateOverlay from '../../../component/updateoverlay/updateoverlay';
 import AlertManager from '../../../manager/alertManager';
+
 const BG = styled.div`
   overflow-y: scroll;
   flex: 1 1 auto;
@@ -19,8 +21,7 @@ export default class ProfileGrid extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      profiles: [],
-      showDelete: false
+      profiles: []
     };
   }
 
@@ -70,12 +71,11 @@ export default class ProfileGrid extends Component {
       deletingProfile: profile
     });
 
-    AlertManager.alert(`are you sure?`, '', this.confirmDelete, 'delete');
+    AlertManager.alert('are you sure?', '', this.confirmDelete, 'delete');
   };
 
   confirmDelete = () => {
-    let { deletingProfile } = this.state;
-    ProfilesManager.deleteProfile(deletingProfile);
+    ProfilesManager.deleteProfile(this.state.deletingProfile);
   };
 
   render() {
@@ -98,10 +98,10 @@ export default class ProfileGrid extends Component {
                     profile={profile}
                   />
                 );
-              } else {
-                return;
               }
             }
+
+            return undefined;
           })}
         {profiles.length === 0 && (
           <>
@@ -115,3 +115,7 @@ export default class ProfileGrid extends Component {
     );
   }
 }
+
+ProfileGrid.propTypes = {
+  searchTerm: PropTypes.string
+};

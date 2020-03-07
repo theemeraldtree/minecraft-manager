@@ -16,30 +16,8 @@ export default function DiscoverPage() {
   const [listState, setListState] = useState('browseAssets');
   const [progressState, setProgressState] = useState({});
 
-  useEffect(() => {
-    ProfilesManager.registerReloadListener(updateProgressStates);
-    updateProgressStates();
-
-    header.setOnBackClick(backClick);
-    header.setTitle('discover');
-    header.setShowBackButton(false);
-    header.setBackLink(undefined);
-    header.setShowChildren(true);
-  }, []);
-
-  useEffect(() => {
-    header.setShowBackButton(listState !== 'browseAssets');
-    header.setShowChildren(listState === 'browseAssets');
-  }, [listState]);
-
-  useEffect(() => {
-    header.setChildren(
-      <SearchBox value={searchValue} onChange={searchChange} onKeyPress={searchChange} placeholder="search" />
-    );
-  }, [searchValue]);
-
   const searchChange = e => {
-    let term = e.target.value;
+    const term = e.target.value;
     setSearchValue(term);
     if (e.key === 'Enter') {
       setSearchTerm(term);
@@ -57,8 +35,8 @@ export default function DiscoverPage() {
 
   const installClick = async e => {
     e.stopPropagation();
-    let cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
-    let modpack = Hosts.cache.assets[cachedID];
+    const cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
+    const modpack = Hosts.cache.assets[cachedID];
     ProfilesManager.progressState[modpack.id] = {
       progress: 'installing',
       version: `temp-${new Date().getTime()}`
@@ -82,22 +60,30 @@ export default function DiscoverPage() {
     });
   };
 
+  useEffect(() => {
+    ProfilesManager.registerReloadListener(updateProgressStates);
+    updateProgressStates();
+
+    header.setOnBackClick(backClick);
+    header.setTitle('discover');
+    header.setShowBackButton(false);
+    header.setBackLink(undefined);
+    header.setShowChildren(true);
+  }, []);
+
+  useEffect(() => {
+    header.setShowBackButton(listState !== 'browseAssets');
+    header.setShowChildren(listState === 'browseAssets');
+  }, [listState]);
+
+  useEffect(() => {
+    header.setChildren(
+      <SearchBox value={searchValue} onChange={searchChange} onKeyPress={searchChange} placeholder="search" />
+    );
+  }, [searchValue]);
+
   return (
     <Page>
-      {/* <Header 
-                showBackButton={listState !== 'browseAssets'} 
-                backClick={backClick} 
-                title='discover'
-                showChildren={listState === 'browseAssets'}
-            >
-                <SearchBox 
-                    value={searchValue} 
-                    onChange={searchChange} 
-                    onKeyPress={earchChange} 
-                    placeholder='search' 
-                />
-            </Header> */}
-
       <DiscoverList
         host="curse"
         mcVerFilter="All"

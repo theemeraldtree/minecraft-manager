@@ -81,9 +81,9 @@ const LauncherManager = {
     this.setProfileData(profile, 'javaArgs', args);
   },
   setDedicatedRam(amount) {
-    for (const profile of ProfilesManager.loadedProfiles) {
+    ProfilesManager.loadedProfiles.forEach(profile => {
       this.setLaunchArguments(profile, `-Xmx${amount}G ${this.DEFAULT_JAVA_ARGS}`);
-    }
+    });
   },
   cleanMinecraftProfiles() {
     LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Starting clean...');

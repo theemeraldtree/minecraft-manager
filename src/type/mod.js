@@ -18,15 +18,11 @@ export default function Mod(rawoamf) {
   // useful functions
 
   this.cleanObject = function() {
-    const copy = { ...this };
-    for (const x of Object.keys(copy)) {
-      if (typeof copy[x] === 'function') {
-        copy[x] = undefined;
-      }
-      if (this.localValues.includes(x)) {
-        copy[x] = undefined;
-      }
-    }
+    const copy = { ...this }.map(x => {
+      if (typeof x !== 'function' && !this.localValues.includes(x)) return x;
+
+      return undefined;
+    });
 
     copy.localValues = undefined;
 
@@ -65,11 +61,9 @@ export default function Mod(rawoamf) {
   };
 
   this.getJARFile = function() {
-    for (const file of this.files) {
-      if (file.type === 'jar' && file.priority === 'mainFile') {
-        return file;
-      }
-    }
+    const file = this.files.find(f => f.type === 'jar' && f.priority === 'mainFile');
+    if (file) return file;
+
     return {
       path: undefined
     };

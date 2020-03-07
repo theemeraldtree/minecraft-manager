@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+
 const Section = styled.div`
   max-width: 680px;
   background-color: #404040;
@@ -13,4 +14,5 @@ const Section = styled.div`
     margin-bottom: 5px;
   }
 `;
+
 export default Section;

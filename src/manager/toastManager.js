@@ -11,11 +11,7 @@ const ToastManager = {
     }
   },
   dissmisToast(id) {
-    for (const toast of this.toasts) {
-      if (toast.id === id) {
-        this.toasts.splice(this.toasts.indexOf(toast), 1);
-      }
-    }
+    this.toasts.splice(this.toasts.find(toast => toast.id === id));
     this.updateHandler();
   },
   createToast(title, body, error) {

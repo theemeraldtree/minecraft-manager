@@ -14,7 +14,7 @@ import FabricFramework from '../framework/fabric/fabricFramework';
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
-const admzip = require('adm-zip');
+const ADMZip = require('adm-zip');
 
 const ProfilesManager = {
   loadedProfiles: [],
@@ -48,9 +48,7 @@ const ProfilesManager = {
   },
   updateReloadListeners() {
     Global.updateCache();
-    for (const listener of this.reloadListeners) {
-      listener();
-    }
+    this.reloadListeners.forEach(listener => listener());
   },
   registerReloadListener(listener) {
     LogManager.log('info', '[ProfilesManager] Registering reload listener');
@@ -74,7 +72,7 @@ const ProfilesManager = {
   },
   importProfile(profilePath, stateChange) {
     return new Promise(resolve => {
-      const zip = new admzip(profilePath);
+      const zip = new ADMZip(profilePath);
 
       stateChange('Extracting...');
       const extractPath = path.join(Global.MCM_TEMP, `profileimport-${new Date().getTime()}`);
@@ -94,7 +92,7 @@ const ProfilesManager = {
       );
 
       if (fs.existsSync(profPath)) {
-        throw `There is already a profile with the name: ${obj.name}`;
+        throw new Error(`There is already a profile with the name: ${obj.name}`);
       }
       fs.mkdirSync(path.join(extractPath, '/_mcm'));
       fs.mkdirSync(path.join(extractPath, '/_mcm/icons'));
@@ -127,8 +125,8 @@ const ProfilesManager = {
         if (profile.mods) {
           LogManager.log('info', `[ProfilesManager] (ProfileImport) Starting mod download for ${profile.id}`);
           stateChange('Downloading mods...');
-          const curseModsToDownload = [];
-          for (const mod of profile.mods) {
+          const curseModsToDownload = profile.mods.map(modT => {
+            const mod = modT;
             if (mod.hosts) {
               if (mod.hosts.curse) {
                 LogManager.log('info', `[ProfilesManager] (ProfileImport) Adding mod to download queue ${mod.id}`);
@@ -138,7 +136,9 @@ const ProfilesManager = {
                 curseModsToDownload.push(mod);
               }
             }
-          }
+
+            return undefined;
+          });
 
           LogManager.log('info', `[ProfilesManager] (ProfileImport) Creating progressive download for ${profile.id}`);
           DownloadsManager.createProgressiveDownload(`Mods from ${profile.name}`).then(download => {
@@ -244,11 +244,9 @@ const ProfilesManager = {
   },
 
   containsProfileWithName(name) {
-    for (const profile of this.loadedProfiles) {
-      if (profile.name.toLowerCase() === name.toLowerCase()) {
-        return true;
-      }
-    }
+    const foundProfile = this.loadedProfiles.find(profile => profile.name.toLowerCase() === name.toLowerCase());
+    if (foundProfile) return true;
+
     return false;
   },
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Page from '../page';
 import styled from 'styled-components';
+import Page from '../page';
 import About from './pages/about';
 import General from './pages/general';
 import Defaults from './pages/defaults';
 import Help from './pages/help';
 import NavContext from '../../navContext';
+
 const Sidebar = styled.div`
   height: 100%;
   position: absolute;
@@ -35,6 +36,7 @@ const Item = styled.p`
             filter: brightness(1.0);
         }
     `}
+
   margin-bottom: 15px;
   transition: font-weight 150ms;
 `;

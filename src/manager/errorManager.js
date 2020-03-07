@@ -11,6 +11,8 @@ const ErrorManager = {
           return error.toString();
       }
     }
+
+    return error.toString();
   }
 };
 

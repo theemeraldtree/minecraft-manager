@@ -13,7 +13,7 @@ function getColor(name) {
     case 'red':
       return '#8a1111';
     default:
-      return '#138c0a';
+      return 'none';
   }
 }
 

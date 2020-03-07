@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import logo from '../../../img/logo-sm.png';
 import { ipcRenderer } from 'electron';
+import logo from '../../../img/logo-sm.png';
 import Button from '../../../component/button/button';
 import Section from '../components/section';
 import NeedHelp from '../components/needhelp';
@@ -85,13 +85,13 @@ export default function About() {
       ipcRenderer.on('error', () => {
         setUpdateDisabled(false);
         setUpdateText('check for updates');
-        setUpdateSubText(`Error checking for updates`);
+        setUpdateSubText('Error checking for updates');
       });
 
       ipcRenderer.on('in-dev', () => {
         setUpdateDisabled(true);
         setUpdateText('in dev');
-        setUpdateSubText(`cannot update while in dev mode`);
+        setUpdateSubText('Cannot update while in dev mode');
       });
 
       ipcRenderer.on('update-not-available', () => {

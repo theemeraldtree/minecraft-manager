@@ -33,7 +33,6 @@ const VersionsManager = {
       obj.libraries[0].name = `minecraftmanager.profiles:mcm-${profile.id}:forge`;
     } else if (type === 'forgeComplex') {
       obj = meta.version;
-      obj._comment_ = undefined;
       obj.time = undefined;
       obj.releaseTime = undefined;
       obj.libraries[0] = {

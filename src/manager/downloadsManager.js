@@ -8,15 +8,15 @@ import LogManager from './logManager';
 const DownloadsManager = {
   activeDownloads: [],
   downloadUpdateFunc: null,
-  startFileDownload(downloadName, file, path, tries) {
+  startFileDownload(downloadName, file, downloadPath, tries) {
     return new Promise((resolve, reject) => {
       if (file) {
-        const download = new Download(downloadName, file, path);
+        const download = new Download(downloadName, file, downloadPath);
         this.activeDownloads.push(download);
         if (this.onDownload) {
           this.downloadUpdate();
         }
-        HTTPRequest.download(file, path, progress => {
+        HTTPRequest.download(file, downloadPath, progress => {
           this.handleDownloadProgress(download, progress);
         })
           .then(() => {
@@ -26,15 +26,15 @@ const DownloadsManager = {
           })
           .catch(() => {
             if (tries === 3) {
-              reject('try-limit');
+              reject(new Error('try-limit'));
             } else {
               this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
-              this.startFileDownload(downloadName, file, path, tries++)
+              this.startFileDownload(downloadName, file, downloadPath, tries + 1)
                 .then(res => {
                   resolve(res);
                 })
                 .catch(() => {
-                  if (tries++ >= 3) {
+                  if (tries + 1 >= 3) {
                     reject();
                   }
                 });
@@ -46,11 +46,7 @@ const DownloadsManager = {
     });
   },
   removeDownload(downloadName) {
-    for (const download of this.activeDownloads) {
-      if (download.name === downloadName) {
-        this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
-      }
-    }
+    this.activeDownloads.splice(this.activeDownloads.find(download => download.name === downloadName));
     this.downloadUpdate();
   },
   createProgressiveDownload(downloadName) {

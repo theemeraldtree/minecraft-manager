@@ -11,11 +11,10 @@ const AlertManager = {
     }
   },
   dismissAlert(id) {
-    for (const alert of this.alerts) {
-      if (alert.id === id) {
-        this.alerts.splice(this.alerts.indexOf(alert), 1);
-      }
-    }
+    this.alerts.splice(
+      this.alerts.find(alert => alert.id === id),
+      1
+    );
 
     this.updateHandler();
   },

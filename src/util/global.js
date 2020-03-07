@@ -94,7 +94,7 @@ const Global = {
 
     if (req !== undefined) {
       versionsJSON = JSON.parse(req);
-    } else if (req == undefined && firstTime) {
+    } else if (req === undefined && firstTime) {
       ToastManager.createToast(
         'Uh oh!',
         "We're having trouble downloading the latest Minecraft versions. This is necessary for Minecraft Manager to function. Check your internet connection and try again"
@@ -104,6 +104,8 @@ const Global = {
     if (versionsJSON) {
       this.parseVersionsJSON(versionsJSON);
     }
+
+    return undefined;
   },
   checkMinecraftVersions() {
     let totalCount = 0;
@@ -162,14 +164,10 @@ const Global = {
     }
   },
   parseVersionsJSON(versionsJSON) {
-    this.ALL_VERSIONS = [];
-    this.MC_VERSIONS = [];
-    for (const ver of versionsJSON.versions) {
-      this.ALL_VERSIONS.push(ver.id);
-      if (ver.type === 'release') {
-        this.MC_VERSIONS.push(ver.id);
-      }
-    }
+    const { versions } = versionsJSON;
+    this.ALL_VERSIONS = versions.map(ver => ver.id);
+    this.MC_VERSIONS = versions.filter(ver => ver.type === 'release');
+
     fs.writeFileSync(path.join(this.MCM_PATH, '/mcvercache.json'), JSON.stringify(versionsJSON));
   },
   getMCFilterOptions() {
@@ -209,6 +207,8 @@ const Global = {
     if (obj instanceof Profile) {
       return 'profile';
     }
+
+    return undefined;
   },
   getDefaultMinecraftPath: () => {
     if (os.platform() === 'win32') {
@@ -246,6 +246,8 @@ const Global = {
     if (os.platform() === 'linux') {
       return path.join('/opt/minecraft-launcher/minecraft-launcher');
     }
+
+    return undefined;
   },
   getMCPath: () => SettingsManager.MC_HOME,
   copyDirSync(src, dest) {
@@ -276,7 +278,7 @@ const Global = {
   // if it finds them, it attempts to understand it and sync minecraft manager's subassets
   // with those that the user has changed
   scanProfiles() {
-    for (const profile of ProfilesManager.loadedProfiles) {
+    ProfilesManager.loadedProfiles.forEach(profile => {
       fs.readdir(path.join(profile.gameDir, '/resourcepacks'), (err, files) => {
         if (files) {
           if (files.length !== profile.resourcepacks.length) {
@@ -347,10 +349,9 @@ const Global = {
         }
       });
 
-      profile.resourcepacks.forEach(rp => {
-        if (!(rp instanceof GenericAsset)) {
-          rp = new GenericAsset(rp);
-        }
+      profile.resourcepacks.forEach(rpT => {
+        let rp = rpT;
+        if (!(rp instanceof GenericAsset)) rp = new GenericAsset(rp);
 
         if (!fs.existsSync(path.join(profile.gameDir, rp.getMainFile().path))) {
           LogManager.log(
@@ -406,10 +407,9 @@ const Global = {
         }
       });
 
-      profile.mods.forEach(mod => {
-        if (!(mod instanceof Mod)) {
-          mod = new Mod(mod);
-        }
+      profile.mods.forEach(modT => {
+        let mod = modT;
+        if (!(mod instanceof Mod)) mod = new Mod(mod);
 
         if (!fs.existsSync(path.join(profile.gameDir, mod.getJARFile().path))) {
           LogManager.log(
@@ -419,7 +419,7 @@ const Global = {
           profile.deleteSubAsset('mod', mod);
         }
       });
-    }
+    });
   },
 
   /* eslint-disable */

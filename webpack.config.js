@@ -9,15 +9,15 @@ module.exports = {
   entry: ['babel-polyfill', './index.js'],
   mode: 'none',
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx']
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './index.html',
+      template: './index.html'
     }),
     new PrettierPlugin({
-      configFile: '.prettierrc',
-    }),
+      configFile: '.prettierrc'
+    })
   ],
   devtool: 'source-map',
   target: 'electron-main',
@@ -25,30 +25,30 @@ module.exports = {
     rules: [
       {
         test: /\.(css)$/,
-        loaders: ['css-loader'],
+        loaders: ['style-loader', 'css-loader']
       },
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        loaders: ['babel-loader', 'eslint-loader'],
+        loaders: ['babel-loader', 'eslint-loader']
       },
       {
         test: /\.(gif|svg|jpg|png)$/,
         include: path.resolve(__dirname, 'src'),
-        loader: 'file-loader',
+        loader: 'file-loader'
       },
       {
         test: /\.(ttf|woff|woff2)$/,
         loader: 'file-loader',
         options: {
-          outputPath: 'src/font',
-        },
-      },
-    ],
+          outputPath: 'src/font'
+        }
+      }
+    ]
   },
   node: {
     __dirname: false,
-    __filename: false,
+    __filename: false
   },
   devServer: {
     contentBase: `${__dirname}/bundles`,
@@ -56,12 +56,12 @@ module.exports = {
       spawn('electron', ['.'], {
         shell: true,
         env: process.env,
-        stdio: 'inherit',
+        stdio: 'inherit'
       }).on('close', code => process.exit(code));
-    },
+    }
   },
   output: {
     filename: 'index.js',
-    path: `${__dirname}/bundles`,
-  },
+    path: `${__dirname}/bundles`
+  }
 };

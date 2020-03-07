@@ -6,6 +6,7 @@ import Detail from '../../../component/detail/detail';
 import InputHolder from '../../../component/inputholder/inputholder';
 import SettingsManager from '../../../manager/settingsManager';
 import Global from '../../../util/global';
+
 const { dialog } = require('electron').remote;
 const os = require('os');
 
@@ -29,14 +30,17 @@ export default function General() {
   const [ramChangeDisabled, setRamChangeDisabled] = useState(true);
   const [warningMessage, setWarningMessage] = useState('');
   const chooseHomeDirectory = () => {
-    let p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialog({
       title: 'Choose your Minecraft Home Directory',
       defaultPath: Global.getDefaultMinecraftPath(),
       buttonLabel: 'Select Directory',
       properties: ['openDirectory', 'showHiddenFiles']
     });
-    SettingsManager.setHomeDirectory(p[0]);
-    setMCHome(p[0]);
+
+    if (p[0]) {
+      SettingsManager.setHomeDirectory(p[0]);
+      setMCHome(p[0]);
+    }
   };
 
   const chooseMCExe = () => {
@@ -46,30 +50,33 @@ export default function General() {
     } else if (os.platform() === 'darwin') {
       properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory'];
     }
-    let p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialog({
       title: 'Choose your Minecraft Executable',
       defaultPath: Global.getDefaultMCExePath(),
       buttonLabel: 'Select File',
-      properties: properties
+      properties
     });
-    SettingsManager.setMCExe(p[0]);
-    setMCExe(p[0]);
+
+    if (p[0]) {
+      SettingsManager.setMCExe(p[0]);
+      setMCExe(p[0]);
+    }
   };
 
   const ramAmountChange = e => {
-    let newAmount = e.target.value;
-    let oldAmount = SettingsManager.currentSettings.dedicatedRam.toString();
+    const newAmount = e.target.value;
+    const oldAmount = SettingsManager.currentSettings.dedicatedRam.toString();
 
     if (/^[0-9\b]+$/.test(newAmount) || newAmount === '') {
       setRamChangeDisabled(true);
       setDedicatedRam(newAmount);
-      let intAmount = parseInt(newAmount);
+      const intAmount = parseInt(newAmount);
       if (intAmount >= Math.ceil(os.totalmem() / 1073741824)) {
-        setWarningMessage(`That is equal to or higher than your available RAM! Please set it lower!`);
+        setWarningMessage('That is equal to or higher than your available RAM! Please set it lower!');
       } else if (newAmount === '') {
-        setWarningMessage(`Please enter a value`);
+        setWarningMessage('Please enter a value');
       } else if (intAmount === 0) {
-        setWarningMessage(`You need to provide SOME amount of RAM!`);
+        setWarningMessage('You need to provide SOME amount of RAM!');
       } else {
         setRamChangeDisabled(newAmount === oldAmount);
         setWarningMessage('');

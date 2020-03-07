@@ -42,9 +42,9 @@ export default function GenericAsset(rawomaf) {
 
   this.cleanObject = function() {
     const copy = { ...this }.map(x => {
-      if (!this.localValues.includes(x) && typeof x !== 'function') {
-        return x;
-      }
+      if (!this.localValues.includes(x) && typeof x !== 'function') return x;
+
+      return undefined;
     });
 
     copy.localValues = undefined;

@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Page from '../page';
+import PropTypes from 'prop-types';
 import { Redirect, withRouter } from 'react-router-dom';
-import ProfilesManager from '../../manager/profilesManager';
 import styled from 'styled-components';
+import Page from '../page';
+import ProfilesManager from '../../manager/profilesManager';
 import Button from '../../component/button/button';
 import SanitizedHTML from '../../component/sanitizedhtml/sanitizedhtml';
 import Confirmation from '../../component/confirmation/confirmation';
@@ -10,6 +11,7 @@ import ShareOverlay from '../../component/shareoverlay/shareoverlay';
 import UpdateOverlay from '../../component/updateoverlay/updateoverlay';
 import NavContext from '../../navContext';
 import Global from '../../util/global';
+
 const Image = styled.img`
   min-width: 193px;
   height: 193px;
@@ -55,6 +57,7 @@ const CustomButton = styled(Button)`
   width: 170px;
   text-align: center;
 `;
+
 const ButtonGroup = styled.div`
   width: 200px;
   div:not(:first-child) {
@@ -69,7 +72,8 @@ const Description = styled.div`
   flex: 1 1 auto;
   height: 100%;
 `;
-export default withRouter(function ViewProfilePage({ match, history }) {
+
+function ViewProfilePage({ match, history }) {
   const { header } = useContext(NavContext);
 
   const [profile, setProfile] = useState({ name: 'loading...' });
@@ -95,7 +99,7 @@ export default withRouter(function ViewProfilePage({ match, history }) {
 
   const confirmDelete = () => {
     ProfilesManager.deleteProfile(profile).then(() => {
-      history.push(`/`);
+      history.push('/');
     });
   };
 
@@ -143,7 +147,13 @@ export default withRouter(function ViewProfilePage({ match, history }) {
         {showUpdateOverlay && <UpdateOverlay cancelClick={() => setShowUpdateOverlay(false)} profile={profile} />}
       </Page>
     );
-  } else {
-    return <Redirect to="/" />;
   }
-});
+  return <Redirect to="/" />;
+}
+
+ViewProfilePage.propTypes = {
+  history: PropTypes.object.isRequired,
+  match: PropTypes.object.isRequired
+};
+
+export default withRouter(ViewProfilePage);
