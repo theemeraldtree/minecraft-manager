@@ -1,5 +1,5 @@
 const ErrorManager = {
-  makeReadable: (error) => {
+  makeReadable: error => {
     // node fs errors
     if (error.code) {
       switch (error.code) {

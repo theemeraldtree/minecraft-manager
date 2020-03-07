@@ -25,13 +25,13 @@ const ProfilesManager = {
   getProfiles() {
     this.loadedProfiles = [];
     LogManager.log('info', '[ProfilesManager] Getting profiles...');
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (fs.existsSync(Global.PROFILES_PATH)) {
         fs.readdir(Global.PROFILES_PATH, (err, files) => {
           if (files.length >= 1) {
-            files.forEach(async (file) => {
+            files.forEach(async file => {
               await this.processProfileFolder(
-                path.join(Global.PROFILES_PATH + file),
+                path.join(Global.PROFILES_PATH + file)
               );
               this.updateReloadListeners();
               resolve();
@@ -65,10 +65,10 @@ const ProfilesManager = {
   updateProfile(newProfile) {
     LogManager.log(
       'info',
-      `[ProfilesManager] Updating profile ${newProfile.id}`,
+      `[ProfilesManager] Updating profile ${newProfile.id}`
     );
     const oldProfile = this.loadedProfiles.findIndex(
-      (item) => item.id === newProfile.id,
+      item => item.id === newProfile.id
     );
     this.loadedProfiles[oldProfile] = newProfile;
     this.updateReloadListeners();
@@ -79,22 +79,22 @@ const ProfilesManager = {
     }
     Global.copyDirSync(
       profile.gameDir,
-      path.join(Global.BACKUPS_DIR, `${profile.id}-${new Date().getTime()}`),
+      path.join(Global.BACKUPS_DIR, `${profile.id}-${new Date().getTime()}`)
     );
   },
   importProfile(profilePath, stateChange) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const zip = new admzip(profilePath);
 
       stateChange('Extracting...');
       const extractPath = path.join(
         Global.MCM_TEMP,
-        `profileimport-${new Date().getTime()}`,
+        `profileimport-${new Date().getTime()}`
       );
       zip.extractAllTo(extractPath, true);
       LogManager.log(
         'info',
-        `[ProfilesManager] (ProfileImport) Extracting profile from ${extractPath}`,
+        `[ProfilesManager] (ProfileImport) Extracting profile from ${extractPath}`
       );
 
       stateChange('Copying...');
@@ -102,18 +102,18 @@ const ProfilesManager = {
         'info',
         `[ProfilesManager] (ProfileImport) Reading profile json file from ${path.join(
           extractPath,
-          '/profile.json',
-        )}`,
+          '/profile.json'
+        )}`
       );
       const obj = JSON.parse(
-        fs.readFileSync(path.join(extractPath, '/profile.json')),
+        fs.readFileSync(path.join(extractPath, '/profile.json'))
       );
       const profPath = path.join(Global.PROFILES_PATH, `/${obj.id}/`);
       LogManager.log(
         'info',
         `[ProfilesManager] (ProfileImport) Copying profile from ${path.join(
-          extractPath,
-        )} to ${profPath}`,
+          extractPath
+        )} to ${profPath}`
       );
 
       if (fs.existsSync(profPath)) {
@@ -128,7 +128,7 @@ const ProfilesManager = {
       stateChange('Reloading profiles...');
       LogManager.log(
         'info',
-        '[ProfilesManager] (ProfileImport) Reloading profiles',
+        '[ProfilesManager] (ProfileImport) Reloading profiles'
       );
       this.getProfiles().then(() => {
         const profile = this.getProfileFromID(obj.id);
@@ -139,19 +139,19 @@ const ProfilesManager = {
 
           LogManager.log(
             'info',
-            `[ProfilesManager] (ProfileImport) Updating profile for ${profile.id}`,
+            `[ProfilesManager] (ProfileImport) Updating profile for ${profile.id}`
           );
           ProfilesManager.updateProfile(profile);
 
           LogManager.log(
             'info',
-            `[ProfilesManager] (ProfileImport) Removing extract path from ${profile.id}`,
+            `[ProfilesManager] (ProfileImport) Removing extract path from ${profile.id}`
           );
           rimraf.sync(extractPath);
 
           LogManager.log(
             'info',
-            `[ProfilesManager] (ProfileImport) Completed import for ${profile.id}`,
+            `[ProfilesManager] (ProfileImport) Completed import for ${profile.id}`
           );
           stateChange('Done');
 
@@ -162,7 +162,7 @@ const ProfilesManager = {
         if (profile.mods) {
           LogManager.log(
             'info',
-            `[ProfilesManager] (ProfileImport) Starting mod download for ${profile.id}`,
+            `[ProfilesManager] (ProfileImport) Starting mod download for ${profile.id}`
           );
           stateChange('Downloading mods...');
           const curseModsToDownload = [];
@@ -171,7 +171,7 @@ const ProfilesManager = {
               if (mod.hosts.curse) {
                 LogManager.log(
                   'info',
-                  `[ProfilesManager] (ProfileImport) Adding mod to download queue ${mod.id}`,
+                  `[ProfilesManager] (ProfileImport) Adding mod to download queue ${mod.id}`
                 );
                 mod.cachedID = `profile-import-${mod.id}`;
                 mod.detailedInfo = false;
@@ -183,11 +183,11 @@ const ProfilesManager = {
 
           LogManager.log(
             'info',
-            `[ProfilesManager] (ProfileImport) Creating progressive download for ${profile.id}`,
+            `[ProfilesManager] (ProfileImport) Creating progressive download for ${profile.id}`
           );
           DownloadsManager.createProgressiveDownload(
-            `Mods from ${profile.name}`,
-          ).then((download) => {
+            `Mods from ${profile.name}`
+          ).then(download => {
             let numberDownloaded = 0;
 
             const concurrent = curseModsToDownload.length >= 5 ? 5 : 0;
@@ -201,13 +201,13 @@ const ProfilesManager = {
                   stateChange('Creating launcher profile...');
                   LogManager.log(
                     'info',
-                    `[ProfilesManager] (ProfileImport) Creating launcher profile for ${profile.id}`,
+                    `[ProfilesManager] (ProfileImport) Creating launcher profile for ${profile.id}`
                   );
                   LauncherManager.createProfile(profile);
                   if (profile.frameworks.forge) {
                     LogManager.log(
                       'info',
-                      `[ProfilesManager] (ProfileImport) Installing Forge for ${profile.id}`,
+                      `[ProfilesManager] (ProfileImport) Installing Forge for ${profile.id}`
                     );
                     stateChange('Installing Forge...');
                     ForgeFramework.setupForge(profile).then(() => {
@@ -216,7 +216,7 @@ const ProfilesManager = {
                   } else if (profile.frameworks.fabric) {
                     LogManager.log(
                       'info',
-                      `[ProfilesManager] (ProfileImport) Installing Fabric for ${profile.id}`,
+                      `[ProfilesManager] (ProfileImport) Installing Fabric for ${profile.id}`
                     );
                     stateChange('Installing Fabric...');
                     FabricFramework.setupFabric(profile).then(() => {
@@ -232,18 +232,18 @@ const ProfilesManager = {
                 DownloadsManager.setDownloadProgress(
                   download.name,
                   Math.ceil(
-                    (numberDownloaded / curseModsToDownload.length) * 100,
-                  ),
+                    (numberDownloaded / curseModsToDownload.length) * 100
+                  )
                 );
               },
-              concurrent,
+              concurrent
             );
           });
         } else {
           stateChange('Creating launcher profile...');
           LogManager.log(
             'info',
-            `[ProfilesManager] (ProfileImport) Creating launcher profile for ${profile.id}`,
+            `[ProfilesManager] (ProfileImport) Creating launcher profile for ${profile.id}`
           );
           LauncherManager.createProfile(profile);
           importComplete();
@@ -254,7 +254,7 @@ const ProfilesManager = {
   async processProfileFolder(location) {
     LogManager.log(
       'info',
-      `[ProfilesManager] Processing profile folder at ${location}`,
+      `[ProfilesManager] Processing profile folder at ${location}`
     );
     const profilePath = path.join(location, '/profile.json');
     if (fs.existsSync(profilePath)) {
@@ -265,9 +265,9 @@ const ProfilesManager = {
         ToastManager.createToast(
           'Warning',
           `The '${path.basename(
-            location,
+            location
           )}' profile has a corrupted/malformed JSON info file! That's no good!`,
-          'OMAF-PROFILE-MALFORMED-JSON',
+          'OMAF-PROFILE-MALFORMED-JSON'
         );
       }
       if (rawOMAF) {
@@ -275,7 +275,7 @@ const ProfilesManager = {
         rawOMAF.installed = true;
         LogManager.log(
           'info',
-          `[ProfilesManager] Loading profile at ${location}`,
+          `[ProfilesManager] Loading profile at ${location}`
         );
         const profile = new Profile(rawOMAF);
         this.loadedProfiles.push(profile);
@@ -299,15 +299,15 @@ const ProfilesManager = {
       ToastManager.createToast(
         'Warning',
         `In your profiles folder, the '${path.basename(
-          location,
+          location
         )}' folder is missing the essential profile.json file!`,
-        'OMAF-PROFILE-MISSING-JSON',
+        'OMAF-PROFILE-MISSING-JSON'
       );
     }
   },
 
   getProfileFromID(id) {
-    return this.loadedProfiles.find((prof) => prof.id === id);
+    return this.loadedProfiles.find(prof => prof.id === id);
   },
 
   containsProfileWithName(name) {
@@ -322,13 +322,13 @@ const ProfilesManager = {
   createProfile(name, mcversion) {
     LogManager.log(
       'info',
-      '[ProfilesManager] (CreateProfile) Starting profile creation...',
+      '[ProfilesManager] (CreateProfile) Starting profile creation...'
     );
     const id = Global.createID(name);
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       LogManager.log(
         'info',
-        '[ProfilesManager] (CreateProfile) Creating profile directories',
+        '[ProfilesManager] (CreateProfile) Creating profile directories'
       );
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/files'));
@@ -340,7 +340,7 @@ const ProfilesManager = {
 
       LogManager.log(
         'info',
-        '[ProfilesManager] Copying default logo to profile',
+        '[ProfilesManager] Copying default logo to profile'
       );
       const profile = new Profile({
         type: 'profile',
@@ -365,25 +365,25 @@ const ProfilesManager = {
 
       LogManager.log(
         'info',
-        '[ProfilesManager] (CreateProfile) Creating launcher profile',
+        '[ProfilesManager] (CreateProfile) Creating launcher profile'
       );
       LauncherManager.createProfile(profile);
 
       LogManager.log(
         'info',
-        '[ProfilesManager] (CreateProfile) Saving profile',
+        '[ProfilesManager] (CreateProfile) Saving profile'
       );
       profile.save().then(() => {
         this.loadedProfiles = [];
 
         LogManager.log(
           'info',
-          '[ProfilesManager] (CreateProfile) Reloading profiles',
+          '[ProfilesManager] (CreateProfile) Reloading profiles'
         );
         this.getProfiles().then(() => {
           LogManager.log(
             'info',
-            `[ProfilesManager] (CreateProfile) Completed profile creation for ${profile.id}`,
+            `[ProfilesManager] (CreateProfile) Completed profile creation for ${profile.id}`
           );
           resolve(profile);
         });
@@ -398,48 +398,48 @@ const ProfilesManager = {
     }
     LogManager.log(
       'info',
-      `[ProfilesManager] (DeleteProfile) Starting profile deletion for ${profile.id}`,
+      `[ProfilesManager] (DeleteProfile) Starting profile deletion for ${profile.id}`
     );
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       LogManager.log(
         'info',
-        `[ProfilesManager] (DeleteProfile) Deleting launcher profile for ${profile.id}`,
+        `[ProfilesManager] (DeleteProfile) Deleting launcher profile for ${profile.id}`
       );
       LauncherManager.deleteProfile(profile);
 
       LogManager.log(
         'info',
-        `[ProfilesManager] (DeleteProfile) Removing profile folder from ${profile.id}`,
+        `[ProfilesManager] (DeleteProfile) Removing profile folder from ${profile.id}`
       );
-      rimraf(profile.profilePath, (err) => {
+      rimraf(profile.profilePath, err => {
         if (err) {
           ToastManager.createToast(
             'Error',
-            `Error deleting profile: ${ErrorManager.makeReadable(err)}`,
+            `Error deleting profile: ${ErrorManager.makeReadable(err)}`
           );
           return;
         }
         LogManager.log(
           'info',
-          `[ProfilesManager] (DeleteProfile) Removing library from ${profile.id}`,
+          `[ProfilesManager] (DeleteProfile) Removing library from ${profile.id}`
         );
         LibrariesManager.deleteLibrary(profile).then(() => {
           LogManager.log(
             'info',
-            `[ProfilesManager] (DeleteProfile) Removing version from ${profile.id}`,
+            `[ProfilesManager] (DeleteProfile) Removing version from ${profile.id}`
           );
           VersionsManager.deleteVersion(profile).then(() => {
             this.loadedProfiles = [];
             LogManager.log(
               'info',
-              '[ProfilesManager] (DeleteProfile) Reloading profiles',
+              '[ProfilesManager] (DeleteProfile) Reloading profiles'
             );
             this.getProfiles().then(() => {
-              this.loadedProfiles.forEach((prof) => {
+              this.loadedProfiles.forEach(prof => {
                 // removes weird backups that can happen when the app crashes/is closed during a profile update
                 if (
-                  prof.id === profile.id
-                  && !this.previouslyRemovedProfiles.includes(prof)
+                  prof.id === profile.id &&
+                  !this.previouslyRemovedProfiles.includes(prof)
                 ) {
                   this.deleteProfile(prof);
                 }

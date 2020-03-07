@@ -1,6 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
+
 const BG = styled.div`
   height: 100%;
   position: absolute;
@@ -29,6 +31,7 @@ const Item = styled(NavLink)`
   margin-bottom: 15px;
   transition: font-weight 150ms;
 `;
+
 const Sidebar = ({ id }) => (
   <BG>
     <Item to={`/edit/general/${id}`} activeClassName="active">
@@ -48,5 +51,9 @@ const Sidebar = ({ id }) => (
     </Item>
   </BG>
 );
+
+Sidebar.propTypes = {
+  id: PropTypes.string.isRequired
+};
 
 export default Sidebar;

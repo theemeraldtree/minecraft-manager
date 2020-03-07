@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import SubAssetEditor from '../components/subAssetEditor';
+
 export default function EditPageResourcePacks({ id }) {
   return (
     <>
@@ -7,3 +9,7 @@ export default function EditPageResourcePacks({ id }) {
     </>
   );
 }
+
+EditPageResourcePacks.propTypes = {
+  id: PropTypes.string.isRequired,
+};

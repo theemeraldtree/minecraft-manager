@@ -16,13 +16,13 @@ const DownloadsManager = {
         if (this.onDownload) {
           this.downloadUpdate();
         }
-        HTTPRequest.download(file, path, (progress) => {
+        HTTPRequest.download(file, path, progress => {
           this.handleDownloadProgress(download, progress);
         })
           .then(() => {
             this.activeDownloads.splice(
               this.activeDownloads.indexOf(download),
-              1,
+              1
             );
             this.downloadUpdate();
             resolve();
@@ -33,10 +33,10 @@ const DownloadsManager = {
             } else {
               this.activeDownloads.splice(
                 this.activeDownloads.indexOf(download),
-                1,
+                1
               );
               this.startFileDownload(downloadName, file, path, tries++)
-                .then((res) => {
+                .then(res => {
                   resolve(res);
                 })
                 .catch(() => {
@@ -49,7 +49,7 @@ const DownloadsManager = {
       } else {
         LogManager.log(
           'severe',
-          '[DownloadsManager] [StartFileDownload] Missing file download path!',
+          '[DownloadsManager] [StartFileDownload] Missing file download path!'
         );
       }
     });
@@ -63,7 +63,7 @@ const DownloadsManager = {
     this.downloadUpdate();
   },
   createProgressiveDownload(downloadName) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const download = new Download(downloadName, 'None', 'None');
       this.activeDownloads.push(download);
 
@@ -73,7 +73,7 @@ const DownloadsManager = {
   },
   setDownloadProgress(downloadName, progress) {
     const download = this.activeDownloads.find(
-      (item) => downloadName === item.name,
+      item => downloadName === item.name
     );
     this.handleDownloadProgress(download, progress);
   },
@@ -83,7 +83,7 @@ const DownloadsManager = {
     this.downloadUpdate();
   },
   startAssetDownload(profile, mod, type, url, modpack) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       let downloadPath;
       if (type === 'mod') {
         if (!fs.existsSync(path.join(profile.gameDir, '/mods'))) {
@@ -91,7 +91,7 @@ const DownloadsManager = {
         }
         downloadPath = path.join(
           profile.modsPath,
-          `/${Global.createID(mod.name)}.jar`,
+          `/${Global.createID(mod.name)}.jar`
         );
       } else if (type === 'resourcepack') {
         if (!fs.existsSync(path.join(profile.gameDir, '/resourcepacks'))) {
@@ -99,14 +99,14 @@ const DownloadsManager = {
         }
         downloadPath = path.join(
           profile.gameDir,
-          `/resourcepacks/${Global.createID(mod.name)}.zip`,
+          `/resourcepacks/${Global.createID(mod.name)}.zip`
         );
       }
       if (modpack === false) {
         this.startFileDownload(
           `${mod.name}\n_A_${profile.name}`,
           url,
-          downloadPath,
+          downloadPath
         ).then(() => {
           resolve();
         });

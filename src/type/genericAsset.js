@@ -2,7 +2,7 @@ export default function GenericAsset(rawomaf) {
   Object.assign(this, rawomaf);
 
   this.localValues = ['installed', 'iconPath', 'iconURL'];
-  this.checkMissing = function () {
+  this.checkMissing = function() {
     if (!this.hosts) {
       this.hosts = {};
     }
@@ -14,8 +14,8 @@ export default function GenericAsset(rawomaf) {
 
   this.checkMissing();
 
-  this.setMainFile = function (pathroot, type, mainFile) {
-    const existing = this.files.find((file) => file.priority === 'mainFile');
+  this.setMainFile = function(pathroot, type, mainFile) {
+    const existing = this.files.find(file => file.priority === 'mainFile');
 
     if (existing) {
       existing.path = `${pathroot}/${mainFile}`;
@@ -29,8 +29,8 @@ export default function GenericAsset(rawomaf) {
     }
   };
 
-  this.getMainFile = function () {
-    const p = this.files.find((file) => file.priority === 'mainFile');
+  this.getMainFile = function() {
+    const p = this.files.find(file => file.priority === 'mainFile');
     if (p) {
       return p;
     }
@@ -40,16 +40,12 @@ export default function GenericAsset(rawomaf) {
     };
   };
 
-  this.cleanObject = function () {
-    const copy = { ...this };
-    for (const x of Object.keys(copy)) {
-      if (typeof copy[x] === 'function') {
-        copy[x] = undefined;
+  this.cleanObject = function() {
+    const copy = { ...this }.map(x => {
+      if (!this.localValues.includes(x) && typeof x !== 'function') {
+        return x;
       }
-      if (this.localValues.includes(x)) {
-        copy[x] = undefined;
-      }
-    }
+    });
 
     copy.localValues = undefined;
 
@@ -73,7 +69,7 @@ export default function GenericAsset(rawomaf) {
   };
 
   // ugh.. hosts...
-  this.getPrimaryHost = function () {
+  this.getPrimaryHost = function() {
     if (this.hosts.curse) {
       return 'curse';
     }

@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import ToastObject from './toastobject';
 import ToastManager from '../../manager/toastManager';
+
 const Container = styled.div`
   position: absolute;
   left: 0;
@@ -15,24 +16,33 @@ const Container = styled.div`
   pointer-events: none;
   overflow: hidden;
 `;
+
 const List = styled.div`
   margin-bottom: 10px;
 `;
+
 export default class Toast extends PureComponent {
   constructor() {
     super();
     this.state = {
       list: [],
       dismissingToasts: [],
-      existingToasts: [],
+      existingToasts: []
     };
   }
+
+  componentDidMount() {
+    ToastManager.registerHandler(this.toastUpdate);
+  }
+
   dismiss = id => {
-    const copy = this.state.dismissingToasts.slice();
+    const { dismissingToasts } = this.state;
+
+    const copy = dismissingToasts.slice();
     copy.push(id);
     this.setState(
       {
-        dismissingToasts: copy,
+        dismissingToasts: copy
       },
       () => {
         this.renderToasts();
@@ -43,37 +53,33 @@ export default class Toast extends PureComponent {
       ToastManager.dissmisToast(id);
     }, 290);
   };
+
   toastUpdate = () => {
     this.renderToasts();
   };
+
   renderToasts() {
-    let list = [];
-    let exist = this.state.existingToasts.slice();
-    for (let toast of ToastManager.toasts) {
-      list.push(
-        <ToastObject
-          key={`${toast.id}`}
-          disableAnimation={exist.includes(toast.id)}
-          slideOut={this.state.dismissingToasts.includes(toast.id)}
-          dismiss={this.dismiss}
-          id={toast.id}
-          title={toast.title}
-          body={toast.body}
-          error={toast.error}
-        />
-      );
-      if (!exist.includes(toast.id)) {
-        exist.push(toast.id);
-      }
-    }
+    const { existingToasts, dismissingToasts } = this.state;
+    const exist = existingToasts.map(toast => toast.id);
+    const list = existingToasts.map(toast => (
+      <ToastObject
+        key={`${toast.id}`}
+        disableAnimation={exist.includes(toast.id)}
+        slideOut={dismissingToasts.includes(toast.id)}
+        dismiss={this.dismiss}
+        id={toast.id}
+        title={toast.title}
+        body={toast.body}
+        error={toast.error}
+      />
+    ));
+
     this.setState({
-      list: list,
-      existingToasts: exist,
+      list,
+      existingToasts: exist
     });
   }
-  componentDidMount() {
-    ToastManager.registerHandler(this.toastUpdate);
-  }
+
   render() {
     return (
       <Container>

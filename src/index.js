@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import fs from 'fs';
@@ -29,25 +30,12 @@ async function load() {
       // LogManager.log('info', '[index] Getting profiles...');
 
       // Check for directories - we need to make sure everything exists
-      if (
-        !fs.existsSync(
-          path.join(Global.getMCPath(), '/libraries/minecraftmanager'),
-        )
-      ) {
-        fs.mkdirSync(
-          path.join(Global.getMCPath(), '/libraries/minecraftmanager'),
-        );
+      if (!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
+        fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
       }
 
-      if (
-        !fs.existsSync(
-          Global.getMCPath(),
-          '/libraries/minecraftmanager/profiles',
-        )
-      ) {
-        fs.mkdirSync(
-          path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'),
-        );
+      if (!fs.existsSync(Global.getMCPath(), '/libraries/minecraftmanager/profiles')) {
+        fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
       }
     }
   } catch (e) {
@@ -57,7 +45,7 @@ async function load() {
 
   await ProfilesManager.getProfiles();
 
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', e => {
     if (e.keyCode == 123) {
       remote.getCurrentWindow().webContents.toggleDevTools();
     }
@@ -94,29 +82,27 @@ async function load() {
   // We're on a Mac, which means auto update doesn't work.
   // Here, we manually check for updates and inform the user a new version is available
   if (os.platform() === 'darwin') {
-    request.get(
-      'https://theemeraldtree.net/updates/mac/mac.yml',
-      (err, resp, body) => {
-        const doc = yaml.safeLoad(body);
-        if (semver.gt(doc.version, version)) {
-          dialog.showMessageBox(
-            {
-              title: 'Minecraft Manager',
-              message:
-                'A new version of Minecraft Manager is available. Would you like to go to the website and download it?',
-              buttons: ['No thanks', 'Take me there!'],
-            },
-            (buttonIndex) => {
-              if (buttonIndex === 1) {
-                shell.openExternal('https://theemeraldtree.net/mcm/download');
-              }
-            },
-          );
-        }
-      },
-    );
+    request.get('https://theemeraldtree.net/updates/mac/mac.yml', (err, resp, body) => {
+      const doc = yaml.safeLoad(body);
+      if (semver.gt(doc.version, version)) {
+        dialog.showMessageBox(
+          {
+            title: 'Minecraft Manager',
+            message:
+              'A new version of Minecraft Manager is available. Would you like to go to the website and download it?',
+            buttons: ['No thanks', 'Take me there!']
+          },
+          buttonIndex => {
+            if (buttonIndex === 1) {
+              shell.openExternal('https://theemeraldtree.net/mcm/download');
+            }
+          }
+        );
+      }
+    });
   }
 
+  // eslint-disable-next-line react/jsx-filename-extension
   ReactDOM.render(<App />, document.getElementById('app'));
 }
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { NavLink, Link } from 'react-router-dom';
+import os from 'os';
 import Downloads from './downloads/downloads';
 import settingsImage from '../windowbar/img/settings.png';
 
@@ -60,7 +61,7 @@ const Navbar = () => (
         discover
       </CLink>
     </Links>
-    {require('os').platform() === 'linux' && <Settings to="/settings" />}
+    {os.platform() === 'linux' && <Settings to="/settings" />}
     <Downloads />
   </BG>
 );

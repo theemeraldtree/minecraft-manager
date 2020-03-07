@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import ProgressBar from '../../progressbar/progressbar';
 
@@ -28,6 +29,7 @@ const PBWrapper = styled.div`
   width: 100%;
   left: 0;
 `;
+
 export default function DownloadItem({ download }) {
   const split = download.name.split('\n');
 
@@ -37,8 +39,7 @@ export default function DownloadItem({ download }) {
         {download.name.split('\n')[0]}
         <br />
 
-        {split.length === 2 &&
-          download.name.split('\n')[1].replace('_A_', '⮡      ')}
+        {split.length === 2 && download.name.split('\n')[1].replace('_A_', '⮡      ')}
       </Title>
       <Progress>{download.progress}</Progress>
       <PBWrapper>
@@ -47,3 +48,11 @@ export default function DownloadItem({ download }) {
     </BG>
   );
 }
+
+DownloadItem.propTypes = {
+  download: PropTypes.shape({
+    name: PropTypes.string,
+    progressPercent: PropTypes.number,
+    progress: PropTypes.string
+  }).isRequired
+};

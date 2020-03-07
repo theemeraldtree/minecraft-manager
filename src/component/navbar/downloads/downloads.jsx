@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import DownloadsManager from '../../../manager/downloadsManager';
+import { ipcRenderer } from 'electron';
 import styled, { keyframes, css } from 'styled-components';
 import downloadsImg from './downloads.png';
 import DownloadItem from './downloadItem';
-import { ipcRenderer } from 'electron';
+import DownloadsManager from '../../../manager/downloadsManager';
+
 const Wrapper = styled.div`
   width: 100px;
   height: 100px;
@@ -14,6 +15,7 @@ const Wrapper = styled.div`
   align-items: flex-end;
   z-index: 51;
 `;
+
 const DownloadsButton = styled.div`
   width: 50px;
   height: 50px;
@@ -42,18 +44,12 @@ const AnimationBar = styled.div`
   ${props =>
     props.active &&
     css`
-      background: linear-gradient(
-        270deg,
-        #0a993c,
-        #0a993c,
-        #0add53,
-        #0a993c,
-        #0a993c
-      ) !important;
+      background: linear-gradient(270deg, #0a993c, #0a993c, #0add53, #0a993c, #0a993c) !important;
       background-size: 600% 600% !important;
       animation: ${Animation} 1.5s ease infinite normal !important;
     `}
 `;
+
 const DownloadsOverlay = styled.div`
   width: 350px;
   height: 350px;
@@ -67,6 +63,7 @@ const DownloadsOverlay = styled.div`
   display: flex;
   flex-flow: column;
 `;
+
 const Title = styled.p`
   font-size: 21pt;
   margin: 5px;
@@ -80,56 +77,61 @@ const List = styled.div`
   box-sizing: content-box;
   width: 100%;
 `;
+
 export default class Downloads extends Component {
   constructor() {
     super();
     this.state = {
       downloadsList: [],
-      showOverlay: false,
+      showOverlay: false
     };
   }
 
   componentDidMount() {
     if (localStorage.getItem('showDownloads') === 'true') {
       this.setState({
-        showOverlay: true,
+        showOverlay: true
       });
     }
-    DownloadsManager.registerDownloadsViewer(downloads => {
-      let list = [];
-      if (downloads.length >= 1) {
+
+    DownloadsManager.registerDownloadsViewer(downloadsList => {
+      if (downloadsList.length >= 1) {
         ipcRenderer.send('start-progress');
-        for (let download of downloads) {
-          list.push(<DownloadItem key={download.name} download={download} />);
-          this.setState({
-            downloadsList: list,
-          });
-        }
+        this.setState({
+          downloadsList
+        });
       } else {
         ipcRenderer.send('stop-progress');
         this.setState({
-          downloadsList: [],
+          downloadsList: []
         });
       }
     });
   }
 
   showDownloads = () => {
-    localStorage.setItem('showDownloads', !this.state.showOverlay);
+    const { showOverlay } = this.state;
+
+    localStorage.setItem('showDownloads', !showOverlay);
     this.setState({
-      showOverlay: !this.state.showOverlay,
+      showOverlay: !showOverlay
     });
   };
 
   render() {
+    const { downloadsList } = this.state;
     return (
       <Wrapper>
         <DownloadsButton onClick={this.showDownloads} />
-        <AnimationBar active={this.state.downloadsList.length} />
+        <AnimationBar active={downloadsList.length} />
         {this.state.showOverlay && (
           <DownloadsOverlay>
             <Title>downloads</Title>
-            <List>{this.state.downloadsList}</List>
+            <List>
+              {downloadsList.map(download => (
+                <DownloadItem key={download.name} download={download} />
+              ))}
+            </List>
           </DownloadsOverlay>
         )}
       </Wrapper>

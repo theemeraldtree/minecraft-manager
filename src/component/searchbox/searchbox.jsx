@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import TextInput from '../textinput/textinput';
+
 const SearchBox = styled(TextInput)`
   height: 40px;
   width: 100%;

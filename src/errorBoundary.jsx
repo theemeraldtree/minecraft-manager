@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import WindowBar from './component/windowbar/windowbar';
 import ErrorIcon from './img/error-icon.png';
@@ -58,6 +59,7 @@ const BG = styled.div`
     user-select: text;
   }
 `;
+
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -68,18 +70,21 @@ class ErrorBoundary extends Component {
     this.setState({
       hasError: true,
       error,
-      info,
+      info
     });
   }
 
   render() {
-    if (this.state.hasError) {
+    const { hasError, error, info } = this.state;
+    const { children } = this.props;
+
+    if (hasError) {
       return (
         <Container>
           <WindowBar />
           <BG>
             <div>
-              <img src={ErrorIcon} />
+              <img alt="Error" src={ErrorIcon} />
               <h1>OH NO!</h1>
             </div>
             <h3>
@@ -91,25 +96,27 @@ class ErrorBoundary extends Component {
             </h3>
             <h5>
               Try restarting Minecraft Manager. If this continues,{' '}
-              <a href="https://theemeraldtree.net/mcm/issues">
-                please file a bug report here.
-              </a>
+              <a href="https://theemeraldtree.net/mcm/issues">please file a bug report here.</a>
             </h5>
             <br />
             <h4>Detailed Error Info:</h4>
             <pre>
-              <code>{this.state.error.toString()}</code>
+              <code>{error.toString()}</code>
             </pre>
             <pre>
-              <code>{this.state.info.componentStack}</code>
+              <code>{info.componentStack}</code>
             </pre>
           </BG>
         </Container>
       );
     }
 
-    return this.props.children;
+    return children;
   }
 }
+
+ErrorBoundary.propTypes = {
+  children: PropTypes.node.isRequired
+};
 
 export default ErrorBoundary;

@@ -6,11 +6,11 @@ function Download(name, url, dest) {
   this.progressPercent = 0;
 }
 
-Download.prototype.setProgress = function (progress) {
+Download.prototype.setProgress = function(progress) {
   this.progress = progress;
 };
 
-Download.prototype.setProgressPercent = function (percent) {
+Download.prototype.setProgressPercent = function(percent) {
   this.progressPercent = percent;
 };
 

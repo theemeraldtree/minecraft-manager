@@ -1,11 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import path from 'path';
+import { remote } from 'electron';
 import ProfilesManager from '../../../manager/profilesManager';
 import Button from '../../../component/button/button';
 import Detail from '../../../component/detail/detail';
-import path from 'path';
-
-import { remote } from 'electron';
 
 const BG = styled.div`
   div {
@@ -19,14 +19,7 @@ export default function EditPageAdvanced({ id }) {
 
   return (
     <BG>
-      <Button
-        color="red"
-        onClick={() =>
-          remote.shell.openExternal(
-            path.join(profile.profilePath, '/profile.json')
-          )
-        }
-      >
+      <Button color="red" onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/profile.json'))}>
         Open profile.json
       </Button>
       <Button color="red" onClick={profile.openGameDir}>
@@ -38,3 +31,7 @@ export default function EditPageAdvanced({ id }) {
     </BG>
   );
 }
+
+EditPageAdvanced.propTypes = {
+  id: PropTypes.string.isRequired
+};

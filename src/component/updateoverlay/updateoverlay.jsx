@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Overlay from '../overlay/overlay';
 import Button from '../button/button';
 import Hosts from '../../host/Hosts';
 import AlertBackground from '../alert/alertbackground';
+
 const BG = styled(AlertBackground)`
   width: 100%;
   height: fit-content;
@@ -45,88 +47,80 @@ export default class UpdateOverlay extends Component {
     super(props);
     this.state = {
       displayState: 'main',
-      exportProgress: 'Waiting...',
-      noConnection: false,
+      noConnection: false
     };
   }
 
-  enableFolder = e => {
-    let { exportFolders } = this.state;
-    exportFolders[e.currentTarget.dataset.folder] = !exportFolders[
-      e.currentTarget.dataset.folder
-    ];
-    this.setState({
-      exportFolders: exportFolders,
-    });
-  };
-
   async componentDidMount() {
-    let { profile } = this.props;
+    const { profile } = this.props;
     if (profile.hosts.curse) {
       const update = await Hosts.checkForAssetUpdates('curse', profile);
       if (update) {
         if (update === 'no-connection') {
           this.setState({
             noConnection: true,
-            updateAvailable: false,
+            updateAvailable: false
           });
         } else {
           this.setState({
             updateAvailable: true,
-            updateVersion: update,
+            updateVersion: update
           });
         }
       } else {
         this.setState({
-          noUpdates: true,
+          noUpdates: true
         });
       }
     } else {
       this.setState({
-        noUpdates: true,
+        noUpdates: true
       });
     }
   }
 
-  updateClick = () => {
-    let { profile } = this.props;
-    let { updateVersion } = this.state;
+  enableFolder = e => {
+    const { exportFolders } = this.state;
+    exportFolders[e.currentTarget.dataset.folder] = !exportFolders[e.currentTarget.dataset.folder];
     this.setState({
-      displayState: 'progress',
+      exportFolders
+    });
+  };
+
+  updateClick = () => {
+    const { profile } = this.props;
+    const { updateVersion } = this.state;
+    this.setState({
+      displayState: 'progress'
     });
     profile
-      .changeHostVersion(
-        'curse',
-        updateVersion.hosts.curse.fileID,
-        progress => {
-          this.setState({
-            updateProgress: progress,
-          });
-        }
-      )
+      .changeHostVersion('curse', updateVersion.hosts.curse.fileID, progress => {
+        this.setState({
+          updateProgress: progress
+        });
+      })
       .then(() => {
         this.setState({
-          displayState: 'done',
+          displayState: 'done'
         });
       });
   };
 
   render() {
-    const {
-      noUpdates,
-      updateAvailable,
-      updateVersion,
-      displayState,
-      noConnection,
-    } = this.state;
+    const { noUpdates, updateAvailable, updateVersion, displayState, noConnection, updateProgress } = this.state;
+
+    // eslint-disable-next-line react/destructuring-assignment
+    const inProp = this.props.in;
+    const { profile, cancelClick } = this.props;
+
     return (
-      <Overlay force in={this.props.in}>
+      <Overlay force in={inProp}>
         <BG>
           {displayState === 'done' && (
             <>
               <Title>done</Title>
               <Subtext>the profile update is complete</Subtext>
-              <Button onClick={this.props.cancelClick} color="green">
+              <Button onClick={cancelClick} color="green">
                 ok
               </Button>
             </>
@@ -134,20 +128,14 @@ export default class UpdateOverlay extends Component {
           {displayState === 'main' && (
             <>
               {displayState !== 'done' && <Title>update your profile</Title>}
-              {!noUpdates && !updateAvailable && !noConnection && (
-                <Subtext>checking for updates...</Subtext>
-              )}
-              {noUpdates && !noConnection && (
-                <Subtext>
-                  you have the latest version. no update is available
-                </Subtext>
-              )}
+              {!noUpdates && !updateAvailable && !noConnection && <Subtext>checking for updates...</Subtext>}
+              {noUpdates && !noConnection && <Subtext>you have the latest version. no update is available</Subtext>}
               {noConnection && <Subtext>Unable to connect.</Subtext>}
               {updateAvailable && (
                 <Subtext>
                   a new version is available.
                   <br />
-                  you have: {this.props.profile.version.displayName}
+                  you have: {profile.version.displayName}
                   <br />
                   latest version: {updateVersion.displayName}
                   <br />
@@ -158,7 +146,7 @@ export default class UpdateOverlay extends Component {
               <ButtonsContainer>
                 {updateAvailable && (
                   <>
-                    <Button onClick={this.props.cancelClick} color="red">
+                    <Button onClick={cancelClick} color="red">
                       cancel
                     </Button>
                     <Button onClick={this.updateClick} color="green">
@@ -167,17 +155,17 @@ export default class UpdateOverlay extends Component {
                   </>
                 )}
                 {(noUpdates || noConnection) && (
-                  <Button color="green" onClick={this.props.cancelClick}>
+                  <Button color="green" onClick={cancelClick}>
                     close
                   </Button>
                 )}
               </ButtonsContainer>
             </>
           )}
-          {this.state.displayState === 'progress' && (
+          {displayState === 'progress' && (
             <>
               <Title>Updating...</Title>
-              <Subtext>{this.state.updateProgress}</Subtext>
+              <Subtext>{updateProgress}</Subtext>
             </>
           )}
         </BG>
@@ -185,3 +173,13 @@ export default class UpdateOverlay extends Component {
     );
   }
 }
+
+UpdateOverlay.propTypes = {
+  profile: PropTypes.object.isRequired,
+  in: PropTypes.bool,
+  cancelClick: PropTypes.func.isRequired
+};
+
+UpdateOverlay.defaultProps = {
+  in: false
+};

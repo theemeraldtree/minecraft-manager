@@ -1,15 +1,18 @@
 import React, { useState, useReducer } from 'react';
+import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
+import styled from 'styled-components';
 import ProfilesManager from '../../../manager/profilesManager';
 import Button from '../../../component/button/button';
-import styled from 'styled-components';
 import TextInput from '../../../component/textinput/textinput';
 import TextBox from '../../../component/textbox/textbox';
 import Detail from '../../../component/detail/detail';
 import InputContainer from '../components/inputcontainer';
 import Global from '../../../util/global';
 import Overlay from '../../../component/overlay/overlay';
+
 const { dialog } = require('electron').remote;
+
 const DescContainer = styled.div`
   margin-top: 20px;
   width: 100%;
@@ -20,11 +23,13 @@ const Renaming = styled.div`
   font-size: 21pt;
   color: white;
 `;
+
 const LongDesc = styled(TextBox)`
   height: 400px;
   width: calc(100vw - 285px);
   max-width: 770px;
 `;
+
 const IconWrapper = styled.div`
   width: 150px;
   height: 150px;
@@ -48,6 +53,7 @@ const ResetIconButton = styled(Button)`
   padding: 11.5px 0;
   text-align: center;
 `;
+
 const Icon = styled.img`
   width: auto;
   height: auto;
@@ -83,7 +89,7 @@ const AboutRight = styled.div`
   }
 `;
 
-export default withRouter(function EditPageGeneral({ id, history }) {
+const EditPageGeneral = ({ id, history }) => {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const [profile] = useState(ProfilesManager.getProfileFromID(id));
   const [nameValue, setNameValue] = useState(profile.name);
@@ -91,13 +97,9 @@ export default withRouter(function EditPageGeneral({ id, history }) {
   const [renaming, setRenaming] = useState(false);
 
   const nameChange = e => {
-    let newName = e.target.value;
+    const newName = e.target.value;
     let namedisable = true;
-    if (
-      newName != profile.name &&
-      newName.trim() !== '' &&
-      !ProfilesManager.containsProfileWithName(newName)
-    ) {
+    if (newName !== profile.name && newName.trim() !== '' && !ProfilesManager.containsProfileWithName(newName)) {
       namedisable = false;
     }
     setNameValue(e.target.value);
@@ -115,11 +117,11 @@ export default withRouter(function EditPageGeneral({ id, history }) {
   };
 
   const changeIcon = () => {
-    let p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialog({
       title: 'Select your image file',
       buttonLabel: 'Choose image',
       filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif'] }],
-      properties: ['openFile'],
+      properties: ['openFile']
     });
 
     if (p && p[0]) {
@@ -134,8 +136,8 @@ export default withRouter(function EditPageGeneral({ id, history }) {
   const confirmNameChange = () => {
     setNameDisabled(true);
     setRenaming(true);
-    profile.rename(nameValue).then(profile => {
-      history.push(`/edit/general/${profile.id}`);
+    profile.rename(nameValue).then(prof => {
+      history.push(`/edit/general/${prof.id}`);
 
       // *unfortunately* a page reload is required to my knowledge
       // react-router doesn't want to refresh the page otherwise
@@ -165,9 +167,7 @@ export default withRouter(function EditPageGeneral({ id, history }) {
               <div>
                 <Detail>profile icon</Detail>
                 <IconWrapper onClick={changeIcon}>
-                  <Icon
-                    src={`file:///${profile.iconPath}#${new Date().getTime()}`}
-                  />
+                  <Icon src={`file:///${profile.iconPath}#${new Date().getTime()}`} />
                 </IconWrapper>
                 <ResetIconButton onClick={resetIcon} color="green">
                   reset
@@ -177,16 +177,8 @@ export default withRouter(function EditPageGeneral({ id, history }) {
                 <div>
                   <Detail>profile name</Detail>
                   <InputContainer>
-                    <TextInput
-                      value={nameValue}
-                      onChange={nameChange}
-                      placeholder="Enter a name"
-                    />
-                    <Button
-                      onClick={confirmNameChange}
-                      disabled={nameDisabled}
-                      color="green"
-                    >
+                    <TextInput value={nameValue} onChange={nameChange} placeholder="Enter a name" />
+                    <Button onClick={confirmNameChange} disabled={nameDisabled} color="green">
                       change
                     </Button>
                   </InputContainer>
@@ -217,4 +209,13 @@ export default withRouter(function EditPageGeneral({ id, history }) {
       )}
     </>
   );
-});
+};
+
+EditPageGeneral.propTypes = {
+  id: PropTypes.string.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func
+  }).isRequired
+};
+
+export default withRouter(EditPageGeneral);

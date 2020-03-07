@@ -4,5 +4,26 @@
   "env": {
     "browser": true,
     "node": true
+  },
+  // airbnb/javascript is ok but i kind of don't like these rules so i turn them off
+  // also sometimes there's collisions with prettier
+  "rules": {
+    "arrow-parens": "off",
+    "indent": "off",
+    "operator-linebreak": "off",
+    "func-names": "off",
+    "space-before-function-paren": "off",
+    "object-curly-newline": "off",
+    "react/jsx-one-expression-per-line": "off",
+    "comma-dangle": "off",
+    "max-len": "off",
+    "one-var-declaration-per-line": "off",
+    "one-var": "off",
+    "implicit-arrow-linebreak": "off",
+    "react/forbid-prop-types": "off",
+    "react/destructuring-assignment": "off",
+    "react/require-default-props": "off",
+    "react/no-unescaped-entities": "off",
+    "react/jsx-props-no-spreading": "off"
   }
 }

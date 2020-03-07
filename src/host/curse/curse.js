@@ -22,7 +22,7 @@ const Curse = {
       name: asset.name,
       id,
       blurb: asset.summary,
-      authors: asset.authors.map((author) => ({ name: author.name })),
+      authors: asset.authors.map(author => ({ name: author.name })),
       cachedID: `curse-cached-${id}`,
       type: this.getTypeFromCurseID(asset.categorySection.gameCategoryId),
       installed: false,
@@ -44,7 +44,7 @@ const Curse = {
     };
 
     if (asset.attachments && asset.attachments.length) {
-      const attachment = asset.attachments.find((a) => a.isDefault);
+      const attachment = asset.attachments.find(a => a.isDefault);
       if (attachment) {
         obj.icon = attachment.url;
         obj.iconPath = attachment.url;
@@ -83,9 +83,9 @@ const Curse = {
 
   // read a list of curse assets (typically returned by a search function)
   readAssetList(list) {
-    return list.map((asset) => {
+    return list.map(asset => {
       const type = this.getTypeFromCurseID(
-        asset.categorySection.gameCategoryId,
+        asset.categorySection.gameCategoryId
       );
 
       const omaf = this.convertToOMAF(asset);
@@ -111,14 +111,14 @@ const Curse = {
       `${this.URL_BASE}/${asset.hosts.curse.id}/description`,
       {
         addonID: asset.hosts.curse.id,
-      },
+      }
     );
   },
 
   convertCurseVersion(ver) {
     const cacheID = `versioncache-curse-${new Date(ver.fileDate).getTime()}`;
     let inferredModloader;
-    if (ver.modules.find((module) => module.foldername === 'fabric.mod.json')) {
+    if (ver.modules.find(module => module.foldername === 'fabric.mod.json')) {
       inferredModloader = 'fabric';
     } else {
       inferredModloader = 'forge';
@@ -149,7 +149,7 @@ const Curse = {
 
   async getFileInfo(asset, fileID) {
     const res = await Hosts.HTTPGet(
-      `${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}`,
+      `${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}`
     );
     if (res) return JSON.parse(res);
     return undefined;
@@ -164,7 +164,7 @@ const Curse = {
       asset.hosts.curse.fileName = info.fileName;
       asset.downloadTemp = info.downloadUrl;
 
-      asset.dependencies = info.dependencies.map((dependency) => {
+      asset.dependencies = info.dependencies.map(dependency => {
         if (dependency.type === 3) {
           return {
             hosts: {
@@ -185,7 +185,7 @@ const Curse = {
 
   async getInfo(asset) {
     return JSON.parse(
-      await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}`),
+      await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}`)
     );
   },
 
@@ -268,12 +268,15 @@ const Curse = {
   // gets the versions for an asset
   async getVersions(asset) {
     const req = await Hosts.HTTPGet(
-      `${this.URL_BASE}/${asset.hosts.curse.id}/files`,
+      `${this.URL_BASE}/${asset.hosts.curse.id}/files`
     );
     if (req) {
       const results = JSON.parse(req);
-      const sorted = results.sort((a, b) => new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime());
-      const final = sorted.map((ver) => (ver = this.convertCurseVersion(ver)));
+      const sorted = results.sort(
+        (a, b) =>
+          new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime()
+      );
+      const final = sorted.map(ver => (ver = this.convertCurseVersion(ver)));
 
       if (!asset.cachedID) {
         asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
@@ -293,8 +296,8 @@ const Curse = {
   // gets the latest version of the asset available for a specific minecraft version
   async getLatestVersionForMCVersion(asset, mcVersion, modloader) {
     if (
-      asset.hosts.curse.localValues
-      && asset.hosts.curse.localValues.gameVerLatestFiles
+      asset.hosts.curse.localValues &&
+      asset.hosts.curse.localValues.gameVerLatestFiles
     ) {
       // curse does a terrible job indicating whether a file is forge or fabric
       // we have to make a bunch of guesses
@@ -302,7 +305,7 @@ const Curse = {
       // now it's time to verify modloader compatibility
 
       const versions = await this.getVersions(asset);
-      const file = versions.find((ver) => {
+      const file = versions.find(ver => {
         let modloaderEqual = false;
         if (asset.type === 'mod' || asset instanceof Mod) {
           if (ver.hosts.curse.localValues.inferredModloader === modloader) {
@@ -327,44 +330,44 @@ const Curse = {
     return await this.getLatestVersionForMCVersion(
       await this.getFullAsset(asset),
       mcVersion,
-      modloader,
+      modloader
     );
   },
 
   // gets the changelog from a file id
   async getFileChangelog(asset, fileID) {
     return await Hosts.HTTPGet(
-      `${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}/changelog`,
+      `${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}/changelog`
     );
   },
 
   // downloads, extracts, and reads the version of a modpack to get the mods list
   async downloadModsListFromModpack(mp, downloadUrl) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const modpack = mp;
       const infoDownload = path.join(
         Global.MCM_TEMP,
-        `${modpack.id}-install.zip`,
+        `${modpack.id}-install.zip`
       );
       DownloadsManager.startFileDownload(
         `${modpack.name}\n_A_Info`,
         downloadUrl,
-        infoDownload,
+        infoDownload
       ).then(async () => {
         const zip = new admzip(infoDownload);
 
         const extractPath = path.join(
           Global.MCM_TEMP,
-          `${modpack.id}-install/`,
+          `${modpack.id}-install/`
         );
         zip.extractAllTo(extractPath, false);
         fs.unlinkSync(infoDownload);
 
         const manifest = JSON.parse(
-          fs.readFileSync(path.join(extractPath, 'manifest.json')),
+          fs.readFileSync(path.join(extractPath, 'manifest.json'))
         );
 
-        const list = manifest.files.map((file) => {
+        const list = manifest.files.map(file => {
           // i'm not sure why required is an option in the manifest...
           // afaik the twitch app only downloads mods marked as required
           // there also was a bug with a modpack caused by not checking for required
@@ -392,18 +395,18 @@ const Curse = {
     const extractPath = path.join(Global.MCM_TEMP, `${profile.id}-install/`);
     const overridesFolder = path.join(extractPath, '/overrides');
     if (fs.existsSync(overridesFolder)) {
-      fs.readdirSync(overridesFolder).forEach((file) => {
+      fs.readdirSync(overridesFolder).forEach(file => {
         if (file === 'mods') {
-          fs.readdirSync(path.join(overridesFolder, file)).forEach((f) => {
+          fs.readdirSync(path.join(overridesFolder, file)).forEach(f => {
             Global.copyDirSync(
               path.join(overridesFolder, file, f),
-              path.join(profile.gameDir, file, f),
+              path.join(profile.gameDir, file, f)
             );
           });
         } else {
           Global.copyDirSync(
             path.join(overridesFolder, file),
-            path.join(profile.gameDir, file),
+            path.join(profile.gameDir, file)
           );
         }
       });
@@ -420,8 +423,8 @@ const Curse = {
   getForgeVersionForModpackInstall(profile) {
     const manifest = JSON.parse(
       fs.readFileSync(
-        path.join(Global.MCM_TEMP, `${profile.id}-install/manifest.json`),
-      ),
+        path.join(Global.MCM_TEMP, `${profile.id}-install/manifest.json`)
+      )
     );
     if (manifest.minecraft.modLoaders[0]) {
       return `${
@@ -434,8 +437,8 @@ const Curse = {
   getMinecraftVersionFromModpackInstall(modpack) {
     const manifest = JSON.parse(
       fs.readFileSync(
-        path.join(Global.MCM_TEMP, `${modpack.id}-install/manifest.json`),
-      ),
+        path.join(Global.MCM_TEMP, `${modpack.id}-install/manifest.json`)
+      )
     );
     return manifest.minecraft.version;
   },

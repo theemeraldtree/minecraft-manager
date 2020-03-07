@@ -101,7 +101,9 @@ ipcMain.on('check-for-updates', function() {
   checkForUpdates();
 });
 
-checkForUpdates();
+if (!dev) {
+  checkForUpdates();
+}
 
 let mainWindow;
 

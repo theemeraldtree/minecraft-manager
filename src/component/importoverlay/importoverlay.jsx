@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import Overlay from '../overlay/overlay';
 import styled from 'styled-components';
 import Button from '../button/button';
 import ProfilesManager from '../../manager/profilesManager';
 import path from 'path';
+import Overlay from '../overlay/overlay';
 import AlertBackground from '../alert/alertbackground';
 const { dialog } = require('electron').remote;
+
 const BG = styled(AlertBackground)`
   width: 100%;
   height: fit-content;
@@ -46,7 +47,7 @@ export default class ImportOverlay extends Component {
     super(props);
     this.state = {
       updateState: '',
-      error: '',
+      error: ''
     };
   }
   chooseFile = () => {
@@ -56,9 +57,9 @@ export default class ImportOverlay extends Component {
       filters: [
         {
           name: 'Minecraft Java Profile',
-          extensions: ['mcjprofile'],
-        },
-      ],
+          extensions: ['mcjprofile']
+        }
+      ]
     });
     if (p[0]) {
       ProfilesManager.importProfile(p[0], this.stateChange)
@@ -68,21 +69,21 @@ export default class ImportOverlay extends Component {
   };
   stateChange = stateChange => {
     this.setState({
-      updateState: stateChange,
+      updateState: stateChange
     });
   };
   done = () => {
     ProfilesManager.getProfiles().then(() => {
       this.props.cancelClick();
       this.setState({
-        updateState: '',
+        updateState: ''
       });
     });
   };
   error = err => {
     this.setState({
       showError: true,
-      error: err.toString(),
+      error: err.toString()
     });
   };
   importFile = () => {

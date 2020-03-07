@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Overlay from '../overlay/overlay';
-import Button from '../button/button';
 import fs from 'fs';
 import path from 'path';
+import Overlay from '../overlay/overlay';
+import Button from '../button/button';
 import Checkbox from '../checkbox/checkbox';
 import AlertBackground from '../alert/alertbackground';
+
 const { dialog } = require('electron').remote;
+
 const BG = styled(AlertBackground)`
   width: 100%;
   height: fit-content;
@@ -69,26 +72,16 @@ export default class ShareOverlay extends Component {
     super(props);
     this.state = {
       displayState: 'main',
-      exportProgress: 'Waiting...',
+      exportProgress: 'Waiting...'
     };
   }
 
-  enableFolder = e => {
-    let { exportFolders } = this.state;
-    exportFolders[e.currentTarget.dataset.info] = !exportFolders[
-      e.currentTarget.dataset.info
-    ];
-    this.setState({
-      exportFolders: exportFolders,
-    });
-  };
-
   componentDidMount() {
-    let { profile } = this.props;
-    let files = fs.readdirSync(profile.gameDir);
+    const { profile } = this.props;
+    const files = fs.readdirSync(profile.gameDir);
     if (files.length) {
-      let exportFolders = [];
-      let exportItems = [];
+      const exportFolders = [];
+      const exportItems = [];
 
       files.forEach(file => {
         if (file !== 'mods') {
@@ -96,11 +89,7 @@ export default class ShareOverlay extends Component {
             exportFolders[file] = false;
             exportItems.push(
               <ExportItem key={file}>
-                <Checkbox
-                  info={file}
-                  onClick={this.enableFolder}
-                  type="checkbox"
-                />
+                <Checkbox info={file} onClick={this.enableFolder} type="checkbox" />
                 <Label>{file}</Label>
               </ExportItem>
             );
@@ -116,35 +105,39 @@ export default class ShareOverlay extends Component {
       });
 
       this.setState({
-        exportFolders: exportFolders,
-        exportItems: exportItems,
-      });
-    } else {
-      this.setState({
-        noFolders: true,
+        exportFolders,
+        exportItems
       });
     }
   }
 
+  enableFolder = e => {
+    const { exportFolders } = this.state;
+    exportFolders[e.currentTarget.dataset.info] = !exportFolders[e.currentTarget.dataset.info];
+    this.setState({
+      exportFolders
+    });
+  };
+
   exportClick = () => {
-    let { profile } = this.props;
-    let { exportFolders } = this.state;
-    let p = dialog.showSaveDialog({
+    const { profile } = this.props;
+    const { exportFolders } = this.state;
+    const p = dialog.showSaveDialog({
       title: 'Where do you want to export to?',
       buttonLabel: 'Export here',
       defaultPath: `${profile.name}.mcjprofile`,
       filters: [
         {
           name: 'Minecraft Java Profile',
-          extensions: ['mcjprofile'],
-        },
-      ],
+          extensions: ['mcjprofile']
+        }
+      ]
     });
     if (p) {
       profile
         .export(p, exportFolders, progress => {
           this.setState({
-            exportProgress: progress,
+            exportProgress: progress
           });
         })
         .then(() => {
@@ -154,7 +147,7 @@ export default class ShareOverlay extends Component {
           this.props.cancelClick();
         });
       this.setState({
-        displayState: 'progress',
+        displayState: 'progress'
       });
     }
   };
@@ -167,18 +160,16 @@ export default class ShareOverlay extends Component {
             <>
               <Title>share your profile</Title>
               <Subtext>
-                exporting your profile will export it to the <b>.mcjprofile</b>{' '}
-                file format, which can be used in Minecraft Manager or other
-                OMAF-supporting apps
+                exporting your profile will export it to the <b>.mcjprofile</b> file format, which can be used in
+                Minecraft Manager or other OMAF-supporting apps
               </Subtext>
               <Breaker />
               {this.state.exportItems && (
                 <>
                   <Title>choose your folders</Title>
                   <Subtext>
-                    choose your folders that you'd like to include with your
-                    export. if you have mods installed, they are automatically
-                    included
+                    choose your folders that you'd like to include with your export. if you have mods installed, they
+                    are automatically included
                   </Subtext>
                   <ExportList>{this.state.exportItems}</ExportList>
                 </>
@@ -204,3 +195,8 @@ export default class ShareOverlay extends Component {
     );
   }
 }
+
+ShareOverlay.propTypes = {
+  profile: PropTypes.object.isRequired,
+  cancelClick: PropTypes.func
+};

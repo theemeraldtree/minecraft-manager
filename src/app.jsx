@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-
 import { HashRouter as Router, Route, Redirect } from 'react-router-dom';
 import fs from 'fs';
+import os from 'os';
 import HomePage from './page/home/homePage';
 import SettingsPage from './page/settings/settingsPage';
 import ViewProfilePage from './page/viewprofile/viewprofile';
@@ -75,8 +75,8 @@ function App() {
           setOnBackClick: func => {
             headerBackClickFunc = func;
             forceUpdate();
-          },
-        },
+          }
+        }
       }}
     >
       {localStorage.setItem('showDownloads', false)}
@@ -89,7 +89,7 @@ function App() {
       <Router>
         <ErrorBoundary>
           <Container>
-            {require('os').platform() !== 'linux' && <WindowBar />}
+            {os.platform() !== 'linux' && <WindowBar />}
             <Content>
               {fs.existsSync(Global.PROFILES_PATH) && <Navbar />}
               <ContentSide>

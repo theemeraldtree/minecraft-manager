@@ -40,15 +40,15 @@ const Global = {
   dateMatches(d1) {
     const d2 = new Date();
     return (
-      d1.getFullYear() === d2.getFullYear()
-      && d1.getMonth() === d2.getMonth()
-      && d1.getDate() === d2.getDate()
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate()
     );
   },
   async checkToastNews() {
     try {
       const req = await HTTPRequest.get(
-        'https://theemeraldtree.net/toastnews.json',
+        'https://theemeraldtree.net/toastnews.json'
       );
       const news = JSON.parse(req);
 
@@ -57,9 +57,9 @@ const Global = {
       }
 
       if (
-        (SettingsManager.currentSettings.lastToastNewsID < news.id
-          || news.repeat)
-        && this.dateMatches(new Date(news.dateToShow))
+        (SettingsManager.currentSettings.lastToastNewsID < news.id ||
+          news.repeat) &&
+        this.dateMatches(new Date(news.dateToShow))
       ) {
         ToastManager.createToast(news.title, news.message);
 
@@ -68,20 +68,20 @@ const Global = {
     } catch (e) {
       ToastManager.createToast(
         'Error',
-        `Error checking for MCM news: ${e.toString()}`,
+        `Error checking for MCM news: ${e.toString()}`
       );
     }
   },
   checkChangelog() {
     const version = SettingsManager.currentSettings.lastVersion;
     if (
-      !version
-      || (semver.gt(this.MCM_VERSION, version)
-        && this.MCM_VERSION.indexOf('beta') === -1)
+      !version ||
+      (semver.gt(this.MCM_VERSION, version) &&
+        this.MCM_VERSION.indexOf('beta') === -1)
     ) {
       ToastManager.createToast(
         `Welcome to ${this.MCM_VERSION}`,
-        `With Forge 1.13+ support, Resource Packs, UI Tweaks, and more. <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`,
+        `With Forge 1.13+ support, Resource Packs, UI Tweaks, and more. <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`
       );
       SettingsManager.setLastVersion(this.MCM_VERSION);
     }
@@ -93,20 +93,20 @@ const Global = {
       if (fs.existsSync(path.join(this.MCM_PATH, '/mcvercache.json'))) {
         this.parseVersionsJSON(
           JSON.parse(
-            fs.readFileSync(path.join(this.MCM_PATH, '/mcvercache.json')),
-          ),
+            fs.readFileSync(path.join(this.MCM_PATH, '/mcvercache.json'))
+          )
         );
       }
     } catch (e) {
       ToastManager.createToast(
         'Just a quick note',
-        "There's a corrupt Minecraft version cache. However this probably won't continue in the future.",
+        "There's a corrupt Minecraft version cache. However this probably won't continue in the future."
       );
     }
 
     try {
       req = await HTTPRequest.get(
-        'https://launchermeta.mojang.com/mc/game/version_manifest.json',
+        'https://launchermeta.mojang.com/mc/game/version_manifest.json'
       );
     } catch (e) {
       req = undefined;
@@ -117,7 +117,7 @@ const Global = {
     } else if (req == undefined && firstTime) {
       ToastManager.createToast(
         'Uh oh!',
-        "We're having trouble downloading the latest Minecraft versions. This is necessary for Minecraft Manager to function. Check your internet connection and try again",
+        "We're having trouble downloading the latest Minecraft versions. This is necessary for Minecraft Manager to function. Check your internet connection and try again"
       );
       return 'no-connection';
     }
@@ -127,11 +127,11 @@ const Global = {
   },
   checkMinecraftVersions() {
     let totalCount = 0;
-    fs.readdirSync(VersionsManager.getVersionsPath()).forEach((file) => {
+    fs.readdirSync(VersionsManager.getVersionsPath()).forEach(file => {
       if (file.indexOf('[Minecraft Manager]') !== -1) {
         if (
           !ProfilesManager.loadedProfiles.find(
-            (prof) => prof.versionname === file,
+            prof => prof.versionname === file
           )
         ) {
           totalCount++;
@@ -142,19 +142,19 @@ const Global = {
       ToastManager.createToast(
         'Warning',
         `There are ${totalCount} Minecraft Manager-related version(s) in your Minecraft installation that do not need to exist!`,
-        'EXTRA-MINECRAFT-VERSIONS',
+        'EXTRA-MINECRAFT-VERSIONS'
       );
     }
   },
   checkMinecraftProfiles() {
     const obj = JSON.parse(
-      fs.readFileSync(LauncherManager.getLauncherProfiles()),
+      fs.readFileSync(LauncherManager.getLauncherProfiles())
     );
     let totalCount = 0;
-    Object.keys(obj.profiles).forEach((key) => {
+    Object.keys(obj.profiles).forEach(key => {
       if (key.substring(0, 4) === 'mcm-') {
         if (
-          !ProfilesManager.loadedProfiles.find((prof) => key === `mcm-${prof.id}`)
+          !ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)
         ) {
           totalCount++;
         }
@@ -165,17 +165,17 @@ const Global = {
       ToastManager.createToast(
         'Warning',
         `There are ${totalCount} Minecraft Manager-related launcher profile(s) in your Minecraft installation that do not need to exist!`,
-        'EXTRA-MINECRAFT-PROFILES',
+        'EXTRA-MINECRAFT-PROFILES'
       );
     }
   },
   checkMinecraftLibraries() {
     let totalCount = 0;
-    fs.readdirSync(LibrariesManager.getMCMLibraries()).forEach((file) => {
+    fs.readdirSync(LibrariesManager.getMCMLibraries()).forEach(file => {
       if (file.substring(0, 4) === 'mcm-') {
         if (
           !ProfilesManager.loadedProfiles.find(
-            (prof) => file === `mcm-${prof.id}`,
+            prof => file === `mcm-${prof.id}`
           )
         ) {
           totalCount++;
@@ -189,7 +189,7 @@ const Global = {
       ToastManager.createToast(
         'Warning',
         `There are ${totalCount} Minecraft-Manager-related launcher libraries in your Minecraft installation that do not need to exist!`,
-        'EXTRA-MINECRAFT-LIBRARIES',
+        'EXTRA-MINECRAFT-LIBRARIES'
       );
     }
   },
@@ -204,7 +204,7 @@ const Global = {
     }
     fs.writeFileSync(
       path.join(this.MCM_PATH, '/mcvercache.json'),
-      JSON.stringify(versionsJSON),
+      JSON.stringify(versionsJSON)
     );
   },
   getMCFilterOptions() {
@@ -213,19 +213,19 @@ const Global = {
     return copy;
   },
   getLauncherPath: () => SettingsManager.currentSettings.mcExe,
-  createID: (name) => {
+  createID: name => {
     let newname = name;
     newname = name.replace(/[^\w]/gi, '-').toLowerCase();
     newname = newname.replace('/', '');
     return newname;
   },
-  createSafeName: (name) => name.replace(/[\W_]+/g, ' '),
+  createSafeName: name => name.replace(/[\W_]+/g, ' '),
   getResourcesPath: () => {
     let dev = false;
     if (
-      process.defaultApp
-      || /[\\/]electron-prebuilt[\\/]/.test(process.execPath)
-      || /[\\/]electron[\\/]/.test(process.execPath)
+      process.defaultApp ||
+      /[\\/]electron-prebuilt[\\/]/.test(process.execPath) ||
+      /[\\/]electron[\\/]/.test(process.execPath)
     ) {
       dev = true;
     }
@@ -237,7 +237,7 @@ const Global = {
     }
     return null;
   },
-  getTypeString: (obj) => {
+  getTypeString: obj => {
     if (obj instanceof Mod) {
       return 'mod';
     }
@@ -270,7 +270,7 @@ const Global = {
   getDefaultMCExePath: () => {
     if (os.platform() === 'win32') {
       const def = path.join(
-        'C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe',
+        'C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe'
       );
       if (fs.existsSync(def)) {
         return def;
@@ -294,10 +294,10 @@ const Global = {
         if (!fs.existsSync(dest)) {
           fs.mkdirSync(dest);
         }
-        fs.readdirSync(src).forEach((childItem) => {
+        fs.readdirSync(src).forEach(childItem => {
           this.copyDirSync(
             path.join(src, childItem),
-            path.join(dest, childItem),
+            path.join(dest, childItem)
           );
         });
       } else if (!fs.existsSync(dest)) {
@@ -320,13 +320,14 @@ const Global = {
       fs.readdir(path.join(profile.gameDir, '/resourcepacks'), (err, files) => {
         if (files) {
           if (files.length !== profile.resourcepacks.length) {
-            files.forEach((file) => {
+            files.forEach(file => {
               const fullPath = path.join(
                 profile.gameDir,
-                `/resourcepacks/${file}`,
+                `/resourcepacks/${file}`
               );
               const doesExist = profile.resourcepacks.find(
-                (rp) => path.join(profile.gameDir, rp.getMainFile().path) === fullPath,
+                rp =>
+                  path.join(profile.gameDir, rp.getMainFile().path) === fullPath
               );
               if (!doesExist) {
                 if (path.extname(file) === '.zip') {
@@ -334,10 +335,10 @@ const Global = {
                   const entries = zip.getEntries();
                   let iconPath;
                   let description;
-                  entries.forEach((entry) => {
+                  entries.forEach(entry => {
                     if (entry.entryName === 'pack.mcmeta') {
                       const parsed = JSON.parse(
-                        entry.getData().toString('utf8'),
+                        entry.getData().toString('utf8')
                       );
                       if (parsed && parsed.pack) {
                         if (parsed.pack.description) {
@@ -350,9 +351,9 @@ const Global = {
                       fs.writeFileSync(
                         path.join(
                           profile.profilePath,
-                          `/_mcm/icons/resourcepacks/${file}`,
+                          `/_mcm/icons/resourcepacks/${file}`
                         ),
-                        entry.getData(),
+                        entry.getData()
                       );
                       iconPath = `/_mcm/icons/resourcepacks/${file}`;
                     }
@@ -360,7 +361,7 @@ const Global = {
 
                   LogManager.log(
                     'info',
-                    `[scan] {${profile.name}} Found resource pack ${file} which does not exist in subassets file. Adding it...`,
+                    `[scan] {${profile.name}} Found resource pack ${file} which does not exist in subassets file. Adding it...`
                   );
                   profile.resourcepacks.push(
                     new GenericAsset({
@@ -385,7 +386,7 @@ const Global = {
                         },
                       ],
                       dependencies: [],
-                    }),
+                    })
                   );
                   profile.save();
                 }
@@ -395,7 +396,7 @@ const Global = {
         }
       });
 
-      profile.resourcepacks.forEach((rp) => {
+      profile.resourcepacks.forEach(rp => {
         if (!(rp instanceof GenericAsset)) {
           rp = new GenericAsset(rp);
         }
@@ -403,7 +404,7 @@ const Global = {
         if (!fs.existsSync(path.join(profile.gameDir, rp.getMainFile().path))) {
           LogManager.log(
             'info',
-            `[scan] {${profile.id}} Found resource pack ${rp.name} where the main file is missing. Removing it from the profile...`,
+            `[scan] {${profile.id}} Found resource pack ${rp.name} where the main file is missing. Removing it from the profile...`
           );
           profile.deleteSubAsset('resourcepack', rp);
         }
@@ -412,15 +413,16 @@ const Global = {
       fs.readdir(path.join(profile.gameDir, '/mods'), (err, files) => {
         if (files) {
           if (files.length !== profile.mods.length) {
-            files.forEach((file) => {
+            files.forEach(file => {
               const fullPath = path.join(profile.gameDir, `/mods/${file}`);
               const doesExist = profile.mods.find(
-                (mod) => path.join(profile.gameDir, mod.getJARFile().path) === fullPath,
+                mod =>
+                  path.join(profile.gameDir, mod.getJARFile().path) === fullPath
               );
               if (!doesExist) {
                 LogManager.log(
                   'info',
-                  `[scan] {${profile.id}} Found mod file ${file} which does not exist in subassets file. Adding it...`,
+                  `[scan] {${profile.id}} Found mod file ${file} which does not exist in subassets file. Adding it...`
                 );
                 profile.mods.push(
                   new Mod({
@@ -445,7 +447,7 @@ const Global = {
                       },
                     ],
                     dependencies: [],
-                  }),
+                  })
                 );
                 profile.save();
               }
@@ -454,7 +456,7 @@ const Global = {
         }
       });
 
-      profile.mods.forEach((mod) => {
+      profile.mods.forEach(mod => {
         if (!(mod instanceof Mod)) {
           mod = new Mod(mod);
         }
@@ -462,13 +464,15 @@ const Global = {
         if (!fs.existsSync(path.join(profile.gameDir, mod.getJARFile().path))) {
           LogManager.log(
             'info',
-            `[scan] {${profile.id}} Found mod ${mod.name} where the main file is missing. Removing it from the profile...`,
+            `[scan] {${profile.id}} Found mod ${mod.name} where the main file is missing. Removing it from the profile...`
           );
           profile.deleteSubAsset('mod', mod);
         }
       });
     }
   },
+
+  /* eslint-disable */
   checkMigration() {
     let showMigrationmessage = false;
     for (const profile of ProfilesManager.loadedProfiles) {
@@ -584,12 +588,13 @@ const Global = {
     if (showMigrationmessage) {
       ToastManager.createToast(
         'Hey There!',
-        'Hello there beta tester! Just a quick message about this new version: your old profiles will not work 100%. Some features may work, some may not. This is due to internal restructuring as to how many things are stored. We hope you understand!',
+        'Hello there beta tester! Just a quick message about this new version: your old profiles will not work 100%. Some features may work, some may not. This is due to internal restructuring as to how many things are stored. We hope you understand!'
       );
     }
 
     ProfilesManager.updateReloadListeners();
   },
+  /* eslint-enable */
   updateCache() {
     Global.cacheUpdateTime = new Date().getTime();
   },
@@ -598,10 +603,12 @@ const Global = {
     img.src = image;
   },
   getJavaPath() {
-    if (os.platform() === 'win32') {
-      // this is where it is on my system, hope others are the same
-      return 'C:\\Program Files (x86)\\Minecraft Launcher\\runtime\\jre-x64\\bin\\java.exe';
-    }
+    const platforms = {
+      win32:
+        'C:\\Program Files (x86)\\Minecraft Launcher\\runtime\\jre-x64\\bin\\java.exe',
+    };
+
+    return platforms[os.platform()];
   },
 };
 

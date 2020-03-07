@@ -3,7 +3,7 @@ export default function Mod(rawoamf) {
 
   this.localValues = ['installed', 'iconPath', 'iconURL'];
 
-  this.checkMissing = function () {
+  this.checkMissing = function() {
     if (!this.hosts) {
       this.hosts = {};
     }
@@ -17,7 +17,7 @@ export default function Mod(rawoamf) {
 
   // useful functions
 
-  this.cleanObject = function () {
+  this.cleanObject = function() {
     const copy = { ...this };
     for (const x of Object.keys(copy)) {
       if (typeof copy[x] === 'function') {
@@ -49,9 +49,9 @@ export default function Mod(rawoamf) {
     return copy;
   };
 
-  this.setJARFile = function (newJARFile) {
+  this.setJARFile = function(newJARFile) {
     const existing = this.files.find(
-      (file) => file.type === 'jar' && file.priority === 'mainFile',
+      file => file.type === 'jar' && file.priority === 'mainFile'
     );
 
     if (existing) {
@@ -66,7 +66,7 @@ export default function Mod(rawoamf) {
     }
   };
 
-  this.getJARFile = function () {
+  this.getJARFile = function() {
     for (const file of this.files) {
       if (file.type === 'jar' && file.priority === 'mainFile') {
         return file;
@@ -78,7 +78,7 @@ export default function Mod(rawoamf) {
   };
 
   // ugh.. hosts...
-  this.getPrimaryHost = function () {
+  this.getPrimaryHost = function() {
     if (this.hosts.curse) {
       return 'curse';
     }

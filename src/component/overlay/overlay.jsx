@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import transition from 'styled-transition-group';
+
 const BG = transition.div`
     width: 100%;
     height: 100%;
@@ -45,7 +47,14 @@ const Overlay = props => (
   </BG>
 );
 
-Overlay.defaultProps = {
-  in: true,
+Overlay.propTypes = {
+  force: PropTypes.bool,
+  in: PropTypes.bool,
+  children: PropTypes.node.isRequired
 };
+
+Overlay.defaultProps = {
+  in: true
+};
+
 export default Overlay;

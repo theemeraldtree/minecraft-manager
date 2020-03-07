@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Link, withRouter } from 'react-router-dom';
 import transition from 'styled-transition-group';
@@ -79,8 +80,8 @@ const Items = transition.div`
     }
 `;
 
-export default withRouter(function Header({ history }) {
-  const context = useContext(NavContext);
+const Header = ({ history }) => {
+  const { header } = useContext(NavContext);
 
   const {
     title,
@@ -89,11 +90,12 @@ export default withRouter(function Header({ history }) {
     showBackButton,
     showChildren,
     onBackClick,
-  } = context.header;
+  } = header;
 
   const click = () => {
     if (!backLink) {
-      onBackClick ? onBackClick() : history.goBack();
+      const callback = onBackClick || history.goBack;
+      callback();
     }
   };
   return (
@@ -104,7 +106,7 @@ export default withRouter(function Header({ history }) {
         timeout={150}
         onClick={click}
       >
-        {!backLink && `←`}
+        {!backLink && '←'}
         {backLink && <Link to={backLink}>←</Link>}
       </BackButton>
       <Title>{title}</Title>
@@ -113,4 +115,10 @@ export default withRouter(function Header({ history }) {
       </Items>
     </BG>
   );
-});
+};
+
+Header.propTypes = {
+  history: PropTypes.node.isRequired,
+};
+
+export default withRouter(Header);

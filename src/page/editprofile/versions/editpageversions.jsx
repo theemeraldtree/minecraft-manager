@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useReducer } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
 import ProfilesManager from '../../../manager/profilesManager';
@@ -14,11 +15,13 @@ import ToastManager from '../../../manager/toastManager';
 import NavContext from '../../../navContext';
 import ForgeFramework from '../../../framework/forge/forgeFramework';
 import FabricFramework from '../../../framework/fabric/fabricFramework';
+
 const CustomVersions = styled.div`
   background-color: #2b2b2b;
   width: 350px;
   padding: 10px;
 `;
+
 const BG = styled.div`
   width: 100%;
   height: fit-content;
@@ -30,11 +33,13 @@ const BG = styled.div`
   display: flex;
   flex-flow: column;
 `;
+
 const Title = styled.p`
   margin: 0;
   font-weight: 200;
   font-size: 21pt;
 `;
+
 export default function EditPageVersions({ id }) {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
@@ -57,142 +62,25 @@ export default function EditPageVersions({ id }) {
   const [forgeIsInstalling, setForgeIsInstalling] = useState(false);
   const [forgeIsUninstalling, setForgeIsUninstalling] = useState(false);
 
-  useEffect(() => {
-    setMCVerValue(profile.version.minecraft.version);
-    reloadCurseVersionsList();
-  }, []);
-
-  const mcverChange = (version, cancel) => {
-    if (!profile.hasFramework()) {
-      setMCVerValue(version);
-      profile.progressState = {};
-      profile.changeMCVersion(version);
-    } else {
-      cancel();
-      setNewVersion(version);
-      AlertManager.alert(
-        `warning`,
-        `changing your minecraft version will remove forge/fabric and all your mods. are you sure you want to change?`,
-        confirmVersionChange,
-        `change`,
-        `don't change`
-      );
-    }
-  };
-
-  const confirmVersionChange = () => {
-    profile.changeMCVersion(newVersion);
-    profile.progressState = {};
-    uninstallForge();
-    uninstallFabric();
-
-    setMCVerValue(newVersion);
-  };
-
-  const downloadFabric = () => {
-    setFabricIsInstalling(true);
-    FabricFramework.getFabricLoaderVersions(profile.version.minecraft.version)
-      .then(versions => {
-        const version = versions[0];
-        if (version) {
-          profile.setFrameworkVersion('fabric', version.loader.version);
-          FabricFramework.setupFabric(profile).then(() => {
-            setFabricIsInstalling(false);
-          });
-        } else {
-          setFabricIsInstalling(false);
-          AlertManager.messageBox(
-            `no fabric version`,
-            `there is no fabric version available for minercaft ${profile.version.minecraft.version}`
-          );
-        }
-      })
-      .catch(() => {
-        setFabricIsInstalling(false);
-      });
-  };
-
-  const uninstallFabric = () => {
-    setFabricIsUninstalling(true);
-    FabricFramework.uninstallFabric(profile).then(() => {
-      setFabricIsUninstalling(false);
-    });
-  };
-
-  const downloadForge = () => {
-    setForgeIsInstalling(true);
-    ForgeFramework.getForgePromotions().then(promos => {
-      if (promos) {
-        let obj = JSON.parse(promos);
-        let verObj = obj.promos[`${profile.version.minecraft.version}-latest`];
-        if (verObj) {
-          let version = `${profile.version.minecraft.version}-${verObj.version}`;
-          profile.setFrameworkVersion('forge', version);
-          ForgeFramework.setupForge(profile).then(() => {
-            setForgeIsInstalling(false);
-          });
-        } else {
-          setForgeIsInstalling(false);
-          AlertManager.messageBox(
-            `no forge version`,
-            `there is no forge version available for minecraft ${profile.version.minecraft.version}`
-          );
-        }
-      } else {
-        setForgeIsInstalling(false);
-        ToastManager.createToast(
-          `Error`,
-          `We can't reach the Forge servers. Check your internet connection, and try again.`
-        );
-      }
-    });
-  };
-
-  const uninstallForge = () => {
-    setForgeIsUninstalling(true);
-    ForgeFramework.uninstallForge(profile).then(() => {
-      setForgeIsUninstalling(false);
-    });
-  };
-
-  const curseVersionChange = e => {
-    profile.temp = {};
-    profile.temp.versionToChangeTo = e;
-    forceUpdate();
-    AlertManager.alert(
-      `are you sure?`,
-      `updating or changing a profile's version will modify the current files. a backup will be created of the current files. if you've modified files or added mods, you will need to move then over from the backup
-            <br>
-            <b>the saves folder and options.txt are automatically moved.`,
-      confirmCurseVerChange,
-      'i understand, continue'
-    );
-  };
-
-  useEffect(() => {
-    reloadCurseVersionsList();
-  }, [profile]);
-
   const reloadCurseVersionsList = async () => {
     if (profile.hosts) {
       if (profile.hosts.curse) {
         const versions = await Hosts.getVersions('curse', profile);
         let nameArray = [];
         versions[0].latest = true;
-        for (let ver of versions) {
+        nameArray = versions.map(ver => {
           let name = ver.displayName;
-          if (ver.latest) {
-            name += ' (latest)';
-          }
+
+          if (ver.latest) name += ' (latest)';
           if (profile.version.displayName === ver.displayName) {
             name += ' (current)';
           }
 
-          nameArray.push({
-            id: ver.hosts.curse.fileID,
-            name: name,
-          });
-        }
+          return {
+            name,
+            id,
+          };
+        });
 
         setHostVersionValues(nameArray);
         setCurseVerValue(profile.version.hosts.curse.fileID);
@@ -223,6 +111,123 @@ export default function EditPageVersions({ id }) {
         reloadCurseVersionsList();
       });
   };
+
+  const uninstallForge = () => {
+    setForgeIsUninstalling(true);
+    ForgeFramework.uninstallForge(profile).then(() => {
+      setForgeIsUninstalling(false);
+    });
+  };
+
+  const uninstallFabric = () => {
+    setFabricIsUninstalling(true);
+    FabricFramework.uninstallFabric(profile).then(() => {
+      setFabricIsUninstalling(false);
+    });
+  };
+
+  const confirmVersionChange = () => {
+    profile.changeMCVersion(newVersion);
+    profile.progressState = {};
+    uninstallForge();
+    uninstallFabric();
+
+    setMCVerValue(newVersion);
+  };
+
+  const mcverChange = (version, cancel) => {
+    if (!profile.hasFramework()) {
+      setMCVerValue(version);
+      profile.progressState = {};
+      profile.changeMCVersion(version);
+    } else {
+      cancel();
+      setNewVersion(version);
+      AlertManager.alert(
+        'warning',
+        'changing your minecraft version will remove forge/fabric and all your mods. are you sure you want to change?',
+        confirmVersionChange,
+        'change',
+        "don't change"
+      );
+    }
+  };
+
+  const downloadFabric = () => {
+    setFabricIsInstalling(true);
+    FabricFramework.getFabricLoaderVersions(profile.version.minecraft.version)
+      .then(versions => {
+        const version = versions[0];
+        if (version) {
+          profile.setFrameworkVersion('fabric', version.loader.version);
+          FabricFramework.setupFabric(profile).then(() => {
+            setFabricIsInstalling(false);
+          });
+        } else {
+          setFabricIsInstalling(false);
+          AlertManager.messageBox(
+            'no fabric version',
+            `there is no fabric version available for minercaft ${profile.version.minecraft.version}`
+          );
+        }
+      })
+      .catch(() => {
+        setFabricIsInstalling(false);
+      });
+  };
+
+  const downloadForge = () => {
+    setForgeIsInstalling(true);
+    ForgeFramework.getForgePromotions().then(promos => {
+      if (promos) {
+        const obj = JSON.parse(promos);
+        const verObj =
+          obj.promos[`${profile.version.minecraft.version}-latest`];
+        if (verObj) {
+          const version = `${profile.version.minecraft.version}-${verObj.version}`;
+          profile.setFrameworkVersion('forge', version);
+          ForgeFramework.setupForge(profile).then(() => {
+            setForgeIsInstalling(false);
+          });
+        } else {
+          setForgeIsInstalling(false);
+          AlertManager.messageBox(
+            'no forge version',
+            `there is no forge version available for minecraft ${profile.version.minecraft.version}`
+          );
+        }
+      } else {
+        setForgeIsInstalling(false);
+        ToastManager.createToast(
+          'Error',
+          "We can't reach the Forge servers. Check your internet connection, and try again."
+        );
+      }
+    });
+  };
+
+  const curseVersionChange = e => {
+    profile.temp = {};
+    profile.temp.versionToChangeTo = e;
+    forceUpdate();
+    AlertManager.alert(
+      'are you sure?',
+      `updating or changing a profile's version will modify the current files. a backup will be created of the current files. if you've modified files or added mods, you will need to move then over from the backup
+            <br>
+            <b>the saves folder and options.txt are automatically moved.`,
+      confirmCurseVerChange,
+      'i understand, continue'
+    );
+  };
+
+  useEffect(() => {
+    setMCVerValue(profile.version.minecraft.version);
+    reloadCurseVersionsList();
+  }, []);
+
+  useEffect(() => {
+    reloadCurseVersionsList();
+  }, [profile]);
 
   if (profile) {
     return (
@@ -317,7 +322,11 @@ export default function EditPageVersions({ id }) {
         )}
       </>
     );
-  } else {
-    return <Redirect to="/" />;
   }
+
+  return <Redirect to="/" />;
 }
+
+EditPageVersions.propTypes = {
+  id: PropTypes.string.isRequired,
+};

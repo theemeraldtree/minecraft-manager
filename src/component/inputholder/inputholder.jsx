@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+
 const InputHolder = styled.div`
   margin-top: 13px;
   div {

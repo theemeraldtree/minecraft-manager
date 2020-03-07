@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled, { keyframes, css } from 'styled-components';
+
 const slideIn = keyframes`
     0% {
         margin-bottom: -50px;
@@ -10,7 +12,7 @@ const slideIn = keyframes`
     }
 `;
 
-const slideOut = keyframes`
+const slideOutAnim = keyframes`
     0% {
         opacity: 1;
         margin-bottom: 7px;
@@ -45,13 +47,15 @@ const BG = styled.div`
   ${props =>
     props.slideOut &&
     css`
-      animation: ${slideOut} 0.3s ease;
+      animation: ${slideOutAnim} 0.3s ease;
     `}
 `;
+
 const Title = styled.p`
   font-weight: bolder;
   margin: 0;
 `;
+
 const Body = styled.p`
   margin: 0;
   word-break: break-word;
@@ -60,6 +64,7 @@ const Body = styled.p`
     text-decoration: none;
   }
 `;
+
 const Dismiss = styled.p`
   position: absolute;
   top: 5px;
@@ -68,15 +73,8 @@ const Dismiss = styled.p`
   cursor: pointer;
   color: #a1a1a1;
 `;
-export default function ToastObject({
-  id,
-  title,
-  body,
-  error,
-  dismiss,
-  slideOut,
-  disableAnimation,
-}) {
+
+export default function ToastObject({ id, title, body, error, dismiss, slideOut, disableAnimation }) {
   return (
     <BG disableAnimation={disableAnimation} slideOut={slideOut}>
       <Title>{title}</Title>
@@ -92,9 +90,7 @@ export default function ToastObject({
         <Body>
           {body}
           <br />
-          <a
-            href={`https://github.com/theemeraldtree/minecraft-manager/wiki/Error-Codes#${error}`}
-          >
+          <a href={`https://github.com/theemeraldtree/minecraft-manager/wiki/Error-Codes#${error}`}>
             Error Code: {error}
           </a>
         </Body>
@@ -102,3 +98,13 @@ export default function ToastObject({
     </BG>
   );
 }
+
+ToastObject.propTypes = {
+  id: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  body: PropTypes.string.isRequired,
+  error: PropTypes.bool.isRequired,
+  dismiss: PropTypes.func.isRequired,
+  slideOut: PropTypes.bool,
+  disableAnimation: PropTypes.bool
+};

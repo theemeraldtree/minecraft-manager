@@ -5,7 +5,7 @@ const path = require('path');
 const PrettierPlugin = require('prettier-webpack-plugin');
 
 module.exports = {
-  context: __dirname + '/src',
+  context: `${__dirname}/src`,
   entry: ['babel-polyfill', './index.js'],
   mode: 'none',
   resolve: {
@@ -51,7 +51,7 @@ module.exports = {
     __filename: false,
   },
   devServer: {
-    contentBase: __dirname + '/dist',
+    contentBase: `${__dirname}/bundles`,
     before() {
       spawn('electron', ['.'], {
         shell: true,
@@ -62,6 +62,6 @@ module.exports = {
   },
   output: {
     filename: 'index.js',
-    path: __dirname + '/bundles',
+    path: `${__dirname}/bundles`,
   },
 };

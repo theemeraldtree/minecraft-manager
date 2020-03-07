@@ -20,9 +20,9 @@ const HTTPRequest = {
           },
           (error, response, body) => {
             resolve(body, response);
-          },
+          }
         )
-        .on('error', (err) => {
+        .on('error', err => {
           reject(err);
         });
     });
@@ -31,7 +31,7 @@ const HTTPRequest = {
   cheerioRequest(url, tries) {
     return new Promise((resolve, reject) => {
       this.httpGet(url)
-        .then((response) => {
+        .then(response => {
           if (response == undefined) {
             this.cheerioRequest(url);
           }
@@ -42,14 +42,14 @@ const HTTPRequest = {
             reject('response-not-found', tries);
           }
         })
-        .catch((err) => {
+        .catch(err => {
           reject(err, tries);
         });
     });
   },
 
   download(url, dest, onProgress) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const id = `${url}-${dest}`;
       this.fileDownloads[id] = {
         onProgress,

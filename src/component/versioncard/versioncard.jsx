@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../button/button';
 import Detail from '../detail/detail';
 import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
 import Hosts from '../../host/Hosts';
+
 const BG = styled.div`
   margin-top: 5px;
   width: 100%;
@@ -16,7 +18,7 @@ const BG = styled.div`
   ${props =>
     props.hideFramework &&
     `
-        height: 55px;
+      height: 55px;
     `}
 
   ${props =>
@@ -24,7 +26,8 @@ const BG = styled.div`
     `
         height: 310px;
     `}
-    transition: height 150ms ease;
+  
+  transition: height 150ms ease;
   position: relative;
   overflow: hidden;
   padding-left: 5px;
@@ -89,30 +92,29 @@ const ButtonContainer = styled.div`
   top: 10px;
   right: 10px;
 `;
+
 export default class VersionCard extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
       showMoreInfo: false,
-      changelog: 'loading...',
+      changelog: 'loading...'
     };
   }
 
   toggleMoreInfo = async () => {
+    const { showMoreInfo, changelog } = this.state;
+    const { version, asset, host } = this.props;
+
     this.setState({
-      showMoreInfo: !this.state.showMoreInfo,
+      showMoreInfo: !showMoreInfo
     });
 
-    const { version, asset, host } = this.props;
     if (version.hosts.curse) {
-      if (this.state.changelog === 'loading...') {
-        const changelog = await Hosts.getFileChangelog(
-          host,
-          asset,
-          version.hosts.curse.fileID
-        );
+      if (changelog === 'loading...') {
+        const newChangelog = await Hosts.getFileChangelog(host, asset, version.hosts.curse.fileID);
         this.setState({
-          changelog: changelog,
+          changelog: newChangelog
         });
       }
     }
@@ -128,22 +130,17 @@ export default class VersionCard extends PureComponent {
       progressState,
       disableMcVer,
       installClick,
-      allowVersionReinstallation,
+      allowVersionReinstallation
     } = this.props;
 
     let progress = '';
     if (progressState) {
       if (progressState.version === version.displayName) {
         progress = progressState.progress;
-      } else {
-        if (
-          progressState.progress === 'installed' &&
-          !allowVersionReinstallation
-        ) {
-          progress = 'disable-install';
-        } else if (progressState.progress === 'installing') {
-          progress = 'disable-install';
-        }
+      } else if (progressState.progress === 'installed' && !allowVersionReinstallation) {
+        progress = 'disable-install';
+      } else if (progressState.progress === 'installing') {
+        progress = 'disable-install';
       }
 
       if (badMCVer) {
@@ -151,18 +148,15 @@ export default class VersionCard extends PureComponent {
       }
     }
 
-    let installed = progress === 'installed';
+    const installed = progress === 'installed';
 
-    const freeToInstall =
-      progress !== 'installing' && progress !== 'disable-install';
+    const freeToInstall = progress !== 'installing' && progress !== 'disable-install';
     return (
       <BG extraInfo={showMoreInfo} hideFramework={hideFramework}>
         <Details>
           <Title>{version.displayName}</Title>
           {version.hosts.curse && !hideFramework && (
-            <Modloader>
-              framework: {version.hosts.curse.localValues.inferredModloader}
-            </Modloader>
+            <Modloader>framework: {version.hosts.curse.localValues.inferredModloader}</Modloader>
           )}
         </Details>
         {!hideButtons && (
@@ -188,29 +182,45 @@ export default class VersionCard extends PureComponent {
               </Button>
             )}
             {!installed && freeToInstall && progress !== 'bad-mc-ver' && (
-              <Button
-                data-version={version.cachedID}
-                onClick={installClick}
-                color="green"
-              >
+              <Button data-version={version.cachedID} onClick={installClick} color="green">
                 install
               </Button>
             )}
           </ButtonContainer>
         )}
-        {!showMoreInfo && (
-          <MoreInfo onClick={this.toggleMoreInfo}>more info</MoreInfo>
-        )}
+        {!showMoreInfo && <MoreInfo onClick={this.toggleMoreInfo}>more info</MoreInfo>}
         <InfoSection>
           <Detail>changelog</Detail>
           <Changelog>
             <SanitizedHTML small html={changelog} />
           </Changelog>
-          {showMoreInfo && (
-            <MoreInfo onClick={this.toggleMoreInfo}>less info</MoreInfo>
-          )}
+          {showMoreInfo && <MoreInfo onClick={this.toggleMoreInfo}>less info</MoreInfo>}
         </InfoSection>
       </BG>
     );
   }
 }
+
+VersionCard.propTypes = {
+  version: PropTypes.object.isRequired,
+  asset: PropTypes.object.isRequired,
+  host: PropTypes.string.isRequired,
+
+  hideButtons: PropTypes.bool,
+  hideFramework: PropTypes.bool,
+  badMCVer: PropTypes.bool,
+  progressState: PropTypes.object,
+  disableMcVer: PropTypes.bool,
+  installClick: PropTypes.func,
+  allowVersionReinstallation: PropTypes.bool
+};
+
+VersionCard.defaultProps = {
+  hideButtons: false,
+  hideFramework: false,
+  badMCVer: false,
+  disableMcVer: false,
+  progressState: {},
+  installClick: undefined,
+  allowVersionReinstallation: false
+};

@@ -1,7 +1,10 @@
 import React from 'react';
-const EditContainer = ({children}) => (
-    <>
-    {children}
-    </>
-)
+import PropTypes from 'prop-types';
+
+const EditContainer = ({ children }) => <>{children}</>;
+
+EditContainer.propTypes = {
+  children: PropTypes.node.isRequired
+};
+
 export default EditContainer;

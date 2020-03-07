@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import os from 'os';
 import ActionButtons from './action-buttons';
 import logo from '../../img/logo-sm.png';
+
 const Wrapper = styled.div`
   flex: 0 1 29px;
   height: 29px;
@@ -45,9 +46,9 @@ const Title = styled.p`
     `}
 `;
 
-let WindowBar = () => (
+const WindowBar = () => (
   <Wrapper>
-    <img src={logo} />
+    <img alt="Logo" src={logo} />
     <Title>Minecraft Manager</Title>
     <ActionButtons />
   </Wrapper>
