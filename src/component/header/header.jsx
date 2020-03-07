@@ -5,20 +5,20 @@ import transition from 'styled-transition-group';
 import NavContext from '../../navContext';
 
 const BG = styled.div`
-    min-height: 60px;
-    background-color: #2b2b2b;
-    display: flex;
-    align-items: center;
-`
+  min-height: 60px;
+  background-color: #2b2b2b;
+  display: flex;
+  align-items: center;
+`;
 
 const Title = styled.p`
-    color: white;
-    margin: 0;
-    margin-left: 10px;
-    font-size: 32pt;
-    font-weight: 900;
-    transition: 150ms;
-`
+  color: white;
+  margin: 0;
+  margin-left: 10px;
+  font-size: 32pt;
+  font-weight: 900;
+  transition: 150ms;
+`;
 
 const BackButton = transition.div`
     color: white;
@@ -49,7 +49,7 @@ const BackButton = transition.div`
         margin-left: -35px;
         transition: 150ms;
     }
-`
+`;
 
 const Items = transition.div`
     display: flex;
@@ -77,38 +77,40 @@ const Items = transition.div`
         opacity: 0;
         transition: 150ms;
     }
-`
+`;
 
 export default withRouter(function Header({ history }) {
+  const context = useContext(NavContext);
 
-    const context = useContext(NavContext);
+  const {
+    title,
+    children,
+    backLink,
+    showBackButton,
+    showChildren,
+    onBackClick,
+  } = context.header;
 
-    const { title, children, backLink, showBackButton, showChildren, onBackClick } = context.header;
-
-    const click = () => {
-        if(!backLink) {
-            onBackClick ? onBackClick() : history.goBack();
-        }
+  const click = () => {
+    if (!backLink) {
+      onBackClick ? onBackClick() : history.goBack();
     }
-    return (
-        <BG>
-            <BackButton 
-                unmountOnExit
-                in={showBackButton}
-                timeout={150}
-                onClick={click}
-            >
-                {!backLink && `←`}
-                {backLink && <Link to={backLink}>←</Link>}
-            </BackButton>
-            <Title>{title}</Title>
-            <Items
-                unmountOnExit
-                in={showChildren}
-                timeout={150}
-            >
-                {children}
-            </Items>
-        </BG>
-        )
+  };
+  return (
+    <BG>
+      <BackButton
+        unmountOnExit
+        in={showBackButton}
+        timeout={150}
+        onClick={click}
+      >
+        {!backLink && `←`}
+        {backLink && <Link to={backLink}>←</Link>}
+      </BackButton>
+      <Title>{title}</Title>
+      <Items unmountOnExit in={showChildren} timeout={150}>
+        {children}
+      </Items>
+    </BG>
+  );
 });

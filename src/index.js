@@ -1,50 +1,64 @@
-import React from "react";
+import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './app';
-import ProfilesManager from "./manager/profilesManager";
 import fs from 'fs';
-import Global from "./util/global";
 import path from 'path';
-import SettingsManager from "./manager/settingsManager";
-import HTTPRequest from "./host/httprequest";
-import ToastManager from "./manager/toastManager";
-import ErrorManager from "./manager/errorManager";
-import LibrariesManager from "./manager/librariesManager";
+import App from './app';
+import ProfilesManager from './manager/profilesManager';
+import Global from './util/global';
+import SettingsManager from './manager/settingsManager';
+import HTTPRequest from './host/httprequest';
+import ToastManager from './manager/toastManager';
+import ErrorManager from './manager/errorManager';
+import LibrariesManager from './manager/librariesManager';
+
 const { remote, shell, ipcRenderer } = require('electron');
 const { dialog } = require('electron').remote;
 const request = require('request');
 const yaml = require('js-yaml');
 const semver = require('semver');
-const { version } = require('../package.json');
 const os = require('os');
+const { version } = require('../package.json');
 require('typeface-roboto');
+
 async function load() {
   try {
     SettingsManager.loadSettings();
 
     Global.updateMCVersions();
-    if(fs.existsSync(Global.PROFILES_PATH)) {
-      //LogManager.log('info', '[index] Getting profiles...');
-    
+    if (fs.existsSync(Global.PROFILES_PATH)) {
+      // LogManager.log('info', '[index] Getting profiles...');
+
       // Check for directories - we need to make sure everything exists
-      if(!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
-        fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
+      if (
+        !fs.existsSync(
+          path.join(Global.getMCPath(), '/libraries/minecraftmanager'),
+        )
+      ) {
+        fs.mkdirSync(
+          path.join(Global.getMCPath(), '/libraries/minecraftmanager'),
+        );
       }
-  
-      if(!fs.existsSync(Global.getMCPath(), '/libraries/minecraftmanager/profiles')) {
-        fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
+
+      if (
+        !fs.existsSync(
+          Global.getMCPath(),
+          '/libraries/minecraftmanager/profiles',
+        )
+      ) {
+        fs.mkdirSync(
+          path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'),
+        );
       }
     }
-  }catch(e) {
-    ToastManager.createToast(`ERROR`, ErrorManager.makeReadable(e));
+  } catch (e) {
+    ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
     console.error(e);
   }
-  
 
   await ProfilesManager.getProfiles();
-  
+
   document.addEventListener('keydown', (e) => {
-    if(e.keyCode == 123) {
+    if (e.keyCode == 123) {
       remote.getCurrentWindow().webContents.toggleDevTools();
     }
   });
@@ -58,8 +72,7 @@ async function load() {
   });
 
   try {
-    if(fs.existsSync(Global.PROFILES_PATH)) {
-
+    if (fs.existsSync(Global.PROFILES_PATH)) {
       LibrariesManager.checkExist();
       Global.checkMinecraftVersions();
       Global.checkMinecraftProfiles();
@@ -73,38 +86,38 @@ async function load() {
 
       ProfilesManager.updateReloadListeners();
     }
-  }catch(e) {
+  } catch (e) {
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
     console.error(e);
   }
 
   // We're on a Mac, which means auto update doesn't work.
   // Here, we manually check for updates and inform the user a new version is available
-  if(os.platform() === 'darwin') {
-    request.get(`https://theemeraldtree.net/updates/mac/mac.yml`, (err, resp, body) => {
+  if (os.platform() === 'darwin') {
+    request.get(
+      'https://theemeraldtree.net/updates/mac/mac.yml',
+      (err, resp, body) => {
         const doc = yaml.safeLoad(body);
-        if(semver.gt(doc.version, version)) {
-            dialog.showMessageBox({
-                title: 'Minecraft Manager',
-                message: 'A new version of Minecraft Manager is available. Would you like to go to the website and download it?',
-                buttons: [
-                    'No thanks',
-                    'Take me there!'
-                ]
-            }, buttonIndex => {
-                if(buttonIndex === 1) {
-                    shell.openExternal(`https://theemeraldtree.net/mcm/download`);
-                }
-            });
+        if (semver.gt(doc.version, version)) {
+          dialog.showMessageBox(
+            {
+              title: 'Minecraft Manager',
+              message:
+                'A new version of Minecraft Manager is available. Would you like to go to the website and download it?',
+              buttons: ['No thanks', 'Take me there!'],
+            },
+            (buttonIndex) => {
+              if (buttonIndex === 1) {
+                shell.openExternal('https://theemeraldtree.net/mcm/download');
+              }
+            },
+          );
         }
-    })
-      
+      },
+    );
   }
 
-  ReactDOM.render(
-    <App />,
-    document.getElementById('app')
-  );
+  ReactDOM.render(<App />, document.getElementById('app'));
 }
 
 load();

@@ -1,24 +1,8 @@
 {
-    "parser": "babel-eslint",
-    "extends": [
-        "eslint:recommended"
-    ],
-    "plugins": [
-        "react"
-    ],
-    "env": {
-        "browser": true,
-        "node": true,
-        "es6": true
-    },
-    "rules": {
-        "no-console": 0,
-        "react/jsx-uses-react": "error",
-        "react/jsx-uses-vars": "error",
-        "require-atomic-updates": 0,
-        "no-async-promise-executor": 0 // eslint likes to throw a fit about this, however in my use case, they are the only option that works afaik
-    },
-    "parserOptions": {
-        "ecmaVersion": 6
-    }
+  "parser": "babel-eslint",
+  "extends": ["airbnb"],
+  "env": {
+    "browser": true,
+    "node": true
+  }
 }

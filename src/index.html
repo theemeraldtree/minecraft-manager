@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <title>Minecraft Manager</title>
     <style>
       * {
-        font-family: 'Roboto';
+        font-family: 'Roboto', sans-serif;
         user-select: none;
       }
-      
+
       a {
         color: #42b3f5;
         text-decoration: none;
@@ -18,32 +18,35 @@
         filter: brightness(0.85);
       }
 
-      html, body {
+      html,
+      body {
         margin: 0;
         padding: 0;
       }
 
-      div, a, img {
+      div,
+      a,
+      img {
         -webkit-user-drag: none;
       }
 
       ::-webkit-scrollbar {
-        width: 10px; 
+        width: 10px;
         padding-top: 5px;
       }
-      
+
       ::-webkit-scrollbar-track {
         border: 2px solid rgba(0, 0, 0, 0);
         background-clip: padding-box;
         border-radius: 30px;
-        background-color: #303030;
+        background-color: black;
       }
-      
+
       ::-webkit-scrollbar-thumb {
         border: 2px solid rgba(0, 0, 0, 0);
         background-clip: padding-box;
         border-radius: 30px;
-        background-color: #101010;
+        background-color: #5c5c5c;
       }
 
       ::-webkit-scrollbar-thumb:hover {
@@ -59,8 +62,8 @@
       }
 
       .react-contextmenu--visible {
-        background-color: #282828;
-        border: 1px solid rgba(0,0,0,.15);
+        background-color: rgba(40, 40, 40, 1);
+        border: 0;
         min-width: 150px;
         color: white;
         outline: none;
@@ -70,11 +73,11 @@
       }
 
       .react-contextmenu-item {
-          color: white;
-          cursor: pointer;
-          padding: 5px 10px;
-          outline: none;
-          white-space: nowrap;
+        color: white;
+        cursor: pointer;
+        padding: 5px 10px;
+        outline: none;
+        white-space: nowrap;
       }
 
       .react-contextmenu-item:hover {
@@ -86,9 +89,9 @@
         margin-top: 7px;
         cursor: inherit;
       }
-      
+
       .react-contextmenu-item--divider:hover {
-          background-color: transparent;
+        background-color: transparent;
       }
 
       .react-contextmenu-item--disabled {
@@ -104,8 +107,9 @@
         padding: 0;
       }
 
-      .react-contextmenu-item.react-contextmenu-submenu > .react-contextmenu-item:after {
-        content: "▶";
+      .react-contextmenu-item.react-contextmenu-submenu
+        > .react-contextmenu-item:after {
+        content: '▶';
         display: inline-block;
         position: absolute;
         right: 7px;
@@ -124,7 +128,7 @@
 
       .loading .windowbar {
         width: 100vw;
-        background-color: #1D1D1D;
+        background-color: #1d1d1d;
         -webkit-app-region: drag;
         user-select: none;
         height: 29px;
@@ -194,43 +198,52 @@
     </style>
   </head>
   <body>
-      <div id="app">
-        <div class='loading'>
-          <div class='windowbar'></div>
-          <div class='content'>
-            <div class='phantom-sidebar'></div>
-            <div class='center'>
-              <div class='phantom-header'></div>
-              <p>loading...</p>
-              <div id='toolong' class='toolong hide'>
-                <p><i>this seems to be taking a while. <a href='https://theemeraldtree.net/mcm/issues'>file a bug report?</a></i></p>
-              </div>
-              <div id='forceclose' class='forceclose hide'>
-                <button onclick='forceClose();'>close this window</button>
-              </div>
+    <div id="app">
+      <div class="loading">
+        <div class="windowbar"></div>
+        <div class="content">
+          <div class="phantom-sidebar"></div>
+          <div class="center">
+            <div class="phantom-header"></div>
+            <p>loading...</p>
+            <div id="toolong" class="toolong hide">
+              <p>
+                <i
+                  >this seems to be taking a while.
+                  <a href="https://theemeraldtree.net/mcm/issues"
+                    >file a bug report?</a
+                  ></i
+                >
+              </p>
+            </div>
+            <div id="forceclose" class="forceclose hide">
+              <button onclick="forceClose();">
+                close this window
+              </button>
             </div>
           </div>
         </div>
       </div>
-      <script>
-        const { remote } = require('electron');
-        const currentWindow = remote.getCurrentWindow();
+    </div>
+    <script>
+      const { remote } = require('electron');
+      const currentWindow = remote.getCurrentWindow();
 
-        window.setTimeout(() => {
-          if(document.getElementById('toolong')) {
-            document.getElementById('toolong').className = 'toolong';
-          }
-        }, 10000);
-
-        window.setTimeout(() => {
-          if(document.getElementById('foreclose')) {
-            document.getElementById('forceclose').className = 'forceclose';
-          }
-        }, 15000);
-
-        function forceClose() {
-          currentWindow.close();
+      window.setTimeout(() => {
+        if (document.getElementById('toolong')) {
+          document.getElementById('toolong').className = 'toolong';
         }
-      </script>
+      }, 10000);
+
+      window.setTimeout(() => {
+        if (document.getElementById('foreclose')) {
+          document.getElementById('forceclose').className = 'forceclose';
+        }
+      }, 15000);
+
+      function forceClose() {
+        currentWindow.close();
+      }
+    </script>
   </body>
 </html>
