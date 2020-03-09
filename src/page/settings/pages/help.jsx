@@ -7,6 +7,7 @@ import LibrariesManager from '../../../manager/librariesManager';
 import VersionsManager from '../../../manager/versionsManager';
 import LauncherManager from '../../../manager/launcherManager';
 import AlertManager from '../../../manager/alertManager';
+import Debug from '../../../util/debug';
 
 const List = styled.div`
   display: flex;
@@ -45,6 +46,10 @@ export default function Help() {
     );
   };
 
+  const dumpData = () => {
+    AlertManager.messageBox('data dump', `<textarea readonly>${Debug.dataDump()}</textarea>`);
+  };
+
   return (
     <>
       <NeedHelp />
@@ -65,6 +70,13 @@ export default function Help() {
             clean launcher versions
           </Button>
         </List>
+      </Section>
+      <Section>
+        <h2>Minecraft Manager Data Dump</h2>
+        <h3>Dumps most of the data that Minecraft Manager has. This can be helpful for error/crash reports.</h3>
+        <Button onClick={dumpData} color="green">
+          Dump Data
+        </Button>
       </Section>
     </>
   );

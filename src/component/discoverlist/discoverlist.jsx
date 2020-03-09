@@ -19,6 +19,7 @@ const LoadingText = styled.div`
 const List = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 10px;
   &::-webkit-scrollbar-track {
     background: transparent;
@@ -289,7 +290,7 @@ DiscoverList.propTypes = {
   type: PropTypes.string,
   progressState: PropTypes.object,
 
-  forceFramework: PropTypes.bool,
+  forceFramework: PropTypes.string,
   forceVersionFilter: PropTypes.bool,
   mcVerFilter: PropTypes.string,
   allowVersionReinstallation: PropTypes.bool,

@@ -14,8 +14,8 @@ const INTRO = keyframes`
 const AlertBackground = styled.div`
   width: 100%;
   height: fit-content;
-  max-width: 350px;
-  max-height: 200px;
+  max-width: 500px;
+  max-height: 500px;
   margin: 10px;
   background-color: #222;
   color: white;
@@ -26,6 +26,22 @@ const AlertBackground = styled.div`
     margin: 0;
     font-weight: 200;
     font-size: 21pt;
+  }
+
+  textarea {
+    background: black;
+    border: 0;
+    font-family: monospace;
+    color: white;
+    width: 100%;
+    height: 40vh;
+    resize: none;
+    max-height: 300px;
+    white-space: pre;
+  }
+
+  textarea:focus {
+    outline: none;
   }
 
   animation: ${INTRO} 125ms ease-out;

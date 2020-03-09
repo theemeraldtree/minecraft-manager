@@ -97,12 +97,30 @@ const LibrariesManager = {
       this.getLibrariesPath(),
       '/com/typesafe/akka/akka-actor_2.11/2.3.3/akka-actor_2.11-2.3.3.jar'
     );
+    const typesafeconfigpath = path.join(this.getLibrariesPath(), '/com/typesafe/config/1.2.1/config-1.2.1.jar');
+    const asmallpath = path.join(this.getLibrariesPath(), '/org/ow2/asm/asm-all/5.2/asm-all-5.2.jar');
     mkdirp.sync(path.dirname(akkaactorpath));
+    mkdirp.sync(path.dirname(typesafeconfigpath));
+    mkdirp.sync(path.dirname(asmallpath));
     if (!fs.existsSync(akkaactorpath)) {
       DownloadsManager.startFileDownload(
         'Missing essential library akka-actor',
         'https://repo1.maven.org/maven2/com/typesafe/akka/akka-actor_2.11/2.3.3/akka-actor_2.11-2.3.3.jar',
         akkaactorpath
+      );
+    }
+    if (!fs.existsSync(typesafeconfigpath)) {
+      DownloadsManager.startFileDownload(
+        'Missing essential library config',
+        'https://repo.maven.apache.org/maven2/com/typesafe/config/1.2.1/config-1.2.1.jar',
+        typesafeconfigpath
+      );
+    }
+    if (!fs.existsSync(asmallpath)) {
+      DownloadsManager.startFileDownload(
+        'Missing essential library asm-all',
+        'https://repo.maven.apache.org/maven2/org/ow2/asm/asm-all/5.2/asm-all-5.2.jar',
+        asmallpath
       );
     }
   }

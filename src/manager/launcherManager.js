@@ -78,6 +78,8 @@ const LauncherManager = {
       exec.exec(`"${launcherPath}"`);
     } else if (os.platform() === 'darwin') {
       exec.exec(`open -a ${launcherPath}`);
+    } else if (os.platform() === 'linux') {
+      exec.exec(`${launcherPath}`);
     }
   },
   setLaunchArguments(profile, args) {

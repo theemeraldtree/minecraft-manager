@@ -85,7 +85,7 @@ const SanitizedHTML = ({ html, small }) => (
 );
 
 SanitizedHTML.propTypes = {
-  html: PropTypes.string.isRequired,
+  html: PropTypes.string,
   small: PropTypes.bool
 };
 

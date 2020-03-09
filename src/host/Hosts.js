@@ -31,13 +31,16 @@ const Hosts = {
 
   async HTTPGet(url, qs, tries) {
     try {
-      return await HTTPRequest.get(url, qs);
+      const res = (await HTTPRequest.get(url, qs)).data;
+      return res;
     } catch (err) {
       if (!tries) {
-        return this.HTTPGet(url, qs, 1);
+        // eslint-disable-next-line no-return-await
+        return await this.HTTPGet(url, qs, 1).data;
       }
       if (tries !== 3) {
-        return this.HTTPGet(url, qs, tries + 1);
+        // eslint-disable-next-line no-return-await
+        return await this.HTTPGet(url, qs, tries + 1).data;
       }
       this.sendCantConnect();
       return undefined;
@@ -178,7 +181,6 @@ const Hosts = {
     }
 
     const ver = await this.getLatestVersionForMCVersion(host, asset, profile.version.minecraft.version, modloader);
-
     if (!ver) {
       return 'no-version-available';
     }

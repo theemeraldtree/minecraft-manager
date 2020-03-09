@@ -18,10 +18,10 @@ export default function Mod(rawoamf) {
   // useful functions
 
   this.cleanObject = function() {
-    const copy = { ...this }.map(x => {
-      if (typeof x !== 'function' && !this.localValues.includes(x)) return x;
+    const copy = { ...this };
 
-      return undefined;
+    Object.keys(copy).forEach(x => {
+      if (typeof copy[x] === 'function' || this.localValues.includes(x)) copy[x] = undefined;
     });
 
     copy.localValues = undefined;

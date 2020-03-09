@@ -24,7 +24,6 @@ Memory:
 	Total: ${os.totalmem()}`,
   dataDump: () => {
     const allDumpedMCProfiles = LauncherManager.dumpAllProfiles();
-    console.log(allDumpedMCProfiles);
     return `
 =======
 Minecraft Manager Data Dump
@@ -114,7 +113,10 @@ All Profiles: ${Object.keys(allDumpedMCProfiles)
       })
       .join('')}
 Extra Profiles: ${Global.checkExtraMinecraftProfiles()}
-`;
+
+=======
+End Minecraft Manager Data Dump
+=======`;
   }
 };
 

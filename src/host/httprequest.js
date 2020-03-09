@@ -1,7 +1,10 @@
+/* eslint-disable */
 const request = require('request');
 const req = require('request-promise');
 const cheerio = require('cheerio');
 const { ipcRenderer } = require('electron');
+const axios = require('axios');
+const qs = require('qs');
 
 const HTTPRequest = {
   fileDownloads: {},
@@ -71,14 +74,13 @@ const HTTPRequest = {
     }
   },
 
-  async get(url, qs) {
-    return req({
-      uri: url,
-      method: 'GET',
-      qs,
+  async get(url, querystring) {
+    return axios.get(url, {
+      params: querystring,
       headers: {
-        'User-Agent': 'MinecraftManagerClient'
-      }
+        'X-Client': 'MinecraftManagerClient'
+      },
+      timeout: 15000
     });
   },
 

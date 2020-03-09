@@ -9,6 +9,9 @@ module.exports = {
   entry: ['babel-polyfill', './index.js'],
   mode: 'none',
   resolve: {
+    alias: {
+      'react-dom': '@hot-loader/react-dom'
+    },
     extensions: ['.js', '.jsx']
   },
   plugins: [

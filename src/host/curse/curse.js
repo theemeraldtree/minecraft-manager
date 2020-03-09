@@ -148,7 +148,7 @@ const Curse = {
 
   async getFileInfo(asset, fileID) {
     const res = await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}`);
-    if (res) return JSON.parse(res);
+    if (res) return res;
     return undefined;
   },
 
@@ -184,7 +184,7 @@ const Curse = {
   },
 
   async getInfo(asset) {
-    return JSON.parse(await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}`));
+    return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}`);
   },
 
   async getFullAsset(asset, type) {
@@ -210,7 +210,7 @@ const Curse = {
       index: 0
     });
 
-    if (result) return this.readAssetList(JSON.parse(result));
+    if (result) return this.readAssetList(result);
     return undefined;
   },
 
@@ -267,9 +267,8 @@ const Curse = {
   // gets the versions for an asset
   async getVersions(assetT) {
     const asset = assetT;
-    const req = await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/files`);
-    if (req) {
-      const results = JSON.parse(req);
+    const results = await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/files`);
+    if (results) {
       const sorted = results.sort((a, b) => new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime());
       const final = sorted.map(ver => this.convertCurseVersion(ver));
 

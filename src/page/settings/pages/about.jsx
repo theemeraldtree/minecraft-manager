@@ -228,6 +228,12 @@ export default function About() {
           <li>
             <a href="https://minecraftforge.net">MinecraftForge website</a>
           </li>
+          <li>
+            <a href="https://www.reddit.com/r/feedthebeast/">r/feedthebeast - modded minecraft subreddit</a>
+          </li>
+          <li>
+            <a href="https://www.reddit.com/r/minecraft/">r/minecraft</a>
+          </li>
         </h3>
       </Section>
     </>

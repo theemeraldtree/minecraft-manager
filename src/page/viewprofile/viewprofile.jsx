@@ -114,7 +114,7 @@ function ViewProfilePage({ match, history }) {
           />
         )}
         <ProfileHeader>
-          <Image src={`file:///${profile.iconPath}#${Global.cacheUpdateTime}`} />
+          {profile.iconPath && <Image src={`file:///${profile.iconPath}#${Global.cacheUpdateTime}`} />}
           <PHSide>
             <Title>{profile.name}</Title>
             <Blurb>{profile.blurb}</Blurb>
