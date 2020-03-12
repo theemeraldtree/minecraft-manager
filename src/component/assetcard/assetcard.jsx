@@ -168,7 +168,7 @@ const AssetCard = ({
           </MenuItem>
         )}
         {showInstall && !installed && !progressState.progress && <MenuItem onClick={installClick}>Install</MenuItem>}
-        {asset.hosts.curse && (
+        {asset.hosts && asset.hosts.curse && (
           <>
             <SubMenu hoverDelay={0} title="CurseForge">
               <MenuItem

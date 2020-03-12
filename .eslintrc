@@ -33,6 +33,7 @@
     "no-plusplus": "off",
     "radix": "off",
     "function-paren-newline": "off",
-    "no-console": "off"
+    "no-console": "off",
+    "linebreak-style": "off"
   }
 }

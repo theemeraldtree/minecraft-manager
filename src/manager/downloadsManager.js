@@ -17,6 +17,8 @@ const DownloadsManager = {
           this.downloadUpdate();
         }
         HTTPRequest.download(file, downloadPath, progress => {
+          console.log('httpREQUEST CALL');
+          console.log(download);
           this.handleDownloadProgress(download, progress);
         })
           .then(() => {
@@ -60,9 +62,13 @@ const DownloadsManager = {
   },
   setDownloadProgress(downloadName, progress) {
     const download = this.activeDownloads.find(item => downloadName === item.name);
-    this.handleDownloadProgress(download, progress);
+
+    if (download) {
+      this.handleDownloadProgress(download, progress);
+    }
   },
   handleDownloadProgress(download, progress) {
+    console.log(download);
     download.setProgress(`${progress}%`);
     download.setProgressPercent(progress);
     this.downloadUpdate();

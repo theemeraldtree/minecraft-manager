@@ -47,6 +47,9 @@ const Container = styled.div`
   overflow-y: auto;
   flex: 1 1 auto;
   height: 100%;
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 `;
 
 const Wrapper = styled.div`

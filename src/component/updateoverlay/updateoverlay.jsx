@@ -109,12 +109,10 @@ export default class UpdateOverlay extends Component {
   render() {
     const { noUpdates, updateAvailable, updateVersion, displayState, noConnection, updateProgress } = this.state;
 
-    // eslint-disable-next-line react/destructuring-assignment
-    const inProp = this.props.in;
     const { profile, cancelClick } = this.props;
 
     return (
-      <Overlay force in={inProp}>
+      <Overlay force>
         <BG>
           {displayState === 'done' && (
             <>
@@ -176,10 +174,5 @@ export default class UpdateOverlay extends Component {
 
 UpdateOverlay.propTypes = {
   profile: PropTypes.object.isRequired,
-  in: PropTypes.bool,
   cancelClick: PropTypes.func.isRequired
-};
-
-UpdateOverlay.defaultProps = {
-  in: false
 };

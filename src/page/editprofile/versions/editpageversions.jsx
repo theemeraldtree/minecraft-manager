@@ -76,7 +76,7 @@ export default function EditPageVersions({ id }) {
 
           return {
             name,
-            id
+            id: ver.hosts.curse.fileID
           };
         });
 

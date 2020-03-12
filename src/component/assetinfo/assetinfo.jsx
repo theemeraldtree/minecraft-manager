@@ -26,6 +26,9 @@ const Description = styled.div`
   background-color: #404040;
   margin-top: 3px;
   margin-bottom: 10px;
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 `;
 
 const HeaderButtons = styled.div`
@@ -58,16 +61,14 @@ const HB = styled(Button)`
 
 const List = styled.div`
   flex: 1 1 auto;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   margin-top: 10px;
   margin-bottom: 20px;
   height: calc(100% - 230px);
-`;
-
-const Header = styled.h4`
-  margin: 0;
-  color: white;
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 `;
 
 const TryAgain = styled.p`
@@ -338,7 +339,6 @@ export default class AssetInfo extends Component {
           <>
             {!cantConnect && (
               <>
-                <Header>all versions</Header>
                 <Detail>minecraft version</Detail>
                 <CustomDropdown
                   value={this.state.mcVerFilter}

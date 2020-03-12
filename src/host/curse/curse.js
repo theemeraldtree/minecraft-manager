@@ -162,8 +162,11 @@ const Curse = {
       asset.hosts.curse.fileName = info.fileName;
       asset.downloadTemp = info.downloadUrl;
 
-      asset.dependencies = info.dependencies.map(dependency => {
-        if (dependency.type === 3) {
+      asset.dependencies = info.dependencies
+        .filter(depend => depend.type === 3)
+        .map(dependency => {
+          console.log('depend');
+          console.log(dependency);
           return {
             hosts: {
               curse: {
@@ -171,10 +174,7 @@ const Curse = {
               }
             }
           };
-        }
-
-        return undefined;
-      });
+        });
 
       Hosts.cache.assets[asset.cachedID] = asset;
       return asset;
@@ -252,8 +252,11 @@ const Curse = {
     }
 
     if (newAsset) {
-      const final = newAsset.dependencies.map(async dependency => this.getFullAsset(dependency));
+      // eslint-disable-next-line no-return-await
+      const final = await Promise.all(newAsset.dependencies.map(dependency => this.getFullAsset(dependency)));
 
+      console.log('getting dependencies');
+      console.log(final);
       if (!asset.cachedID) {
         asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
       }
@@ -281,6 +284,8 @@ const Curse = {
       }
 
       Hosts.cache.assets[asset.cachedID].hosts.curse.versionCache = final;
+
+      console.log(final);
       return final;
     }
 

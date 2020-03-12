@@ -18,7 +18,7 @@ const BG = transition.div`
     ${props =>
       props.force &&
       `
-        z-index: 20;
+        z-index: 10;
     `}
 
     &:enter {

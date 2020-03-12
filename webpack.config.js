@@ -2,7 +2,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { spawn } = require('child_process');
 const process = require('process');
 const path = require('path');
-const PrettierPlugin = require('prettier-webpack-plugin');
 
 module.exports = {
   context: `${__dirname}/src`,
@@ -17,9 +16,6 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './index.html'
-    }),
-    new PrettierPlugin({
-      configFile: '.prettierrc'
     })
   ],
   devtool: 'source-map',

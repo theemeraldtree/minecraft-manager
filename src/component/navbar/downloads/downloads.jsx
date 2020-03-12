@@ -54,7 +54,7 @@ const DownloadsOverlay = styled.div`
   width: 350px;
   height: 350px;
   background-color: #1d1d1d;
-  z-index: 100;
+  z-index: 10000;
   cursor: default;
   position: absolute;
   left: 120px;

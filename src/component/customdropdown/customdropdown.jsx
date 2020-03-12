@@ -207,6 +207,7 @@ export default class CustomDropdown extends Component {
 
     const finalArr = this.props.items.map(item => {
       let id, name;
+      console.log(item);
       if (item instanceof Object) {
         id = item.id;
         name = item.name;
@@ -264,6 +265,6 @@ export default class CustomDropdown extends Component {
 CustomDropdown.propTypes = {
   onChange: PropTypes.func,
   items: PropTypes.array,
-  value: PropTypes.string,
+  value: PropTypes.any,
   disabled: PropTypes.bool
 };

@@ -161,8 +161,8 @@ export default class VersionCard extends PureComponent {
         {!hideButtons && (
           <ButtonContainer>
             {progress === 'bad-mc-ver' && (
-              <Button disabled color="green">
-                wrong minecraft version
+              <Button disabled title="minecraft version is incompatible" color="green">
+                incompatible
               </Button>
             )}
             {installed && !disableMcVer && progress !== 'disable-install' && (
