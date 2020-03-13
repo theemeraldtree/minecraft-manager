@@ -577,6 +577,15 @@ const Global = {
     };
 
     return platforms[os.platform()];
+  },
+  // it really annoys me that authors leave stuff like the file extension in the version name
+  // all this does is hide it from the user; no actual names are being changed
+  cleanVersionName: name => {
+    let currentName = name;
+    if (currentName.substring(currentName.length - 4) === '.zip') {
+      currentName = name.substring(0, currentName.length - 4);
+    }
+    return currentName;
   }
 };
 

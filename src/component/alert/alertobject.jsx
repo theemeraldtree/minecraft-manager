@@ -8,7 +8,7 @@ const InputContainer = styled.div`
   position: absolute;
   bottom: 10px;
   right: 10px;
-  div {
+  button {
     margin: 2px;
   }
   display: flex;

@@ -8,7 +8,7 @@ import Button from '../../../component/button/button';
 import Detail from '../../../component/detail/detail';
 
 const BG = styled.div`
-  div {
+  button {
     margin-bottom: 5px;
     display: block;
   }

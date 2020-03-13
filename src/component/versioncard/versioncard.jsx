@@ -5,6 +5,7 @@ import Button from '../button/button';
 import Detail from '../detail/detail';
 import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
 import Hosts from '../../host/Hosts';
+import Global from '../../util/global';
 
 const BG = styled.div`
   margin-top: 5px;
@@ -84,6 +85,9 @@ const Changelog = styled.div`
   overflow-y: scroll;
   width: 100%;
   background-color: #2b2b2b;
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 `;
 
 const ButtonContainer = styled.div`
@@ -153,7 +157,7 @@ export default class VersionCard extends PureComponent {
     return (
       <BG extraInfo={showMoreInfo} hideFramework={hideFramework}>
         <Details>
-          <Title>{version.displayName}</Title>
+          <Title>{Global.cleanVersionName(version.displayName)}</Title>
           {version.hosts.curse && !hideFramework && (
             <Modloader>framework: {version.hosts.curse.localValues.inferredModloader}</Modloader>
           )}

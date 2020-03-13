@@ -30,7 +30,6 @@ const Button = styled.button.attrs(props => ({
   outline: none;
   border: 0;
   font-size: 12pt;
-  margin-bottom: 3px;
   ${props =>
     props.disabled &&
     `

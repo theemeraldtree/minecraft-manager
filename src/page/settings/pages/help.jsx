@@ -12,9 +12,10 @@ import Debug from '../../../util/debug';
 const List = styled.div`
   display: flex;
   flex-flow: column;
-  div {
+  button {
     margin-top: 3px;
     width: auto;
+    max-width: 300px;
   }
 `;
 
@@ -75,7 +76,7 @@ export default function Help() {
         <h2>Minecraft Manager Data Dump</h2>
         <h3>Dumps most of the data that Minecraft Manager has. This can be helpful for error/crash reports.</h3>
         <Button onClick={dumpData} color="green">
-          Dump Data
+          dump data
         </Button>
       </Section>
     </>

@@ -26,7 +26,7 @@ const BG = styled.div`
         cursor: pointer;
         &:hover {
             background-color: #5b5b5b;
-            transform: scale(1.04);
+            transform: scale(1.02);
         }
     `}
 `;

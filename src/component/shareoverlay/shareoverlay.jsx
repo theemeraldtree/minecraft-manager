@@ -62,7 +62,7 @@ const ButtonsContainer = styled.div`
   justify-content: flex-end;
   margin-top: 5px;
   flex-shrink: 0;
-  div {
+  button {
     margin-right: 5px;
   }
 `;

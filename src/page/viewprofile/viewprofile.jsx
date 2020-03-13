@@ -60,7 +60,7 @@ const CustomButton = styled(Button)`
 
 const ButtonGroup = styled.div`
   width: 200px;
-  div:not(:first-child) {
+  button:not(:first-child) {
     margin-top: 5px;
   }
 `;
