@@ -7,7 +7,6 @@ const BG = transition.div`
     height: 100%;
     position: absolute;
     background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,21 +22,17 @@ const BG = transition.div`
 
     &:enter {
         opacity: 0;
-        backdrop-filter: blur(0);
     }
     &:enter-active {
         opacity: 1;
-        backdrop-filter: blur(10px);
         transition: 125ms;
     }
     &:exit {
         opacity: 1;
-        backdrop-filter: blur(10px);
     }
     &:exit-active {
         opacity: 0;
         transition: 125ms;
-        backdrop-filter: blur(0);
     }
 `;
 
