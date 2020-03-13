@@ -10,11 +10,11 @@ import LauncherManager from '../../manager/launcherManager';
 const FabricFramework = {
   setupFabric: profile =>
     new Promise(async resolve => {
-      const versionMeta = JSON.parse(
+      const versionMeta = (
         await HTTPRequest.get(
           `https://meta.fabricmc.net/v2/versions/loader/${profile.version.minecraft.version}/${profile.frameworks.fabric.version}`
         )
-      );
+      ).data;
       VersionsManager.createVersion(profile, 'fabric', versionMeta);
 
       const libraryPath = path.join(LibrariesManager.getMCMLibraries(), `/mcm-${profile.id}`);
@@ -52,9 +52,9 @@ const FabricFramework = {
     }),
   getFabricLoaderVersions: mcversion =>
     new Promise((resolve, reject) => {
-      HTTPRequest.httpGet(`https://meta.fabricmc.net/v2/versions/loader/${mcversion}`).then(versions => {
-        if (versions) {
-          resolve(JSON.parse(versions));
+      HTTPRequest.get(`https://meta.fabricmc.net/v2/versions/loader/${mcversion}`).then(versions => {
+        if (versions && versions.data) {
+          resolve(versions.data);
         } else {
           reject();
           ToastManager.createToast(

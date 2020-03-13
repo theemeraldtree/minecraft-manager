@@ -9,6 +9,10 @@ const BG = styled.div`
   margin-top: 2px;
   width: 100%;
   height: 90px;
+  outline: none;
+  text-align: left;
+  border: 0;
+  padding: 0;
   background-color: #404040;
   display: inline-flex;
   user-select: none;
@@ -105,7 +109,14 @@ const AssetCard = ({
 }) => (
   <>
     <ContextMenuTrigger holdToDisplay={-1} id={`assetcard${asset.id}`}>
-      <BG disableHover={disableHover} data-cachedid={asset.cachedID} data-assetid={asset.id} onClick={onClick}>
+      <BG
+        disableHover={disableHover}
+        tabIndex={disableHover ? -1 : 0}
+        data-cachedid={asset.cachedID}
+        data-assetid={asset.id}
+        onClick={onClick}
+        role="button"
+      >
         {asset.iconPath && (
           <Image src={`${asset.iconPath.substring(0, 1) === '/' ? 'file:///' : ''}${asset.iconPath}`} />
         )}

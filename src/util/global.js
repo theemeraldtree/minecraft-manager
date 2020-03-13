@@ -44,7 +44,7 @@ const Global = {
   async checkToastNews() {
     try {
       const req = await HTTPRequest.get('https://theemeraldtree.net/toastnews.json');
-      const news = JSON.parse(req);
+      const news = req.data;
 
       if (SettingsManager.currentSettings.lastToastNewsID === undefined) {
         SettingsManager.setLastToastNewsID(-1);
@@ -93,7 +93,7 @@ const Global = {
     }
 
     if (req !== undefined) {
-      versionsJSON = JSON.parse(req);
+      versionsJSON = req.data;
     } else if (req === undefined && firstTime) {
       ToastManager.createToast(
         'Uh oh!',
@@ -121,7 +121,7 @@ const Global = {
   },
   checkMinecraftVersions() {
     const totalCount = this.checkExtraMinecraftVersions().length;
-    if (totalCount) {
+    if (totalCount >= 1) {
       ToastManager.createToast(
         'Warning',
         `There are ${totalCount} Minecraft Manager-related version(s) in your Minecraft installation that do not need to exist!`,
@@ -145,7 +145,7 @@ const Global = {
   checkMinecraftProfiles() {
     const totalCount = this.checkExtraMinecraftProfiles().length;
 
-    if (totalCount) {
+    if (totalCount >= 1) {
       ToastManager.createToast(
         'Warning',
         `There are ${totalCount} Minecraft Manager-related launcher profile(s) in your Minecraft installation that do not need to exist!`,

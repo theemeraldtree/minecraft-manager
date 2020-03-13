@@ -61,7 +61,7 @@ export default class Toast extends PureComponent {
   renderToasts() {
     const { existingToasts, dismissingToasts } = this.state;
     const exist = existingToasts.map(toast => toast.id);
-    const list = existingToasts.map(toast => (
+    const list = ToastManager.toasts.map(toast => (
       <ToastObject
         key={`${toast.id}`}
         disableAnimation={exist.includes(toast.id)}

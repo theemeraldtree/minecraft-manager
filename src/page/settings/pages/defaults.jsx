@@ -34,6 +34,14 @@ export default function Defaults() {
         />
         <Detail>Auto-jump</Detail>
       </InputContainer>
+      <InputContainer>
+        <Checkbox
+          checked={SettingsManager.currentSettings.defaultsMultiplayerWarning}
+          lighter
+          onClick={() => toggleItem('defaultsMultiplayerWarning')}
+        />
+        <Detail>Show Multiplayer Content Warning Screen</Detail>
+      </InputContainer>
     </>
   );
 }

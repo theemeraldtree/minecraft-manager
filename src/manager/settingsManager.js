@@ -21,6 +21,9 @@ const SettingsManager = {
     if (!this.currentSettings.defaultsAutoJump) {
       this.currentSettings.defaultsAutoJump = false;
     }
+    if (!this.currentSettings.defaultsMultiplayerWarning) {
+      this.currentSettings.defaultsMultiplayerWarning = false;
+    }
   },
   save() {
     fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(this.currentSettings));

@@ -111,7 +111,8 @@ export default function Profile(rawomaf) {
     const { currentSettings } = SettingsManager;
     const options = `
             autoJump:${currentSettings.defaultsAutoJump}\n
-            tutorialStep:${currentSettings.defaultsShowTutorial ? 'movement' : 'none'}
+            tutorialStep:${currentSettings.defaultsShowTutorial ? 'movement' : 'none'}\n
+            skipMultiplayerWarning:${!currentSettings.defaultsMultiplayerWarning}
         `
       .replace(/ /g, '')
       .replace(/(^[ \t]*\n)/gm, '');

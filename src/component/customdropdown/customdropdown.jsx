@@ -18,6 +18,9 @@ const CDropdown = styled.div`
   &:hover {
     background-color: #5b5b5b;
   }
+  font-size: 12pt;
+  outline: none;
+  border: 0;
   ${props =>
     props.active &&
     `
@@ -46,6 +49,7 @@ const Items = transition.div`
     top: 40px;
     display: block;
     z-index: 150;
+    left: 0;
     &:enter {
         height: 0;
     }
@@ -72,7 +76,7 @@ const Label = styled.p`
   margin-left: 10px;
 `;
 
-const Item = styled.div`
+const Item = styled.button`
   cursor: pointer;
   padding-left: 10px;
   min-height: 25px;
@@ -83,6 +87,12 @@ const Item = styled.div`
   &:hover {
     background: #363636;
   }
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: 12pt;
 
   ${props =>
     props.active &&
@@ -207,7 +217,6 @@ export default class CustomDropdown extends Component {
 
     const finalArr = this.props.items.map(item => {
       let id, name;
-      console.log(item);
       if (item instanceof Object) {
         id = item.id;
         name = item.name;
@@ -248,7 +257,7 @@ export default class CustomDropdown extends Component {
     const { dropdownOpen, currentName } = this.state;
     return (
       <ClickAwayListener onClickAway={this.clickAway}>
-        <CDropdown disabled={this.props.disabled} active={dropdownOpen} onClick={this.openDropdown}>
+        <CDropdown role="button" disabled={this.props.disabled} active={dropdownOpen} onClick={this.openDropdown}>
           <Label>{currentName}</Label>
           <Arrow flip={dropdownOpen} src={arrow} />
           {!this.props.disabled && (

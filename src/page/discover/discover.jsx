@@ -78,7 +78,13 @@ export default function DiscoverPage() {
 
   useEffect(() => {
     header.setChildren(
-      <SearchBox value={searchValue} onChange={searchChange} onKeyPress={searchChange} placeholder="search" />
+      <SearchBox
+        type="text"
+        value={searchValue}
+        onChange={searchChange}
+        onKeyPress={searchChange}
+        placeholder="search"
+      />
     );
   }, [searchValue]);
 

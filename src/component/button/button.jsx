@@ -17,7 +17,7 @@ function getColor(name) {
   }
 }
 
-const Button = styled.div.attrs(props => ({
+const Button = styled.button.attrs(props => ({
   style: {
     backgroundColor: getColor(props.color)
   }
@@ -27,6 +27,10 @@ const Button = styled.div.attrs(props => ({
   width: fit-content;
   display: inline-block;
   cursor: pointer;
+  outline: none;
+  border: 0;
+  font-size: 12pt;
+  margin-bottom: 3px;
   ${props =>
     props.disabled &&
     `

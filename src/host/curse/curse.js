@@ -164,17 +164,13 @@ const Curse = {
 
       asset.dependencies = info.dependencies
         .filter(depend => depend.type === 3)
-        .map(dependency => {
-          console.log('depend');
-          console.log(dependency);
-          return {
-            hosts: {
-              curse: {
-                id: dependency.addonId
-              }
+        .map(dependency => ({
+          hosts: {
+            curse: {
+              id: dependency.addonId
             }
-          };
-        });
+          }
+        }));
 
       Hosts.cache.assets[asset.cachedID] = asset;
       return asset;
@@ -255,8 +251,6 @@ const Curse = {
       // eslint-disable-next-line no-return-await
       const final = await Promise.all(newAsset.dependencies.map(dependency => this.getFullAsset(dependency)));
 
-      console.log('getting dependencies');
-      console.log(final);
       if (!asset.cachedID) {
         asset.cachedID = `curse-cached-${Global.createID(asset.name)}`;
       }
@@ -285,7 +279,6 @@ const Curse = {
 
       Hosts.cache.assets[asset.cachedID].hosts.curse.versionCache = final;
 
-      console.log(final);
       return final;
     }
 
