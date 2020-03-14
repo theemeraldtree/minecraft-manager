@@ -80,6 +80,8 @@ const MoreInfo = styled.button`
   cursor: pointer;
   position: absolute;
   bottom: 0;
+  font-size: 12pt;
+  padding-left: 3px;
   &:focus-visible {
     outline: 2px solid yellow;
   }

@@ -1,7 +1,6 @@
 /* eslint-disable */
 const request = require('request');
 const req = require('request-promise');
-const cheerio = require('cheerio');
 const { ipcRenderer } = require('electron');
 const axios = require('axios');
 const qs = require('qs');
@@ -27,26 +26,6 @@ const HTTPRequest = {
         )
         .on('error', err => {
           reject(err);
-        });
-    });
-  },
-
-  cheerioRequest(url, tries) {
-    return new Promise((resolve, reject) => {
-      this.httpGet(url)
-        .then(response => {
-          if (response === undefined) {
-            this.cheerioRequest(url);
-          }
-
-          if (response) {
-            resolve(cheerio.load(response.replace(/\s\s+/g, ' ')));
-          } else {
-            reject(new Error('response-not-found'), tries);
-          }
-        })
-        .catch(err => {
-          reject(err, tries);
         });
     });
   },

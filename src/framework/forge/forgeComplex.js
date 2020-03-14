@@ -166,10 +166,10 @@ const ForgeComplex = {
       this.log('Data is done being parsed');
       this.log('Downloading Minecraft JAR');
 
-      HTTPRequest.httpGet('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(vers => {
+      HTTPRequest.get('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(vers => {
         const versions = JSON.parse(vers);
         const verURL = versions.versions.find(ver => ver.id === profile.version.minecraft.version).url;
-        HTTPRequest.httpGet(verURL).then(verDatas => {
+        HTTPRequest.get(verURL).then(verDatas => {
           const verData = JSON.parse(verDatas);
           DownloadsManager.startFileDownload(
             `Minecraft ${profile.version.minecraft.version} Client JAR\n_A_${profile.name}`,

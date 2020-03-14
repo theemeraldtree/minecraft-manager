@@ -147,7 +147,7 @@ export default function SubAssetEditor({ id, assetType }) {
   };
 
   const installErrorHandler = (m, asset) => {
-    const { assetID } = asset.id;
+    const { assetID } = asset;
     if (m === 'no-version-available') {
       if (assetType === 'mod') {
         let modloader;
@@ -168,7 +168,7 @@ export default function SubAssetEditor({ id, assetType }) {
 
           updateProgressStates();
         } else {
-          profile.progressState[assetID].progress = '';
+          if (profile.progressState[assetID]) profile.progressState[assetID].progress = '';
           ToastManager.createToast(
             'No modloader',
             "You don't have a modloader installed. Install one in the versions tab first."
@@ -230,7 +230,7 @@ export default function SubAssetEditor({ id, assetType }) {
         { name: 'All Files', extensions: ['*'] }
       ]
     });
-    if (p[0]) {
+    if (p && p[0]) {
       const pth = p[0];
       if (!fs.existsSync(profile.modsPath)) {
         fs.mkdirSync(profile.modsPath);

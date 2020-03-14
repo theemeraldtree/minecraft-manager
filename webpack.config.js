@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const PreloadWebpackPlugin = require('preload-webpack-plugin');
 const { spawn } = require('child_process');
 const process = require('process');
 const path = require('path');
@@ -8,15 +9,13 @@ module.exports = {
   entry: ['babel-polyfill', './index.js'],
   mode: 'none',
   resolve: {
-    alias: {
-      'react-dom': '@hot-loader/react-dom'
-    },
     extensions: ['.js', '.jsx']
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './index.html'
-    })
+    }),
+    new PreloadWebpackPlugin()
   ],
   devtool: 'source-map',
   target: 'electron-main',

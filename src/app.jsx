@@ -1,4 +1,3 @@
-import { hot } from 'react-hot-loader/root';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { HashRouter as Router, Route, Redirect } from 'react-router-dom';
@@ -113,4 +112,4 @@ function App() {
   );
 }
 
-export default hot(App);
+export default App;
