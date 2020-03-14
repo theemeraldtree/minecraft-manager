@@ -38,7 +38,7 @@ const CDropdown = styled.div`
         }
     `}
 
-  &:focus-within {
+  &:focus-visible {
     outline: 2px solid yellow;
   }
 `;
@@ -104,7 +104,7 @@ const Item = styled.button`
         background: #6e6e6e;
     `}
 
-  &:focus-within {
+  &:focus-visible {
     outline: 2px solid yellow;
   }
 `;

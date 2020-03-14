@@ -80,7 +80,7 @@ const MoreInfo = styled.button`
   cursor: pointer;
   position: absolute;
   bottom: 0;
-  &:focus-within {
+  &:focus-visible {
     outline: 2px solid yellow;
   }
 `;
