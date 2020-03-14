@@ -37,6 +37,10 @@ const CDropdown = styled.div`
             background-color: #2e2e2e;
         }
     `}
+
+  &:focus-within {
+    outline: 2px solid yellow;
+  }
 `;
 
 const Items = transition.div`
@@ -83,7 +87,7 @@ const Item = styled.button`
   max-height: 65px;
   display: flex;
   align-items: center;
-  transition: 150ms;
+  transition: background 150ms;
   &:hover {
     background: #363636;
   }
@@ -99,6 +103,10 @@ const Item = styled.button`
     `
         background: #6e6e6e;
     `}
+
+  &:focus-within {
+    outline: 2px solid yellow;
+  }
 `;
 
 const Arrow = styled.img`
@@ -257,7 +265,18 @@ export default class CustomDropdown extends Component {
     const { dropdownOpen, currentName } = this.state;
     return (
       <ClickAwayListener onClickAway={this.clickAway}>
-        <CDropdown role="button" disabled={this.props.disabled} active={dropdownOpen} onClick={this.openDropdown}>
+        <CDropdown
+          role="button"
+          tabIndex="0"
+          onKeyDown={e => {
+            if (e.keyCode === 13 || e.keyCode === 32) {
+              this.openDropdown();
+            }
+          }}
+          disabled={this.props.disabled}
+          active={dropdownOpen}
+          onClick={this.openDropdown}
+        >
           <Label>{currentName}</Label>
           <Arrow flip={dropdownOpen} src={arrow} />
           {!this.props.disabled && (

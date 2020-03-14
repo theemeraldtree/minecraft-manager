@@ -29,6 +29,9 @@ const BG = styled.div`
             transform: scale(1.02);
         }
     `}
+  &:focus-visible {
+    outline: 2px solid yellow;
+  }
 `;
 
 const Image = styled.div.attrs(props => ({
@@ -115,7 +118,13 @@ const AssetCard = ({
         data-cachedid={asset.cachedID}
         data-assetid={asset.id}
         onClick={onClick}
+        onKeyDown={e => {
+          if (e.keyCode === 13 || e.keyCode === 32) {
+            onClick(e);
+          }
+        }}
         role="button"
+        aria-pressed="false"
       >
         {asset.iconPath && (
           <Image src={`${asset.iconPath.substring(0, 1) === '/' ? 'file:///' : ''}${asset.iconPath}`} />

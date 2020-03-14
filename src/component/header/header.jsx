@@ -22,35 +22,47 @@ const Title = styled.p`
   transition: 150ms;
 `;
 
-const BackButton = transition.div`
-    color: white;
-    font-weight: 900;
-    text-decoration: none;
-    font-size: 17pt;
-    margin-left: 10px;
-    margin-right: 12px;
-    cursor: pointer;
-    &:hover {
-        filter: brightness(0.75);;
-    }
-    & a {
-        text-decoration: none;
-        color: white;
-    }
-    &:enter {
-        margin-left: -35px
-    }
-    &:enter-active {
-        margin-left: 10px;
-        transition: 150ms;
-    }
-    &:exit {
-        margin-left: 10px;
-    }
-    &:exit-active {
-        margin-left: -35px;
-        transition: 150ms;
-    }
+const BackButton = transition.button`
+  background: none;
+  border: 0;
+  color: white;
+  font-weight: 900;
+  text-decoration: none;
+  font-size: 17pt;
+  margin-left: 10px;
+  margin-right: 12px;
+  cursor: pointer;
+  
+  &:hover {
+      filter: brightness(0.75);;
+  }
+  
+  & a {
+      text-decoration: none;
+      color: white;
+  }
+  
+  &:enter {
+      margin-left: -35px
+  }
+  
+  &:enter-active {
+      margin-left: 10px;
+      transition: 150ms;
+  }
+  
+  &:exit {
+      margin-left: 10px;
+  }
+
+  &:exit-active {
+      margin-left: -35px;
+      transition: 150ms;
+  }
+
+  &:focus-visible {
+    outline: 2px solid yellow;
+  }
 `;
 
 const Items = transition.div`
@@ -94,7 +106,7 @@ const Header = ({ history }) => {
   };
   return (
     <BG>
-      <BackButton unmountOnExit in={showBackButton} timeout={150} onClick={click}>
+      <BackButton unmountOnExit in={showBackButton} tabIndex={`${backLink ? '-1' : '0'}`} timeout={150} onClick={click}>
         {!backLink && '←'}
         {backLink && <Link to={backLink}>←</Link>}
       </BackButton>

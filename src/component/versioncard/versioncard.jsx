@@ -72,12 +72,17 @@ const Details = styled.div`
   flex-shrink: 0;
 `;
 
-const MoreInfo = styled.p`
+const MoreInfo = styled.button`
+  background: none;
+  border: 0;
   color: lightblue;
   margin: 0;
   cursor: pointer;
   position: absolute;
   bottom: 0;
+  &:focus-within {
+    outline: 2px solid yellow;
+  }
 `;
 
 const Changelog = styled.div`

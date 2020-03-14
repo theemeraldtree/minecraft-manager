@@ -16,18 +16,24 @@ const Wrapper = styled.div`
   z-index: 51;
 `;
 
-const DownloadsButton = styled.div`
+const DownloadsButton = styled.button`
   width: 50px;
   height: 50px;
   position: absolute;
   bottom: 23px;
   cursor: pointer;
+  background-color: transparent;
+  border: 0;
   background-image: url(${downloadsImg});
   background-size: contain;
   background-position-y: 7px;
   background-repeat: no-repeat;
   &:hover {
     filter: brightness(0.75);
+  }
+  &:focus-visible {
+    outline: 2px solid yellow;
+    outline-offset: 5px;
   }
 `;
 

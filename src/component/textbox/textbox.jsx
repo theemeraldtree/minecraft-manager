@@ -12,6 +12,10 @@ const TextBox = styled.textarea`
   &::placeholder {
     color: white;
   }
+  &:hover:not(:disabled),
+  &:focus {
+    filter: brightness(0.85);
+  }
 `;
 
 export default TextBox;

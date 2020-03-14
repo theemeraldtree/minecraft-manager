@@ -30,9 +30,10 @@ const LongDesc = styled(TextBox)`
   max-width: 770px;
 `;
 
-const IconWrapper = styled.div`
+const IconWrapper = styled.button`
   width: 150px;
   height: 150px;
+  border: 0;
   background-color: #404040;
   display: flex;
   align-items: center;
@@ -45,6 +46,10 @@ const IconWrapper = styled.div`
     text-align: center;
     position: absolute;
     bottom: 0;
+  }
+
+  &:focus-visible {
+    outline: 2px solid yellow;
   }
 `;
 

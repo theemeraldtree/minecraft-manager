@@ -13,7 +13,8 @@ const TextInput = styled.input.attrs({
   &::placeholder {
     color: white;
   }
-  &:hover:not(:disabled) {
+  &:hover:not(:disabled),
+  &:focus {
     filter: brightness(0.85);
   }
 `;

@@ -22,7 +22,7 @@ const Button = styled.button.attrs(props => ({
     backgroundColor: getColor(props.color)
   }
 }))`
-  padding: 11.5px;
+  padding: 9.5px;
   color: white;
   width: fit-content;
   display: inline-block;
@@ -30,6 +30,7 @@ const Button = styled.button.attrs(props => ({
   outline: none;
   border: 0;
   font-size: 12pt;
+  border: 2px solid transparent;
   ${props =>
     props.disabled &&
     `
@@ -49,6 +50,9 @@ const Button = styled.button.attrs(props => ({
       `
             cursor: not-allowed;
         `}
+  }
+  &:focus-visible {
+    border-color: yellow;
   }
 `;
 
