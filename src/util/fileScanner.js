@@ -6,6 +6,7 @@ import LogManager from '../manager/logManager';
 import GenericAsset from '../type/genericAsset';
 import Global from './global';
 import Mod from '../type/mod';
+import World from '../type/world';
 
 /* FileScanner scans through different types of non-OMAF files (such as Mod JARs or Resource Pack ZIPs),
 to convert them to OMAF-compliant data using the available information */
@@ -213,6 +214,81 @@ const FileScanner = {
         );
         profile.save();
       }
+    }
+  },
+  scanWorld(profile, file) {
+    const fullPath = path.join(profile.gameDir, `/saves/${file}`);
+    const doesExist = profile.mods.find(mod => path.join(profile.gameDir, mod.getJARFile().path) === fullPath);
+    if (!doesExist) {
+      LogManager.log(
+        'info',
+        `[scan] {${profile.id}} Found mod file ${file} which does not exist in subassets file. Adding it...`
+      );
+
+      profile.worlds.push(
+        new World({
+          id: `${Global.createID(path.parse(file).name)}-${Math.floor(Math.random() * (999 - 100 + 1) + 100)}`,
+          name: file,
+          version: {
+            displayName: 'Unknown',
+            minecraft: {
+              supportedVersions: profile.version.minecraft.version
+            }
+          },
+          blurb: `Imported from ${file}`,
+          icon: '',
+          description: 'Imported',
+          hosts: {},
+          datapacks: [],
+          files: [
+            {
+              displayName: 'World Folder',
+              type: 'worldfolder',
+              priority: 'mainFile',
+              path: `saves/${file}`
+            }
+          ],
+          dependencies: []
+        })
+      );
+    }
+  },
+  scanDatapack(profile, world, file) {
+    const fullPath = path.join(profile.gameDir, `${world.getMainFile().path}/datapacks/${file}`);
+    const doesExist = world.datapacks.find(
+      dp => path.join(profile.gameDir, `${world.getMainFile().path}/${dp.getMainFile().path}`) === fullPath
+    );
+    if (!doesExist) {
+      LogManager.log(
+        'info',
+        `[scan] {${profile.id}} Found datapacke ${file} in world ${world.id} which does not exist in subassets file. Adding it...`
+      );
+
+      world.datapacks.push(
+        new GenericAsset({
+          id: Global.createID(file),
+          name: file,
+          version: {
+            displayName: 'Unknown',
+            minecraft: {
+              supportedVersions: profile.version.minecraft.version
+            }
+          },
+          blurb: `Imported from ${file}`,
+          icon: '',
+          description: 'Imported',
+          hosts: {},
+          files: [
+            {
+              displayName: 'Main Datapack File',
+              type: 'datapackzip',
+              priority: 'mainFile',
+              path: `datapacks/${file}`
+            }
+          ],
+          dependencies: []
+        })
+      );
     }
   },
   // this is run when a world .zip file is downloaded

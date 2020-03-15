@@ -11,6 +11,7 @@ import ErrorManager from '../manager/errorManager';
 import LogManager from '../manager/logManager';
 import GenericAsset from '../type/genericAsset';
 import FileScanner from './fileScanner';
+import World from '../type/world';
 
 const semver = require('semver');
 const { remote } = require('electron');
@@ -341,6 +342,41 @@ const Global = {
             `[scan] {${profile.id}} Found mod ${mod.name} where the main file is missing. Removing it from the profile...`
           );
           profile.deleteSubAsset('mod', mod);
+        }
+      });
+
+      fs.readdir(path.join(profile.gameDir, '/saves'), (err, files) => {
+        if (files) {
+          if (files.length !== profile.worlds.length) {
+            files.forEach(file => {
+              FileScanner.scanWorld(profile, file);
+            });
+          }
+        }
+      });
+
+      profile.worlds.forEach(worldT => {
+        let world = worldT;
+        if (!(world instanceof World)) world = new World(world);
+
+        const fullPath = path.join(profile.gameDir, world.getMainFile().path);
+
+        if (!fs.existsSync(path.join(profile.gameDir, world.getMainFile().path))) {
+          LogManager.log(
+            'info',
+            `[scan] {${profile.id}} Found world ${world.name} where the folder is missing. Removing it from the profile...`
+          );
+          profile.deleteSubAsset('resourcepack', world);
+        } else if (fs.existsSync(path.join(fullPath, '/datapacks'))) {
+          fs.readdir(path.join(fullPath, '/datapacks'), (err, files) => {
+            if (files) {
+              if (files.length !== world.datapacks.length) {
+                files.forEach(file => {
+                  FileScanner.scanDatapack(profile, world, file);
+                });
+              }
+            }
+          });
         }
       });
     });

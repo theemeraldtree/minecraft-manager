@@ -71,7 +71,7 @@ const AnimateButton = transition(Button)`
     }
 `;
 
-export default function SubAssetEditor({ id, assetType }) {
+export default function SubAssetEditor({ id, assetType, dpWorld }) {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const [profile] = useState(ProfilesManager.getProfileFromID(id));
   const [progressState, setProgressState] = useState(profile.progressState);
@@ -82,12 +82,16 @@ export default function SubAssetEditor({ id, assetType }) {
   const [activeAsset, setActiveAsset] = useState({});
 
   let po;
+  let selobj = profile;
   if (assetType === 'mod') {
     po = 'mods';
   } else if (assetType === 'resourcepack') {
     po = 'resourcepacks';
   } else if (assetType === 'world') {
     po = 'worlds';
+  } else if (assetType === 'datapack') {
+    po = 'datapacks';
+    selobj = dpWorld;
   }
 
   const updateProgressStates = () => {
@@ -96,12 +100,18 @@ export default function SubAssetEditor({ id, assetType }) {
   };
 
   const showInfoClick = e => {
-    let mod = profile.getSubAssetFromID(assetType, e.currentTarget.dataset.assetid);
+    let mod;
+    if (assetType !== 'datapack') {
+      mod = profile.getSubAssetFromID(assetType, e.currentTarget.dataset.assetid);
+    } else {
+      mod = dpWorld.datapacks.find(dp => dp.id === e.currentTarget.dataset.assetid);
+    }
+
     if (assetType === 'mod') {
       if (!(mod instanceof Mod)) {
         mod = new Mod(mod);
       }
-    } else if (assetType === 'resourcepack') {
+    } else if (assetType === 'resourcepack' || assetType === 'datapack') {
       if (!(mod instanceof GenericAsset)) {
         mod = new GenericAsset(mod);
       }
@@ -138,9 +148,67 @@ export default function SubAssetEditor({ id, assetType }) {
     }
   };
 
+  const addFromFile = () => {
+    let filterName, filterExtensions;
+    if (assetType === 'mod') {
+      filterName = 'Mod Files';
+      filterExtensions = ['jar'];
+    } else if (assetType === 'resourcepack') {
+      filterName = 'Resource Packs';
+      filterExtensions = ['zip'];
+    } else if (assetType === 'datapack') {
+      filterName = 'Datapacks';
+      filterExtensions = ['zip'];
+    }
+
+    const p = dialog.showOpenDialog({
+      title: 'Choose your file',
+      buttonLabel: 'Choose File',
+      properties: ['openFile'],
+      filters: [
+        { name: filterName, extensions: filterExtensions },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    });
+    if (p && p[0]) {
+      const pth = p[0];
+
+      if (assetType === 'mod') {
+        if (!fs.existsSync(profile.modsPath)) {
+          fs.mkdirSync(profile.modsPath);
+        }
+
+        fs.copyFileSync(pth, path.join(profile.modsPath, path.basename(pth)));
+      } else if (assetType === 'datapack') {
+        if (!fs.existsSync(path.join(profile.gameDir, dpWorld.getMainFile().path, '/datapacks'))) {
+          fs.mkdirSync(path.join(profile.gameDir, dpWorld.getMainFile().path, '/datapacks'));
+        }
+
+        fs.copyFileSync(
+          pth,
+          path.join(profile.gameDir, dpWorld.getMainFile().path, `/datapacks/${path.basename(pth)}`)
+        );
+      }
+
+      Global.scanProfiles();
+
+      // this is a *very* hacky fix
+      // but if it ain't broke, don't fix it, right?
+      setTimeout(() => {
+        if (assetType === 'datapack') {
+          updateProgressStates();
+        }
+      }, 500);
+    }
+  };
+
   const browseMods = () => {
-    setDisplayState('addMods');
-    setLiveSearchTerm('');
+    if (assetType !== 'datapack') {
+      setDisplayState('addMods');
+      setLiveSearchTerm('');
+    } else {
+      addFromFile();
+    }
   };
 
   const searchChange = e => {
@@ -214,39 +282,15 @@ export default function SubAssetEditor({ id, assetType }) {
   };
 
   const deleteClick = assetid => {
-    const asset = profile.getSubAssetFromID(assetType, assetid);
-    profile.deleteSubAsset(assetType, asset).then(() => {
+    if (assetType !== 'datapack') {
+      const asset = profile.getSubAssetFromID(assetType, assetid);
+      profile.deleteSubAsset(assetType, asset).then(() => {
+        updateProgressStates();
+      });
+    } else {
+      const asset = dpWorld.datapacks.find(dp => dp.id === assetid);
+      dpWorld.deleteDatapack(profile, asset);
       updateProgressStates();
-    });
-  };
-
-  const addFromFile = () => {
-    let filterName, filterExtensions;
-    if (assetType === 'mod') {
-      filterName = 'Mod Files';
-      filterExtensions = ['jar'];
-    } else if (assetType === 'resourcepack') {
-      filterName = 'Resource Packs';
-      filterExtensions = ['zip'];
-    }
-
-    const p = dialog.showOpenDialog({
-      title: 'Choose your file',
-      buttonLabel: 'Choose File',
-      properties: ['openFile'],
-      filters: [
-        { name: filterName, extensions: filterExtensions },
-        { name: 'All Files', extensions: ['*'] }
-      ]
-    });
-    if (p && p[0]) {
-      const pth = p[0];
-      if (!fs.existsSync(profile.modsPath)) {
-        fs.mkdirSync(profile.modsPath);
-      }
-
-      fs.copyFileSync(pth, path.join(profile.modsPath, path.basename(pth)));
-      Global.scanProfiles();
     }
   };
 
@@ -296,7 +340,7 @@ export default function SubAssetEditor({ id, assetType }) {
           {displayState === 'assetsList' && (
             <>
               <List>
-                {profile[po].map(asset => {
+                {selobj[po].map(asset => {
                   if (displayState === 'assetsList') {
                     if (asset.name.toLowerCase().includes(liveSearchTerm.toLowerCase())) {
                       return (
@@ -331,6 +375,7 @@ export default function SubAssetEditor({ id, assetType }) {
                 asset={activeAsset}
                 displayState={progressState}
                 type={assetType}
+                profileID={id}
                 localAsset
               />
             </>
@@ -361,5 +406,6 @@ export default function SubAssetEditor({ id, assetType }) {
 
 SubAssetEditor.propTypes = {
   id: PropTypes.string.isRequired,
-  assetType: PropTypes.string.isRequired
+  assetType: PropTypes.string.isRequired,
+  dpWorld: PropTypes.object
 };

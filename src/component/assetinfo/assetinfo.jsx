@@ -10,6 +10,7 @@ import Global from '../../util/global';
 import CustomDropdown from '../customdropdown/customdropdown';
 import Hosts from '../../host/Hosts';
 import ToastManager from '../../manager/toastManager';
+import SubAssetEditor from '../../page/editprofile/components/subAssetEditor';
 
 const LoadingText = styled.div`
   font-size: 23pt;
@@ -302,7 +303,7 @@ export default class AssetInfo extends Component {
 
   render() {
     const { displayState, description, versions, activeAsset, assetDependencies, cantConnect } = this.state;
-    const { type, installClick, localAsset, progressState } = this.props;
+    const { type, installClick, localAsset, progressState, profileID } = this.props;
     return (
       <>
         <AssetCard
@@ -326,6 +327,11 @@ export default class AssetInfo extends Component {
           {activeAsset.hosts.curse && type === 'mod' && (
             <HB active={displayState === 'dependencies'} onClick={this.displayStateSwitch} data-state="dependencies">
               Dependencies
+            </HB>
+          )}
+          {activeAsset.installed && type === 'world' && (
+            <HB active={displayState === 'datapacks'} onClick={this.displayStateSwitch} data-state="datapacks">
+              Datapacks
             </HB>
           )}
         </HeaderButtons>
@@ -367,6 +373,12 @@ export default class AssetInfo extends Component {
         )}
 
         {displayState === 'dependencies' && <List>{assetDependencies}</List>}
+
+        {displayState === 'datapacks' && (
+          <>
+            <SubAssetEditor id={profileID} assetType="datapack" dpWorld={activeAsset} />
+          </>
+        )}
       </>
     );
   }
@@ -385,5 +397,6 @@ AssetInfo.propTypes = {
   forceFramework: PropTypes.string,
   installClick: PropTypes.func,
   localAsset: PropTypes.bool,
-  type: PropTypes.string
+  type: PropTypes.string,
+  profileID: PropTypes.string
 };
