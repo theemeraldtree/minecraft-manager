@@ -24,30 +24,28 @@ const ProfilesManager = {
   profilesBeingInstalled: [],
   progressState: {},
   getProfiles() {
-    this.loadedProfiles = [];
+    this.loadedProfiles = [LatestProfile];
     LogManager.log('info', '[ProfilesManager] Getting profiles...');
     return new Promise(resolve => {
       if (fs.existsSync(Global.PROFILES_PATH)) {
         fs.readdir(Global.PROFILES_PATH, (err, files) => {
           if (files.length >= 1) {
             files.forEach(async file => {
-              await this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
-
-              this.loadedProfiles.push(LatestProfile);
+              if (file !== '0-default-profile-latest') {
+                await this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
+              }
 
               this.updateReloadListeners();
               resolve();
             });
           } else {
             LogManager.log('info', '[ProfilesManager] done getting profiles');
-            this.loadedProfiles.push(LatestProfile);
             this.updateReloadListeners();
             resolve();
           }
         });
       } else {
-        this.loadedProfiles = [];
-        this.loadedProfiles.push(LatestProfile);
+        this.loadedProfiles = [LatestProfile];
 
         resolve();
       }

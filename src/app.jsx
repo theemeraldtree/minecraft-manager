@@ -7,7 +7,6 @@ import HomePage from './page/home/homePage';
 import SettingsPage from './page/settings/settingsPage';
 import ViewProfilePage from './page/viewprofile/viewprofile';
 import DiscoverPage from './page/discover/discover';
-import SettingsManager from './manager/settingsManager';
 import Global from './util/global';
 import WelcomePage from './page/welcome/welcome';
 import Toast from './component/toast/toast';
@@ -81,7 +80,6 @@ function App() {
     >
       {localStorage.setItem('showDownloads', false)}
       {localStorage.setItem('importDone', false)}
-      {SettingsManager.loadSettings()}
       <div>
         <Alert />
         <Toast />

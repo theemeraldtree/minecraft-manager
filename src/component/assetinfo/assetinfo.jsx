@@ -241,15 +241,17 @@ export default class AssetInfo extends Component {
 
   versionInstall = e => {
     const version = Global.cached.versions[e.currentTarget.dataset.version];
-    if (this.props.forceFramework) {
-      if (version.hosts.curse) {
-        if (version.hosts.curse.localValues && version.hosts.curse.localValues.inferredModloader) {
-          if (version.hosts.curse.localValues.inferredModloader !== this.props.forceFramework) {
-            ToastManager.createToast(
-              'Uh oh',
-              `It seems you're trying to install a version that's built for ${version.hosts.curse.localValues.inferredModloader}, not for ${this.props.forceFramework}`
-            );
-            return;
+    if (this.state.activeAsset.type === 'mod') {
+      if (this.props.forceFramework) {
+        if (version.hosts.curse) {
+          if (version.hosts.curse.localValues && version.hosts.curse.localValues.inferredModloader) {
+            if (version.hosts.curse.localValues.inferredModloader !== this.props.forceFramework) {
+              ToastManager.createToast(
+                'Uh oh',
+                `It seems you're trying to install a version that's built for ${version.hosts.curse.localValues.inferredModloader}, not for ${this.props.forceFramework}`
+              );
+              return;
+            }
           }
         }
       }

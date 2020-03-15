@@ -8,6 +8,7 @@ import NavContext from '../../navContext';
 import EditPageMods from './mods/editpagemods';
 import EditPageAdvanced from './advanced/editpageadvanced';
 import EditPageResourcePacks from './resourcepacks/editpageresourcepacks';
+import ProfilesManager from '../../manager/profilesManager';
 
 const BG = styled.div`
   position: relative;
@@ -37,7 +38,7 @@ export default function EditPage({ match }) {
 
   return (
     <BG>
-      <Sidebar id={id} />
+      <Sidebar isDefaultProfile={ProfilesManager.getProfileFromID(id).isDefaultProfile} id={id} />
       <CC>
         {page === 'general' && <EditPageGeneral id={id} />}
         {page === 'versions' && <EditPageVersions id={id} />}

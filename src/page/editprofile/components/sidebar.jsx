@@ -32,17 +32,21 @@ const Item = styled(NavLink)`
   transition: font-weight 150ms;
 `;
 
-const Sidebar = ({ id }) => (
+const Sidebar = ({ id, isDefaultProfile }) => (
   <BG>
     <Item to={`/edit/general/${id}`} activeClassName="active">
       general
     </Item>
-    <Item to={`/edit/versions/${id}`} activeClassName="active">
-      versions
-    </Item>
-    <Item to={`/edit/mods/${id}`} activeClassName="active">
-      mods
-    </Item>
+    {!isDefaultProfile && (
+      <>
+        <Item to={`/edit/versions/${id}`} activeClassName="active">
+          versions
+        </Item>
+        <Item to={`/edit/mods/${id}`} activeClassName="active">
+          mods
+        </Item>
+      </>
+    )}
     <Item to={`/edit/resourcepacks/${id}`} activeClassName="active">
       resource packs
     </Item>
@@ -53,7 +57,8 @@ const Sidebar = ({ id }) => (
 );
 
 Sidebar.propTypes = {
-  id: PropTypes.string.isRequired
+  id: PropTypes.string.isRequired,
+  isDefaultProfile: PropTypes.bool.isRequired
 };
 
 export default Sidebar;

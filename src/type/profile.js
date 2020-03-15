@@ -495,7 +495,7 @@ export default function Profile(rawomaf) {
           this.resourcepacks.splice(this.resourcepacks.indexOf(this.resourcepacks.find(a => a.id === asset.id)), 1);
           this.progressState[asset.id] = undefined;
           if (fs.existsSync(path.join(this.gameDir, `/${asset.getMainFile().path}`))) {
-            fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), () => {
+            const callback = () => {
               if (asset.icon) {
                 if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
                   fs.unlinkSync(path.join(this.profilePath, asset.icon));
@@ -505,7 +505,13 @@ export default function Profile(rawomaf) {
               this.save();
 
               resolve();
-            });
+            };
+
+            if (fs.lstatSync(path.join(this.gameDir, `/${asset.getMainFile().path}`)).isDirectory) {
+              rimraf(path.join(this.gameDir, `/${asset.getMainFile().path}`), callback);
+            } else {
+              fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), callback);
+            }
           } else {
             this.save();
             resolve();

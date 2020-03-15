@@ -51,6 +51,11 @@ const IconWrapper = styled.button`
   &:focus-visible {
     outline: 2px solid yellow;
   }
+
+  &:disabled {
+    filter: brightness(0.75);
+    cursor: not-allowed;
+  }
 `;
 
 const ResetIconButton = styled(Button)`
@@ -171,10 +176,10 @@ const EditPageGeneral = ({ id, history }) => {
             <AboutContainer>
               <div>
                 <Detail>profile icon</Detail>
-                <IconWrapper onClick={changeIcon}>
+                <IconWrapper disabled={profile.isDefaultProfile} onClick={changeIcon}>
                   <Icon src={`file:///${profile.iconPath}#${new Date().getTime()}`} />
                 </IconWrapper>
-                <ResetIconButton onClick={resetIcon} color="green">
+                <ResetIconButton disabled={profile.isDefaultProfile} onClick={resetIcon} color="green">
                   reset
                 </ResetIconButton>
               </div>
@@ -182,7 +187,12 @@ const EditPageGeneral = ({ id, history }) => {
                 <div>
                   <Detail>profile name</Detail>
                   <InputContainer>
-                    <TextInput value={nameValue} onChange={nameChange} placeholder="Enter a name" />
+                    <TextInput
+                      disabled={profile.isDefaultProfile}
+                      value={nameValue}
+                      onChange={nameChange}
+                      placeholder="Enter a name"
+                    />
                     <Button onClick={confirmNameChange} disabled={nameDisabled} color="green">
                       change
                     </Button>
@@ -194,6 +204,7 @@ const EditPageGeneral = ({ id, history }) => {
                     <TextBox
                       defaultValue={profile.blurb}
                       onChange={blurbChange}
+                      disabled={profile.isDefaultProfile}
                       placeholder="Enter a short description"
                     />
                   </DescContainer>
@@ -206,6 +217,7 @@ const EditPageGeneral = ({ id, history }) => {
               <LongDesc
                 defaultValue={profile.description}
                 onChange={descChange}
+                disabled={profile.isDefaultProfile}
                 placeholder="Enter a long description"
               />
             </DescContainer>

@@ -71,6 +71,60 @@ const FileScanner = {
           })
         );
         profile.save();
+      } else {
+        // folder, not a zipped resourcep ack
+
+        // loop through files in the folder to find what we want
+
+        let iconPath, description;
+        let containsMCMeta = false;
+        fs.readdirSync(fullPath).forEach(f => {
+          if (f === 'pack.mcmeta') {
+            containsMCMeta = true;
+            const parsed = JSON.parse(fs.readFileSync(path.join(fullPath, f)));
+            if (parsed && parsed.pack) {
+              if (parsed.pack.description) {
+                // set description and remove any minecraft color code stuff
+                description = parsed.pack.description.replace(/§[a-zA-Z0-9]/g, '');
+              }
+            }
+          } else if (f === 'pack.png') {
+            fs.writeFileSync(
+              path.join(profile.profilePath, `/_mcm/icons/resourcepacks/${file}.png`),
+              fs.readFileSync(path.join(fullPath, f))
+            );
+            iconPath = `/_mcm/icons/resourcepacks/${file}.png`;
+          }
+        });
+
+        if (containsMCMeta) {
+          profile.resourcepacks.push(
+            new GenericAsset({
+              icon: iconPath,
+              id: Global.createID(path.parse(file).name),
+              name: path.parse(file).name,
+              version: {
+                displayName: file,
+                minecraft: {
+                  supportedVersions: ['unknown']
+                }
+              },
+              blurb: description,
+              description: `Imported from ${file}`,
+              hosts: {},
+              files: [
+                {
+                  displayName: 'Main Folder',
+                  type: 'resourcepackfolder',
+                  priority: 'mainFile',
+                  path: `resourcepacks/${file}`
+                }
+              ],
+              dependencies: []
+            })
+          );
+          profile.save();
+        }
       }
     }
   },

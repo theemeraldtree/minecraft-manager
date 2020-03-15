@@ -25,6 +25,8 @@ const LauncherManager = {
     let verId;
     if (profile.hasFramework()) {
       verId = `${profile.safename} [Minecraft Manager]`;
+    } else if (profile.id === '0-default-profile-latest') {
+      verId = 'latest-release';
     } else {
       verId = profile.version.minecraft.version;
     }
@@ -34,16 +36,18 @@ const LauncherManager = {
     return JSON.parse(fs.readFileSync(this.getLauncherProfiles())).profiles;
   },
   createProfile(profile) {
-    const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
-    obj.profiles[`mcm-${profile.id}`] = {
-      name: profile.name,
-      type: 'custom',
-      gameDir: path.join(profile.gameDir),
-      lastVersionId: profile.version.minecraft.version,
-      lastUsed: new Date().toISOString(),
-      javaArgs: `-Xmx${SettingsManager.currentSettings.dedicatedRam}G ${this.DEFAULT_JAVA_ARGS}`
-    };
-    fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
+    if (!profile.isDefaultProfile) {
+      const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
+      obj.profiles[`mcm-${profile.id}`] = {
+        name: profile.name,
+        type: 'custom',
+        gameDir: path.join(profile.gameDir),
+        lastVersionId: profile.version.minecraft.version,
+        lastUsed: new Date().toISOString(),
+        javaArgs: `-Xmx${SettingsManager.currentSettings.dedicatedRam}G ${this.DEFAULT_JAVA_ARGS}`
+      };
+      fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
+    }
   },
   deleteProfile(profile) {
     const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
@@ -62,8 +66,14 @@ const LauncherManager = {
   setProfileData(profile, tag, val) {
     const id = `mcm-${profile.id}`;
     const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
-    if (obj.profiles[id]) {
-      obj.profiles[id][tag] = val;
+
+    if (!profile.isDefaultProfile) {
+      if (obj.profiles[id]) {
+        obj.profiles[id][tag] = val;
+      }
+    } else if (profile.id === '0-default-profile-latest') {
+      const find = Object.keys(obj.profiles).find(prof => obj.profiles[prof].type === 'latest-release');
+      obj.profiles[find][tag] = val;
     }
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
   },

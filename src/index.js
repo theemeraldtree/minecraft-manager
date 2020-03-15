@@ -12,6 +12,7 @@ import ToastManager from './manager/toastManager';
 import ErrorManager from './manager/errorManager';
 import LibrariesManager from './manager/librariesManager';
 import './font/fonts.css';
+import { loadLatestProfile } from './defaulltProfiles/latestProfile';
 
 const { remote, shell, ipcRenderer } = require('electron');
 const { dialog } = require('electron').remote;
@@ -22,9 +23,9 @@ const os = require('os');
 const { version } = require('../package.json');
 
 async function load() {
-  try {
-    SettingsManager.loadSettings();
+  await SettingsManager.loadSettings();
 
+  try {
     Global.updateMCVersions();
     if (fs.existsSync(Global.PROFILES_PATH)) {
       // LogManager.log('info', '[index] Getting profiles...');
@@ -42,6 +43,8 @@ async function load() {
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
     console.error(e);
   }
+
+  loadLatestProfile();
 
   await ProfilesManager.getProfiles();
 

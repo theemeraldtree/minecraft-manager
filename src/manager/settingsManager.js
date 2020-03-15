@@ -9,21 +9,29 @@ const SettingsManager = {
   MC_HOME: '',
   currentSettings: {},
   loadSettings() {
-    if (!fs.existsSync(this.SETTINGS_PATH)) {
-      this.createSettings();
-    }
-    const parsed = JSON.parse(fs.readFileSync(this.SETTINGS_PATH));
-    this.MC_HOME = parsed.homeDirectory;
-    this.currentSettings = parsed;
-    if (!this.currentSettings.defaultsShowTutorial) {
-      this.currentSettings.defaultsShowTutorial = false;
-    }
-    if (!this.currentSettings.defaultsAutoJump) {
-      this.currentSettings.defaultsAutoJump = false;
-    }
-    if (!this.currentSettings.defaultsMultiplayerWarning) {
-      this.currentSettings.defaultsMultiplayerWarning = false;
-    }
+    return new Promise(async resolve => {
+      if (!fs.existsSync(this.SETTINGS_PATH)) {
+        this.createSettings();
+      }
+
+      fs.readFile(this.SETTINGS_PATH, (err, data) => {
+        const parsed = JSON.parse(data);
+
+        this.MC_HOME = parsed.homeDirectory;
+        this.currentSettings = parsed;
+        if (!this.currentSettings.defaultsShowTutorial) {
+          this.currentSettings.defaultsShowTutorial = false;
+        }
+        if (!this.currentSettings.defaultsAutoJump) {
+          this.currentSettings.defaultsAutoJump = false;
+        }
+        if (!this.currentSettings.defaultsMultiplayerWarning) {
+          this.currentSettings.defaultsMultiplayerWarning = false;
+        }
+
+        resolve();
+      });
+    });
   },
   save() {
     fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(this.currentSettings));

@@ -238,21 +238,23 @@ const Hosts = {
             mod = await Curse.addFileInfo(mod, mod.hosts.curse.fileID);
           }
 
-          if (profile.hasFramework()) {
-            if (profile.frameworks.forge) {
-              if (mod.version.hosts.curse.localValues.inferredModloader !== 'forge') {
-                resolve('no-version-available');
-                return;
+          if (type === 'mod') {
+            if (profile.hasFramework()) {
+              if (profile.frameworks.forge) {
+                if (mod.version.hosts.curse.localValues.inferredModloader !== 'forge') {
+                  resolve('no-version-available');
+                  return;
+                }
+              } else if (profile.frameworks.fabric) {
+                if (mod.version.hosts.curse.localValues.inferredModloader !== 'fabric') {
+                  resolve('no-version-available');
+                  return;
+                }
               }
-            } else if (profile.frameworks.fabric) {
-              if (mod.version.hosts.curse.localValues.inferredModloader !== 'fabric') {
-                resolve('no-version-available');
-                return;
-              }
+            } else {
+              resolve('no-version-available');
+              return;
             }
-          } else {
-            resolve('no-version-available');
-            return;
           }
         }
 

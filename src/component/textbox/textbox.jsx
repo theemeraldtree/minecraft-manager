@@ -16,6 +16,10 @@ const TextBox = styled.textarea`
   &:focus {
     filter: brightness(0.85);
   }
+  &:disabled {
+    filter: brightness(0.75);
+    cursor: not-allowed;
+  }
 `;
 
 export default TextBox;
