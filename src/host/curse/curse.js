@@ -8,6 +8,7 @@ import Hosts from '../Hosts';
 import LogManager from '../../manager/logManager';
 import DownloadsManager from '../../manager/downloadsManager';
 import GenericAsset from '../../type/genericAsset';
+import World from '../../type/world';
 
 const ADMZip = require('adm-zip');
 
@@ -98,6 +99,8 @@ const Curse = {
         obj = new Mod(omaf);
       } else if (type === 'resourcepack') {
         obj = new GenericAsset(omaf);
+      } else if (type === 'world') {
+        obj = new World(omaf);
       }
 
       Global.cacheImage(obj.icon);

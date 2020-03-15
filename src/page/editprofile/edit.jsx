@@ -9,6 +9,7 @@ import EditPageMods from './mods/editpagemods';
 import EditPageAdvanced from './advanced/editpageadvanced';
 import EditPageResourcePacks from './resourcepacks/editpageresourcepacks';
 import ProfilesManager from '../../manager/profilesManager';
+import EditPageWorlds from './worlds/editpageworlds';
 
 const BG = styled.div`
   position: relative;
@@ -44,6 +45,7 @@ export default function EditPage({ match }) {
         {page === 'versions' && <EditPageVersions id={id} />}
         {page === 'mods' && <EditPageMods id={id} />}
         {page === 'resourcepacks' && <EditPageResourcePacks id={id} />}
+        {page === 'worlds' && <EditPageWorlds id={id} />}
         {page === 'advanced' && <EditPageAdvanced id={id} />}
       </CC>
     </BG>

@@ -10,6 +10,7 @@ import ProfilesManager from '../manager/profilesManager';
 import GenericAsset from '../type/genericAsset';
 import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
+import World from '../type/world';
 
 const Hosts = {
   /* shared functions for hosts */
@@ -280,6 +281,8 @@ const Hosts = {
             modObj = new Mod(mod);
           } else if (type === 'resourcepack') {
             modObj = new GenericAsset(mod);
+          } else if (type === 'world') {
+            modObj = new World(mod);
           }
 
           DownloadsManager.startAssetDownload(profile, mod, type, mod.downloadTemp, false).then(async () => {
@@ -289,6 +292,9 @@ const Hosts = {
             } else if (type === 'resourcepack') {
               modObj.setMainFile('resourcepacks', 'resourcepackzip', `${mod.id}.zip`);
               modObj.icon = `_mcm/icons/resourcepacks/${mod.id}${path.extname(mod.iconPath)}`;
+            } else if (type === 'world') {
+              modObj.setMainFile('saves', 'worldfolder', mod.id);
+              modObj.icon = `_mcm/icons/worlds/${mod.id}${path.extname(mod.iconPath)}`;
             }
 
             DownloadsManager.startFileDownload(

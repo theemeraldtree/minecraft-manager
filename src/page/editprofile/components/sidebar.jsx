@@ -47,6 +47,9 @@ const Sidebar = ({ id, isDefaultProfile }) => (
         </Item>
       </>
     )}
+    <Item to={`/edit/worlds/${id}`} activeClassName="active">
+      worlds
+    </Item>
     <Item to={`/edit/resourcepacks/${id}`} activeClassName="active">
       resource packs
     </Item>

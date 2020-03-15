@@ -1,9 +1,11 @@
 import path from 'path';
 import fs from 'fs';
+import mkdirp from 'mkdirp';
 import HTTPRequest from '../host/httprequest';
 import Download from '../type/download';
 import Global from '../util/global';
 import LogManager from './logManager';
+import FileScanner from '../util/fileScanner';
 
 const DownloadsManager = {
   activeDownloads: [],
@@ -83,9 +85,21 @@ const DownloadsManager = {
           fs.mkdirSync(path.join(profile.gameDir, '/resourcepacks'));
         }
         downloadPath = path.join(profile.gameDir, `/resourcepacks/${Global.createID(mod.name)}.zip`);
+      } else if (type === 'world') {
+        if (!fs.existsSync(path.join(profile.gameDir, '/saves'))) {
+          fs.mkdirSync(path.join(profile.gameDir, '/saves'));
+        }
+        if (!fs.existsSync(path.join(Global.MCM_TEMP, '/world-install'))) {
+          mkdirp.sync(path.join(Global.MCM_TEMP, '/world-install'));
+        }
+
+        downloadPath = path.join(Global.MCM_TEMP, `/world-install/${Global.createID(mod.name)}-world-install.zip`);
       }
       if (modpack === false) {
         this.startFileDownload(`${mod.name}\n_A_${profile.name}`, url, downloadPath).then(() => {
+          if (type === 'world') {
+            FileScanner.scanInstallingWorld(profile, downloadPath, mod);
+          }
           resolve();
         });
       }

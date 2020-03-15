@@ -16,6 +16,7 @@ import VersionsManager from '../manager/versionsManager';
 import LibrariesManager from '../manager/librariesManager';
 import GenericAsset from './genericAsset';
 import SettingsManager from '../manager/settingsManager';
+import World from './world';
 
 export default function Profile(rawomaf) {
   Object.assign(this, rawomaf);
@@ -79,6 +80,10 @@ export default function Profile(rawomaf) {
       this.resourcepacks = [];
     }
 
+    if (!this.worlds) {
+      this.worlds = [];
+    }
+
     if (this.hosts) {
       if (this.hosts.curse) {
         if (!this.hosts.curse.fullyInstalled) {
@@ -103,6 +108,9 @@ export default function Profile(rawomaf) {
     if (this.installed) {
       if (!fs.existsSync(path.join(this.profilePath, '/_mcm/icons/resourcepacks'))) {
         fs.mkdirSync(path.join(this.profilePath, '/_mcm/icons/resourcepacks'));
+      }
+      if (!fs.existsSync(path.join(this.profilePath, '/_mcm/icons/worlds'))) {
+        fs.mkdirSync(path.join(this.profilePath, '/_mcm/icons/worlds'));
       }
     }
   };
@@ -131,13 +139,18 @@ export default function Profile(rawomaf) {
       index = 'mods';
     } else if (json.assetType === 'resourcepack') {
       index = 'resourcepacks';
+    } else if (json.assetType === 'world') {
+      index = 'worlds';
     }
+
     this[index] = json.assets.map(asset => {
       let assetObj;
       if (index === 'mods') {
         assetObj = new Mod(asset);
       } else if (index === 'resourcepacks') {
         assetObj = new GenericAsset(asset);
+      } else if (index === 'worlds') {
+        assetObj = new World(asset);
       }
 
       // make sure icon works
@@ -180,6 +193,10 @@ export default function Profile(rawomaf) {
 
     if (exists(path.join(this.subAssetsPath, 'resourcepacks.json'))) {
       this.readSubAsset('resourcepacks.json');
+    }
+
+    if (exists(path.join(this.subAssetsPath, 'worlds.json'))) {
+      this.readSubAsset('worlds.json');
     }
   };
 
@@ -238,6 +255,7 @@ export default function Profile(rawomaf) {
     copy.omafVersion = Global.OMAF_VERSION;
     copy.mods = undefined;
     copy.resourcepacks = undefined;
+    copy.worlds = undefined;
 
     return JSON.stringify(copy);
   };
@@ -279,6 +297,25 @@ export default function Profile(rawomaf) {
               omafVersion: Global.OMAF_VERSION,
               assetType: 'resourcepack',
               assets: rpOut
+            })
+          );
+        }
+
+        if (this.worlds) {
+          const worldOut = this.worlds.map(worldT => {
+            let world = worldT;
+            if (!(world instanceof World)) {
+              world = new World(world);
+            }
+            return world.cleanObject();
+          });
+
+          fs.writeFileSync(
+            path.join(this.profilePath, '/_omaf/subAssets/worlds.json'),
+            JSON.stringify({
+              omafVersion: Global.OMAF_VERSION,
+              assetType: 'world',
+              assets: worldOut
             })
           );
         }
@@ -439,6 +476,13 @@ export default function Profile(rawomaf) {
       }
       return this.resourcepacks.find(rp => rp.id === id);
     }
+    if (type === 'world') {
+      if (!this.worlds) {
+        this.worlds = [];
+      }
+
+      return this.worlds.find(world => world.id === id);
+    }
 
     return undefined;
   };
@@ -458,6 +502,14 @@ export default function Profile(rawomaf) {
       }
       if (!this.getSubAssetFromID('resourcepack', asset.id)) {
         this.resourcepacks.push(asset);
+        this.save();
+      }
+    } else if (type === 'world') {
+      if (!this.worlds) {
+        this.worlds = [];
+      }
+      if (!this.getSubAssetFromID('world', asset.id)) {
+        this.worlds.push(asset);
         this.save();
       }
     }
@@ -518,6 +570,39 @@ export default function Profile(rawomaf) {
           }
         } else {
           resolve();
+        }
+      } else if (type === 'world') {
+        asset = this.worlds.find(a => a.id === asset.id);
+        if (!(asset instanceof World)) {
+          asset = new World(asset);
+        }
+        if (asset && asset instanceof World && asset.getMainFile().path !== undefined) {
+          this.worlds.splice(this.worlds.indexOf(this.worlds.find(a => a.id === asset.id)), 1);
+          this.progressState[asset.id] = undefined;
+
+          const gpath = path.join(this.gameDir, `/${asset.getMainFile().path}`);
+          if (fs.existsSync(gpath)) {
+            rimraf(gpath, () => {
+              if (asset.icon) {
+                if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
+                  fs.unlinkSync(path.join(this.profilePath, asset.icon));
+                }
+              }
+
+              this.save();
+
+              resolve();
+            });
+          } else {
+            if (asset.icon) {
+              if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
+                fs.unlinkSync(path.join(this.profilePath, asset.icon));
+              }
+            }
+
+            this.save();
+            resolve();
+          }
         }
       }
     });

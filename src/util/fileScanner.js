@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
+import rimraf from 'rimraf';
 import LogManager from '../manager/logManager';
 import GenericAsset from '../type/genericAsset';
 import Global from './global';
@@ -213,6 +214,36 @@ const FileScanner = {
         profile.save();
       }
     }
+  },
+  // this is run when a world .zip file is downloaded
+  // it extracts only the correct folder, and places it into /saves
+  scanInstallingWorld(profile, zipPath, asset) {
+    const zip = new AdmZip(zipPath);
+
+    const extractedPath = path.join(Global.MCM_TEMP, `/world-install/${Global.createID(asset.name)}-extracted`);
+    zip.extractAllToAsync(extractedPath, true, () => {
+      const worlds = [];
+
+      fs.readdirSync(extractedPath).forEach(f => {
+        if (fs.lstatSync(path.join(extractedPath, f)).isDirectory()) {
+          fs.readdirSync(path.join(extractedPath, f)).forEach(file => {
+            if (file === 'level.dat') {
+              worlds.push(f);
+            }
+          });
+        }
+      });
+
+      worlds.forEach(world => {
+        Global.copyDirSync(
+          path.join(extractedPath, world),
+          path.join(profile.gameDir, `/saves/${Global.createID(asset.name)}`)
+        );
+      });
+
+      fs.unlinkSync(zipPath);
+      rimraf.sync(extractedPath);
+    });
   }
 };
 

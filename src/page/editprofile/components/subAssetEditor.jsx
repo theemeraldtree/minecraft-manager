@@ -16,6 +16,7 @@ import AssetInfo from '../../../component/assetinfo/assetinfo';
 import ToastManager from '../../../manager/toastManager';
 import Hosts from '../../../host/Hosts';
 import GenericAsset from '../../../type/genericAsset';
+import World from '../../../type/world';
 
 const { dialog } = require('electron').remote;
 
@@ -85,6 +86,8 @@ export default function SubAssetEditor({ id, assetType }) {
     po = 'mods';
   } else if (assetType === 'resourcepack') {
     po = 'resourcepacks';
+  } else if (assetType === 'world') {
+    po = 'worlds';
   }
 
   const updateProgressStates = () => {
@@ -102,7 +105,12 @@ export default function SubAssetEditor({ id, assetType }) {
       if (!(mod instanceof GenericAsset)) {
         mod = new GenericAsset(mod);
       }
+    } else if (assetType === 'world') {
+      if (!(mod instanceof World)) {
+        mod = new World(mod);
+      }
     }
+
     if (!progressState[mod.id]) {
       const copy = { ...progressState };
       copy[mod.id] = {
@@ -147,7 +155,8 @@ export default function SubAssetEditor({ id, assetType }) {
   };
 
   const installErrorHandler = (m, asset) => {
-    const { assetID } = asset;
+    const assetID = asset.id;
+
     if (m === 'no-version-available') {
       if (assetType === 'mod') {
         let modloader;
