@@ -23,6 +23,8 @@ const LatestProfile = new Profile({
 });
 
 function loadLatestProfile() {
+  LatestProfile.loadSubAssets(true);
+
   LatestProfile.iconPath = path.join(Global.getResourcesPath(), 'icon-latest.png');
   LatestProfile.addIconToLauncher = () => {};
 
@@ -38,6 +40,10 @@ function loadLatestProfile() {
 
   if (!fs.existsSync(path.join(LatestProfile.profilePath, '/_mcm/icons/resourcepacks'))) {
     mkdirp.sync(path.join(LatestProfile.profilePath, '/_mcm/icons/resourcepacks'));
+  }
+
+  if (!fs.existsSync(path.join(LatestProfile.profilePath, '/_mcm/icons/worlds'))) {
+    mkdirp.sync(path.join(LatestProfile.profilePath, '/_mcm/icons/worlds'));
   }
 
   LatestProfile.version.minecraft.version = Global.MC_VERSIONS[0];

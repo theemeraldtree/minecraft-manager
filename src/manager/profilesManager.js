@@ -265,6 +265,8 @@ const ProfilesManager = {
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm'));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/icons'));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/icons/mods'));
+      fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/icons/resourcepacks'));
+      fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/icons/worlds'));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_omaf'));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_omaf/subAssets'));
 

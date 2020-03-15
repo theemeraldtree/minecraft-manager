@@ -61,7 +61,7 @@ const Sidebar = ({ id, isDefaultProfile }) => (
 
 Sidebar.propTypes = {
   id: PropTypes.string.isRequired,
-  isDefaultProfile: PropTypes.bool.isRequired
+  isDefaultProfile: PropTypes.bool
 };
 
 export default Sidebar;

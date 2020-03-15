@@ -47,7 +47,11 @@ export default function Profile(rawomaf) {
     // all of these are used LOCALLY only
 
     this.profilePath = path.join(Global.PROFILES_PATH, `/${this.id}`);
-    this.gameDir = path.join(this.profilePath, '/files');
+
+    if (!this.gameDir) {
+      this.gameDir = path.join(this.profilePath, '/files');
+    }
+
     this.safename = Global.createSafeName(this.name);
     this.versionname = `${this.safename} [Minecraft Manager]`;
 
@@ -157,6 +161,12 @@ export default function Profile(rawomaf) {
       if (assetObj.icon) {
         if (assetObj.icon.substring(0, 4) === 'http') {
           assetObj.iconPath = assetObj.icon;
+        } else if (assetObj.icon.substring(0, 5) === 'game:') {
+          if (this.id === '0-default-profile-latest') {
+            assetObj.iconPath = path.join(Global.getMCPath(), assetObj.icon.substring(5)).replace(/\\/g, '/');
+          } else {
+            assetObj.iconPath = path.join(this.gameDir, assetObj.icon.substring(5)).replace(/\\/g, '/');
+          }
         } else {
           assetObj.iconPath = path.join(this.profilePath, assetObj.icon).replace(/\\/g, '/');
 
@@ -183,20 +193,23 @@ export default function Profile(rawomaf) {
     });
   };
 
-  this.loadSubAssets = function() {
+  this.loadSubAssets = function(force) {
     // load sub assets (such as mods, resourcepacks)
-    const exists = fs.existsSync;
 
-    if (exists(path.join(this.subAssetsPath, 'mods.json'))) {
-      this.readSubAsset('mods.json');
-    }
+    if (!this.isDefaultProfile || force) {
+      const exists = fs.existsSync;
 
-    if (exists(path.join(this.subAssetsPath, 'resourcepacks.json'))) {
-      this.readSubAsset('resourcepacks.json');
-    }
+      if (exists(path.join(this.subAssetsPath, 'mods.json'))) {
+        this.readSubAsset('mods.json');
+      }
 
-    if (exists(path.join(this.subAssetsPath, 'worlds.json'))) {
-      this.readSubAsset('worlds.json');
+      if (exists(path.join(this.subAssetsPath, 'resourcepacks.json'))) {
+        this.readSubAsset('resourcepacks.json');
+      }
+
+      if (exists(path.join(this.subAssetsPath, 'worlds.json'))) {
+        this.readSubAsset('worlds.json');
+      }
     }
   };
 

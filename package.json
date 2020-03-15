@@ -70,6 +70,7 @@
     "mkdirp": "^0.5.1",
     "preload-webpack-plugin": "3.0.0-beta.4",
     "prettier": "^1.19.1",
+    "prismarine-nbt": "^1.2.1",
     "prop-types": "^15.7.2",
     "qs": "^6.9.1",
     "react": "^16.10.0",

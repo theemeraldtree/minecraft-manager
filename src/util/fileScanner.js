@@ -8,6 +8,8 @@ import Global from './global';
 import Mod from '../type/mod';
 import World from '../type/world';
 
+const nbt = require('prismarine-nbt');
+
 /* FileScanner scans through different types of non-OMAF files (such as Mod JARs or Resource Pack ZIPs),
 to convert them to OMAF-compliant data using the available information */
 
@@ -218,39 +220,68 @@ const FileScanner = {
   },
   scanWorld(profile, file) {
     const fullPath = path.join(profile.gameDir, `/saves/${file}`);
-    const doesExist = profile.mods.find(mod => path.join(profile.gameDir, mod.getJARFile().path) === fullPath);
+    const doesExist = profile.worlds.find(world => path.join(profile.gameDir, world.getMainFile().path) === fullPath);
     if (!doesExist) {
       LogManager.log(
         'info',
-        `[scan] {${profile.id}} Found mod file ${file} which does not exist in subassets file. Adding it...`
+        `[scan] {${profile.id}} Found world ${file} which does not exist in subassets file. Adding it...`
       );
 
-      profile.worlds.push(
-        new World({
-          id: `${Global.createID(path.parse(file).name)}-${Math.floor(Math.random() * (999 - 100 + 1) + 100)}`,
-          name: file,
-          version: {
-            displayName: 'Unknown',
-            minecraft: {
-              supportedVersions: profile.version.minecraft.version
-            }
-          },
-          blurb: `Imported from ${file}`,
-          icon: '',
-          description: 'Imported',
-          hosts: {},
-          datapacks: [],
-          files: [
-            {
-              displayName: 'World Folder',
-              type: 'worldfolder',
-              priority: 'mainFile',
-              path: `saves/${file}`
-            }
-          ],
-          dependencies: []
-        })
-      );
+      const rawleveldat = fs.readFileSync(path.join(fullPath, 'level.dat'));
+      nbt.parse(rawleveldat, (err, leveldat) => {
+        const data = leveldat.value.Data.value;
+        const worldID = `${Global.createID(path.parse(file).name)}-${Math.floor(
+          Math.random() * (999 - 100 + 1) + 100
+        )}`;
+        let supportedVersion = profile.version.minecraft.version;
+        let name;
+
+        if (data.LevelName && data.LevelName.value) {
+          name = data.LevelName.value;
+        } else {
+          name = file;
+        }
+
+        if (data.Version && data.Version.value && data.Version.value.Name) {
+          supportedVersion = data.Version.value.Name.value;
+        }
+
+        if (fs.existsSync(path.join(fullPath, '/icon.png'))) {
+          fs.copyFileSync(
+            path.join(fullPath, '/icon.png'),
+            path.join(profile.profilePath, `/_mcm/icons/worlds/${worldID}.png`)
+          );
+        }
+
+        profile.worlds.push(
+          new World({
+            id: worldID,
+            name,
+            version: {
+              displayName: file,
+              minecraft: {
+                supportedVersions: supportedVersion
+              }
+            },
+            blurb: `${file}`,
+            icon: `game:saves/${file}/icon.png`,
+            description: name,
+            hosts: {},
+            datapacks: [],
+            files: [
+              {
+                displayName: 'World Folder',
+                type: 'worldfolder',
+                priority: 'mainFile',
+                path: `saves/${file}`
+              }
+            ],
+            dependencies: []
+          })
+        );
+
+        profile.save();
+      });
     }
   },
   scanDatapack(profile, world, file) {
@@ -261,22 +292,27 @@ const FileScanner = {
     if (!doesExist) {
       LogManager.log(
         'info',
-        `[scan] {${profile.id}} Found datapacke ${file} in world ${world.id} which does not exist in subassets file. Adding it...`
+        `[scan] {${profile.id}} Found datapack ${file} in world ${world.id} which does not exist in subassets file. Adding it...`
       );
+
+      let name = file;
+      if (name.substring(name.length - 4) === '.zip') {
+        name = name.substring(0, name.length - 4);
+      }
 
       world.datapacks.push(
         new GenericAsset({
           id: Global.createID(file),
-          name: file,
+          name,
           version: {
-            displayName: 'Unknown',
+            displayName: file,
             minecraft: {
               supportedVersions: profile.version.minecraft.version
             }
           },
-          blurb: `Imported from ${file}`,
+          blurb: file,
           icon: '',
-          description: 'Imported',
+          description: file,
           hosts: {},
           files: [
             {
