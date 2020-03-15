@@ -35,10 +35,10 @@ const BG = styled.div`
 `;
 
 const Image = styled.div.attrs(props => ({
-  style: {
-    backgroundImage: `url('${props.src}')`
-  }
-}))`
+    style: {
+      backgroundImage: `url('${props.src.replace(/\\/g, '/')}')`
+    }
+})`
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -169,9 +169,14 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate }) 
       {!profile.error && profile.state !== 'installing' && (
         <>
           <MenuItem onClick={() => profile.launch()}>Launch</MenuItem>
-          <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>Edit</MenuItem>
-          <MenuItem onClick={() => showUpdate(profile)}>Update</MenuItem>
-          <MenuItem onClick={() => showShare(profile)}>Share</MenuItem>
+
+          {!profile.isDefaultProfile && (
+            <>
+              <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>Edit</MenuItem>
+              <MenuItem onClick={() => showUpdate(profile)}>Update</MenuItem>
+              <MenuItem onClick={() => showShare(profile)}>Share</MenuItem>
+            </>
+          )}
         </>
       )}
       {profile.state !== 'installing' && (

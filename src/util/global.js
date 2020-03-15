@@ -1,4 +1,3 @@
-import AdmZip from 'adm-zip';
 import SettingsManager from '../manager/settingsManager';
 import ProfilesManager from '../manager/profilesManager';
 import Mod from '../type/mod';
@@ -11,6 +10,7 @@ import LibrariesManager from '../manager/librariesManager';
 import ErrorManager from '../manager/errorManager';
 import LogManager from '../manager/logManager';
 import GenericAsset from '../type/genericAsset';
+import FileScanner from './fileScanner';
 
 const semver = require('semver');
 const { remote } = require('electron');
@@ -302,67 +302,7 @@ const Global = {
         if (files) {
           if (files.length !== profile.resourcepacks.length) {
             files.forEach(file => {
-              const fullPath = path.join(profile.gameDir, `/resourcepacks/${file}`);
-              const doesExist = profile.resourcepacks.find(
-                rp => path.join(profile.gameDir, rp.getMainFile().path) === fullPath
-              );
-              if (!doesExist) {
-                if (path.extname(file) === '.zip') {
-                  const zip = new AdmZip(fullPath);
-                  const entries = zip.getEntries();
-                  let iconPath;
-                  let description;
-                  entries.forEach(entry => {
-                    if (entry.entryName === 'pack.mcmeta') {
-                      const parsed = JSON.parse(entry.getData().toString('utf8'));
-                      if (parsed && parsed.pack) {
-                        if (parsed.pack.description) {
-                          description = parsed.pack.description;
-                        }
-                      }
-                    }
-
-                    if (entry.entryName === 'pack.png') {
-                      fs.writeFileSync(
-                        path.join(profile.profilePath, `/_mcm/icons/resourcepacks/${file}`),
-                        entry.getData()
-                      );
-                      iconPath = `/_mcm/icons/resourcepacks/${file}`;
-                    }
-                  });
-
-                  LogManager.log(
-                    'info',
-                    `[scan] {${profile.name}} Found resource pack ${file} which does not exist in subassets file. Adding it...`
-                  );
-                  profile.resourcepacks.push(
-                    new GenericAsset({
-                      icon: iconPath,
-                      id: Global.createID(path.parse(file).name),
-                      name: path.parse(file).name,
-                      version: {
-                        displayName: file,
-                        minecraft: {
-                          supportedVersions: ['unknown']
-                        }
-                      },
-                      blurb: description,
-                      description: `Imported from ${file}`,
-                      hosts: {},
-                      files: [
-                        {
-                          displayName: 'Main File',
-                          type: 'resourcepackzip',
-                          priority: 'mainFile',
-                          path: `resourcepacks/${file}`
-                        }
-                      ],
-                      dependencies: []
-                    })
-                  );
-                  profile.save();
-                }
-              }
+              FileScanner.scanResourcePack(profile, file);
             });
           }
         }
@@ -385,42 +325,7 @@ const Global = {
         if (files) {
           if (files.length !== profile.mods.length) {
             files.forEach(file => {
-              const fullPath = path.join(profile.gameDir, `/mods/${file}`);
-              const doesExist = profile.mods.find(
-                mod => path.join(profile.gameDir, mod.getJARFile().path) === fullPath
-              );
-              if (!doesExist) {
-                LogManager.log(
-                  'info',
-                  `[scan] {${profile.id}} Found mod file ${file} which does not exist in subassets file. Adding it...`
-                );
-                profile.mods.push(
-                  new Mod({
-                    icon: '',
-                    id: Global.createID(path.parse(file).name),
-                    name: path.parse(file).name,
-                    version: {
-                      displayName: file,
-                      minecraft: {
-                        supportedVersions: ['unknown']
-                      }
-                    },
-                    blurb: `Imported from ${file}`,
-                    description: `Imported from ${file}`,
-                    hosts: {},
-                    files: [
-                      {
-                        displayName: 'Main JAR File',
-                        type: 'jar',
-                        priority: 'mainFile',
-                        path: `mods/${file}`
-                      }
-                    ],
-                    dependencies: []
-                  })
-                );
-                profile.save();
-              }
+              FileScanner.scanMod(profile, file);
             });
           }
         }
@@ -582,7 +487,10 @@ const Global = {
   // all this does is hide it from the user; no actual names are being changed
   cleanVersionName: name => {
     let currentName = name;
-    if (currentName.substring(currentName.length - 4) === '.zip') {
+    if (
+      currentName.substring(currentName.length - 4) === '.zip' ||
+      currentName.substring(currentName.length - 4) === '.jar'
+    ) {
       currentName = name.substring(0, currentName.length - 4);
     }
     return currentName;

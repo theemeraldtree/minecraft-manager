@@ -62,6 +62,8 @@ const Hosts = {
 
   async getDependencies(host, asset) {
     if (host === 'curse') {
+      const cachedAsset = this.cache.assets[asset.cachedID];
+      if (cachedAsset && cachedAsset.dependencies) return cachedAsset.dependencies;
       return Curse.getDependencies(asset);
     }
 

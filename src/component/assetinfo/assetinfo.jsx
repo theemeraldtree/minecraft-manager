@@ -32,6 +32,7 @@ const Description = styled.div`
 `;
 
 const HeaderButtons = styled.div`
+  margin-top: 5px;
   min-height: 46px;
 `;
 
@@ -183,8 +184,14 @@ export default class AssetInfo extends Component {
       });
       const versions = await Hosts.getVersions(host, activeAsset);
       if (versions) {
-        const final = versions.map(version => {
-          if (version.minecraft.supportedVersions.includes(mcVerFilter) || mcVerFilter === 'All') {
+        const final = versions
+          .filter(version => {
+            if (version.minecraft.supportedVersions.includes(mcVerFilter) || mcVerFilter === 'All') {
+              return true;
+            }
+            return false;
+          })
+          .map(version => {
             const ps = this.props.progressState;
             if (this.props.disableVersionInstall && ps.progress !== 'installing') {
               ps.progress = 'disable-install';
@@ -204,10 +211,7 @@ export default class AssetInfo extends Component {
                 hideFramework={activeAsset.type !== 'mod'}
               />
             );
-          }
-
-          return <></>;
-        });
+          });
 
         if (final.length === 0) {
           final.push(<LoadingText key="none1">no versions found</LoadingText>);
@@ -376,7 +380,7 @@ AssetInfo.propTypes = {
   disableVersionInstall: PropTypes.bool,
   forceVersionFilter: PropTypes.bool,
   versionInstall: PropTypes.func,
-  forceFramework: PropTypes.bool,
+  forceFramework: PropTypes.string,
   installClick: PropTypes.func,
   localAsset: PropTypes.bool,
   type: PropTypes.string

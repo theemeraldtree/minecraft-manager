@@ -10,6 +10,7 @@ import Hosts from '../host/Hosts';
 import ErrorManager from './errorManager';
 import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
+import LatestProfile from '../defaulltProfiles/latestProfile';
 
 const path = require('path');
 const fs = require('fs');
@@ -31,17 +32,23 @@ const ProfilesManager = {
           if (files.length >= 1) {
             files.forEach(async file => {
               await this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
+
+              this.loadedProfiles.push(LatestProfile);
+
               this.updateReloadListeners();
               resolve();
             });
           } else {
             LogManager.log('info', '[ProfilesManager] done getting profiles');
+            this.loadedProfiles.push(LatestProfile);
             this.updateReloadListeners();
             resolve();
           }
         });
       } else {
         this.loadedProfiles = [];
+        this.loadedProfiles.push(LatestProfile);
+
         resolve();
       }
     });

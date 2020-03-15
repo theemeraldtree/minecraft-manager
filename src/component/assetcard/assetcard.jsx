@@ -6,7 +6,8 @@ import { shell, clipboard } from 'electron';
 import Button from '../button/button';
 
 const BG = styled.div`
-  margin-top: 2px;
+  margin-top: 4px;
+  display: flex;
   width: 100%;
   height: 90px;
   outline: none;
@@ -14,7 +15,6 @@ const BG = styled.div`
   border: 0;
   padding: 0;
   background-color: #404040;
-  display: inline-flex;
   user-select: none;
   position: relative;
   overflow: hidden;
@@ -75,6 +75,8 @@ const Version = styled.p`
   margin-top: 0;
   user-select: none;
   color: #dddbdd;
+  white-space: pre-line;
+
   ${props =>
     props.buttonShown &&
     `

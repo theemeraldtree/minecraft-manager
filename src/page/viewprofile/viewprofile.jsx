@@ -126,18 +126,22 @@ function ViewProfilePage({ match, history }) {
             <CustomButton onClick={() => profile.launch()} color="green">
               launch
             </CustomButton>
-            <CustomButton onClick={editProfile} color="yellow">
-              edit
-            </CustomButton>
-            <CustomButton onClick={() => setShowUpdateOverlay(true)} color="purple">
-              update
-            </CustomButton>
-            <CustomButton onClick={() => setShowShareOverlay(true)} color="blue">
-              share
-            </CustomButton>
-            <CustomButton onClick={() => setShowDelete(true)} color="red">
-              delete
-            </CustomButton>
+            {!profile.isDefaultProfile && (
+              <>
+                <CustomButton onClick={editProfile} color="yellow">
+                  edit
+                </CustomButton>
+                <CustomButton onClick={() => setShowUpdateOverlay(true)} color="purple">
+                  update
+                </CustomButton>
+                <CustomButton onClick={() => setShowShareOverlay(true)} color="blue">
+                  share
+                </CustomButton>
+                <CustomButton onClick={() => setShowDelete(true)} color="red">
+                  delete
+                </CustomButton>
+              </>
+            )}
           </ButtonGroup>
           <Description>
             <SanitizedHTML html={profile.description} />
