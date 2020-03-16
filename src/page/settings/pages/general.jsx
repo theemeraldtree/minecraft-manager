@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 import styled from 'styled-components';
 import TextInput from '../../../component/textinput/textinput';
 import Button from '../../../component/button/button';
@@ -6,6 +6,9 @@ import Detail from '../../../component/detail/detail';
 import InputHolder from '../../../component/inputholder/inputholder';
 import SettingsManager from '../../../manager/settingsManager';
 import Global from '../../../util/global';
+import Checkbox from '../../../component/checkbox/checkbox';
+import ProfilesManager from '../../../manager/profilesManager';
+import InputContainer from '../../editprofile/components/inputcontainer';
 
 const { dialog } = require('electron').remote;
 const os = require('os');
@@ -29,6 +32,8 @@ export default function General() {
   const [dedicatedRam, setDedicatedRam] = useState(SettingsManager.currentSettings.dedicatedRam);
   const [ramChangeDisabled, setRamChangeDisabled] = useState(true);
   const [warningMessage, setWarningMessage] = useState('');
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+
   const chooseHomeDirectory = () => {
     const p = dialog.showOpenDialog({
       title: 'Choose your Minecraft Home Directory',
@@ -91,6 +96,13 @@ export default function General() {
     }
   };
 
+  const allowSnapshotProfileClick = () => {
+    SettingsManager.currentSettings.allowSnapshotProfile = !SettingsManager.currentSettings.allowSnapshotProfile;
+    SettingsManager.save();
+    ProfilesManager.getProfiles();
+    forceUpdate();
+  };
+
   return (
     <>
       <Settings>
@@ -122,6 +134,14 @@ export default function General() {
           </div>
           <WarningMSG>{warningMessage}</WarningMSG>
         </InputHolder>
+        <InputContainer>
+          <Checkbox
+            checked={SettingsManager.currentSettings.allowSnapshotProfile}
+            lighter
+            onClick={allowSnapshotProfileClick}
+          />
+          <Detail>show latest snapshot profile</Detail>
+        </InputContainer>
       </Settings>
     </>
   );

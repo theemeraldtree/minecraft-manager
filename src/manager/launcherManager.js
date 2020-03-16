@@ -27,6 +27,8 @@ const LauncherManager = {
       verId = `${profile.safename} [Minecraft Manager]`;
     } else if (profile.id === '0-default-profile-latest') {
       verId = 'latest-release';
+    } else if (profile.id === '0-default-profile-snapshot') {
+      verId = 'latest-snapshot';
     } else {
       verId = profile.version.minecraft.version;
     }
@@ -73,6 +75,9 @@ const LauncherManager = {
       }
     } else if (profile.id === '0-default-profile-latest') {
       const find = Object.keys(obj.profiles).find(prof => obj.profiles[prof].type === 'latest-release');
+      obj.profiles[find][tag] = val;
+    } else if (profile.id === '0-default-profile-snapshot') {
+      const find = Object.keys(obj.profiles).find(prof => obj.profiles[prof].type === 'latest-snapshot');
       obj.profiles[find][tag] = val;
     }
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));

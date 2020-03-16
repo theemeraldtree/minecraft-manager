@@ -103,7 +103,7 @@ ToastObject.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
-  error: PropTypes.bool.isRequired,
+  error: PropTypes.bool,
   dismiss: PropTypes.func.isRequired,
   slideOut: PropTypes.bool,
   disableAnimation: PropTypes.bool

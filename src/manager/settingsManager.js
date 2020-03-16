@@ -29,6 +29,10 @@ const SettingsManager = {
           this.currentSettings.defaultsMultiplayerWarning = false;
         }
 
+        if (!this.currentSettings.allowSnapshotProfile) {
+          this.currentSettings.allowSnapshotProfile = false;
+        }
+
         resolve();
       });
     });

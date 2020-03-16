@@ -26,7 +26,9 @@ const BG = styled.div`
     bottom: -40px;
   }
   overflow: hidden;
-  &:hover {
+  &:hover,
+  &:focus,
+  &:focus-within {
     background-color: #5b5b5b;
     .buttons {
       bottom: 3px;
@@ -169,17 +171,17 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate }) 
       {!profile.error && profile.state !== 'installing' && (
         <>
           <MenuItem onClick={() => profile.launch()}>Launch</MenuItem>
+          <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>Edit</MenuItem>
 
           {!profile.isDefaultProfile && (
             <>
-              <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>Edit</MenuItem>
               <MenuItem onClick={() => showUpdate(profile)}>Update</MenuItem>
               <MenuItem onClick={() => showShare(profile)}>Share</MenuItem>
             </>
           )}
         </>
       )}
-      {profile.state !== 'installing' && (
+      {profile.state !== 'installing' && !profile.isDefaultProfile && (
         <MenuItem
           onClick={() => {
             showDeletion(profile);

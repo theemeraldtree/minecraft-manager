@@ -11,6 +11,8 @@ import ErrorManager from './errorManager';
 import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
 import LatestProfile from '../defaulltProfiles/latestProfile';
+import SnapshotProfile from '../defaulltProfiles/snapshotProfile';
+import SettingsManager from './settingsManager';
 
 const path = require('path');
 const fs = require('fs');
@@ -25,13 +27,17 @@ const ProfilesManager = {
   progressState: {},
   getProfiles() {
     this.loadedProfiles = [LatestProfile];
+
+    if (SettingsManager.currentSettings.allowSnapshotProfile) {
+      this.loadedProfiles.push(SnapshotProfile);
+    }
     LogManager.log('info', '[ProfilesManager] Getting profiles...');
     return new Promise(resolve => {
       if (fs.existsSync(Global.PROFILES_PATH)) {
         fs.readdir(Global.PROFILES_PATH, (err, files) => {
           if (files.length >= 1) {
             files.forEach(async file => {
-              if (file !== '0-default-profile-latest') {
+              if (file !== '0-default-profile-latest' && file !== '0-default-profile-snapshot') {
                 await this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
               }
 
@@ -45,7 +51,11 @@ const ProfilesManager = {
           }
         });
       } else {
-        this.loadedProfiles = [LatestProfile];
+        this.loadedProfiles = [LatestProfile, SnapshotProfile];
+
+        if (SettingsManager.currentSettings.allowSnapshotProfile) {
+          this.loadedProfiles.push(SnapshotProfile);
+        }
 
         resolve();
       }

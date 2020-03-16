@@ -246,11 +246,10 @@ const FileScanner = {
           supportedVersion = data.Version.value.Name.value;
         }
 
+        let icon = '';
+
         if (fs.existsSync(path.join(fullPath, '/icon.png'))) {
-          fs.copyFileSync(
-            path.join(fullPath, '/icon.png'),
-            path.join(profile.profilePath, `/_mcm/icons/worlds/${worldID}.png`)
-          );
+          icon = `game:saves/${file}/icon.png`;
         }
 
         profile.worlds.push(
@@ -264,7 +263,7 @@ const FileScanner = {
               }
             },
             blurb: `${file}`,
-            icon: `game:saves/${file}/icon.png`,
+            icon,
             description: name,
             hosts: {},
             datapacks: [],

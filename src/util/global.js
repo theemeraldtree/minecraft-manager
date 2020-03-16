@@ -366,7 +366,7 @@ const Global = {
             'info',
             `[scan] {${profile.id}} Found world ${world.name} where the folder is missing. Removing it from the profile...`
           );
-          profile.deleteSubAsset('resourcepack', world);
+          profile.deleteSubAsset('world', world);
         } else if (fs.existsSync(path.join(fullPath, '/datapacks'))) {
           fs.readdir(path.join(fullPath, '/datapacks'), (err, files) => {
             if (files) {
