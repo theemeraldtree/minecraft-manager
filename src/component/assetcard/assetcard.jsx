@@ -73,6 +73,7 @@ const Version = styled.p`
   text-overflow: ellipsis;
   margin: 5px;
   margin-top: 0;
+  margin-left: 2px;
   user-select: none;
   color: #dddbdd;
   white-space: pre-line;
@@ -87,9 +88,14 @@ const Version = styled.p`
 const Buttons = styled.div`
   display: flex;
   flex-flow: row;
-  right: 3px;
-  bottom: 3px;
+  right: 0;
+  bottom: 0;
   position: absolute;
+
+  button {
+    padding: 7px;
+    font-size: 11pt;
+  }
 `;
 
 const Details = styled.div`

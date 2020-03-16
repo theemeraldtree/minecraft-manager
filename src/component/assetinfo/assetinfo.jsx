@@ -68,7 +68,7 @@ const HB = styled(Button)`
 
 const List = styled.div`
   flex: 1 1 auto;
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden;
   margin-top: 10px;
   margin-bottom: 20px;

@@ -219,6 +219,13 @@ export default class CustomDropdown extends Component {
 
     if (this.props.value) {
       currentValue = this.props.value;
+
+      if (typeof this.props.items[0] === 'string') {
+        if (!this.props.items.find(item => item === currentValue)) {
+          currentValue = this.props.items[0];
+          this.props.onChange(currentValue);
+        }
+      }
     }
 
     const indexes = {};
@@ -241,7 +248,11 @@ export default class CustomDropdown extends Component {
     });
 
     if (this.props.value) {
-      currentName = indexes[currentValue];
+      if (indexes[currentValue]) {
+        currentName = indexes[currentValue];
+      } else {
+        currentName = indexes[Object.keys(indexes)[0]];
+      }
     }
 
     if (initial && !this.props.value) {

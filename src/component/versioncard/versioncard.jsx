@@ -99,8 +99,13 @@ const Changelog = styled.div`
 
 const ButtonContainer = styled.div`
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 19px;
+  right: 5px;
+
+  button {
+    padding: 7px;
+    font-size: 11pt;
+  }
 `;
 
 export default class VersionCard extends PureComponent {

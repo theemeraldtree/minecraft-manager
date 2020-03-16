@@ -11,7 +11,7 @@ const TextInput = styled.input.attrs({
   font-size: 17pt;
   padding-left: 10px;
   &::placeholder {
-    color: white;
+    color: #cfcfcf;
   }
   &:hover:not(:disabled),
   &:focus {

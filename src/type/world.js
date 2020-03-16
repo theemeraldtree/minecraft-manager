@@ -12,7 +12,12 @@ function World(omaf) {
 
 World.prototype = Object.create(GenericAsset.prototype);
 
-World.prototype.deleteDatapack = function(profile, asset) {
+World.prototype.deleteDatapack = function(profile, assetT) {
+  let asset = assetT;
+  if (!(asset instanceof GenericAsset)) {
+    asset = new GenericAsset(asset);
+  }
+
   rimraf.sync(path.join(profile.gameDir, this.getMainFile().path, asset.getMainFile().path));
   this.datapacks.splice(
     this.datapacks.find(dp => dp.id === asset.id),

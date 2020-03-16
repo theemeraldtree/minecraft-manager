@@ -40,6 +40,9 @@ const List = styled.div`
   margin-top: 10px;
   margin-bottom: 20px;
   padding: 10px;
+  &::-webkit-scrollbar-track {
+    background: none;
+  }
 `;
 
 const Search = styled(TextInput)`
@@ -320,11 +323,11 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
               ←
             </AnimateButton>
             {displayState !== 'assetsList' && displayState !== 'modInfo' && (
-              <Search onChange={searchChange} onKeyPress={searchChange} placeholder="Search" />
+              <Search onChange={searchChange} onKeyPress={searchChange} placeholder="search curseforge" />
             )}
 
             {displayState === 'assetsList' && (
-              <Search value={liveSearchTerm} onChange={searchChange} onKeyPress={searchChange} placeholder="Search" />
+              <Search value={liveSearchTerm} onChange={searchChange} onKeyPress={searchChange} placeholder="search" />
             )}
             {displayState === 'addMods' && listState !== 'viewAsset' && (
               <Button timeout={150} unmountOnExit onClick={addFromFile} color="green">
@@ -358,6 +361,11 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
 
                   return <></>;
                 })}
+                {selobj[po].length === 0 && (
+                  <>
+                    <h1 style={{ textAlign: 'center' }}>There's nothing here!</h1>
+                  </>
+                )}
               </List>
             </>
           )}

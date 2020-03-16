@@ -10,11 +10,12 @@ import launch from './img/launch.png';
 import Button from '../button/button';
 
 const BG = styled.div`
-  width: 110px;
-  height: 180px;
+  width: 120px;
+  height: 190px;
   background-color: #404040;
   display: inline-flex;
   margin: 5px;
+  margin-right: 0;
   align-items: center;
   flex-flow: column;
   cursor: pointer;
@@ -44,8 +45,8 @@ const Image = styled.div.attrs(props => ({
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  height: 110px;
-  width: 110px;
+  height: 120px;
+  width: 120px;
   flex-shrink: 0;
 `;
 
@@ -72,7 +73,7 @@ const Buttons = styled.div`
   flex-flow: row;
   bottom: 3px;
   position: absolute;
-  left: 0;
+  left: 1.5px;
   right: 0;
   padding-left: 2px;
   padding-right: 2px;
@@ -82,7 +83,7 @@ const LaunchButton = styled(Button)`
   img {
     width: 20px;
   }
-  width: 70px;
+  width: 80px;
   text-align: center;
   display: flex;
   justify-content: center;
