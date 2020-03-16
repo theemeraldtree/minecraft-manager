@@ -5,7 +5,7 @@ import styled from 'styled-components';
 const sanitizeHTML = require('sanitize-html');
 
 const Styling = styled.div`
-  color: white;
+  color: #ececec;
   p,
   h1,
   h2,
@@ -14,7 +14,7 @@ const Styling = styled.div`
   h5,
   h6,
   span {
-    color: white;
+    color: #ececec;
   }
 
   img {
@@ -29,10 +29,20 @@ const Styling = styled.div`
 
   iframe {
     border: 0;
+    width: 400px;
+    height: 200px;
   }
 
   word-break: break-word;
   padding: 10px;
+
+  span[style*='color:#800000'] {
+    color: #cc0000 !important;
+  }
+
+  span[style*='color:#000'] {
+    color: white !important;
+  }
 
   ${props =>
     props.small &&
@@ -75,7 +85,7 @@ const SanitizedHTML = ({ html, small }) => (
         allowedAttributes: {
           '*': ['style'],
           a: ['href'],
-          iframe: ['src'],
+          iframe: ['src', 'allowfullscreen'],
           img: ['src', 'width', 'height']
         },
         allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com']
