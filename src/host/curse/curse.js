@@ -320,6 +320,21 @@ const Curse = {
     return this.getLatestVersionForMCVersion(await this.getFullAsset(asset), mcVersion, modloader);
   },
 
+  // gets the closest version of an asset to a minecraft version, but only an older version
+  async getClosestOlderVersion(asset, mcVersion) {
+    if (asset.hosts.curse.localValues && asset.hosts.curse.localValues.gameVerLatestFiles) {
+      const preferredVerIndex = Global.ALL_VERSIONS.indexOf(mcVersion);
+      const futureVersionsRemoved = asset.hosts.curse.localValues.gameVerLatestFiles.filter(
+        version => Global.ALL_VERSIONS.indexOf(version.gameVersion) >= preferredVerIndex
+      );
+
+      if (futureVersionsRemoved[0]) return futureVersionsRemoved[0].gameVersion;
+      return undefined;
+    }
+
+    return this.getClosestOlderVersion(await this.getFullAsset(asset), mcVersion);
+  },
+
   // gets the changelog from a file id
   async getFileChangelog(asset, fileID) {
     return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}/changelog`);

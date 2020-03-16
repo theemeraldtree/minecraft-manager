@@ -100,6 +100,14 @@ const Hosts = {
     return undefined;
   },
 
+  async getClosestOlderVersion(host, asset, mcVersion) {
+    if (host === 'curse') {
+      return Curse.getClosestOlderVersion(asset, mcVersion);
+    }
+
+    return undefined;
+  },
+
   async getFileChangelog(host, asset, fileID) {
     if (host === 'curse') {
       return Curse.getFileChangelog(asset, fileID);
@@ -183,9 +191,34 @@ const Hosts = {
       modloader = 'fabric';
     }
 
-    const ver = await this.getLatestVersionForMCVersion(host, asset, profile.version.minecraft.version, modloader);
-    if (!ver) {
-      return 'no-version-available';
+    let ver;
+    const latestForMCVer = await this.getLatestVersionForMCVersion(
+      host,
+      asset,
+      profile.version.minecraft.version,
+      modloader
+    );
+
+    if (type === 'mod') {
+      if (!latestForMCVer) {
+        return 'no-version-available';
+      }
+    } else if (!latestForMCVer) {
+      ver = await this.getLatestVersionForMCVersion(
+        host,
+        asset,
+        await this.getClosestOlderVersion(host, asset, profile.version.minecraft.version),
+        modloader
+      );
+
+      if (!ver) return 'no-version-available';
+
+      ToastManager.createToast(
+        'Heads up',
+        `A ${profile.version.minecraft.version}-compatible version of ${asset.name} wasn't found, but we're compensating by getting an older version. There may be bugs.`
+      );
+    } else {
+      ver = latestForMCVer;
     }
 
     let newMod;

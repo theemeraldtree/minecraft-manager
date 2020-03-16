@@ -86,6 +86,7 @@ const LauncherManager = {
     const date = new Date();
     const iso = date.toISOString();
     this.setProfileData(profile, 'lastUsed', iso);
+    this.setProfileData(profile, 'gameDir', profile.gameDir);
   },
   openLauncher() {
     const launcherPath = Global.getLauncherPath();

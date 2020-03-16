@@ -44,6 +44,10 @@ function loadSnapshotProfile() {
     mkdirp.sync(path.join(SnapshotProfile.profilePath, '/_mcm/icons/worlds'));
   }
 
+  if (!fs.existsSync(SnapshotProfile.gameDir)) {
+    mkdirp.sync(SnapshotProfile.gameDir);
+  }
+
   SnapshotProfile.version.minecraft.version = Global.ALL_VERSIONS[0];
   SnapshotProfile.minecraftversion = Global.ALL_VERSIONS[0];
 

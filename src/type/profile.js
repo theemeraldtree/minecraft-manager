@@ -162,7 +162,7 @@ export default function Profile(rawomaf) {
         if (assetObj.icon.substring(0, 4) === 'http') {
           assetObj.iconPath = assetObj.icon;
         } else if (assetObj.icon.substring(0, 5) === 'game:') {
-          if (this.id === '0-default-profile-latest' || this.id === '0-default-profile-snapshot') {
+          if (this.id === '0-default-profile-latest') {
             assetObj.iconPath = path.join(Global.getMCPath(), assetObj.icon.substring(5)).replace(/\\/g, '/');
           } else {
             assetObj.iconPath = path.join(this.gameDir, assetObj.icon.substring(5)).replace(/\\/g, '/');
