@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import path from 'path';
 import { remote } from 'electron';
 import LauncherManager from './launcherManager';
@@ -63,9 +64,26 @@ const SettingsManager = {
     this.save();
   },
   createSettings() {
+    const totalRAM = Math.ceil(os.totalmem() / 1073741824);
+
+    let dedicatedRam;
+    if (totalRAM <= 2) {
+      dedicatedRam = 1;
+    } else if (totalRAM <= 4) {
+      dedicatedRam = 2;
+    } else if (totalRAM === 5) {
+      dedicatedRam = 3;
+    } else if (totalRAM <= 7) {
+      dedicatedRam = 4;
+    } else if (totalRAM <= 9) {
+      dedicatedRam = 6;
+    } else {
+      dedicatedRam = 8;
+    }
+
     const obj = {
       homeDirectory: '',
-      dedicatedRam: 2,
+      dedicatedRam,
       mcExe: '',
       lastToastNewsID: -1
     };

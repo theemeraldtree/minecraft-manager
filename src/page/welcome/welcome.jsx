@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
@@ -13,6 +14,8 @@ import SettingsManager from '../../manager/settingsManager';
 import LibrariesManager from '../../manager/librariesManager';
 import logo from '../../img/logo-sm.png';
 import NavContext from '../../navContext';
+import tipShare from './img/tip-share.png';
+import tipRightClick from './img/tip-right-click.png';
 
 const { dialog } = require('electron').remote;
 
@@ -44,6 +47,21 @@ const Content = styled.div`
   display: flex;
   align-items: center;
   flex-flow: column;
+  color: white;
+
+  img {
+    width: 200px;
+  }
+
+  h3 {
+    font-size: 21pt;
+  }
+
+  p {
+    font-size: 15pt;
+    max-width: 500px;
+    text-align: center;
+  }
 `;
 
 const Logo = styled.div`
@@ -75,7 +93,7 @@ const Spacing = styled.div`
 
 const AutofillText = styled.p`
   margin: 0;
-  font-size: 10pt;
+  font-size: 10pt !important;
   color: white;
 `;
 
@@ -222,11 +240,49 @@ function WelcomePage({ history }) {
                 <Spacing />
                 <Title>You're all set!</Title>
 
-                <Subtext>You're done setting up Minecraft Manager.</Subtext>
-                <Subtext>
-                  If you need help,{' '}
+                <h3>You're done setting up Minecraft Manager.</h3>
+                <p>
+                  Check out these tips and tricks to see what you can do. <br />
+                  If you want more,{' '}
                   <a href="https://theemeraldtree.net/mcm/wiki">check out the Minecraft Manager wiki.</a>
-                </Subtext>
+                </p>
+
+                <GB onClick={nextStep} color="green">
+                  Next
+                </GB>
+              </>
+            )}
+
+            {step === 4 && (
+              <>
+                <Spacing />
+                <Title>tips and tricks</Title>
+
+                <img alt="Share your profile" src={tipShare} />
+
+                <h3>
+                  <b>share your profile</b>
+                </h3>
+                <p>Share your custom-made profile with your friends through a tiny, typically less than 1 MB file</p>
+
+                <GB onClick={nextStep} color="green">
+                  Next Tip
+                </GB>
+              </>
+            )}
+
+            {step === 5 && (
+              <>
+                <Spacing />
+                <Title>tips and tricks</Title>
+
+                <img alt="Right click" src={tipRightClick} />
+
+                <h3>
+                  <b>right click for more</b>
+                </h3>
+
+                <p>Right click various things to access hidden actions! Who knows what you'll discover!</p>
 
                 <GB onClick={start} color="green">
                   Finish Setup

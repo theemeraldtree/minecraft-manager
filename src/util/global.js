@@ -33,8 +33,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.3.0',
-  MCM_RELEASE_DATE: '2/27/2020',
+  MCM_VERSION: '2.3.1',
+  MCM_RELEASE_DATE: '3/16/2020',
 
   OMAF_VERSION: '1.0.0',
 
@@ -68,7 +68,7 @@ const Global = {
     if (!version || (semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1)) {
       ToastManager.createToast(
         `Welcome to ${this.MCM_VERSION}`,
-        `With Forge 1.13+ support, Resource Packs, UI Tweaks, and more. <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`
+        `With Worlds, Datapacks, UI Tweaks, and more! <a href="https://theemeraldtree.net/mcm/changelogs/${this.MCM_VERSION}">View the changelog</a>`
       );
       SettingsManager.setLastVersion(this.MCM_VERSION);
     }

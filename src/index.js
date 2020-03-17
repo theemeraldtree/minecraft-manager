@@ -45,8 +45,10 @@ async function load() {
     console.error(e);
   }
 
-  loadLatestProfile();
-  loadSnapshotProfile();
+  if (fs.existsSync(Global.PROFILES_PATH)) {
+    loadLatestProfile();
+    loadSnapshotProfile();
+  }
 
   await ProfilesManager.getProfiles();
 

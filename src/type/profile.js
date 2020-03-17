@@ -64,7 +64,7 @@ export default function Profile(rawomaf) {
     this.modsPath = path.join(this.gameDir, '/mods');
 
     if (this.icon) {
-      if (this.icon.substring(0, 4) === 'http') {
+      if (this.icon.substring(0, 4) === 'http' || this.isDefaultProfile) {
         this.iconPath = this.icon;
       } else {
         // backslashes are replaced with forward slashes because they are being used as escape characters

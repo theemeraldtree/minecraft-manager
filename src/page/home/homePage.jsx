@@ -41,7 +41,7 @@ const CreateControls = styled.div`
     margin: 2px;
   }
 `;
-export default withRouter(function HomePage({ history }) {
+export default withRouter(({ history }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [createName, setCreateName] = useState('');
@@ -75,9 +75,6 @@ export default withRouter(function HomePage({ history }) {
       setNameEntered(true);
     } else {
       setNameEntered(false);
-      this.setState({
-        nameEntered: false
-      });
     }
     setCreateName(input);
   };

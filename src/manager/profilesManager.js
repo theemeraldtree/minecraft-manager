@@ -51,7 +51,7 @@ const ProfilesManager = {
           }
         });
       } else {
-        this.loadedProfiles = [LatestProfile, SnapshotProfile];
+        this.loadedProfiles = [LatestProfile];
 
         if (SettingsManager.currentSettings.allowSnapshotProfile) {
           this.loadedProfiles.push(SnapshotProfile);
