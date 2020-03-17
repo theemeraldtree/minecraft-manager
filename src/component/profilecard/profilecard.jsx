@@ -14,8 +14,7 @@ const BG = styled.div`
   height: 190px;
   background-color: #404040;
   display: inline-flex;
-  margin: 5px;
-  margin-right: 0;
+  margin: 3px;
   align-items: center;
   flex-flow: column;
   cursor: pointer;

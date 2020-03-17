@@ -2,6 +2,15 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## Current Development Version
+
+#### work branch
+
+### Changed
+
+- Adjusted spacing between Profiles
+- Fix clicking away from dropdowns
+
 ## 2.3.4
 
 #### Released 2020-03-17

@@ -81,7 +81,6 @@
     "prop-types": "^15.7.2",
     "qs": "^6.9.1",
     "react": "^16.10.0",
-    "react-click-away-listener": "^0.4.3",
     "react-contextmenu": "^2.11.0",
     "react-dom": "^16.10.0",
     "react-router-dom": "^5.1.2",

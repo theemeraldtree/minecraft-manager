@@ -7509,11 +7509,6 @@ rc@^1.1.6, rc@^1.2.1, rc@^1.2.7, rc@^1.2.8:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-click-away-listener@^0.4.3:
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/react-click-away-listener/-/react-click-away-listener-0.4.3.tgz#70e0f902ba2e11e945f54a35c465d259f7631f17"
-  integrity sha512-n7eskZ4Asf6tQlk7I0nFai0mEcyYwVw3ROg9vXHYA40+vO4Md8gF9Bxuxc/FwDv4dUonYJiRxLdLXMtSOvULmw==
-
 react-contextmenu@^2.11.0:
   version "2.11.0"
   resolved "https://registry.yarnpkg.com/react-contextmenu/-/react-contextmenu-2.11.0.tgz#ec57614e6d687ceaec5c0ba97d56a302c9551d17"

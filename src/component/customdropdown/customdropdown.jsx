@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import ClickAwayListener from 'react-click-away-listener';
 import transition from 'styled-transition-group';
 import arrow from './img/arrow.png';
 
@@ -10,6 +9,7 @@ const CDropdown = styled.div`
   color: white;
   width: 300px;
   height: 40px;
+  flex-shrink: 0;
   position: relative;
   display: flex;
   align-items: center;
@@ -125,6 +125,7 @@ export default class CustomDropdown extends Component {
   constructor(props) {
     super(props);
     this.itemsRef = React.createRef();
+    this.wrapperRef = React.createRef();
     this.state = {
       currentValue: '',
       items: [],
@@ -134,6 +135,7 @@ export default class CustomDropdown extends Component {
 
   componentDidMount() {
     this.renderDropdown(true);
+    document.addEventListener('mousedown', this.handleClick, false);
   }
 
   componentDidUpdate(prevProps) {
@@ -142,10 +144,12 @@ export default class CustomDropdown extends Component {
     }
   }
 
-  clickAway = () => {
-    this.setState({
-      dropdownOpen: false
-    });
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.handleClick, false);
+  }
+
+  dropdownChange = e => {
+    this.props.onChange(e.target.value, e);
   };
 
   selectItem = e => {
@@ -197,8 +201,16 @@ export default class CustomDropdown extends Component {
     }
   };
 
-  dropdownChange = e => {
-    this.props.onChange(e.target.value, e);
+  clickAway = () => {
+    this.setState({
+      dropdownOpen: false
+    });
+  };
+
+  handleClick = e => {
+    if (!this.wrapperRef.current.contains(e.target)) {
+      this.clickAway();
+    }
   };
 
   renderDropdown(initial) {
@@ -275,28 +287,27 @@ export default class CustomDropdown extends Component {
   render() {
     const { dropdownOpen, currentName } = this.state;
     return (
-      <ClickAwayListener onClickAway={this.clickAway}>
-        <CDropdown
-          role="button"
-          tabIndex="0"
-          onKeyDown={e => {
-            if (e.keyCode === 13 || e.keyCode === 32) {
-              this.openDropdown();
-            }
-          }}
-          disabled={this.props.disabled}
-          active={dropdownOpen}
-          onClick={this.openDropdown}
-        >
-          <Label>{currentName}</Label>
-          <Arrow flip={dropdownOpen} src={arrow} />
-          {!this.props.disabled && (
-            <Items timeout={350} in={dropdownOpen} unmountOnExit ref={this.itemsRef}>
-              {this.state.items}
-            </Items>
-          )}
-        </CDropdown>
-      </ClickAwayListener>
+      <CDropdown
+        ref={this.wrapperRef}
+        role="button"
+        tabIndex="0"
+        onKeyDown={e => {
+          if (e.keyCode === 13 || e.keyCode === 32) {
+            this.openDropdown();
+          }
+        }}
+        disabled={this.props.disabled}
+        active={dropdownOpen}
+        onClick={this.openDropdown}
+      >
+        <Label>{currentName}</Label>
+        <Arrow flip={dropdownOpen} src={arrow} />
+        {!this.props.disabled && (
+          <Items timeout={350} in={dropdownOpen} unmountOnExit ref={this.itemsRef}>
+            {this.state.items}
+          </Items>
+        )}
+      </CDropdown>
     );
   }
 }
