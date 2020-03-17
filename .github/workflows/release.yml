@@ -6,8 +6,11 @@ on:
       - master
 
 jobs:
+  strategy:
+    matrix:
+      os: [macos-latest, ubuntu-latest, windows-latest]
   build:
-    runs-on: macos-latest # only macOS can build all 3 platforms at once
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
