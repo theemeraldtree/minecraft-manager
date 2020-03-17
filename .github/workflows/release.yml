@@ -16,6 +16,6 @@ jobs:
       - name: Install Dependencies
         run: yarn
       - name: Build and add to release draft
-        run: yarn pub -mwl
+        run: yarn ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

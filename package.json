@@ -109,6 +109,8 @@
     "build": "electron-builder ./",
     "package": "npm run compile && npm run build",
     "lint": "npx eslint src",
-    "lint-fix": "npx eslint src --fix"
+    "lint-fix": "npx eslint src --fix",
+    "pub": "electron-builder ./ --publish onTagOrDraft",
+    "ci": "yarn run build && yarn pub -mwl"
   }
 }
