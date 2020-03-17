@@ -1,6 +1,6 @@
 {
   "name": "minecraft-manager",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "license": "GPL-3.0",
   "main": "main.js",
   "author": "theemeraldtree",
@@ -35,7 +35,7 @@
     },
     "linux": {
       "target": "AppImage",
-      "artifactName": "Install Minecraft Manager.${ext}"
+      "artifactName": "Minecraft Manager.${ext}"
     },
     "nsis": {
       "license": "LICENSE",

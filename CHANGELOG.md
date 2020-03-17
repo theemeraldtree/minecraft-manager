@@ -2,6 +2,12 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.3.4
+
+#### Released 2020-03-17
+
+Version for testing GitHub Actions and Releases. No new features or bug fixes.
+
 ## 2.3.3
 
 #### Released 2020-03-17
