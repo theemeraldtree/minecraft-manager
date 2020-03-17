@@ -4,25 +4,19 @@ Changelogs for development versions are located in their corresponding branch.
 
 ## 2.3.3
 
-Released 2020-03-17
-
----
+#### Released 2020-03-17
 
 Version for testing GitHub Actions and Releases. No new features or bug fixes.
 
 ## 2.3.2
 
-Released 2020-03-17
-
----
+#### Released 2020-03-17
 
 Version for testing GitHub Actions and Releases. No new features or bug fixes.
 
 ## 2.3.1
 
-Released 2020-03-16
-
----
+#### Released 2020-03-16
 
 Minecraft Manager 2.3.1 includes Worlds, Datapacks, UI Improvements, and more.
 
