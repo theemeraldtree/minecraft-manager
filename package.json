@@ -40,7 +40,8 @@
     "nsis": {
       "license": "LICENSE",
       "perMachine": "true",
-      "oneClick": "false"
+      "oneClick": "false",
+      "useZip": "true"
     },
     "dmg": {
       "title": "Install Minecraft Manager"
@@ -111,6 +112,6 @@
     "lint": "npx eslint src",
     "lint-fix": "npx eslint src --fix",
     "pub": "electron-builder ./ --publish onTagOrDraft",
-    "ci": "yarn run compile && yarn pub -mwl"
+    "ci": "yarn run compile && yarn pub --ml"
   }
 }
