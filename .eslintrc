@@ -34,6 +34,7 @@
     "radix": "off",
     "function-paren-newline": "off",
     "no-console": "off",
-    "linebreak-style": "off"
+    "linebreak-style": "off",
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
   }
 }
