@@ -100,7 +100,7 @@
   },
   "devDependencies": {
     "electron": "^4.0.1",
-    "electron-builder": "^20.38.5",
+    "electron-builder": "22.4.1",
     "webpack-cli": "3.2.1"
   },
   "scripts": {
