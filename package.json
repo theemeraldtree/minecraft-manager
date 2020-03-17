@@ -1,6 +1,6 @@
 {
   "name": "minecraft-manager",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "license": "GPL-3.0",
   "main": "main.js",
   "author": "theemeraldtree",
@@ -20,22 +20,30 @@
         "description": "Minecraft Java Profile for OMAF"
       }
     ],
+    "publish": {
+      "provider": "github",
+      "repo": "minecraft-manager",
+      "owner": "theemeraldtree"
+    },
     "win": {
-      "publish": {
-        "provider": "generic",
-        "url": "https://theemeraldtree.net/updates/win"
-      }
+      "target": "nsis",
+      "artifactName": "Install Minecraft Manager.${ext}"
     },
     "mac": {
-      "publish": {
-        "provider": "generic",
-        "url": "https://theemeraldtree.net/updates/mac"
-      }
+      "target": "dmg",
+      "artifactName": "Install Minecraft Manager.${ext}"
+    },
+    "linux": {
+      "target": "AppImage",
+      "artifactName": "Install Minecraft Manager.${ext}"
     },
     "nsis": {
       "license": "LICENSE",
       "perMachine": "true",
       "oneClick": "false"
+    },
+    "dmg": {
+      "title": "Install Minecraft Manager"
     }
   },
   "dependencies": {

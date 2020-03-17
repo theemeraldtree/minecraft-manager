@@ -1,0 +1,21 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: macos-latest # only macOS can build all 3 platforms at once
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 10
+      - name: Install Dependencies
+        run: yarn
+      - name: Build and add to release draft
+        run: yarn pub -mwl
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
