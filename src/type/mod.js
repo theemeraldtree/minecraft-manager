@@ -69,6 +69,10 @@ export default function Mod(rawoamf) {
     };
   };
 
+  this.getMainFile = function() {
+    return this.getJARFile();
+  };
+
   // ugh.. hosts...
   this.getPrimaryHost = function() {
     if (this.hosts.curse) {

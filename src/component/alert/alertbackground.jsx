@@ -45,6 +45,12 @@ const AlertBackground = styled.div`
   }
 
   animation: ${INTRO} 125ms ease-out;
+
+  div.buttons {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+  }
 `;
 
 export default AlertBackground;

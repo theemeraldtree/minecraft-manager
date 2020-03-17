@@ -116,7 +116,9 @@ const AssetCard = ({
   installed,
   installClick,
   deleteClick,
-  showBlurb
+  showBlurb,
+  copyToClick,
+  moveToClick
 }) => (
   <>
     <ContextMenuTrigger holdToDisplay={-1} id={`assetcard${asset.id}`}>
@@ -195,6 +197,26 @@ const AssetCard = ({
             Delete
           </MenuItem>
         )}
+        {installed && (
+          <MenuItem
+            onClick={e => {
+              e.stopPropagation();
+              copyToClick(asset.id);
+            }}
+          >
+            Copy to...
+          </MenuItem>
+        )}
+        {installed && (
+          <MenuItem
+            onClick={e => {
+              e.stopPropagation();
+              moveToClick(asset.id);
+            }}
+          >
+            Move to...
+          </MenuItem>
+        )}
         {showInstall && !installed && !progressState.progress && <MenuItem onClick={installClick}>Install</MenuItem>}
         {asset.hosts && asset.hosts.curse && (
           <>
@@ -237,7 +259,9 @@ AssetCard.propTypes = {
   installed: PropTypes.bool,
   installClick: PropTypes.func,
   deleteClick: PropTypes.func,
-  showBlurb: PropTypes.bool
+  showBlurb: PropTypes.bool,
+  copyToClick: PropTypes.func,
+  moveToClick: PropTypes.func
 };
 
 export default AssetCard;

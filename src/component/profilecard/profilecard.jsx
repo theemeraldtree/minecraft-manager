@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { withRouter } from 'react-router-dom';
-import { ContextMenu, MenuItem, ContextMenuTrigger } from 'react-contextmenu';
+import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from 'react-contextmenu';
 import { shell } from 'electron';
 import Global from '../../util/global';
 import edit from './img/edit.png';
@@ -172,7 +172,18 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate }) 
       {!profile.error && profile.state !== 'installing' && (
         <>
           <MenuItem onClick={() => profile.launch()}>Launch</MenuItem>
-          <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>Edit</MenuItem>
+          <SubMenu title="Edit" hoverDelay={0} onClick={() => history.push(`/edit/general/${profile.id}`)}>
+            <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>General</MenuItem>
+            {!profile.isDefaultProfile && (
+              <>
+                <MenuItem onClick={() => history.push(`/edit/versions/${profile.id}`)}>Versions</MenuItem>
+                <MenuItem onClick={() => history.push(`/edit/mods/${profile.id}`)}>Mods</MenuItem>
+              </>
+            )}
+            <MenuItem onClick={() => history.push(`/edit/worlds/${profile.id}`)}>Worlds</MenuItem>
+            <MenuItem onClick={() => history.push(`/edit/resourcepacks/${profile.id}`)}>Resource Packs</MenuItem>
+            <MenuItem onClick={() => history.push(`/edit/advanced/${profile.id}`)}>Advanced</MenuItem>
+          </SubMenu>
 
           {!profile.isDefaultProfile && (
             <>

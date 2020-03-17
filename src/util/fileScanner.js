@@ -63,6 +63,7 @@ const FileScanner = {
             blurb: description,
             description: `Imported from ${file}`,
             hosts: {},
+            type: 'resourcepack',
             files: [
               {
                 displayName: 'Main File',
@@ -116,6 +117,7 @@ const FileScanner = {
               blurb: description,
               description: `Imported from ${file}`,
               hosts: {},
+              type: 'resourcepack',
               files: [
                 {
                   displayName: 'Main Folder',
@@ -203,6 +205,7 @@ const FileScanner = {
             icon,
             description: `${description}<br /><br />Credits:<br />${credits}<br /><br />Imported from ${file}`,
             hosts: {},
+            type: 'mod',
             files: [
               {
                 displayName: 'Main JAR File',
@@ -267,6 +270,7 @@ const FileScanner = {
             description: name,
             hosts: {},
             datapacks: [],
+            type: 'world',
             files: [
               {
                 displayName: 'World Folder',
@@ -313,6 +317,7 @@ const FileScanner = {
           icon: '',
           description: file,
           hosts: {},
+          type: 'datapack',
           files: [
             {
               displayName: 'Main Datapack File',

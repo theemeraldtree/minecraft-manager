@@ -24,6 +24,15 @@ const ToastManager = {
       error
     });
     this.updateHandler();
+  },
+  noticeToast(text) {
+    this.toasts.push({
+      id: `notice-${text}-${new Date().getTime()}-${Math.random()
+        .toString(36)
+        .substring(6)}`,
+      text
+    });
+    this.updateHandler();
   }
 };
 

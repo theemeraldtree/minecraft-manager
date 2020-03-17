@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -17,6 +18,8 @@ import ToastManager from '../../../manager/toastManager';
 import Hosts from '../../../host/Hosts';
 import GenericAsset from '../../../type/genericAsset';
 import World from '../../../type/world';
+import CopyToOverlay from './copyToOverlay';
+import MoveToOverlay from './moveToOverlay';
 
 const { dialog } = require('electron').remote;
 
@@ -83,6 +86,9 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
   const [displayState, setDisplayState] = useState('assetsList');
   const [listState, setListState] = useState('browseAssets');
   const [activeAsset, setActiveAsset] = useState({});
+  const [showCopyToOverlay, setShowCopyToOverlay] = useState(false);
+  const [showMoveToOverlay, setShowMoveToOverlay] = useState(false);
+  const [actionAsset, setActionAsset] = useState({});
 
   let po;
   let selobj = profile;
@@ -314,9 +320,36 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
     });
   };
 
+  const copyToClick = assetid => {
+    setShowCopyToOverlay(true);
+    setActionAsset(profile.getSubAssetFromID(assetType, assetid));
+  };
+
+  const moveToClick = assetid => {
+    setShowMoveToOverlay(true);
+    setActionAsset(profile.getSubAssetFromID(assetType, assetid));
+  };
+
   return (
     <>
       <Wrapper>
+        <CopyToOverlay
+          profile={profile}
+          asset={actionAsset}
+          show={showCopyToOverlay}
+          assetType={assetType}
+          cancelClick={() => setShowCopyToOverlay(false)}
+        />
+        <MoveToOverlay
+          profile={profile}
+          asset={actionAsset}
+          show={showMoveToOverlay}
+          assetType={assetType}
+          cancelClick={() => {
+            setShowMoveToOverlay(false);
+            forceUpdate();
+          }}
+        />
         <Container>
           <SearchContainer>
             <AnimateButton in={displayState !== 'assetsList'} timeout={150} unmountOnExit onClick={goBack} color="red">
@@ -354,6 +387,9 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
                           showDelete
                           onClick={showInfoClick}
                           deleteClick={deleteClick}
+                          installed
+                          copyToClick={copyToClick}
+                          moveToClick={moveToClick}
                         />
                       );
                     }

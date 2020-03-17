@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import ToastObject from './toastobject';
 import ToastManager from '../../manager/toastManager';
+import NoticeToastObject from './noticeToastObject';
 
 const Container = styled.div`
   position: absolute;
@@ -60,19 +61,24 @@ export default class Toast extends PureComponent {
 
   renderToasts() {
     const { existingToasts, dismissingToasts } = this.state;
-    const exist = existingToasts.map(toast => toast.id);
-    const list = ToastManager.toasts.map(toast => (
-      <ToastObject
-        key={`${toast.id}`}
-        disableAnimation={exist.includes(toast.id)}
-        slideOut={dismissingToasts.includes(toast.id)}
-        dismiss={this.dismiss}
-        id={toast.id}
-        title={toast.title}
-        body={toast.body}
-        error={toast.error}
-      />
-    ));
+    const exist = existingToasts.filter(toast => toast.id.indexOf('notice-') === -1).map(toast => toast.id);
+    const list = ToastManager.toasts.map(toast => {
+      if (toast.id.indexOf('notice-') === -1) {
+        return (
+          <ToastObject
+            key={`${toast.id}`}
+            disableAnimation={exist.includes(toast.id)}
+            slideOut={dismissingToasts.includes(toast.id)}
+            dismiss={this.dismiss}
+            id={toast.id}
+            title={toast.title}
+            body={toast.body}
+            error={toast.error}
+          />
+        );
+      }
+      return <NoticeToastObject key={toast.id} text={toast.text} />;
+    });
 
     this.setState({
       list,

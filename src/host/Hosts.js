@@ -203,6 +203,8 @@ const Hosts = {
       if (!latestForMCVer) {
         return 'no-version-available';
       }
+
+      ver = latestForMCVer;
     } else if (!latestForMCVer) {
       ver = await this.getLatestVersionForMCVersion(
         host,
