@@ -16,6 +16,10 @@ Changelogs for development versions are located in their corresponding branch.
 - Adjusted spacing between Profiles
 - Fix clicking away from dropdowns
 
+### Fixes
+
+- Fixed Notice Toasts staying on the screen for a long time
+
 ## 2.3.4
 
 #### Released 2020-03-17

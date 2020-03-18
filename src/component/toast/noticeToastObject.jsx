@@ -59,7 +59,7 @@ export default function NoticeToastObject({ id, text }) {
     setTimeout(() => {
       ToastManager.dissmisToast(id);
     }, 300);
-  }, 100000000);
+  }, 1000);
 
   return (
     <BG slideOut={slideOut}>

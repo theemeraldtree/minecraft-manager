@@ -20,6 +20,7 @@ import GenericAsset from '../../../type/genericAsset';
 import World from '../../../type/world';
 import CopyToOverlay from './copyToOverlay';
 import MoveToOverlay from './moveToOverlay';
+import CustomDropdown from '../../../component/customdropdown/customdropdown';
 
 const { dialog } = require('electron').remote;
 
@@ -34,14 +35,14 @@ const Container = styled.div`
   padding: 10px;
   display: flex;
   flex-flow: column;
-  height: calc(100vh - 110px);
+  height: calc(100% - 20px);
 `;
 
 const List = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
-  margin-top: 10px;
   padding: 10px;
+  padding-top: 0;
   &::-webkit-scrollbar-track {
     background: none;
   }
@@ -76,6 +77,15 @@ const AnimateButton = transition(Button)`
     }
 `;
 
+const FilterHeader = styled.div`
+  margin: 10px;
+  margin-bottom: 0;
+
+  & > div {
+    width: 130px;
+  }
+`;
+
 export default function SubAssetEditor({ id, assetType, dpWorld }) {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const [profile] = useState(ProfilesManager.getProfileFromID(id));
@@ -88,6 +98,7 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
   const [showCopyToOverlay, setShowCopyToOverlay] = useState(false);
   const [showMoveToOverlay, setShowMoveToOverlay] = useState(false);
   const [actionAsset, setActionAsset] = useState({});
+  const [sortValue, setSortValue] = useState('a-z');
 
   let po;
   let selobj = profile;
@@ -329,6 +340,21 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
     setActionAsset(profile.getSubAssetFromID(assetType, assetid));
   };
 
+  const sortValueChange = value => {
+    setSortValue(value);
+  };
+
+  const sortOptions = [
+    {
+      id: 'a-z',
+      name: 'Name (A-Z)'
+    },
+    {
+      id: 'z-a',
+      name: 'Name (Z-A)'
+    }
+  ];
+
   return (
     <>
       <Wrapper>
@@ -374,28 +400,39 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
           </SearchContainer>
           {displayState === 'assetsList' && (
             <>
+              <FilterHeader>
+                <CustomDropdown items={sortOptions} value={sortValue} onChange={sortValueChange} />
+              </FilterHeader>
               <List>
-                {selobj[po].map(asset => {
-                  if (displayState === 'assetsList') {
-                    if (asset.name.toLowerCase().includes(liveSearchTerm.toLowerCase())) {
-                      return (
-                        <AssetCard
-                          progressState={progressState}
-                          key={asset.id}
-                          asset={asset}
-                          showDelete
-                          onClick={showInfoClick}
-                          deleteClick={deleteClick}
-                          installed
-                          copyToClick={copyToClick}
-                          moveToClick={moveToClick}
-                        />
-                      );
+                {selobj[po]
+                  .sort((a, b) => {
+                    if (sortValue === 'a-z') {
+                      return a.name.localeCompare(b.name);
+                    } else {
+                      return b.name.localeCompare(a.name);
                     }
-                  }
+                  })
+                  .map(asset => {
+                    if (displayState === 'assetsList') {
+                      if (asset.name.toLowerCase().includes(liveSearchTerm.toLowerCase())) {
+                        return (
+                          <AssetCard
+                            progressState={progressState}
+                            key={asset.id}
+                            asset={asset}
+                            showDelete
+                            onClick={showInfoClick}
+                            deleteClick={deleteClick}
+                            installed
+                            copyToClick={copyToClick}
+                            moveToClick={moveToClick}
+                          />
+                        );
+                      }
+                    }
 
-                  return <></>;
-                })}
+                    return <></>;
+                  })}
                 {selobj[po].length === 0 && (
                   <>
                     <h1 style={{ textAlign: 'center' }}>There's nothing here!</h1>
