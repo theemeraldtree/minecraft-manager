@@ -58,6 +58,10 @@ const SortDropdown = styled(CustomDropdown)`
   margin-bottom: 5px;
 `;
 
+const MCVerSel = styled(MCVersionSelector)`
+  width: 168px;
+`;
+
 export default class DiscoverList extends Component {
   constructor(props) {
     super(props);
@@ -304,7 +308,7 @@ export default class DiscoverList extends Component {
           <>
             <Header>
               <SortDropdown onChange={this.sortValueChange} items={sortOptions} value={sortValue} />
-              <MCVersionSelector showAll onChange={this.mcVerValueChange} value={mcVerValue} />
+              <MCVerSel showAll onChange={this.mcVerValueChange} value={mcVerValue} />
             </Header>
             <List ref={this.listRef}>
               {assets &&

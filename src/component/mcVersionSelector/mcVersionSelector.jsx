@@ -9,28 +9,29 @@ import InputContainer from '../../page/editprofile/components/inputcontainer';
 import Checkbox from '../checkbox/checkbox';
 
 const Container = styled.div`
-  padding-top: 5px;
   padding-bottom: 5px;
-  width: 300px;
-  height: 27px;
-  display: flex;
-  align-items: center;
-  flex-flow: column;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  transition: height 150ms;
+  height: 27px;
+  max-height: max-content;
   flex-shrink: 0;
   background: #404040;
+  transition: 150ms;
 
   & > div:nth-child(1) {
     display: flex;
     flex-shrink: 0;
+    justify-content: center;
+    width: 100%;
   }
 
   input[type='text'] {
-    width: 242px;
     background: #6e6e6e;
     height: 25px;
     font-size: 13pt;
+    width: 100%;
+    max-width: 242px;
   }
 
   button {
@@ -41,7 +42,7 @@ const Container = styled.div`
   ${props =>
     props.open &&
     css`
-      height: 103px;
+      height: 300px;
     `}
 `;
 
@@ -56,9 +57,11 @@ const OptionsButton = styled.button`
 `;
 
 const Options = styled.div`
-  width: 241px;
+  width: 100%;
+  max-width: 241px;
   cursor: default;
   margin-top: 10px;
+  padding-left: 5px;
 
   p {
     margin: 0;
@@ -70,15 +73,16 @@ const Options = styled.div`
 
   & > div {
     display: flex;
-    margin-top: 3px;
+    flex-wrap: wrap;
 
     & > div {
       width: 120px;
+      margin-top: 3px;
     }
   }
 `;
 
-export default function MCVersionSelector({ showAll, disabled, onChange, value }) {
+export default function MCVersionSelector({ showAll, disabled, onChange, value, className }) {
   const [showOptions, setShowOptions] = useState(false);
 
   const inputRef = useRef(null);
@@ -172,6 +176,7 @@ export default function MCVersionSelector({ showAll, disabled, onChange, value }
       disabled={disabled}
       onChange={onChange}
       value={value}
+      className={className}
       onOpen={onOpen}
       onOpenComplete={onOpenComplete}
     >
@@ -192,8 +197,6 @@ export default function MCVersionSelector({ showAll, disabled, onChange, value }
               <Checkbox onClick={() => toggleOption('preReleases')} checked={visibilityOptions.preReleases} />
               <p>Pre-Releases</p>
             </InputContainer>
-          </div>
-          <div>
             <InputContainer>
               <Checkbox onClick={() => toggleOption('snapshots')} checked={visibilityOptions.snapshots} />
               <p>Snapshots</p>
@@ -213,5 +216,6 @@ MCVersionSelector.propTypes = {
   showAll: PropTypes.bool,
   onChange: PropTypes.func,
   value: PropTypes.string,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  className: PropTypes.string
 };

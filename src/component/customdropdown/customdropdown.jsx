@@ -72,7 +72,7 @@ const Items = transition.div`
   & > .list {
     width: 100%;
     background-color: #4f4f4f;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     &::-webkit-scrollbar-track {
       border: 0;
