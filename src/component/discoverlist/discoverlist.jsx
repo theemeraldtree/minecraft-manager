@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import AssetCard from '../assetcard/assetcard';
 import AssetInfo from '../assetinfo/assetinfo';
 import Hosts from '../../host/Hosts';
+import CustomDropdown from '../customdropdown/customdropdown';
+import MCVersionSelector from '../mcVersionSelector/mcVersionSelector';
 
 const LoadingText = styled.div`
   font-size: 23pt;
@@ -21,6 +23,7 @@ const List = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
   padding: 10px;
+  padding-top: 0;
   &::-webkit-scrollbar-track {
     background: transparent;
   }
@@ -39,6 +42,22 @@ const Persists = styled.p`
   color: white;
 `;
 
+const Header = styled.div`
+  margin: 10px;
+  margin-bottom: 0;
+  flex-shrink: 0;
+
+  & > div {
+    display: inline-flex;
+  }
+`;
+
+const SortDropdown = styled(CustomDropdown)`
+  width: 130px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+`;
+
 export default class DiscoverList extends Component {
   constructor(props) {
     super(props);
@@ -48,7 +67,9 @@ export default class DiscoverList extends Component {
       assets: [],
       loading: true,
       cantConnect: false,
-      isSearching: false
+      isSearching: false,
+      sortValue: 'popular',
+      mcVerValue: 'All'
     };
   }
 
@@ -69,7 +90,7 @@ export default class DiscoverList extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.searchTerm !== this.props.searchTerm) {
-      this.renderSearch();
+      this.renderSearchChange();
     }
     if (prevProps.progressState !== this.props.progressState) {
       this.updateProgressStates();
@@ -79,7 +100,7 @@ export default class DiscoverList extends Component {
     }
   }
 
-  browseAssets = async () => {
+  browseAssets = async (options = { sort: 'popular', minecraftVersion: 'All' }) => {
     const { host, type } = this.props;
     this.setState({
       displayState: 'browseAssets',
@@ -87,7 +108,7 @@ export default class DiscoverList extends Component {
       cantConnect: false
     });
 
-    const assets = await Hosts.getTopAssets(host, type);
+    const assets = await Hosts.getTopAssets(host, type, options);
     if (assets) {
       this.setState({
         assets,
@@ -178,7 +199,7 @@ export default class DiscoverList extends Component {
     }
   };
 
-  renderSearch = async () => {
+  renderSearch = async (options = { sort: 'popular', minecraftVersion: 'all' }) => {
     const { displayState } = this.state;
     const { searchTerm, type, host } = this.props;
 
@@ -190,19 +211,58 @@ export default class DiscoverList extends Component {
     });
     if (displayState === 'browseAssets') {
       if (searchTerm.trim() !== '') {
-        const res = await Hosts.searchAssets(host, type, searchTerm);
+        const res = await Hosts.searchAssets(host, type, searchTerm, options);
         this.setState({
           assets: res,
           loading: false
         });
       } else {
-        this.browseAssets();
+        this.browseAssets(options);
       }
     }
   };
 
+  renderSearchChange = () => {
+    this.renderSearch({ sort: this.state.sortValue, minecraftVersion: this.state.mcVerValue });
+  };
+
+  sortValueChange = newValue => {
+    this.setState({
+      sortValue: newValue,
+      loading: true
+    });
+
+    if (this.state.displayState === 'browseAssets' && !this.state.isSearching) {
+      this.browseAssets({ sort: newValue, minecraftVersion: this.state.mcVerValue });
+    } else if (this.state.isSearching) {
+      this.renderSearch({ sort: newValue, minecraftVersion: this.state.mcVerValue });
+    }
+  };
+
+  mcVerValueChange = newValue => {
+    this.setState({
+      mcVerValue: newValue,
+      loading: true
+    });
+
+    if (this.state.displayState === 'browseAssets' && !this.state.isSearching) {
+      this.browseAssets({ sort: this.state.sortValue, minecraftVersion: newValue });
+    } else if (this.state.isSearching) {
+      this.renderSearch({ sort: this.state.sortValue, minecraftVersion: newValue });
+    }
+  };
+
   render() {
-    const { displayState, assets, loading, activeAsset, progressState, cantConnect } = this.state;
+    const {
+      displayState,
+      assets,
+      loading,
+      activeAsset,
+      progressState,
+      cantConnect,
+      sortValue,
+      mcVerValue
+    } = this.state;
     const {
       type,
       forceFramework,
@@ -214,10 +274,38 @@ export default class DiscoverList extends Component {
       forceVersionFilter,
       specificMCVer
     } = this.props;
+
+    const sortOptions = [
+      {
+        id: 'popular',
+        name: 'Popularity'
+      },
+      {
+        id: 'featured',
+        name: 'Featured'
+      },
+      {
+        id: 'downloads',
+        name: 'Downloads'
+      },
+      {
+        id: 'a-z',
+        name: 'Name (A-Z)'
+      },
+      {
+        id: 'author',
+        name: 'Author'
+      }
+    ];
+
     return (
       <>
         {displayState === 'browseAssets' && (
           <>
+            <Header>
+              <SortDropdown onChange={this.sortValueChange} items={sortOptions} value={sortValue} />
+              <MCVersionSelector showAll onChange={this.mcVerValueChange} value={mcVerValue} />
+            </Header>
             <List ref={this.listRef}>
               {assets &&
                 assets.length >= 1 &&

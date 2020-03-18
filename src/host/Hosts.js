@@ -49,10 +49,13 @@ const Hosts = {
   },
 
   /* functions for using hosts */
-  async getTopAssets(host, assetType) {
+  async getTopAssets(host, assetType, options = { sort: 'popular', minecraftVersion: 'All' }) {
     if (host === 'curse') {
-      if (!this.cache.popular.curse[assetType]) {
-        return Curse.getPopularAssets(assetType);
+      if (
+        !this.cache.popular.curse[assetType] ||
+        (this.cache.popular.curse && this.cache.popular.curse.options !== options)
+      ) {
+        return Curse.getPopularAssets(assetType, options);
       }
 
       return this.cache.popular.curse[assetType];
@@ -116,9 +119,9 @@ const Hosts = {
     return undefined;
   },
 
-  async searchAssets(host, assetType, searchTerm) {
+  async searchAssets(host, assetType, searchTerm, sort = 'popular', filter) {
     if (host === 'curse') {
-      return Curse.search(assetType, searchTerm);
+      return Curse.search(assetType, searchTerm, sort, filter);
     }
 
     return undefined;

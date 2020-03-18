@@ -34,14 +34,13 @@ const Container = styled.div`
   padding: 10px;
   display: flex;
   flex-flow: column;
-  height: 100%;
+  height: calc(100vh - 110px);
 `;
 
 const List = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
   margin-top: 10px;
-  margin-bottom: 20px;
   padding: 10px;
   &::-webkit-scrollbar-track {
     background: none;

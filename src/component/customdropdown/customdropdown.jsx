@@ -47,13 +47,12 @@ const Items = transition.div`
   position: absolute;
   height: auto;
   max-height: 300px;
-  width: 300px;
+  width: 100%;
   top: 40px;
   display: flex;
   flex-flow: column;
   z-index: 150;
   left: 0;
-  background: #404040;
   overflow: hidden;
   &:enter {
       height: 0;
@@ -305,12 +304,13 @@ export default class CustomDropdown extends Component {
 
   render() {
     const { dropdownOpen, currentName } = this.state;
-    const { children } = this.props;
+    const { children, className } = this.props;
     return (
       <CDropdown
         ref={this.wrapperRef}
         role="button"
         tabIndex="0"
+        className={className}
         onKeyDown={e => {
           if (e.keyCode === 13 || e.keyCode === 32) {
             this.openDropdown();
@@ -343,5 +343,6 @@ CustomDropdown.propTypes = {
   disabled: PropTypes.bool,
   children: PropTypes.node,
   onOpen: PropTypes.func,
-  onOpenComplete: PropTypes.func
+  onOpenComplete: PropTypes.func,
+  className: PropTypes.string
 };

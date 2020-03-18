@@ -196,18 +196,45 @@ const Curse = {
     return this.convertToOMAF(info);
   },
 
+  convertSortString(string) {
+    switch (string) {
+      case 'popular':
+        return 1;
+      case 'a-z':
+        return 3;
+      case 'updated':
+        return 2;
+      case 'featured':
+        return 0;
+      case 'author':
+        return 4;
+      case 'downloads':
+        return 5;
+      default:
+        return 1;
+    }
+  },
+
   // search for an asset
-  async search(type, term) {
-    LogManager.log('info', `[Curse] Searching ${type}s for ${term}`);
-    const result = await Hosts.HTTPGet(`${this.URL_BASE}/search`, {
+  async search(type, term, options = { sort: 'popular', minecraftVersion: 'All' }) {
+    const sort = this.convertSortString(options.sort);
+
+    const params = {
       searchFilter: term.split(' ').join('%20'),
       gameId: 432,
       sectionId: this.getCurseIDFromType(type),
       categoryId: 0,
-      sort: 1,
+      sort,
       pageSize: 20,
       index: 0
-    });
+    };
+
+    if (options.minecraftVersion !== 'All') {
+      params.gameVersion = options.minecraftVersion;
+    }
+
+    LogManager.log('info', `[Curse] Searching ${type}s for ${term}`);
+    const result = await Hosts.HTTPGet(`${this.URL_BASE}/search`, params);
 
     if (result) return this.readAssetList(result);
     return undefined;
@@ -230,10 +257,12 @@ const Curse = {
   },
 
   // gets the popular assets for a certain asset type (e.g. mod)
-  async getPopularAssets(type) {
-    const res = await this.search(type, '');
+  async getPopularAssets(type, options = { sort: 'popular', minecraftVersion: 'All' }) {
+    const res = await this.search(type, '', options);
     if (res) {
       Hosts.cache.popular.curse[type] = res;
+      Hosts.cache.popular.curse.options = options;
+
       return res;
     }
 

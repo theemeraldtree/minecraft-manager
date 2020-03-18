@@ -19,6 +19,7 @@ const Container = styled.div`
   overflow: hidden;
   transition: height 150ms;
   flex-shrink: 0;
+  background: #404040;
 
   & > div:nth-child(1) {
     display: flex;
