@@ -6,6 +6,10 @@ Changelogs for development versions are located in their corresponding branch.
 
 #### work branch
 
+### Features
+
+- Dropdowns for Minecraft Versions now include search and type selection
+
 ### Changed
 
 - Adjusted spacing between Profiles

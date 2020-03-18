@@ -28,6 +28,7 @@ const Global = {
   PROFILES_PATH: path.join(`${app.getPath('userData')}/profiles/`),
   MC_VERSIONS: [],
   ALL_VERSIONS: [],
+  VERSIONS_RAW: [],
   cacheUpdateTime: new Date().getTime(),
   cached: {
     versions: {}
@@ -180,6 +181,7 @@ const Global = {
   parseVersionsJSON(versionsJSON) {
     const { versions } = versionsJSON;
     this.ALL_VERSIONS = versions.map(ver => ver.id);
+    this.VERSIONS_RAW = versions;
     this.MC_VERSIONS = versions.map(ver => {
       if (ver.type === 'release') return ver.id;
 

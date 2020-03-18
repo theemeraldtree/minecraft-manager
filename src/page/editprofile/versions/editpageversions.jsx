@@ -7,7 +7,6 @@ import Detail from '../../../component/detail/detail';
 import OptionBreak from '../components/optionbreak';
 import Button from '../../../component/button/button';
 import CustomDropdown from '../../../component/customdropdown/customdropdown';
-import Global from '../../../util/global';
 import Overlay from '../../../component/overlay/overlay';
 import Hosts from '../../../host/Hosts';
 import AlertManager from '../../../manager/alertManager';
@@ -15,6 +14,7 @@ import ToastManager from '../../../manager/toastManager';
 import NavContext from '../../../navContext';
 import ForgeFramework from '../../../framework/forge/forgeFramework';
 import FabricFramework from '../../../framework/fabric/fabricFramework';
+import MCVersionSelector from '../../../component/mcVersionSelector/mcVersionSelector';
 
 const CustomVersions = styled.div`
   background-color: #2b2b2b;
@@ -240,12 +240,13 @@ export default function EditPageVersions({ id }) {
         {!profile.hosts.curse && (
           <>
             <Detail>minecraft version</Detail>
-            <CustomDropdown
-              onChange={mcverChange}
-              items={Global.MC_VERSIONS}
-              value={mcverValue}
-              disabled={forgeIsInstalling || fabricIsInstalling}
-            />
+            {mcverValue && (
+              <MCVersionSelector
+                onChange={mcverChange}
+                value={mcverValue}
+                disabled={forgeIsInstalling || fabricIsInstalling}
+              />
+            )}
             <OptionBreak />
           </>
         )}

@@ -9,11 +9,11 @@ import Detail from '../../component/detail/detail';
 import TextInput from '../../component/textinput/textinput';
 import ProfilesManager from '../../manager/profilesManager';
 import Overlay from '../../component/overlay/overlay';
-import CustomDropdown from '../../component/customdropdown/customdropdown';
 import Global from '../../util/global';
 import ImportOverlay from '../../component/importoverlay/importoverlay';
 import NavContext from '../../navContext';
 import AlertBackground from '../../component/alert/alertbackground';
+import MCVersionSelector from '../../component/mcVersionSelector/mcVersionSelector';
 
 const CreateBG = styled(AlertBackground)`
   max-width: 600px;
@@ -95,7 +95,7 @@ export default withRouter(({ history }) => {
           <Detail>profile name</Detail>
           <TextInput onChange={createNameChange} />
           <Detail>minecraft version</Detail>
-          <CustomDropdown onChange={ver => setMCCVersion(ver)} items={Global.MC_VERSIONS} />
+          <MCVersionSelector onChange={ver => setMCCVersion(ver)} />
 
           <Detail>looking to download a modpack? head to the discover section on the sidebar</Detail>
           <CreateControls>

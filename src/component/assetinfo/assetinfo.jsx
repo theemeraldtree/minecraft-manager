@@ -7,10 +7,10 @@ import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
 import VersionCard from '../versioncard/versioncard';
 import Detail from '../detail/detail';
 import Global from '../../util/global';
-import CustomDropdown from '../customdropdown/customdropdown';
 import Hosts from '../../host/Hosts';
 import ToastManager from '../../manager/toastManager';
 import SubAssetEditor from '../../page/editprofile/components/subAssetEditor';
+import MCVersionSelector from '../mcVersionSelector/mcVersionSelector';
 
 const LoadingText = styled.div`
   font-size: 23pt;
@@ -357,11 +357,7 @@ export default class AssetInfo extends Component {
             {!cantConnect && (
               <>
                 <Detail>minecraft version</Detail>
-                <CustomDropdown
-                  value={this.state.mcVerFilter}
-                  items={Global.getMCFilterOptions()}
-                  onChange={this.mcVerChange}
-                />
+                <MCVersionSelector showAll value={this.state.mcVerFilter} onChange={this.mcVerChange} />
                 {activeAsset.hosts.curse && (
                   <>
                     <List ref={this.versionsListRef}>{versions}</List>

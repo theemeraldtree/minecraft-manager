@@ -44,35 +44,47 @@ const CDropdown = styled.div`
 `;
 
 const Items = transition.div`
-    position: absolute;
-    height: auto;
-    max-height: 300px;
+  position: absolute;
+  height: auto;
+  max-height: 300px;
+  width: 300px;
+  top: 40px;
+  display: flex;
+  flex-flow: column;
+  z-index: 150;
+  left: 0;
+  background: #404040;
+  overflow: hidden;
+  &:enter {
+      height: 0;
+  }
+  &:enter-active {
+      height: 100vh;
+      transition: height 350ms;
+  }
+  &:exit {
+      height: 100vh;
+  }
+  &:exit-active {
+      height: 0;
+      transition: height 350ms;
+  }
+
+  & > .list {
+    width: 100%;
     background-color: #4f4f4f;
-    width: 300px;
     overflow-y: scroll;
-    top: 40px;
-    display: block;
-    z-index: 150;
-    left: 0;
-    &:enter {
-        height: 0;
-    }
-    &:enter-active {
-        height: 100vh;
-        transition: height 350ms;
-    }
-    &:exit {
-        height: 100vh;
-    }
-    &:exit-active {
-        height: 0;
-        transition: height 350ms;
-    }
+
     &::-webkit-scrollbar-track {
-        border: 0;
-        border-radius: 0;
-        background-color: #6e6e6e;
+      border: 0;
+      border-radius: 0;
+      background-color: #6e6e6e;
     }
+
+    p {
+      text-align: center;
+    }
+  }
 `;
 
 const Label = styled.p`
@@ -125,11 +137,12 @@ export default class CustomDropdown extends Component {
   constructor(props) {
     super(props);
     this.itemsRef = React.createRef();
+    this.itemsListRef = React.createRef();
     this.wrapperRef = React.createRef();
+    this.activeItemRef = React.createRef();
     this.state = {
       currentValue: '',
-      items: [],
-      scrollPos: 0
+      items: []
     };
   }
 
@@ -157,10 +170,6 @@ export default class CustomDropdown extends Component {
     const { value } = e.currentTarget.dataset;
     const { indexes } = this.state;
     const { onChange } = this.props;
-    let scrollPos;
-    if (this.itemsRef) {
-      scrollPos = this.itemsRef.current.scrollTop;
-    }
 
     const oldValue = this.state.currentValue;
     const oldName = indexes[oldValue];
@@ -177,7 +186,6 @@ export default class CustomDropdown extends Component {
       {
         currentValue: value,
         currentName: indexes[value],
-        scrollPos,
         dropdownOpen: false
       },
       () => {
@@ -188,13 +196,20 @@ export default class CustomDropdown extends Component {
 
   openDropdown = () => {
     if (!this.props.disabled) {
+      if (!this.state.dropdownOpen && this.props.onOpen) {
+        this.props.onOpen();
+      }
       this.setState(
         prevState => ({
           dropdownOpen: !prevState.dropdownOpen
         }),
         () => {
-          if (this.itemsRef) {
-            this.itemsRef.current.scrollTop = this.state.scrollPos;
+          if (this.itemsListRef && this.activeItemRef.current) {
+            this.itemsListRef.current.scrollTop = this.activeItemRef.current.offsetTop - 137;
+          }
+
+          if (this.state.dropdownOpen && this.props.onOpenComplete) {
+            this.props.onOpenComplete();
           }
         }
       );
@@ -208,8 +223,10 @@ export default class CustomDropdown extends Component {
   };
 
   handleClick = e => {
-    if (!this.wrapperRef.current.contains(e.target)) {
-      this.clickAway();
+    if (this.wrapperRef.current && this.itemsRef.current) {
+      if (!this.wrapperRef.current.contains(e.target) && !this.itemsRef.current.contains(e.target)) {
+        this.clickAway();
+      }
     }
   };
 
@@ -252,26 +269,28 @@ export default class CustomDropdown extends Component {
         name = item;
       }
       indexes[id] = name;
+      if (currentValue === id) {
+        return (
+          <Item onClick={this.selectItem} active ref={this.activeItemRef} key={id} data-value={id}>
+            {name}
+          </Item>
+        );
+      }
+
       return (
-        <Item onClick={this.selectItem} active={currentValue === id} key={id} data-value={id}>
+        <Item onClick={this.selectItem} key={id} data-value={id}>
           {name}
         </Item>
       );
     });
 
-    if (this.props.value) {
-      if (indexes[currentValue]) {
-        currentName = indexes[currentValue];
-      } else {
-        currentName = indexes[Object.keys(indexes)[0]];
-      }
+    if (this.props.value && indexes[currentValue]) {
+      currentName = indexes[currentValue];
     }
 
     if (initial && !this.props.value) {
       this.setState({
         items: finalArr,
-        currentValue: finalArr[0].props['data-value'],
-        currentName: indexes[finalArr[0].props['data-value']],
         indexes
       });
     } else {
@@ -286,6 +305,7 @@ export default class CustomDropdown extends Component {
 
   render() {
     const { dropdownOpen, currentName } = this.state;
+    const { children } = this.props;
     return (
       <CDropdown
         ref={this.wrapperRef}
@@ -304,7 +324,11 @@ export default class CustomDropdown extends Component {
         <Arrow flip={dropdownOpen} src={arrow} />
         {!this.props.disabled && (
           <Items timeout={350} in={dropdownOpen} unmountOnExit ref={this.itemsRef}>
-            {this.state.items}
+            {children}
+            <div ref={this.itemsListRef} className="list">
+              {this.state.items.length >= 1 && this.state.items}
+              {this.state.items.length === 0 && <p>There's nothing here!</p>}
+            </div>
           </Items>
         )}
       </CDropdown>
@@ -316,5 +340,8 @@ CustomDropdown.propTypes = {
   onChange: PropTypes.func,
   items: PropTypes.array,
   value: PropTypes.any,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
+  children: PropTypes.node,
+  onOpen: PropTypes.func,
+  onOpenComplete: PropTypes.func
 };
