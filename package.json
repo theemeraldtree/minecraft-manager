@@ -80,6 +80,7 @@
     "prismarine-nbt": "^1.2.1",
     "prop-types": "^15.7.2",
     "qs": "^6.9.1",
+    "raw-loader": "^4.0.0",
     "react": "^16.10.0",
     "react-contextmenu": "^2.11.0",
     "react-dom": "^16.10.0",
@@ -110,6 +111,7 @@
     "lint": "npx eslint src",
     "lint-fix": "npx eslint src --fix",
     "pub": "electron-builder ./ --publish onTagOrDraft",
-    "ci": "yarn run compile && yarn pub"
+    "ci": "yarn run compile && yarn pub",
+    "license-disclaimer": "yarn licenses generate-disclaimer > src/assets/licenseDisclaimer.txt"
   }
 }

@@ -36,6 +36,10 @@ module.exports = {
         loader: 'file-loader'
       },
       {
+        test: /\.txt$/i,
+        loader: 'raw-loader'
+      },
+      {
         test: /\.(ttf|woff|woff2)$/,
         loader: 'file-loader',
         options: {

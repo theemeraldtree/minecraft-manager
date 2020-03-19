@@ -40,6 +40,10 @@ const AlertBackground = styled.div`
     white-space: pre;
   }
 
+  textarea.wrap {
+    white-space: normal;
+  }
+
   textarea:focus {
     outline: none;
   }

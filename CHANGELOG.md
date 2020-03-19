@@ -12,6 +12,7 @@ Changelogs for development versions are located in their corresponding branch.
 - Sort and Filter when adding assets from CurseForge
 - Improve modloader installation
   - Allow installing of custom versions
+- Add Full License Disclaimer to About Page
 
 ### Changed
 

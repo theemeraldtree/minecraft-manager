@@ -7,6 +7,8 @@ import Section from '../components/section';
 import NeedHelp from '../components/needhelp';
 import Global from '../../../util/global';
 import theemeraldtreelogo from '../img/theemeraldtree-logo.png';
+import AlertManager from '../../../manager/alertManager';
+import licenseDisclaimer from '../../../assets/licenseDisclaimer.txt';
 
 const AboutTop = styled.div`
   display: flex;
@@ -178,6 +180,9 @@ export default function About() {
             <a href="https://github.com/isaacs/rimraf">rimraf</a>
           </li>
           <li>
+            <a href="https://github.com/axios/axios">axios</a>
+          </li>
+          <li>
             <a href="https://github.com/request/request-promise">request-promise</a>
           </li>
           <li>
@@ -201,12 +206,6 @@ export default function About() {
           <li>
             <a href="https://fonts.google.com/specimen/Roboto">the Roboto font</a>
           </li>
-          <li>
-            <a href="https://github.com/KyleAMathews/typefaces/tree/master/packages/roboto">typeface-roboto</a>
-          </li>
-          <li>
-            <a href="https://github.com/ooade/react-click-away-listener">react-click-away-listener</a>
-          </li>
           <li>other projects</li>
           and of course, YOU! Thank you!
         </h3>
@@ -219,6 +218,18 @@ export default function About() {
           CurseForge API Information thanks to <a href="https://github.com/dries007/CurseMeta">dries007's CurseMeta</a>{' '}
           and <a href="https://twitchappapi.docs.apiary.io/">Gaz492's TwitchAppAPI Docs</a>
         </h3>
+
+        <Button
+          onClick={() =>
+            AlertManager.messageBox(
+              'full license information',
+              `<textarea class="wrap">${licenseDisclaimer}</textarea>`
+            )
+          }
+          color="green"
+        >
+          view full license information
+        </Button>
       </Section>
       <Section>
         <h2>Other things to check out</h2>
