@@ -16,7 +16,8 @@ const HTTPRequest = {
           {
             url,
             headers: {
-              'User-Agent': 'Minecraft-Manager'
+              'X-Client': 'MinecraftManager',
+              'X-Source': 'github.com/theemeraldtree/minecraft-manager'
             },
             followAllRedirects: true
           },
@@ -57,7 +58,8 @@ const HTTPRequest = {
     return axios.get(url, {
       params: querystring,
       headers: {
-        'X-Client': 'MinecraftManagerClient'
+        'X-Client': 'MinecraftManager',
+        'X-Source': 'github.com/theemeraldtree/minecraft-manager'
       },
       timeout: 15000
     });
@@ -70,7 +72,8 @@ const HTTPRequest = {
       body: JSON.stringify(body),
       headers: {
         'content-type': 'application/json',
-        'User-Agent': 'MinecraftManagerClient'
+        'X-Client': 'MinecraftManager',
+        'X-Source': 'github.com/theemeraldtree/minecraft-manager'
       }
     });
   }

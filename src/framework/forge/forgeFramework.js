@@ -59,6 +59,13 @@ const ForgeFramework = {
           resolve(promotions);
         }
       );
+    }),
+  getForgeVersions: minecraftVersion =>
+    new Promise(async resolve => {
+      const metadata = await HTTPRequest.get(
+        'https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.json'
+      );
+      resolve(metadata.data[minecraftVersion]);
     })
 };
 

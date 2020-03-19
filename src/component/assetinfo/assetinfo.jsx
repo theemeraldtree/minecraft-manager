@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Button from '../button/button';
 import AssetCard from '../assetcard/assetcard';
 import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
 import VersionCard from '../versioncard/versioncard';
@@ -11,6 +10,7 @@ import Hosts from '../../host/Hosts';
 import ToastManager from '../../manager/toastManager';
 import SubAssetEditor from '../../page/editprofile/components/subAssetEditor';
 import MCVersionSelector from '../mcVersionSelector/mcVersionSelector';
+import HeaderButton from '../headerButton/headerButton';
 
 const LoadingText = styled.div`
   font-size: 23pt;
@@ -35,35 +35,6 @@ const Description = styled.div`
 const HeaderButtons = styled.div`
   margin-top: 5px;
   min-height: 46px;
-`;
-
-const HB = styled(Button)`
-  background-color: #404040;
-  border: 0;
-  &:hover {
-    filter: brightness(1);
-    background-color: #5b5b5b;
-    border-bottom: 2px solid #08b20b;
-  }
-  ${props =>
-    props.active &&
-    `
-        border-bottom: 4px solid #08b20b;
-        &:hover {
-            border-bottom: 4px solid #08b20b !important;
-        }
-    `}
-  ${props =>
-    !props.active &&
-    `
-        border-bottom: 0px solid #08b20b;
-    `}
-  transition: border-bottom 150ms;
-  margin-right: 3px;
-  &:focus-visible {
-    border-color: #08b20b;
-    outline: 2px solid yellow;
-  }
 `;
 
 const List = styled.div`
@@ -316,23 +287,35 @@ export default class AssetInfo extends Component {
           showBlurb
         />
         <HeaderButtons>
-          <HB active={displayState === 'description'} onClick={this.displayStateSwitch} data-state="description">
+          <HeaderButton
+            active={displayState === 'description'}
+            onClick={this.displayStateSwitch}
+            data-state="description"
+          >
             Description
-          </HB>
+          </HeaderButton>
           {activeAsset.hosts.curse && (
-            <HB active={displayState === 'versions'} onClick={this.displayStateSwitch} data-state="versions">
+            <HeaderButton active={displayState === 'versions'} onClick={this.displayStateSwitch} data-state="versions">
               Versions
-            </HB>
+            </HeaderButton>
           )}
           {activeAsset.hosts.curse && type === 'mod' && (
-            <HB active={displayState === 'dependencies'} onClick={this.displayStateSwitch} data-state="dependencies">
+            <HeaderButton
+              active={displayState === 'dependencies'}
+              onClick={this.displayStateSwitch}
+              data-state="dependencies"
+            >
               Dependencies
-            </HB>
+            </HeaderButton>
           )}
           {activeAsset.installed && type === 'world' && (
-            <HB active={displayState === 'datapacks'} onClick={this.displayStateSwitch} data-state="datapacks">
+            <HeaderButton
+              active={displayState === 'datapacks'}
+              onClick={this.displayStateSwitch}
+              data-state="datapacks"
+            >
               Datapacks
-            </HB>
+            </HeaderButton>
           )}
         </HeaderButtons>
         {displayState === 'description' && (

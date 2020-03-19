@@ -215,6 +215,10 @@ export default function About() {
           <a href="https://github.com/Stonebound/ForgeTheSane">Stonebound's fork</a>. Because of these open source
           projects, we have Forge 1.13+ support!
         </h3>
+        <h3>
+          CurseForge API Information thanks to <a href="https://github.com/dries007/CurseMeta">dries007's CurseMeta</a>{' '}
+          and <a href="https://twitchappapi.docs.apiary.io/">Gaz492's TwitchAppAPI Docs</a>
+        </h3>
       </Section>
       <Section>
         <h2>Other things to check out</h2>
@@ -234,6 +238,14 @@ export default function About() {
           <li>
             <a href="https://www.reddit.com/r/minecraft/">r/minecraft</a>
           </li>
+        </h3>
+      </Section>
+      <Section>
+        <h2>Other information</h2>
+        <h3>
+          Minecraft Manager, theemeraldtree, and stairman06 are in no way related to, endorsed by, or otherwise
+          affiliated with Minecraft Forge, Forge Development LLC, Fabric, CurseForge, Twitch, Amazon, Mojang, or
+          Microsoft Studios. All trademarks belong to their respective owners.
         </h3>
       </Section>
     </>

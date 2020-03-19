@@ -10,6 +10,8 @@ Changelogs for development versions are located in their corresponding branch.
 
 - Dropdowns for Minecraft Versions now include search and type selection
 - Sort and Filter when adding assets from CurseForge
+- Improve modloader installation
+  - Allow installing of custom versions
 
 ### Changed
 

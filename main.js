@@ -24,7 +24,8 @@ ipcMain.on('download-file', (event, downloadURL, dest, id) => {
   const req = request(downloadURL, {
     downloadURL,
     headers: {
-      'User-Agent': 'Minecraft-Manager'
+      'X-Client': 'MinecraftManager',
+      'X-Source': 'github.com/theemeraldtree/minecraft-manager'
     },
     followAllRedirects: true
   });

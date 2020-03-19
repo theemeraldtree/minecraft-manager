@@ -15,11 +15,21 @@ import NavContext from '../../../navContext';
 import ForgeFramework from '../../../framework/forge/forgeFramework';
 import FabricFramework from '../../../framework/fabric/fabricFramework';
 import MCVersionSelector from '../../../component/mcVersionSelector/mcVersionSelector';
+import FrameworkInstaller from './frameworkInstaller';
 
 const CustomVersions = styled.div`
   background-color: #2b2b2b;
   width: 350px;
   padding: 10px;
+  margin-bottom: 5px;
+
+  h3 {
+    margin: 0;
+  }
+
+  button {
+    margin-top: 5px;
+  }
 `;
 
 const BG = styled.div`
@@ -59,6 +69,9 @@ export default function EditPageVersions({ id }) {
 
   const [forgeIsInstalling, setForgeIsInstalling] = useState(false);
   const [forgeIsUninstalling, setForgeIsUninstalling] = useState(false);
+
+  const [showConfirmForge, setShowConfirmForge] = useState(false);
+  const [showConfirmFabric, setShowConfirmFabric] = useState(false);
 
   const reloadCurseVersionsList = async () => {
     if (profile.hosts) {
@@ -151,55 +164,70 @@ export default function EditPageVersions({ id }) {
     }
   };
 
-  const downloadFabric = () => {
+  const downloadFabric = async versionT => {
     setFabricIsInstalling(true);
-    FabricFramework.getFabricLoaderVersions(profile.version.minecraft.version)
-      .then(versions => {
-        const version = versions[0];
-        if (version) {
-          profile.setFrameworkVersion('fabric', version.loader.version);
-          FabricFramework.setupFabric(profile).then(() => {
-            setFabricIsInstalling(false);
-          });
+
+    let version = versionT;
+    if (versionT === 'latest') {
+      const versions = await FabricFramework.getFabricLoaderVersions(profile.version.minecraft.version);
+      if (versions) {
+        if (versions[0]) {
+          version = versions[0].loader.version;
         } else {
-          setFabricIsInstalling(false);
           AlertManager.messageBox(
             'no fabric version',
-            `there is no fabric version available for minercaft ${profile.version.minecraft.version}`
+            `There is no Fabric version available for Minecraft ${profile.version.minecraft.version}`
           );
-        }
-      })
-      .catch(() => {
-        setFabricIsInstalling(false);
-      });
-  };
-
-  const downloadForge = () => {
-    setForgeIsInstalling(true);
-    ForgeFramework.getForgePromotions().then(promos => {
-      if (promos) {
-        const obj = JSON.parse(promos);
-        const verObj = obj.promos[`${profile.version.minecraft.version}-latest`];
-        if (verObj) {
-          const version = `${profile.version.minecraft.version}-${verObj.version}`;
-          profile.setFrameworkVersion('forge', version);
-          ForgeFramework.setupForge(profile).then(() => {
-            setForgeIsInstalling(false);
-          });
-        } else {
-          setForgeIsInstalling(false);
-          AlertManager.messageBox(
-            'no forge version',
-            `there is no forge version available for minecraft ${profile.version.minecraft.version}`
-          );
+          setFabricIsInstalling(false);
+          return;
         }
       } else {
-        setForgeIsInstalling(false);
+        ToastManager.createToast(
+          'Error',
+          "We can't reach the Fabric servers. Check your internet connection, and try again."
+        );
+        setFabricIsInstalling(false);
+        return;
+      }
+    }
+
+    profile.setFrameworkVersion('fabric', version);
+    FabricFramework.setupFabric(profile).then(() => {
+      setFabricIsInstalling(false);
+    });
+  };
+
+  const downloadForge = async versionT => {
+    setForgeIsInstalling(true);
+
+    let version = versionT;
+    if (versionT === 'latest') {
+      const promos = JSON.parse(await ForgeFramework.getForgePromotions());
+      if (!promos) {
         ToastManager.createToast(
           'Error',
           "We can't reach the Forge servers. Check your internet connection, and try again."
         );
+        return;
       }
+
+      const latest = `${profile.version.minecraft.version}-${
+        promos.promos[`${profile.version.minecraft.version}-latest`].version
+      }`;
+      if (!latest) {
+        AlertManager.messageBox(
+          'no minecraft forge version',
+          `There is no Minecraft Forge version available for Minecraft ${profile.version.minecraft.version}`
+        );
+        return;
+      }
+
+      version = latest;
+    }
+
+    profile.setFrameworkVersion('forge', version);
+    ForgeFramework.setupForge(profile).then(() => {
+      setForgeIsInstalling(false);
     });
   };
 
@@ -229,6 +257,21 @@ export default function EditPageVersions({ id }) {
   if (profile) {
     return (
       <>
+        <FrameworkInstaller
+          cancelClick={() => setShowConfirmForge(false)}
+          profile={profile}
+          framework="forge"
+          installClick={downloadForge}
+          show={showConfirmForge}
+        />
+
+        <FrameworkInstaller
+          cancelClick={() => setShowConfirmFabric(false)}
+          profile={profile}
+          framework="fabric"
+          installClick={downloadFabric}
+          show={showConfirmFabric}
+        />
         {updateOverlay && (
           <Overlay force>
             <BG>
@@ -268,21 +311,24 @@ export default function EditPageVersions({ id }) {
         <Detail>modloaders</Detail>
         {!profile.frameworks.fabric && !fabricIsInstalling && (
           <CustomVersions>
-            <Detail>forge</Detail>
+            <h3>Minecraft Forge</h3>
+            <Detail>The most popular modloader. Currently used in just about every mod.</Detail>
             {!profile.frameworks.forge && !forgeIsInstalling && (
-              <Button onClick={downloadForge} color="green">
-                install forge
+              <Button onClick={() => setShowConfirmForge(true)} color="green">
+                install
               </Button>
             )}
             {forgeIsInstalling && (
-              <p>Forge is installing. To check progress, open the Downloads viewer in the sidebar</p>
+              <p>
+                Forge is installing. This may take a while. To check progress, open the Downloads viewer in the sidebar
+              </p>
             )}
             {forgeIsUninstalling && <p>Forge is being removed...</p>}
-            {profile.frameworks.forge && !forgeIsUninstalling && (
+            {profile.frameworks.forge && !forgeIsUninstalling && !forgeIsInstalling && (
               <>
                 <p>Version: {profile.frameworks.forge.version}</p>
                 <Button onClick={uninstallForge} color="red">
-                  uninstall forge
+                  uninstall
                 </Button>
               </>
             )}
@@ -290,21 +336,22 @@ export default function EditPageVersions({ id }) {
         )}
         {!profile.frameworks.forge && !forgeIsInstalling && (
           <CustomVersions>
-            <Detail>fabric</Detail>
+            <h3>Fabric</h3>
+            <Detail>The Next-Generation Modloader. Currently used in small, quality-of-life mods.</Detail>
             {!profile.frameworks.fabric && !fabricIsInstalling && (
-              <Button onClick={downloadFabric} color="green">
-                install fabric
+              <Button onClick={() => setShowConfirmFabric(true)} color="green">
+                install
               </Button>
             )}
             {fabricIsInstalling && (
               <p>Fabric is installing. To check progress, open the Downloads viewer in the sidebar</p>
             )}
             {fabricIsUninstalling && <p>Fabric is being removed...</p>}
-            {profile.frameworks.fabric && (
+            {profile.frameworks.fabric && !fabricIsUninstalling && !forgeIsInstalling && (
               <>
                 <p>Version: {profile.frameworks.fabric.version}</p>
                 <Button onClick={uninstallFabric} color="red">
-                  uninstall fabric
+                  uninstall
                 </Button>
               </>
             )}
