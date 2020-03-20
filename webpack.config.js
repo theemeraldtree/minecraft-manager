@@ -1,24 +1,26 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const PreloadWebpackPlugin = require('preload-webpack-plugin');
 const { spawn } = require('child_process');
 const process = require('process');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   context: `${__dirname}/src`,
   entry: ['babel-polyfill', './index.js'],
-  mode: 'none',
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx'],
+    alias: {
+      'react-dom': '@hot-loader/react-dom'
+    }
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: './index.html'
     }),
-    new PreloadWebpackPlugin()
+    new webpack.HotModuleReplacementPlugin()
   ],
-  devtool: 'source-map',
-  target: 'electron-main',
+  devtool: 'cheap-module-eval-source-map',
+  target: 'electron-renderer',
   module: {
     rules: [
       {
@@ -37,6 +39,7 @@ module.exports = {
       },
       {
         test: /\.txt$/i,
+        exclude: /node_modules/,
         loader: 'raw-loader'
       },
       {
@@ -53,7 +56,8 @@ module.exports = {
     __filename: false
   },
   devServer: {
-    contentBase: `${__dirname}/bundles`,
+    contentBase: './',
+    hot: true,
     before() {
       spawn('electron', ['.'], {
         shell: true,

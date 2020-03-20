@@ -51,6 +51,7 @@
     "@babel/plugin-proposal-class-properties": "^7.3.0",
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-react": "^7.0.0",
+    "@hot-loader/react-dom": "^16.13.0",
     "adm-zip": "^0.4.13",
     "archiver": "^3.0.0",
     "axios": "^0.19.2",
@@ -84,6 +85,7 @@
     "react": "^16.10.0",
     "react-contextmenu": "^2.11.0",
     "react-dom": "^16.10.0",
+    "react-hot-loader": "^4.12.20",
     "react-router-dom": "^5.1.2",
     "react-transition-group": "^4.3.0",
     "request": "^2.88.2",
@@ -91,6 +93,7 @@
     "rimraf": "^2.6.3",
     "sanitize-html": "^1.20.0",
     "semver": "^6.1.1",
+    "speed-measure-webpack-plugin": "^1.3.1",
     "style-loader": "^1.1.3",
     "styled-components": "^5.0.0-beta.9",
     "styled-transition-group": "^2.0.0",
@@ -104,7 +107,7 @@
     "webpack-cli": "3.2.1"
   },
   "scripts": {
-    "dev": "webpack-dev-server --hot --inline --port 9483",
+    "dev": "webpack-dev-server --mode development --inline --port 9483",
     "compile": "webpack",
     "build": "electron-builder ./",
     "package": "npm run compile && npm run build",

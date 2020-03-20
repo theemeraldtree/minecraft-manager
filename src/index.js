@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import 'react-hot-loader/patch';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import fs from 'fs';
@@ -111,6 +112,10 @@ async function load() {
 
   // eslint-disable-next-line react/jsx-filename-extension
   ReactDOM.render(<App />, document.getElementById('app'));
+}
+
+if (module.hot) {
+  module.hot.accept();
 }
 
 load();
