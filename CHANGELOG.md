@@ -13,6 +13,7 @@ Changelogs for development versions are located in their corresponding branch.
 - Improve modloader installation
   - Allow installing of custom versions
 - Add Full License Disclaimer to About Page
+- Show Downloads info in Asset Cards
 
 ### Changed
 

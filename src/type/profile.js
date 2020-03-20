@@ -190,7 +190,7 @@ export default class Profile extends OAMFAsset {
   save() {
     LogManager.log('info', `{${this.id}} saving...`);
     return new Promise(resolve => {
-      fs.writeFile(path.join(this.profilePath, 'profile.json'), this.toJSON(), () => {
+      fs.writeFile(path.join(this.profilePath, 'profile.json'), JSON.stringify(this.toJSON()), () => {
         if (this.mods) {
           const modOut = this.mods.map(modT => {
             let mod = modT;

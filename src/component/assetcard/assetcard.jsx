@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import { ContextMenu, ContextMenuTrigger, MenuItem, SubMenu } from 'react-contextmenu';
 import { shell, clipboard } from 'electron';
 import Button from '../button/button';
+import Global from '../../util/global';
+import downloadsIcon from '../navbar/downloads/downloads.png';
 
 const BG = styled.div`
   margin-top: 4px;
@@ -50,21 +52,20 @@ const Image = styled.div.attrs(props => ({
 const Title = styled.p`
   color: white;
   font-weight: bolder;
-  font-size: 18pt;
+  font-size: 14pt;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 5px 2px;
-  margin-bottom: 0;
+  margin: 0 2px;
+  margin-top: 4px;
   user-select: none;
   display: inline-block;
   white-space: nowrap;
 `;
 
 const Version = styled.p`
-  color: white;
   font-size: 11pt;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -106,6 +107,28 @@ const Details = styled.div`
   margin-left: 5px;
 `;
 
+const ExtraInfo = styled.div`
+  color: #dbdbdb;
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  text-align: right;
+  display: flex;
+  align-items: center;
+  border-radius: 3px;
+  p {
+    margin: 0;
+    font-size: 9pt;
+    margin-left: 2px;
+    display: inline-block;
+  }
+  img {
+    width: 15px;
+    height: 15px;
+    filter: brightness(0.85);
+  }
+`;
+
 const AssetCard = ({
   asset,
   onClick,
@@ -140,6 +163,12 @@ const AssetCard = ({
           <Image src={`${asset.iconPath.substring(0, 1) === '/' ? 'file:///' : ''}${asset.iconPath}`} />
         )}
         <Details>
+          {!installed && asset.hosts && asset.hosts.curse && (
+            <ExtraInfo>
+              <img alt="Downloads" src={downloadsIcon} />
+              <p>{Global.abbreviateNumber(asset.hosts.curse.downloadCount)}</p>
+            </ExtraInfo>
+          )}
           <Title>{asset.name}</Title>
           <Version buttonShown={showInstall || showDelete}>
             {!showBlurb && asset.version && asset.version.displayName}

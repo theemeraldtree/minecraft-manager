@@ -39,6 +39,29 @@ const Global = {
 
   OMAF_VERSION: '1.0.0',
 
+  /**
+   * Abbreivate the supplied number (e.g. 24K, 55M)
+   * @param {int} number - Number to abbreivate
+   */
+  abbreviateNumber(number) {
+    const range = [
+      {
+        divider: 1e6,
+        suffix: 'M'
+      },
+      {
+        divider: 1e3,
+        suffix: 'K'
+      }
+    ];
+
+    const greaterRange = range.find(r => number >= r.divider);
+    if (greaterRange) {
+      return `${(number / greaterRange.divider).toFixed()}${greaterRange.suffix}`;
+    }
+
+    return number.toLocaleString();
+  },
   dateMatches(d1) {
     const d2 = new Date();
     return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
