@@ -8,7 +8,7 @@ import AlertBackground from '../../../component/alert/alertbackground';
 import Button from '../../../component/button/button';
 import ProfileSelector from '../../../component/profileSelector/profileSelector';
 import Global from '../../../util/global';
-import FSUtil from '../../../util/fsutil';
+import FSU from '../../../util/fsu';
 import modVersionCheck from './modVersionCheck';
 import ToastManager from '../../../manager/toastManager';
 
@@ -16,7 +16,7 @@ export default function CopyToOverlay({ show, profile, asset, assetType, cancelC
   const onSelect = (newProfile, e) => {
     if ((assetType === 'mod' && modVersionCheck(profile, newProfile, asset)) || assetType !== 'mod') {
       if (!fs.lstatSync(path.join(profile.gameDir, asset.getMainFile().path)).isDirectory()) {
-        FSUtil.copyFileMakeDirSync(
+        FSU.copyFileMakeDirSync(
           path.join(profile.gameDir, asset.getMainFile().path),
           path.join(newProfile.gameDir, asset.getMainFile().path)
         );

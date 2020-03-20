@@ -1,64 +1,57 @@
-import path from 'path';
 import fs from 'fs';
-import Jimp from 'jimp';
-import { remote } from 'electron';
+import path from 'path';
 import rimraf from 'rimraf';
 import archiver from 'archiver';
-import LogManager from '../manager/logManager';
+import { remote } from 'electron';
+import Jimp from 'jimp';
+import OAMFAsset from './omafAsset';
 import Global from '../util/global';
+import FSU from '../util/fsu';
 import Mod from './mod';
+import GenericAsset from './genericAsset';
+import World from './world';
+import LogManager from '../manager/logManager';
 import LauncherManager from '../manager/launcherManager';
-import ProfilesManager from '../manager/profilesManager';
 import ToastManager from '../manager/toastManager';
 import ErrorManager from '../manager/errorManager';
-import Hosts from '../host/Hosts';
+import ProfilesManager from '../manager/profilesManager';
 import VersionsManager from '../manager/versionsManager';
 import LibrariesManager from '../manager/librariesManager';
-import GenericAsset from './genericAsset';
+import Hosts from '../host/Hosts';
 import SettingsManager from '../manager/settingsManager';
-import World from './world';
 
-export default function Profile(rawomaf) {
-  Object.assign(this, rawomaf);
+export default class Profile extends OAMFAsset {
+  /**
+   * Profile Class
+   * @param {Object} json - The JSON object this Profile is being created from
+   */
+  constructor(json) {
+    super(json);
 
-  // these are the "local values"
-  // they are NOT saved to disk
-  this.localValues = [
-    'profilePath',
-    'subAssetsPath',
-    'iconPath',
-    'installed',
-    'progressState',
-    'fpath',
-    'gameDir',
-    'safename',
-    'minecraftversion',
-    'modsPath',
-    'versionname',
-    'error',
-    'state',
-    'temp',
-    'iconURL'
-  ];
+    if (json.isDefaultProfile) this.isDefaultProfile = json.isDefaultProfile;
 
-  this.initLocalValues = function() {
-    LogManager.log('info', `{${this.id}} Initializing Local Values`);
+    this.error = false;
 
-    // all of these are used LOCALLY only
+    this.initLocalValues();
+    this.loadSubAssets();
+    this.checkMissingDirectories();
+  }
 
+  /**
+   * Initializes Local Values for this Profile
+   */
+  initLocalValues() {
     this.profilePath = path.join(Global.PROFILES_PATH, `/${this.id}`);
 
-    if (!this.gameDir) {
-      this.gameDir = path.join(this.profilePath, '/files');
-    }
+    if (!this.gameDir) this.gameDir = path.join(this.profilePath, '/files');
+
+    this.subAssetsPath = path.join(this.profilePath, '/_omaf/subAssets');
 
     this.safename = Global.createSafeName(this.name);
     this.versionname = `${this.safename} [Minecraft Manager]`;
 
-    if (this.version) {
-      if (this.version.minecraft) {
-        this.minecraftversion = this.version.minecraft.version;
-      }
+    if (this.version && this.version.minecraft) {
+      this.minecraftVersion = this.version.minecraft.version;
     }
 
     this.modsPath = path.join(this.gameDir, '/mods');
@@ -67,161 +60,123 @@ export default function Profile(rawomaf) {
       if (this.icon.substring(0, 4) === 'http' || this.isDefaultProfile) {
         this.iconPath = this.icon;
       } else {
-        // backslashes are replaced with forward slashes because they are being used as escape characters
+        // backslashes are replaced with forward slashes because they're being used as escape characters
         this.iconPath = path.join(this.profilePath, this.icon).replace(/\\/g, '/');
       }
     }
 
-    this.subAssetsPath = path.join(this.profilePath, '/_omaf/subAssets');
+    if (!this.mods) this.mods = [];
+    if (!this.resourcepacks) this.resourcepacks = [];
+    if (!this.worlds) this.worlds = [];
+    if (!this.hosts) this.hosts = {};
+    if (!this.frameworks) this.frameworks = {};
+    if (this.hosts && this.hosts.curse && !this.hosts.curse.fullyInstalled) this.error = true;
 
     this.progressState = {};
+  }
 
-    if (!this.mods) {
-      this.mods = [];
-    }
-
-    if (!this.resourcepacks) {
-      this.resourcepacks = [];
-    }
-
-    if (!this.worlds) {
-      this.worlds = [];
-    }
-
-    if (this.hosts) {
-      if (this.hosts.curse) {
-        if (!this.hosts.curse.fullyInstalled) {
-          this.error = true;
-        }
-      }
-    }
-  };
-
-  this.checkMissing = function() {
-    // check for missing values in the object
-
-    // if these do not exist (even if they aren't needed), make them anyway
-    if (!this.hosts) {
-      this.hosts = {};
-    }
-
-    if (!this.frameworks) {
-      this.frameworks = {};
-    }
-
+  /**
+   * Checks for missing directories, and if they're missing, creates them
+   */
+  checkMissingDirectories() {
     if (this.installed) {
-      if (!fs.existsSync(path.join(this.profilePath, '/_mcm/icons/resourcepacks'))) {
-        fs.mkdirSync(path.join(this.profilePath, '/_mcm/icons/resourcepacks'));
-      }
-      if (!fs.existsSync(path.join(this.profilePath, '/_mcm/icons/worlds'))) {
-        fs.mkdirSync(path.join(this.profilePath, '/_mcm/icons/worlds'));
-      }
+      FSU.createDirIfMissing(path.join(this.profilePath, '/_mcm/icons/resourcepacks'));
+      FSU.createDirIfMissing(path.join(this.profilePath, '/_mcm/icons/worlds'));
+      FSU.createDirIfMissing(path.join(this.profilePath, '/_mcm/icons/mods'));
     }
-  };
+  }
 
-  this.applyDefaults = function() {
-    const { currentSettings } = SettingsManager;
-    const options = `
-            autoJump:${currentSettings.defaultsAutoJump}\n
-            tutorialStep:${currentSettings.defaultsShowTutorial ? 'movement' : 'none'}\n
-            skipMultiplayerWarning:${!currentSettings.defaultsMultiplayerWarning}
-        `
-      .replace(/ /g, '')
-      .replace(/(^[ \t]*\n)/gm, '');
+  /**
+   * Reads and imports the requested subasset
+   * @param {string} subAsset - The file name of the subasset (e.g. mods.json)
+   */
+  readSubAsset(subAsset) {
+    const subAssetPath = path.join(this.subAssetsPath, subAsset);
+    if (fs.existsSync(subAssetPath)) {
+      const json = FSU.readJSON(subAssetPath);
 
-    fs.writeFileSync(path.join(this.gameDir, 'options.txt'), options);
-  };
-
-  this.readSubAsset = function(subAsset) {
-    // read a sub asset (such as mods), and place it's info into us
-
-    LogManager.log('info', `{${this.id}} Reading sub-asset ${subAsset}`);
-    const json = JSON.parse(fs.readFileSync(path.join(this.subAssetsPath, subAsset)));
-
-    let index;
-    if (json.assetType === 'mod' || json.assetType === 'mods') {
-      index = 'mods';
-    } else if (json.assetType === 'resourcepack') {
-      index = 'resourcepacks';
-    } else if (json.assetType === 'world') {
-      index = 'worlds';
-    }
-
-    this[index] = json.assets.map(asset => {
-      let assetObj;
-      if (index === 'mods') {
-        assetObj = new Mod(asset);
-      } else if (index === 'resourcepacks') {
-        assetObj = new GenericAsset(asset);
-      } else if (index === 'worlds') {
-        assetObj = new World(asset);
+      let index;
+      const { assetType } = json;
+      if (assetType === 'mod' || assetType === 'mods') {
+        index = 'mods';
+      } else if (assetType === 'resourcepack') {
+        index = 'resourcepacks';
+      } else if (assetType === 'world') {
+        index = 'worlds';
       }
 
-      // make sure icon works
-      if (assetObj.icon) {
-        if (assetObj.icon.substring(0, 4) === 'http') {
-          assetObj.iconPath = assetObj.icon;
-        } else if (assetObj.icon.substring(0, 5) === 'game:') {
-          if (this.id === '0-default-profile-latest') {
-            assetObj.iconPath = path.join(Global.getMCPath(), assetObj.icon.substring(5)).replace(/\\/g, '/');
+      this[index] = json.assets.map(asset => {
+        let assetObj;
+        if (index === 'mods') {
+          assetObj = new Mod(asset);
+        } else if (index === 'resourcepacks') {
+          assetObj = new GenericAsset(asset);
+        } else if (index === 'worlds') {
+          assetObj = new World(asset);
+        }
+
+        // make sure the icon works
+        if (assetObj.icon) {
+          if (assetObj.icon.substring(0, 4) === 'http') {
+            assetObj.iconPath = assetObj.icon;
+          } else if (assetObj.icon.substring(0, 5) === 'game:') {
+            // when an icon starts with "game:", it means it's pulling the icon directly from the game directory
+
+            // Latest profile handles this differently
+            if (this.id === '0-default-profile-latest') {
+              assetObj.iconPath = path.join(Global.getMCPath(), assetObj.icon.substring(5)).replace(/\\/g, '/');
+            } else {
+              assetObj.iconPath = path.join(this.gameDir, assetObj.icon.substring(5)).replace(/\\/g, '/');
+            }
           } else {
-            assetObj.iconPath = path.join(this.gameDir, assetObj.icon.substring(5)).replace(/\\/g, '/');
-          }
-        } else {
-          assetObj.iconPath = path.join(this.profilePath, assetObj.icon).replace(/\\/g, '/');
+            assetObj.iconPath = path.join(this.profilePath, assetObj.icon).replace(/\\/g, '/');
 
-          if (!fs.existsSync(assetObj.iconPath)) {
-            if (assetObj.iconURL) {
-              assetObj.iconPath = assetObj.iconURL;
+            if (!fs.existsSync(assetObj.iconPath)) {
+              if (assetObj.iconURL) {
+                assetObj.iconPath = assetObj.iconURL;
+              }
             }
           }
+        } else {
+          assetObj.iconPath = '';
         }
-      } else {
-        assetObj.iconPath = '';
-      }
 
-      // set a progress state (for us) for each
-      this.progressState[asset.id] = {
-        progress: 'installed',
-        version: asset.version.displayName
-      };
+        // set a progress state (for this profile) for each
+        this.progressState[asset.id] = {
+          progress: 'installed',
+          version: asset.version.displayName
+        };
 
-      // set it installed
-      assetObj.installed = true;
+        assetObj.installed = true;
 
-      return assetObj;
-    });
-  };
-
-  this.loadSubAssets = function(force) {
-    // load sub assets (such as mods, resourcepacks)
-
-    if (!this.isDefaultProfile || force) {
-      const exists = fs.existsSync;
-
-      if (exists(path.join(this.subAssetsPath, 'mods.json'))) {
-        this.readSubAsset('mods.json');
-      }
-
-      if (exists(path.join(this.subAssetsPath, 'resourcepacks.json'))) {
-        this.readSubAsset('resourcepacks.json');
-      }
-
-      if (exists(path.join(this.subAssetsPath, 'worlds.json'))) {
-        this.readSubAsset('worlds.json');
-      }
+        return assetObj;
+      });
     }
-  };
+  }
 
-  this.initLocalValues();
-  this.checkMissing();
-  this.loadSubAssets();
+  /**
+   * Load the sub assets from this profile (e.g. mods, resourcepacks, etc)
+   * @param {boolean} force - Force loading sub assets, even if this is a default profile
+   */
+  loadSubAssets(force) {
+    if (!this.isDefaultProfile || force) {
+      this.readSubAsset('mods.json');
+      this.readSubAsset('resourcepacks.json');
+      this.readSubAsset('worlds.json');
+    }
+  }
 
-  // usable functions
+  // TODO: Write JSDoc info for these functions
 
-  this.hasFramework = () => this.frameworks.forge || this.frameworks.fabric;
-  this.openGameDir = () => remote.shell.openExternal(this.gameDir);
-  this.getPrimaryFramework = () => {
+  hasFramework() {
+    return this.frameworks.forge || this.frameworks.fabric;
+  }
+
+  openGameDir() {
+    return remote.shell.openExternal(this.gameDir);
+  }
+
+  getPrimaryFramework() {
     if (this.frameworks.forge) {
       return 'forge';
     }
@@ -230,50 +185,9 @@ export default function Profile(rawomaf) {
     }
 
     return 'none';
-  };
-  this.toJSON = function() {
-    const copy = { ...this };
+  }
 
-    Object.keys(copy).forEach(x => {
-      if (typeof copy[x] === 'function' || this.localValues.includes(x)) copy[x] = undefined;
-    });
-
-    copy.localValues = undefined;
-
-    if (this.hosts) {
-      if (this.hosts.curse) {
-        copy.hosts.curse.localValues = undefined;
-        copy.hosts.curse.versionCache = undefined;
-      }
-    }
-
-    if (this.version) {
-      if (this.version.cachedID) {
-        copy.version.cachedID = undefined;
-      }
-      if (this.version.TEMP) {
-        copy.version.TEMP = undefined;
-      }
-      if (this.version.supportedVersions) {
-        copy.version.supportedVersions = undefined;
-      }
-
-      if (this.version.hosts && this.version.hosts.curse) {
-        if (this.version.hosts.curse.localValues) {
-          copy.version.hosts.curse.localValues = undefined;
-        }
-      }
-    }
-
-    copy.omafVersion = Global.OMAF_VERSION;
-    copy.mods = undefined;
-    copy.resourcepacks = undefined;
-    copy.worlds = undefined;
-
-    return JSON.stringify(copy);
-  };
-
-  this.save = function() {
+  save() {
     LogManager.log('info', `{${this.id}} saving...`);
     return new Promise(resolve => {
       fs.writeFile(path.join(this.profilePath, 'profile.json'), this.toJSON(), () => {
@@ -335,9 +249,9 @@ export default function Profile(rawomaf) {
         resolve();
       });
     });
-  };
+  }
 
-  this.addIconToLauncher = function() {
+  addIconToLauncher() {
     Jimp.read(this.iconPath).then(jmp =>
       jmp.contain(128, 128).getBase64(Jimp.MIME_PNG, (err, res) => {
         if (!err) {
@@ -345,9 +259,9 @@ export default function Profile(rawomaf) {
         }
       })
     );
-  };
+  }
 
-  this.setIcon = function(img) {
+  setIcon(img) {
     if (fs.existsSync(this.iconPath)) {
       fs.unlinkSync(this.iconPath);
     }
@@ -358,13 +272,13 @@ export default function Profile(rawomaf) {
     this.iconPath = newPath.replace(/\\/g, '/');
     this.addIconToLauncher();
     this.save();
-  };
+  }
 
-  this.resetIcon = function() {
+  resetIcon() {
     this.setIcon(path.join(Global.getResourcesPath(), '/logo-sm.png'));
-  };
+  }
 
-  this.launch = function() {
+  launch() {
     if (!LauncherManager.profileExists(this)) {
       LauncherManager.createProfile(this);
     }
@@ -373,16 +287,16 @@ export default function Profile(rawomaf) {
     LauncherManager.updateVersion(this);
     LauncherManager.setMostRecentProfile(this);
     LauncherManager.openLauncher();
-  };
+  }
 
-  this.removeAllMods = function() {
+  removeAllMods() {
     this.mods = [];
     rimraf.sync(this.modsPath);
     fs.mkdirSync(this.modsPath);
     this.save();
-  };
+  }
 
-  this.changeMCVersion = function(newVer) {
+  changeMCVersion(newVer) {
     if (this.hasFramework()) {
       this.removeAllMods();
     }
@@ -392,11 +306,11 @@ export default function Profile(rawomaf) {
     }
 
     this.version.minecraft.version = newVer;
-    this.minecraftversion = newVer;
+    this.minecraftVersion = newVer;
     this.save();
-  };
+  }
 
-  this.export = function(output, exportFolders, exportProgress) {
+  export(output, exportFolders, exportProgress) {
     return new Promise((resolve, reject) => {
       try {
         const tempPath = path.join(Global.MCM_TEMP, `/profileexport-${this.id}/`);
@@ -458,25 +372,25 @@ export default function Profile(rawomaf) {
         reject();
       }
     });
-  };
+  }
 
   // ugh.. frameworks...
-  this.setFrameworkVersion = function(framework, newVer) {
+  setFrameworkVersion(framework, newVer) {
     if (!this.frameworks[framework]) {
       this.frameworks[framework] = {};
     }
 
     this.frameworks[framework].version = newVer;
     this.save();
-  };
+  }
 
-  this.removeFramework = function(framework) {
+  removeFramework(framework) {
     this.frameworks[framework] = undefined;
     this.save();
-  };
+  }
 
   // ugh.. subassets...
-  this.getSubAssetFromID = function(type, id) {
+  getSubAssetFromID(type, id) {
     if (type === 'mod') {
       if (!this.mods) {
         this.mods = [];
@@ -498,9 +412,9 @@ export default function Profile(rawomaf) {
     }
 
     return undefined;
-  };
+  }
 
-  this.addSubAsset = function(type, asset) {
+  addSubAsset(type, asset) {
     if (type === 'mod') {
       if (!this.mods) {
         this.mods = [];
@@ -526,9 +440,9 @@ export default function Profile(rawomaf) {
         this.save();
       }
     }
-  };
+  }
 
-  this.deleteSubAsset = function(type, assetT) {
+  deleteSubAsset(type, assetT) {
     return new Promise(resolve => {
       let asset = assetT;
       if (type === 'mod') {
@@ -619,10 +533,10 @@ export default function Profile(rawomaf) {
         }
       }
     });
-  };
+  }
 
   // ugh.. hosts...
-  this.changeHostVersion = function(host, versionToChangeTo, onUpdate) {
+  changeHostVersion(host, versionToChangeTo, onUpdate) {
     if (host === 'curse') {
       return new Promise(async (resolve, reject) => {
         onUpdate('Creating backup...');
@@ -659,10 +573,10 @@ export default function Profile(rawomaf) {
     }
 
     return undefined;
-  };
+  }
 
   // ugh.. renaming...
-  this.rename = function(newName) {
+  rename(newName) {
     return new Promise(resolve => {
       const newID = Global.createID(newName);
       const safeName = Global.createSafeName(newName);
@@ -691,5 +605,18 @@ export default function Profile(rawomaf) {
         resolve(this);
       });
     });
-  };
+  }
+
+  applyDefaults() {
+    const { currentSettings } = SettingsManager;
+    const options = `
+            autoJump:${currentSettings.defaultsAutoJump}\n
+            tutorialStep:${currentSettings.defaultsShowTutorial ? 'movement' : 'none'}\n
+            skipMultiplayerWarning:${!currentSettings.defaultsMultiplayerWarning}
+        `
+      .replace(/ /g, '')
+      .replace(/(^[ \t]*\n)/gm, '');
+
+    fs.writeFileSync(path.join(this.gameDir, 'options.txt'), options);
+  }
 }

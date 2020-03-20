@@ -6,7 +6,7 @@ import Overlay from '../../../component/overlay/overlay';
 import AlertBackground from '../../../component/alert/alertbackground';
 import Button from '../../../component/button/button';
 import ProfileSelector from '../../../component/profileSelector/profileSelector';
-import FSUtil from '../../../util/fsutil';
+import FSU from '../../../util/fsu';
 import ToastManager from '../../../manager/toastManager';
 import modVersionCheck from './modVersionCheck';
 
@@ -15,7 +15,7 @@ export default function MoveToOverlay({ show, profile, asset, assetType, cancelC
     if ((assetType === 'mod' && modVersionCheck(profile, newProfile, asset)) || assetType !== 'mod') {
       const newPath = path.join(newProfile.gameDir, asset.getMainFile().path);
       if (!fs.existsSync(newPath)) {
-        FSUtil.renameMakeDirSync(
+        FSU.renameMakeDirSync(
           path.join(profile.gameDir, asset.getMainFile().path),
           path.join(newProfile.gameDir, asset.getMainFile().path)
         );

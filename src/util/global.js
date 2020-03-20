@@ -449,9 +449,9 @@ const Global = {
           fs.mkdirSync(path.join(profile.profilePath, '/_omaf/subAssets'));
         }
 
-        if (profile.minecraftversion) {
+        if (profile.minecraftVersion) {
           profile.version.minecraft = {};
-          profile.version.minecraft.version = profile.minecraftversion;
+          profile.version.minecraft.version = profile.minecraftVersion;
         }
 
         for (const mod of profile.mods) {

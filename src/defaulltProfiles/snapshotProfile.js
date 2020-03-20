@@ -49,7 +49,7 @@ function loadSnapshotProfile() {
   }
 
   SnapshotProfile.version.minecraft.version = Global.ALL_VERSIONS[0];
-  SnapshotProfile.minecraftversion = Global.ALL_VERSIONS[0];
+  SnapshotProfile.minecraftVersion = Global.ALL_VERSIONS[0];
 
   SnapshotProfile.save();
 }

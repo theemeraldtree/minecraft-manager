@@ -66,7 +66,7 @@ Loaded Profiles: ${ProfilesManager.loadedProfiles
 	gameDir: ${profile.gameDir}
 	fpath: ${profile.fpath},
 	safename: ${profile.safename}
-	minecraftversion: ${profile.minecraftversion}
+	minecraftversion: ${profile.minecraftVersion}
 	modsPath: ${profile.modsPath}
 	versionname: ${profile.versionname}
 	iconPath: ${profile.iconPath}
