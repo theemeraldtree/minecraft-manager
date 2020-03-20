@@ -7,7 +7,7 @@ import Mod from '../../type/mod';
 import Hosts from '../Hosts';
 import LogManager from '../../manager/logManager';
 import DownloadsManager from '../../manager/downloadsManager';
-import GenericAsset from '../../type/genericAsset';
+import OMAFFileAsset from '../../type/omafFileAsset';
 import World from '../../type/world';
 
 const ADMZip = require('adm-zip');
@@ -20,6 +20,7 @@ const Curse = {
   convertToOMAF(asset) {
     const id = Global.createID(asset.name);
     const obj = {
+      omafVersion: Global.OMAF_VERSION,
       name: asset.name,
       id,
       blurb: asset.summary,
@@ -98,7 +99,7 @@ const Curse = {
       } else if (type === 'mod') {
         obj = new Mod(omaf);
       } else if (type === 'resourcepack') {
-        obj = new GenericAsset(omaf);
+        obj = new OMAFFileAsset(omaf);
       } else if (type === 'world') {
         obj = new World(omaf);
       }

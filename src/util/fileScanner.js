@@ -3,7 +3,7 @@ import fs from 'fs';
 import AdmZip from 'adm-zip';
 import rimraf from 'rimraf';
 import LogManager from '../manager/logManager';
-import GenericAsset from '../type/genericAsset';
+import OMAFFileAsset from '../type/omafFileAsset';
 import Global from './global';
 import Mod from '../type/mod';
 import World from '../type/world';
@@ -50,7 +50,7 @@ const FileScanner = {
         );
 
         profile.resourcepacks.push(
-          new GenericAsset({
+          new OMAFFileAsset({
             icon: iconPath,
             id: Global.createID(path.parse(file).name),
             name: path.parse(file).name,
@@ -104,7 +104,7 @@ const FileScanner = {
 
         if (containsMCMeta) {
           profile.resourcepacks.push(
-            new GenericAsset({
+            new OMAFFileAsset({
               icon: iconPath,
               id: Global.createID(path.parse(file).name),
               name: path.parse(file).name,
@@ -136,7 +136,7 @@ const FileScanner = {
   },
   scanMod: (profile, file) => {
     const fullPath = path.join(profile.gameDir, `/mods/${file}`);
-    const doesExist = profile.mods.find(mod => path.join(profile.gameDir, mod.getJARFile().path) === fullPath);
+    const doesExist = profile.mods.find(mod => path.join(profile.gameDir, mod.getMainFile().path) === fullPath);
     if (!doesExist) {
       LogManager.log(
         'info',
@@ -304,7 +304,7 @@ const FileScanner = {
       }
 
       world.datapacks.push(
-        new GenericAsset({
+        new OMAFFileAsset({
           id: Global.createID(file),
           name,
           version: {

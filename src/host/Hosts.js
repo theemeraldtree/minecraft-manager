@@ -7,7 +7,7 @@ import DownloadsManager from '../manager/downloadsManager';
 import Mod from '../type/mod';
 import Global from '../util/global';
 import ProfilesManager from '../manager/profilesManager';
-import GenericAsset from '../type/genericAsset';
+import OMAFFileAsset from '../type/omafFileAsset';
 import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
 import World from '../type/world';
@@ -318,7 +318,7 @@ const Hosts = {
           if (type === 'mod') {
             modObj = new Mod(mod);
           } else if (type === 'resourcepack') {
-            modObj = new GenericAsset(mod);
+            modObj = new OMAFFileAsset(mod);
           } else if (type === 'world') {
             modObj = new World(mod);
           }

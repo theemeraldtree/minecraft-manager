@@ -3,7 +3,20 @@ export default class OAMFAsset {
    * Base Minecraft Asset
    * @param {Object} json - The JSON object this asset is being created from
    */
-  constructor({ type, id, name, icon, blurb, description, omafVersion, version, hosts }) {
+  constructor({
+    type,
+    id,
+    name,
+    icon,
+    blurb,
+    description,
+    omafVersion,
+    version,
+    hosts = {},
+    cachedID,
+    dependencies,
+    files
+  }) {
     this.omafVersion = omafVersion;
     this.type = type;
     this.id = id;
@@ -13,6 +26,12 @@ export default class OAMFAsset {
     this.version = version;
     this.hosts = hosts;
     this.icon = icon;
+    this.cachedID = cachedID;
+
+    if (type !== 'profile') {
+      this.dependencies = dependencies;
+      this.files = files;
+    }
   }
 
   /**
@@ -20,7 +39,7 @@ export default class OAMFAsset {
    * @returns {Object} The OMAFAsset as a JSON Object
    */
   toJSON() {
-    const { omafVersion, type, id, name, blurb, description, version, hosts, icon } = this;
+    const { omafVersion, type, id, name, blurb, description, version, hosts, icon, dependencies, files } = this;
 
     return {
       omafVersion,
@@ -31,7 +50,20 @@ export default class OAMFAsset {
       hosts,
       icon,
       blurb,
-      description
+      description,
+      dependencies,
+      files
     };
+  }
+
+  /**
+   * Returns the "primary" host
+   * As of now the only host is Curse so it's not really needed
+   * @returns {string} The Primary Host
+   */
+  getPrimaryHost() {
+    if (this.hosts.curse) return 'curse';
+
+    return undefined;
   }
 }

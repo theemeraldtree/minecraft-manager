@@ -13,8 +13,8 @@ import ToastManager from './manager/toastManager';
 import ErrorManager from './manager/errorManager';
 import LibrariesManager from './manager/librariesManager';
 import './font/fonts.css';
-import { loadLatestProfile } from './defaulltProfiles/latestProfile';
-import { loadSnapshotProfile } from './defaulltProfiles/snapshotProfile';
+import { loadLatestProfile } from './defaultProfiles/latestProfile';
+import { loadSnapshotProfile } from './defaultProfiles/snapshotProfile';
 
 const { remote, shell, ipcRenderer } = require('electron');
 const { dialog } = require('electron').remote;

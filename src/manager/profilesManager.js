@@ -10,8 +10,8 @@ import Hosts from '../host/Hosts';
 import ErrorManager from './errorManager';
 import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
-import LatestProfile from '../defaulltProfiles/latestProfile';
-import SnapshotProfile from '../defaulltProfiles/snapshotProfile';
+import LatestProfile from '../defaultProfiles/latestProfile';
+import SnapshotProfile from '../defaultProfiles/snapshotProfile';
 import SettingsManager from './settingsManager';
 
 const path = require('path');

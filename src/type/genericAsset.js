@@ -1,4 +1,4 @@
-export default function GenericAsset(rawomaf) {
+export default function OMAFFileAsset(rawomaf) {
   Object.assign(this, rawomaf);
 
   this.localValues = ['installed', 'iconPath', 'iconURL'];
@@ -40,7 +40,7 @@ export default function GenericAsset(rawomaf) {
     };
   };
 
-  this.cleanObject = function() {
+  this.toJSON = function() {
     const copy = { ...this };
 
     Object.keys(copy).forEach(x => {

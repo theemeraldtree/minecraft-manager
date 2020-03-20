@@ -9,7 +9,7 @@ import LauncherManager from '../manager/launcherManager';
 import LibrariesManager from '../manager/librariesManager';
 import ErrorManager from '../manager/errorManager';
 import LogManager from '../manager/logManager';
-import GenericAsset from '../type/genericAsset';
+import OMAFFileAsset from '../type/omafFileAsset';
 import FileScanner from './fileScanner';
 import World from '../type/world';
 
@@ -328,7 +328,11 @@ const Global = {
         if (files) {
           if (files.length !== profile.resourcepacks.length) {
             files.forEach(file => {
-              FileScanner.scanResourcePack(profile, file);
+              try {
+                FileScanner.scanResourcePack(profile, file);
+              } catch (e) {
+                console.error(e);
+              }
             });
           }
         }
@@ -336,7 +340,7 @@ const Global = {
 
       profile.resourcepacks.forEach(rpT => {
         let rp = rpT;
-        if (!(rp instanceof GenericAsset)) rp = new GenericAsset(rp);
+        if (!(rp instanceof OMAFFileAsset)) rp = new OMAFFileAsset(rp);
 
         if (!fs.existsSync(path.join(profile.gameDir, rp.getMainFile().path))) {
           LogManager.log(
@@ -361,7 +365,7 @@ const Global = {
         let mod = modT;
         if (!(mod instanceof Mod)) mod = new Mod(mod);
 
-        if (!fs.existsSync(path.join(profile.gameDir, mod.getJARFile().path))) {
+        if (!fs.existsSync(path.join(profile.gameDir, mod.getMainFile().path))) {
           LogManager.log(
             'info',
             `[scan] {${profile.id}} Found mod ${mod.name} where the main file is missing. Removing it from the profile...`

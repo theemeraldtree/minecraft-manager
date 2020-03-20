@@ -16,7 +16,7 @@ import Global from '../../../util/global';
 import AssetInfo from '../../../component/assetinfo/assetinfo';
 import ToastManager from '../../../manager/toastManager';
 import Hosts from '../../../host/Hosts';
-import GenericAsset from '../../../type/genericAsset';
+import OMAFFileAsset from '../../../type/omafFileAsset';
 import World from '../../../type/world';
 import CopyToOverlay from './copyToOverlay';
 import MoveToOverlay from './moveToOverlay';
@@ -131,8 +131,8 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
         mod = new Mod(mod);
       }
     } else if (assetType === 'resourcepack' || assetType === 'datapack') {
-      if (!(mod instanceof GenericAsset)) {
-        mod = new GenericAsset(mod);
+      if (!(mod instanceof OMAFFileAsset)) {
+        mod = new OMAFFileAsset(mod);
       }
     } else if (assetType === 'world') {
       if (!(mod instanceof World)) {

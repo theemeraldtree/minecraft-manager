@@ -129,23 +129,8 @@ export default function About() {
         </AboutTop>
         <AboutBottom>
           <h3>
-            <a href="https://github.com/theemeraldtree/minecraft-manager/blob/master/LICENSE">
-              Minecraft Manager is licensed under the GNU General Public License v3
-            </a>
-          </h3>
-          <h3>
             <a title="Minecraft Manager Source Code" href="https://github.com/theemeraldtree/minecraft-manager">
-              Minecraft Manager is an open source project created by theemeraldtree and stairman06
-            </a>
-          </h3>
-          <h3>
-            <a title="theemeraldtree website" href="https://theemeraldtree.net">
-              Visit theemeraldtree's website for more cool stuff
-            </a>
-          </h3>
-          <h3>
-            <a title="OMAF Wiki and Documentation" href="https://github.com/theemeraldtree/omaf/wiki">
-              Minecraft Manager uses the open-source OMAF standard
+              Minecraft Manager is open source under GPLv3
             </a>
           </h3>
         </AboutBottom>
@@ -190,6 +175,9 @@ export default function About() {
           </li>
           <li>
             <a href="https://github.com/archiverjs/node-archiver">archiver</a>
+          </li>
+          <li>
+            <a href="https://github.com/PrismarineJS/prismarine-nbt">prismarine-nbt</a>
           </li>
           <li>
             <a href="https://github.com/vkbansal/react-contextmenu">react-contextmenu</a>

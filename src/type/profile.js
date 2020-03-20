@@ -8,7 +8,7 @@ import OAMFAsset from './omafAsset';
 import Global from '../util/global';
 import FSU from '../util/fsu';
 import Mod from './mod';
-import GenericAsset from './genericAsset';
+import OMAFFileAsset from './omafFileAsset';
 import World from './world';
 import LogManager from '../manager/logManager';
 import LauncherManager from '../manager/launcherManager';
@@ -110,7 +110,7 @@ export default class Profile extends OAMFAsset {
         if (index === 'mods') {
           assetObj = new Mod(asset);
         } else if (index === 'resourcepacks') {
-          assetObj = new GenericAsset(asset);
+          assetObj = new OMAFFileAsset(asset);
         } else if (index === 'worlds') {
           assetObj = new World(asset);
         }
@@ -197,7 +197,7 @@ export default class Profile extends OAMFAsset {
             if (!(mod instanceof Mod)) {
               mod = new Mod(mod);
             }
-            return mod.cleanObject();
+            return mod.toJSON();
           });
           fs.writeFileSync(
             path.join(this.profilePath, '/_omaf/subAssets/mods.json'),
@@ -212,10 +212,10 @@ export default class Profile extends OAMFAsset {
         if (this.resourcepacks) {
           const rpOut = this.resourcepacks.map(rpT => {
             let rp = rpT;
-            if (!(rp instanceof GenericAsset)) {
-              rp = new GenericAsset(rp);
+            if (!(rp instanceof OMAFFileAsset)) {
+              rp = new OMAFFileAsset(rp);
             }
-            return rp.cleanObject();
+            return rp.toJSON();
           });
 
           fs.writeFileSync(
@@ -234,7 +234,7 @@ export default class Profile extends OAMFAsset {
             if (!(world instanceof World)) {
               world = new World(world);
             }
-            return world.cleanObject();
+            return world.toJSON();
           });
 
           fs.writeFileSync(
@@ -326,7 +326,7 @@ export default class Profile extends OAMFAsset {
           let mod = modT;
           if (!(mod instanceof Mod)) mod = new Mod(mod);
 
-          if (mod.hosts && mod.hosts.curse) fs.unlinkSync(path.join(filesPath, mod.getJARFile().path));
+          if (mod.hosts && mod.hosts.curse) fs.unlinkSync(path.join(filesPath, mod.getMainFile().path));
 
           return mod;
         });
@@ -450,10 +450,10 @@ export default class Profile extends OAMFAsset {
         if (!(asset instanceof Mod)) {
           asset = new Mod(asset);
         }
-        if (asset && asset instanceof Mod && asset.getJARFile().path !== undefined) {
+        if (asset && asset instanceof Mod && asset.getMainFile().path !== undefined) {
           this.mods.splice(this.mods.indexOf(asset), 1);
           this.progressState[asset.id] = undefined;
-          fs.unlink(path.join(this.gameDir, `/${asset.getJARFile().path}`), () => {
+          fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), () => {
             if (asset.icon) {
               if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
                 fs.unlinkSync(path.join(this.profilePath, asset.icon));
@@ -467,10 +467,10 @@ export default class Profile extends OAMFAsset {
         }
       } else if (type === 'resourcepack') {
         asset = this.resourcepacks.find(a => a.id === asset.id);
-        if (!(asset instanceof GenericAsset)) {
-          asset = new GenericAsset(asset);
+        if (!(asset instanceof OMAFFileAsset)) {
+          asset = new OMAFFileAsset(asset);
         }
-        if (asset && asset instanceof GenericAsset && asset.getMainFile().path !== undefined) {
+        if (asset && asset instanceof OMAFFileAsset && asset.getMainFile().path !== undefined) {
           this.resourcepacks.splice(this.resourcepacks.indexOf(this.resourcepacks.find(a => a.id === asset.id)), 1);
           this.progressState[asset.id] = undefined;
           if (fs.existsSync(path.join(this.gameDir, `/${asset.getMainFile().path}`))) {
