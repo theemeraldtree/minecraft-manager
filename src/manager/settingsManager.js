@@ -34,6 +34,10 @@ const SettingsManager = {
           this.currentSettings.allowSnapshotProfile = false;
         }
 
+        if (!this.currentSettings.checkToastNews) {
+          this.currentSettings.checkToastNews = true;
+        }
+
         resolve();
       });
     });
@@ -85,7 +89,8 @@ const SettingsManager = {
       homeDirectory: '',
       dedicatedRam,
       mcExe: '',
-      lastToastNewsID: -1
+      lastToastNewsID: -1,
+      checkToastNews: true
     };
 
     fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(obj));

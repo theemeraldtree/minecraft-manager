@@ -14,6 +14,7 @@ Changelogs for development versions are located in their corresponding branch.
   - Allow installing of custom versions
 - Add Full License Disclaimer to About Page
 - Show Downloads info in Asset Cards
+- Disable News checks on start up
 
 ### Changed
 

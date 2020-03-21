@@ -103,6 +103,12 @@ export default function General() {
     forceUpdate();
   };
 
+  const checkToastNewsClick = () => {
+    SettingsManager.currentSettings.checkToastNews = !SettingsManager.currentSettings.checkToastNews;
+    SettingsManager.save();
+    forceUpdate();
+  };
+
   return (
     <>
       <Settings>
@@ -141,6 +147,10 @@ export default function General() {
             onClick={allowSnapshotProfileClick}
           />
           <Detail>show latest snapshot profile</Detail>
+        </InputContainer>
+        <InputContainer>
+          <Checkbox checked={SettingsManager.currentSettings.checkToastNews} lighter onClick={checkToastNewsClick} />
+          <Detail>check for news on startup</Detail>
         </InputContainer>
       </Settings>
     </>

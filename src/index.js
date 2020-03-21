@@ -67,7 +67,11 @@ async function load() {
       Global.checkMinecraftVersions();
       Global.checkMinecraftProfiles();
       Global.checkMinecraftLibraries();
-      Global.checkToastNews();
+
+      if (SettingsManager.currentSettings.checkToastNews) {
+        Global.checkToastNews();
+      }
+
       Global.checkChangelog();
       // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
       Global.checkMigration();
