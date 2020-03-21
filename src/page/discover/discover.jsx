@@ -83,7 +83,7 @@ export default function DiscoverPage() {
         value={searchValue}
         onChange={searchChange}
         onKeyPress={searchChange}
-        placeholder="search"
+        placeholder="search curseforge"
       />
     );
   }, [searchValue]);

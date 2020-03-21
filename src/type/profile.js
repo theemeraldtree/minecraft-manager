@@ -287,6 +287,12 @@ export default class Profile extends OAMFAsset {
     LauncherManager.updateVersion(this);
     LauncherManager.setMostRecentProfile(this);
     LauncherManager.openLauncher();
+
+    if (SettingsManager.currentSettings.closeOnLaunch) {
+      setTimeout(() => {
+        remote.getCurrentWindow().close();
+      }, 3000);
+    }
   }
 
   removeAllMods() {

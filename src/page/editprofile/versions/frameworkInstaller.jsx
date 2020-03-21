@@ -81,7 +81,7 @@ export default function FrameworkInstaller({ show, profile, framework, cancelCli
     if (allVersions.length === 0) {
       if (framework === 'forge') {
         const versions = await ForgeFramework.getForgeVersions(profile.version.minecraft.version);
-        const promos = JSON.parse(await ForgeFramework.getForgePromotions());
+        const promos = await ForgeFramework.getForgePromotions();
         if (versions) {
           setAllVersions(
             versions

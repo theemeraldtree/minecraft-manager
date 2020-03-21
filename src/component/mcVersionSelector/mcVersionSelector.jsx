@@ -82,7 +82,7 @@ const Options = styled.div`
   }
 `;
 
-export default function MCVersionSelector({ showAll, disabled, onChange, value, className }) {
+export default function MCVersionSelector({ showAll, disabled, onChange, value, className, dontAutoSelectFirst }) {
   const [showOptions, setShowOptions] = useState(false);
 
   const inputRef = useRef(null);
@@ -179,6 +179,7 @@ export default function MCVersionSelector({ showAll, disabled, onChange, value, 
       className={className}
       onOpen={onOpen}
       onOpenComplete={onOpenComplete}
+      dontAutoSelectFirst={dontAutoSelectFirst}
     >
       <Container open={showOptions}>
         <div>
@@ -217,5 +218,6 @@ MCVersionSelector.propTypes = {
   onChange: PropTypes.func,
   value: PropTypes.string,
   disabled: PropTypes.bool,
-  className: PropTypes.string
+  className: PropTypes.string,
+  dontAutoSelectFirst: PropTypes.bool
 };

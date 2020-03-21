@@ -38,6 +38,10 @@ const SettingsManager = {
           this.currentSettings.checkToastNews = true;
         }
 
+        if (!this.currentSettings.closeOnLaunch) {
+          this.currentSettings.closeOnLaunch = false;
+        }
+
         resolve();
       });
     });
@@ -90,7 +94,8 @@ const SettingsManager = {
       dedicatedRam,
       mcExe: '',
       lastToastNewsID: -1,
-      checkToastNews: true
+      checkToastNews: true,
+      closeOnLaunch: false
     };
 
     fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(obj));

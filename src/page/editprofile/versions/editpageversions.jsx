@@ -56,7 +56,6 @@ export default function EditPageVersions({ id }) {
   const { header } = useContext(NavContext);
 
   const [profile, setProfile] = useState(ProfilesManager.getProfileFromID(id));
-  const [newVersion, setNewVersion] = useState('');
   const [mcverValue, setMCVerValue] = useState('');
   const [curseVerValue, setCurseVerValue] = useState('');
   const [hostVersionValues, setHostVersionValues] = useState(undefined);
@@ -137,13 +136,13 @@ export default function EditPageVersions({ id }) {
     });
   };
 
-  const confirmVersionChange = () => {
-    profile.changeMCVersion(newVersion);
+  const confirmVersionChange = newVer => {
+    profile.changeMCVersion(newVer);
     profile.progressState = {};
     uninstallForge();
     uninstallFabric();
 
-    setMCVerValue(newVersion);
+    setMCVerValue(newVer);
   };
 
   const mcverChange = (version, cancel) => {
@@ -153,11 +152,10 @@ export default function EditPageVersions({ id }) {
       profile.changeMCVersion(version);
     } else {
       cancel();
-      setNewVersion(version);
       AlertManager.alert(
         'warning',
         'changing your minecraft version will remove forge/fabric and all your mods. are you sure you want to change?',
-        confirmVersionChange,
+        () => confirmVersionChange(version),
         'change',
         "don't change"
       );
@@ -202,7 +200,7 @@ export default function EditPageVersions({ id }) {
 
     let version = versionT;
     if (versionT === 'latest') {
-      const promos = JSON.parse(await ForgeFramework.getForgePromotions());
+      const promos = await ForgeFramework.getForgePromotions();
       if (!promos) {
         ToastManager.createToast(
           'Error',
@@ -211,18 +209,18 @@ export default function EditPageVersions({ id }) {
         return;
       }
 
-      const latest = `${profile.version.minecraft.version}-${
-        promos.promos[`${profile.version.minecraft.version}-latest`].version
-      }`;
-      if (!latest) {
+      const latestPromo = promos.promos[`${profile.version.minecraft.version}-latest`];
+
+      if (!latestPromo) {
         AlertManager.messageBox(
           'no minecraft forge version',
           `There is no Minecraft Forge version available for Minecraft ${profile.version.minecraft.version}`
         );
+        setForgeIsInstalling(false);
         return;
       }
 
-      version = latest;
+      version = latestPromo.version;
     }
 
     profile.setFrameworkVersion('forge', version);
@@ -288,6 +286,7 @@ export default function EditPageVersions({ id }) {
                 onChange={mcverChange}
                 value={mcverValue}
                 disabled={forgeIsInstalling || fabricIsInstalling}
+                dontAutoSelectFirst
               />
             )}
             <OptionBreak />

@@ -17,7 +17,9 @@ export default class OAMFAsset {
     dependencies,
     frameworks,
     files,
-    datapacks
+    datapacks,
+    iconURL,
+    iconPath
   }) {
     this.omafVersion = omafVersion;
     this.type = type;
@@ -40,6 +42,10 @@ export default class OAMFAsset {
     if (type === 'world') {
       this.datapacks = datapacks;
     }
+
+    // this solely exists out of laziness
+    this.iconURL = iconURL;
+    this.iconPath = iconPath;
   }
 
   /**

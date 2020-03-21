@@ -20,7 +20,7 @@ const BG = styled(AlertBackground)`
   color: white;
   display: flex;
   flex-flow: column;
-  min-height: 100px;
+  min-height: 160px;
 `;
 
 const Title = styled.p`

@@ -37,10 +37,11 @@ const CreateControls = styled.div`
   position: absolute;
   bottom: 10px;
   right: 10px;
-  div {
+  button {
     margin: 2px;
   }
 `;
+
 export default withRouter(({ history }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreate, setShowCreate] = useState(false);
@@ -95,7 +96,7 @@ export default withRouter(({ history }) => {
           <Detail>profile name</Detail>
           <TextInput onChange={createNameChange} />
           <Detail>minecraft version</Detail>
-          <MCVersionSelector onChange={ver => setMCCVersion(ver)} />
+          <MCVersionSelector value={mcVersion} onChange={ver => setMCCVersion(ver)} />
 
           <Detail>looking to download a modpack? head to the discover section on the sidebar</Detail>
           <CreateControls>

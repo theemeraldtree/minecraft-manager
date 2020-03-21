@@ -14,16 +14,18 @@ Changelogs for development versions are located in their corresponding branch.
   - Allow installing of custom versions
 - Add Full License Disclaimer to About Page
 - Show Downloads info in Asset Cards
-- Disable News checks on start up
+- The option to disable News checks on start up
+- MultiMC Importing (experimental)
 
 ### Changed
 
 - Adjusted spacing between Profiles
-- Fix clicking away from dropdowns
 
 ### Fixes
 
 - Fixed Notice Toasts staying on the screen for a long time
+- Fix clicking away from dropdowns
+- Fixed Minecraft Version selection bugs
 
 ## 2.3.4
 

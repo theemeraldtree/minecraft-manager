@@ -96,17 +96,23 @@ export default function General() {
     }
   };
 
-  const allowSnapshotProfileClick = () => {
-    SettingsManager.currentSettings.allowSnapshotProfile = !SettingsManager.currentSettings.allowSnapshotProfile;
+  const toggleSetting = setting => {
+    SettingsManager.currentSettings[setting] = !SettingsManager.currentSettings[setting];
     SettingsManager.save();
-    ProfilesManager.getProfiles();
     forceUpdate();
   };
 
+  const allowSnapshotProfileClick = () => {
+    toggleSetting('allowSnapshotProfile');
+    ProfilesManager.getProfiles();
+  };
+
   const checkToastNewsClick = () => {
-    SettingsManager.currentSettings.checkToastNews = !SettingsManager.currentSettings.checkToastNews;
-    SettingsManager.save();
-    forceUpdate();
+    toggleSetting('checkToastNews');
+  };
+
+  const closeOnLaunchClick = () => {
+    toggleSetting('closeOnLaunch');
   };
 
   return (
@@ -151,6 +157,10 @@ export default function General() {
         <InputContainer>
           <Checkbox checked={SettingsManager.currentSettings.checkToastNews} lighter onClick={checkToastNewsClick} />
           <Detail>check for news on startup</Detail>
+        </InputContainer>
+        <InputContainer>
+          <Checkbox checked={SettingsManager.currentSettings.closeOnLaunch} lighter onClick={closeOnLaunchClick} />
+          <Detail>close minecraft manager on profile launch</Detail>
         </InputContainer>
       </Settings>
     </>

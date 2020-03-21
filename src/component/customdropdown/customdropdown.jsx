@@ -249,9 +249,10 @@ export default class CustomDropdown extends Component {
       currentValue = this.props.value;
 
       if (typeof this.props.items[0] === 'string') {
-        if (!this.props.items.find(item => item === currentValue)) {
+        if (!this.props.items.find(item => item === currentValue) && !this.props.dontAutoSelectFirst) {
           currentValue = this.props.items[0];
-          this.props.onChange(currentValue);
+
+          this.props.onChange(currentValue, () => {});
         }
       }
     }
@@ -344,5 +345,6 @@ CustomDropdown.propTypes = {
   children: PropTypes.node,
   onOpen: PropTypes.func,
   onOpenComplete: PropTypes.func,
-  className: PropTypes.string
+  className: PropTypes.string,
+  dontAutoSelectFirst: PropTypes.bool
 };
