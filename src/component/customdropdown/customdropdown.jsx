@@ -51,7 +51,7 @@ const Items = transition.div`
   top: 40px;
   display: flex;
   flex-flow: column;
-  z-index: 150;
+  z-index: 4;
   left: 0;
   overflow: hidden;
   &:enter {

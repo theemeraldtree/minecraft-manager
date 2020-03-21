@@ -11,7 +11,6 @@ const BG = styled.div`
   height: 100%;
   background-color: #1c1c1c;
   flex: 0 1 auto;
-  z-index: 2;
 `;
 
 const CLink = styled(NavLink)`

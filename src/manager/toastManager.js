@@ -10,8 +10,11 @@ const ToastManager = {
       this.toastHandler();
     }
   },
-  dissmisToast(id) {
-    this.toasts.splice(this.toasts.find(toast => toast.id === id));
+  dismissToast(id) {
+    this.toasts.splice(
+      this.toasts.find(toast => toast.id === id),
+      1
+    );
     this.updateHandler();
   },
   createToast(title, body, error) {

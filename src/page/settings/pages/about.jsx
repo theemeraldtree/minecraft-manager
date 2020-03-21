@@ -121,12 +121,12 @@ export default function About() {
             <h3>released {Global.MCM_RELEASE_DATE}</h3>
 
             <Updates>
-              {os.platform() === 'darwin' && (
+              {os.platform() !== 'darwin' && (
                 <Button onClick={checkForUpdates} disabled={updateDisabled} color="green">
                   {updateText}
                 </Button>
               )}
-              {os.platform() !== 'darwin' && (
+              {os.platform() === 'darwin' && (
                 <h4>
                   Auto-update isn't supported on macOS
                   <br />

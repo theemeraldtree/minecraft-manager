@@ -16,6 +16,7 @@ const ForgeFramework = {
 
         ForgeComplex.setupForge(profile, resolve);
       } else {
+        profile.setFrameworkIsInstalling('forge');
         VersionsManager.createVersion(profile, 'forge');
 
         const libraryPath = LibrariesManager.createLibraryPath(profile);
@@ -38,6 +39,7 @@ const ForgeFramework = {
           downloadURL,
           path.join(forgePath, `mcm-${profile.id}-forge.jar`)
         ).then(() => {
+          profile.unsetFrameworkIsInstalling('forge');
           resolve();
         });
       }

@@ -69,7 +69,7 @@ export default class OAMFAsset {
       datapacks
     } = this;
 
-    return {
+    const returnObject = {
       omafVersion,
       type,
       id,
@@ -84,6 +84,24 @@ export default class OAMFAsset {
       frameworks,
       datapacks
     };
+
+    // Cleanup regarding local values on hosts
+    if (returnObject.hosts.curse) {
+      returnObject.hosts.curse.localValues = undefined;
+      returnObject.hosts.curse.versionCache = undefined;
+      returnObject.hosts.curse.latestFileID = undefined;
+    }
+
+    // Cleanup regarding local values on versions
+    if (returnObject.version) {
+      returnObject.version.TEMP = undefined;
+      returnObject.version.cachedID = undefined;
+      if (returnObject.version.hosts && returnObject.version.hosts.curse) {
+        returnObject.version.hosts.curse.localValues = undefined;
+      }
+    }
+
+    return returnObject;
   }
 
   /**

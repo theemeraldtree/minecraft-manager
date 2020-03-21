@@ -51,7 +51,7 @@ export default class Toast extends PureComponent {
     );
 
     window.setTimeout(() => {
-      ToastManager.dissmisToast(id);
+      ToastManager.dismissToast(id);
     }, 290);
   };
 

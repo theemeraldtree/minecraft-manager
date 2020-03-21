@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
+import path from 'path';
 import styled from 'styled-components';
+import { shell } from 'electron';
 import NeedHelp from '../components/needhelp';
 import Section from '../components/section';
 import Button from '../../../component/button/button';
@@ -8,6 +10,8 @@ import VersionsManager from '../../../manager/versionsManager';
 import LauncherManager from '../../../manager/launcherManager';
 import AlertManager from '../../../manager/alertManager';
 import Debug from '../../../util/debug';
+import ProfilesManager from '../../../manager/profilesManager';
+import Global from '../../../util/global';
 
 const List = styled.div`
   display: flex;
@@ -20,10 +24,8 @@ const List = styled.div`
 `;
 
 export default function Help() {
-  const [action, setAction] = useState('');
-
-  const confirmAction = () => {
-    switch (action) {
+  const confirmAction = act => {
+    switch (act) {
       case 'clean-launcher-profiles':
         LauncherManager.cleanMinecraftProfiles();
         break;
@@ -33,18 +35,30 @@ export default function Help() {
       case 'clean-launcher-versions':
         VersionsManager.cleanVersions();
         break;
+      case 'reload-profiles':
+        ProfilesManager.getProfiles();
+        break;
       default:
         break;
     }
   };
 
   const prepareAction = act => {
-    setAction(act);
     AlertManager.alert(
       'this can be dangerous!',
       'are you sure? this is a potentially dangerous operation that can screw up your game!',
-      confirmAction
+      () => confirmAction(act)
     );
+  };
+
+  const technicalAction = act => {
+    switch (act) {
+      case 'open-profiles-folder':
+        shell.openItem(path.join(Global.PROFILES_PATH));
+        break;
+      default:
+        break;
+    }
   };
 
   const dumpData = () => {
@@ -54,6 +68,14 @@ export default function Help() {
   return (
     <>
       <NeedHelp />
+      <Section>
+        <h2>Technical Troubleshooting</h2>
+        <List>
+          <Button onClick={() => technicalAction('open-profiles-folder')} color="green">
+            Open Profiles Folder
+          </Button>
+        </List>
+      </Section>
       <Section>
         <h2>Advanced Troubleshooting Functions</h2>
         <h3>
@@ -69,6 +91,9 @@ export default function Help() {
           </Button>
           <Button onClick={() => prepareAction('clean-launcher-versions')} color="red">
             clean launcher versions
+          </Button>
+          <Button onClick={() => prepareAction('reload-profiles')} color="red">
+            force reload profiles
           </Button>
         </List>
       </Section>

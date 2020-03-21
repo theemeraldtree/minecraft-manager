@@ -57,7 +57,7 @@ export default function NoticeToastObject({ id, text }) {
   setTimeout(() => {
     setSlideOut(true);
     setTimeout(() => {
-      ToastManager.dissmisToast(id);
+      ToastManager.dismissToast(id);
     }, 300);
   }, 1000);
 

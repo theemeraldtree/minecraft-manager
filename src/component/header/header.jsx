@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Link, withRouter } from 'react-router-dom';
 import transition from 'styled-transition-group';
 import NavContext from '../../navContext';
@@ -40,6 +40,7 @@ const BackButton = transition.button`
   & a {
       text-decoration: none;
       color: white;
+      pointer-events: all;
   }
   
   &:enter {
@@ -63,6 +64,12 @@ const BackButton = transition.button`
   &:focus-visible {
     outline: 2px solid yellow;
   }
+
+  ${props =>
+    props.isLink &&
+    css`
+      pointer-events: none;
+    `}
 `;
 
 const Items = transition.div`
@@ -106,7 +113,14 @@ const Header = ({ history }) => {
   };
   return (
     <BG>
-      <BackButton unmountOnExit in={showBackButton} tabIndex={`${backLink ? '-1' : '0'}`} timeout={150} onClick={click}>
+      <BackButton
+        isLink={backLink !== undefined}
+        unmountOnExit
+        in={showBackButton}
+        tabIndex={`${backLink ? '-1' : '0'}`}
+        timeout={150}
+        onClick={click}
+      >
         {!backLink && '←'}
         {backLink && <Link to={backLink}>←</Link>}
       </BackButton>

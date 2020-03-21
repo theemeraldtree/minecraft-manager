@@ -1,5 +1,3 @@
-/* eslint-disable */
-const req = require('request-promise');
 const { ipcRenderer } = require('electron');
 const axios = require('axios');
 

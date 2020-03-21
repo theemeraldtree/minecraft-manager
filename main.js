@@ -3,8 +3,10 @@ const { autoUpdater } = require('electron-updater');
 const url = require('url');
 const path = require('path');
 const fs = require('fs');
-const request = require('request-promise');
+const axios = require('axios');
 const os = require('os');
+
+console.log('Starting Minecraft Manager main Node process');
 
 // Security warning IS DISABLED because we're loading from localhost.
 // this is only disabled so it doesn't clog the console in dev mode
@@ -16,21 +18,22 @@ ipcMain.on('install-update', () => {
 
 const downloadProgresses = {};
 
-ipcMain.on('download-file', (event, downloadURL, dest, id) => {
+ipcMain.on('download-file', async (event, downloadURL, dest, id) => {
   downloadProgresses[id] = 0;
   let progressData = 0;
-  let contentLength = 0;
   const ws = fs.createWriteStream(dest);
-  const req = request(downloadURL, {
-    downloadURL,
+  console.log(`Downloading ${downloadURL}`);
+  const { data, headers } = await axios(downloadURL, {
+    responseType: 'stream',
     headers: {
       'X-Client': 'MinecraftManager'
-    },
-    followAllRedirects: true
+    }
   });
 
-  req.on('data', data => {
-    progressData += data.length;
+  const contentLength = headers['content-length'];
+
+  data.on('data', chunk => {
+    progressData += chunk.length;
 
     const prog = Math.trunc((progressData / contentLength) * 100);
     if (prog - downloadProgresses[id] >= 10) {
@@ -45,17 +48,14 @@ ipcMain.on('download-file', (event, downloadURL, dest, id) => {
       }
     }
   });
-  req.on('response', res => {
-    contentLength = res.headers['content-length'];
-    res.pipe(ws);
-    ws.on('finish', () =>
-      event.sender.send('file-download-finish', {
-        id
-      })
-    );
-  });
-  req.on('error', () => {
-    ws.end();
+
+  data.pipe(ws);
+
+  ws.on('finish', () => {
+    console.log(`Download finished ${downloadURL}`);
+    event.sender.send('file-download-finish', {
+      id
+    });
   });
 });
 
@@ -104,6 +104,7 @@ function createWindow() {
   // why show a frame on linux but hide it on everything else?
   // on linux CSD (client-side decoration) causes a ton of problems without a frame
   // so unfortunately it has to be disabled
+  console.log('Creating BrowserWindow...');
 
   mainWindow = new BrowserWindow({
     width: 800,

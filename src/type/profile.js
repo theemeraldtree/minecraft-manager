@@ -105,52 +105,54 @@ export default class Profile extends OAMFAsset {
         index = 'worlds';
       }
 
-      this[index] = json.assets.map(asset => {
-        let assetObj;
-        if (index === 'mods') {
-          assetObj = new Mod(asset);
-        } else if (index === 'resourcepacks') {
-          assetObj = new OMAFFileAsset(asset);
-        } else if (index === 'worlds') {
-          assetObj = new World(asset);
-        }
+      this[index] = json.assets
+        .filter(asset => asset !== undefined && asset !== null)
+        .map(asset => {
+          let assetObj;
+          if (index === 'mods') {
+            assetObj = new Mod(asset);
+          } else if (index === 'resourcepacks') {
+            assetObj = new OMAFFileAsset(asset);
+          } else if (index === 'worlds') {
+            assetObj = new World(asset);
+          }
 
-        // make sure the icon works
-        if (assetObj.icon) {
-          if (assetObj.icon.substring(0, 4) === 'http') {
-            assetObj.iconPath = assetObj.icon;
-          } else if (assetObj.icon.substring(0, 5) === 'game:') {
-            // when an icon starts with "game:", it means it's pulling the icon directly from the game directory
+          // make sure the icon works
+          if (assetObj.icon) {
+            if (assetObj.icon.substring(0, 4) === 'http') {
+              assetObj.iconPath = assetObj.icon;
+            } else if (assetObj.icon.substring(0, 5) === 'game:') {
+              // when an icon starts with "game:", it means it's pulling the icon directly from the game directory
 
-            // Latest profile handles this differently
-            if (this.id === '0-default-profile-latest') {
-              assetObj.iconPath = path.join(Global.getMCPath(), assetObj.icon.substring(5)).replace(/\\/g, '/');
+              // Latest profile handles this differently
+              if (this.id === '0-default-profile-latest') {
+                assetObj.iconPath = path.join(Global.getMCPath(), assetObj.icon.substring(5)).replace(/\\/g, '/');
+              } else {
+                assetObj.iconPath = path.join(this.gameDir, assetObj.icon.substring(5)).replace(/\\/g, '/');
+              }
             } else {
-              assetObj.iconPath = path.join(this.gameDir, assetObj.icon.substring(5)).replace(/\\/g, '/');
-            }
-          } else {
-            assetObj.iconPath = path.join(this.profilePath, assetObj.icon).replace(/\\/g, '/');
+              assetObj.iconPath = path.join(this.profilePath, assetObj.icon).replace(/\\/g, '/');
 
-            if (!fs.existsSync(assetObj.iconPath)) {
-              if (assetObj.iconURL) {
-                assetObj.iconPath = assetObj.iconURL;
+              if (!fs.existsSync(assetObj.iconPath)) {
+                if (assetObj.iconURL) {
+                  assetObj.iconPath = assetObj.iconURL;
+                }
               }
             }
+          } else {
+            assetObj.iconPath = '';
           }
-        } else {
-          assetObj.iconPath = '';
-        }
 
-        // set a progress state (for this profile) for each
-        this.progressState[asset.id] = {
-          progress: 'installed',
-          version: asset.version.displayName
-        };
+          // set a progress state (for this profile) for each
+          this.progressState[asset.id] = {
+            progress: 'installed',
+            version: asset.version.displayName
+          };
 
-        assetObj.installed = true;
+          assetObj.installed = true;
 
-        return assetObj;
-      });
+          return assetObj;
+        });
     }
   }
 
@@ -392,6 +394,17 @@ export default class Profile extends OAMFAsset {
 
   removeFramework(framework) {
     this.frameworks[framework] = undefined;
+    this.save();
+  }
+
+  setFrameworkIsInstalling(framework) {
+    this.frameworks[framework].isInstalling = true;
+    this.save();
+  }
+
+  unsetFrameworkIsInstalling(framework) {
+    this.frameworks[framework].isInstalling = false;
+    ProfilesManager.updateProfile(this);
     this.save();
   }
 

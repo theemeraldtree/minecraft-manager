@@ -72,6 +72,8 @@ export default function EditPageVersions({ id }) {
   const [showConfirmForge, setShowConfirmForge] = useState(false);
   const [showConfirmFabric, setShowConfirmFabric] = useState(false);
 
+  let isMounted = false;
+
   const reloadCurseVersionsList = async () => {
     if (profile.hosts) {
       if (profile.hosts.curse) {
@@ -191,7 +193,7 @@ export default function EditPageVersions({ id }) {
 
     profile.setFrameworkVersion('fabric', version);
     FabricFramework.setupFabric(profile).then(() => {
-      setFabricIsInstalling(false);
+      if (isMounted) setFabricIsInstalling(false);
     });
   };
 
@@ -220,12 +222,12 @@ export default function EditPageVersions({ id }) {
         return;
       }
 
-      version = latestPromo.version;
+      version = `${profile.version.minecraft.version}-${latestPromo.version}`;
     }
 
     profile.setFrameworkVersion('forge', version);
     ForgeFramework.setupForge(profile).then(() => {
-      setForgeIsInstalling(false);
+      if (isMounted) setForgeIsInstalling(false);
     });
   };
 
@@ -243,9 +245,22 @@ export default function EditPageVersions({ id }) {
     );
   };
 
+  const updateIsInstalling = () => {
+    setForgeIsInstalling(profile.frameworks.forge ? profile.frameworks.forge.isInstalling : false);
+    setFabricIsInstalling(profile.frameworks.fabric ? profile.frameworks.fabric.isInstalling : false);
+  };
+
   useEffect(() => {
     setMCVerValue(profile.version.minecraft.version);
     reloadCurseVersionsList();
+    updateIsInstalling();
+
+    ProfilesManager.registerReloadListener(updateIsInstalling);
+
+    return () => {
+      isMounted = false;
+      ProfilesManager.unregisterReloadListener(updateIsInstalling);
+    };
   }, []);
 
   useEffect(() => {

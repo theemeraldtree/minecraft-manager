@@ -217,6 +217,7 @@ const ProfilesManager = {
       try {
         rawOMAF = JSON.parse(fs.readFileSync(profilePath));
       } catch (e) {
+        console.error(e);
         ToastManager.createToast(
           'Warning',
           `The '${path.basename(location)}' profile has a corrupted/malformed JSON info file! That's no good!`,

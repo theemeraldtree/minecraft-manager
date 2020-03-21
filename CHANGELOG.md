@@ -20,12 +20,15 @@ Changelogs for development versions are located in their corresponding branch.
 ### Changed
 
 - Adjusted spacing between Profiles
+- "Framework is installing" persists between edit page changes
+- Downloads are now logged in the main process console
 
 ### Fixes
 
 - Fixed Notice Toasts staying on the screen for a long time
 - Fix clicking away from dropdowns
 - Fixed Minecraft Version selection bugs
+- Fix all Toasts dissappearing when one was dismissed
 
 ## 2.3.4
 
