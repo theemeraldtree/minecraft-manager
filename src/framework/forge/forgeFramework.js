@@ -53,11 +53,9 @@ const ForgeFramework = {
       });
     }),
   getForgePromotions: () =>
-    new Promise(resolve => {
-      HTTPRequest.httpGet('https://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions.json').then(
-        promotions => {
-          resolve(promotions);
-        }
+    new Promise(async resolve => {
+      resolve(
+        (await HTTPRequest.get('https://files.minecraftforge.net/maven/net/minecraftforge/forge/promotions.json')).data
       );
     }),
   getForgeVersions: minecraftVersion =>

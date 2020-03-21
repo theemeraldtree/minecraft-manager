@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
+import os from 'os';
 import logo from '../../../img/logo-sm.png';
 import Button from '../../../component/button/button';
 import Section from '../components/section';
@@ -120,9 +121,20 @@ export default function About() {
             <h3>released {Global.MCM_RELEASE_DATE}</h3>
 
             <Updates>
-              <Button onClick={checkForUpdates} disabled={updateDisabled} color="green">
-                {updateText}
-              </Button>
+              {os.platform() === 'darwin' && (
+                <Button onClick={checkForUpdates} disabled={updateDisabled} color="green">
+                  {updateText}
+                </Button>
+              )}
+              {os.platform() !== 'darwin' && (
+                <h4>
+                  Auto-update isn't supported on macOS
+                  <br />
+                  <a href="https://github.com/theemeraldtree/minecraft-manager/releases/">
+                    Please visit the GitHub Releases page to see if there's an update
+                  </a>
+                </h4>
+              )}
               <h3>{updateSubText}</h3>
             </Updates>
           </div>

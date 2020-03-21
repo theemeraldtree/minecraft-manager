@@ -36,8 +36,16 @@ const FSU = {
    * Read the JSON from the requested path
    * @param {string} jsonPath - The path to read the JSON from
    */
-  readJSON(jsonPath) {
+  readJSONSync(jsonPath) {
     return JSON.parse(fs.readFileSync(jsonPath));
+  },
+
+  /**
+   * Read the JSON from the requested path asynchronously
+   * @param {string} jsonPath - The path to read the JSON from
+   */
+  async readJSON(jsonPath) {
+    return JSON.parse(await fs.promises.readFile(jsonPath));
   },
 
   /**

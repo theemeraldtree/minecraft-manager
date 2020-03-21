@@ -93,7 +93,7 @@ export default class Profile extends OAMFAsset {
   readSubAsset(subAsset) {
     const subAssetPath = path.join(this.subAssetsPath, subAsset);
     if (fs.existsSync(subAssetPath)) {
-      const json = FSU.readJSON(subAssetPath);
+      const json = FSU.readJSONSync(subAssetPath);
 
       let index;
       const { assetType } = json;

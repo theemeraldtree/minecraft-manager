@@ -16,13 +16,7 @@ import './font/fonts.css';
 import { loadLatestProfile } from './defaultProfiles/latestProfile';
 import { loadSnapshotProfile } from './defaultProfiles/snapshotProfile';
 
-const { remote, shell, ipcRenderer } = require('electron');
-const { dialog } = require('electron').remote;
-const request = require('request');
-const yaml = require('js-yaml');
-const semver = require('semver');
-const os = require('os');
-const { version } = require('../package.json');
+const { remote, ipcRenderer } = require('electron');
 
 async function load() {
   await SettingsManager.loadSettings();
@@ -85,29 +79,6 @@ async function load() {
   } catch (e) {
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
     console.error(e);
-  }
-
-  // We're on a Mac, which means auto update doesn't work.
-  // Here, we manually check for updates and inform the user a new version is available
-  if (os.platform() === 'darwin') {
-    request.get('https://theemeraldtree.net/updates/mac/mac.yml', (err, resp, body) => {
-      const doc = yaml.safeLoad(body);
-      if (semver.gt(doc.version, version)) {
-        dialog.showMessageBox(
-          {
-            title: 'Minecraft Manager',
-            message:
-              'A new version of Minecraft Manager is available. Would you like to go to the website and download it?',
-            buttons: ['No thanks', 'Take me there!']
-          },
-          buttonIndex => {
-            if (buttonIndex === 1) {
-              shell.openExternal('https://theemeraldtree.net/mcm/download');
-            }
-          }
-        );
-      }
-    });
   }
 
   // eslint-disable-next-line react/jsx-filename-extension
