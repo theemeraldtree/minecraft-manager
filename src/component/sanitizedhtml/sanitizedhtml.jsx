@@ -19,7 +19,9 @@ const Styling = styled.div`
 
   img {
     max-width: 100%;
-    height: auto;
+    display: inline;
+    vertical-align: top;
+    height: 100%;
   }
 
   a {
@@ -44,6 +46,10 @@ const Styling = styled.div`
     color: white !important;
   }
 
+  pre {
+    white-space: pre-line;
+  }
+
   ${props =>
     props.small &&
     `
@@ -57,6 +63,7 @@ const Styling = styled.div`
   `}
 `;
 
+// TODO: Spoiler control buttons
 const SanitizedHTML = ({ html, small }) => (
   <Styling
     small={small}
@@ -68,6 +75,7 @@ const SanitizedHTML = ({ html, small }) => (
           'i',
           'em',
           'strong',
+          'pre',
           'a',
           'iframe',
           'h1',
@@ -80,13 +88,15 @@ const SanitizedHTML = ({ html, small }) => (
           'h5',
           'h6',
           'ul',
-          'li'
+          'li',
+          'div'
         ],
         allowedAttributes: {
           '*': ['style'],
           a: ['href'],
           iframe: ['src', 'allowfullscreen'],
-          img: ['src', 'width', 'height']
+          img: ['src', 'width', 'height'],
+          div: ['class']
         },
         allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com']
       })

@@ -22,6 +22,7 @@ Changelogs for development versions are located in their corresponding branch.
 - Adjusted spacing between Profiles
 - "Framework is installing" persists between edit page changes
 - Downloads are now logged in the main process console
+- Improve CurseForge HTML rendering
 
 ### Fixes
 
