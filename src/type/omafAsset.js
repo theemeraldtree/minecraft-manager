@@ -15,7 +15,9 @@ export default class OAMFAsset {
     hosts = {},
     cachedID,
     dependencies,
-    files
+    frameworks,
+    files,
+    datapacks
   }) {
     this.omafVersion = omafVersion;
     this.type = type;
@@ -31,6 +33,12 @@ export default class OAMFAsset {
     if (type !== 'profile') {
       this.dependencies = dependencies;
       this.files = files;
+    } else {
+      this.frameworks = frameworks;
+    }
+
+    if (type === 'world') {
+      this.datapacks = datapacks;
     }
   }
 
@@ -39,7 +47,21 @@ export default class OAMFAsset {
    * @returns {Object} The OMAFAsset as a JSON Object
    */
   toJSON() {
-    const { omafVersion, type, id, name, blurb, description, version, hosts, icon, dependencies, files } = this;
+    const {
+      omafVersion,
+      type,
+      id,
+      name,
+      blurb,
+      description,
+      version,
+      hosts,
+      icon,
+      dependencies,
+      files,
+      frameworks,
+      datapacks
+    } = this;
 
     return {
       omafVersion,
@@ -52,7 +74,9 @@ export default class OAMFAsset {
       blurb,
       description,
       dependencies,
-      files
+      files,
+      frameworks,
+      datapacks
     };
   }
 

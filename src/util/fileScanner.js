@@ -75,7 +75,6 @@ const FileScanner = {
             dependencies: []
           })
         );
-        profile.save();
       } else {
         // folder, not a zipped resourcep ack
 
@@ -129,7 +128,6 @@ const FileScanner = {
               dependencies: []
             })
           );
-          profile.save();
         }
       }
     }
@@ -149,6 +147,7 @@ const FileScanner = {
         const entries = zip.getEntries();
 
         let name, version, blurb, description, authors, icon, mcVersion, iconPath, credits;
+        credits = 'Unable to find credits';
         entries.forEach(entry => {
           if (entry.entryName === 'mcmod.info') {
             let data = entry.getData().toString('utf8');
@@ -172,6 +171,24 @@ const FileScanner = {
               mcVersion = info.mcversion;
               credits = info.credits;
             }
+          } else if (entry.entryName === 'fabric.mod.json') {
+            let data = entry.getData().toString('utf8');
+
+            data = data.replace(/\r?\n|\r/g, '');
+
+            const parsed = JSON.parse(data);
+            if (parsed) {
+              name = parsed.name;
+              version = parsed.version;
+              description = parsed.description;
+              blurb = `Imported from ${file}`;
+              if (parsed.authors) {
+                authors = parsed.authors.map(author => ({
+                  name: author
+                }));
+              }
+              iconPath = parsed.icon;
+            }
           }
         });
 
@@ -188,6 +205,10 @@ const FileScanner = {
           );
 
           icon = `/_mcm/icons/mods/${file}${extension}`;
+        }
+
+        if (!name) {
+          name = path.parse(file).name;
         }
 
         profile.mods.push(
@@ -217,7 +238,6 @@ const FileScanner = {
             dependencies: []
           })
         );
-        profile.save();
       }
     }
   },
@@ -282,8 +302,6 @@ const FileScanner = {
             dependencies: []
           })
         );
-
-        profile.save();
       });
     }
   },

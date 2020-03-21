@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState, useReducer } from 'react';
+import React, { useState, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import transition from 'styled-transition-group';
@@ -406,11 +406,14 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
               <List>
                 {selobj[po]
                   .sort((a, b) => {
-                    if (sortValue === 'a-z') {
-                      return a.name.localeCompare(b.name);
-                    } else {
-                      return b.name.localeCompare(a.name);
+                    if (a.name && b.name) {
+                      if (sortValue === 'a-z') {
+                        return a.name.localeCompare(b.name);
+                      } else {
+                        return b.name.localeCompare(a.name);
+                      }
                     }
+                    return true;
                   })
                   .map(asset => {
                     if (displayState === 'assetsList') {

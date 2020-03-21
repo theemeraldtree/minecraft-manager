@@ -6,6 +6,8 @@ import Button from '../button/button';
 import ProfilesManager from '../../manager/profilesManager';
 import Overlay from '../overlay/overlay';
 import AlertBackground from '../alert/alertbackground';
+import HeaderButton from '../headerButton/headerButton';
+import MultiMC from '../../util/multimc';
 
 const { dialog } = require('electron').remote;
 
@@ -47,12 +49,18 @@ const ButtonContainer = styled.div`
   align-items: center;
 `;
 
+const HBWrapper = styled.div`
+  margin-top: 5px;
+  min-height: 46px;
+`;
+
 export default class ImportOverlay extends Component {
   constructor(props) {
     super(props);
     this.state = {
       updateState: '',
-      error: ''
+      error: '',
+      displayState: 'omaf'
     };
   }
 
@@ -67,8 +75,26 @@ export default class ImportOverlay extends Component {
         }
       ]
     });
-    if (p[0]) {
+    if (p && p[0]) {
       ProfilesManager.importProfile(p[0], this.stateChange)
+        .then(this.done)
+        .catch(this.error);
+    }
+  };
+
+  chooseFileMMC = () => {
+    const p = dialog.showOpenDialog({
+      title: 'Choose a file to import',
+      buttonLabel: 'Import',
+      filters: [
+        {
+          name: 'MultiMC zip',
+          extensions: ['zip']
+        }
+      ]
+    });
+    if (p && p[0]) {
+      MultiMC.import(p[0], this.stateChange)
         .then(this.done)
         .catch(this.error);
     }
@@ -102,15 +128,38 @@ export default class ImportOverlay extends Component {
       .catch(this.error);
   };
 
+  switchOMAF = () => {
+    this.setState({
+      displayState: 'omaf'
+    });
+  };
+
+  switchMMC = () => {
+    this.setState({
+      displayState: 'mmc'
+    });
+  };
+
   render() {
-    const { updateState, showError, error } = this.state;
+    const { updateState, showError, error, displayState } = this.state;
     const { cancelClick, file } = this.props;
     return (
       <Overlay in={this.props.in}>
         <BG>
+          {!updateState && !showError && !file && <Title>import a profile</Title>}
           {!updateState && !showError && !file && (
+            <HBWrapper>
+              <HeaderButton active={displayState === 'omaf'} onClick={this.switchOMAF}>
+                OMAF .mcjprofile
+              </HeaderButton>
+              <HeaderButton active={displayState === 'mmc'} onClick={this.switchMMC}>
+                MultiMC .zip
+              </HeaderButton>
+            </HBWrapper>
+          )}
+
+          {displayState === 'omaf' && !updateState && !showError && !file && (
             <>
-              <Title>import a profile</Title>
               <Subtext>
                 Choose the <b>.mcjprofile</b> file that you would like to import
               </Subtext>
@@ -119,6 +168,22 @@ export default class ImportOverlay extends Component {
                   cancel
                 </BTN>
                 <BTN onClick={this.chooseFile} color="green">
+                  choose a file
+                </BTN>
+              </ButtonContainer>
+            </>
+          )}
+
+          {displayState === 'mmc' && !updateState && !showError && !file && (
+            <>
+              <Subtext>
+                Choose the MultiMC <b>.zip</b> file that you would like to import
+              </Subtext>
+              <ButtonContainer>
+                <BTN onClick={cancelClick} color="red">
+                  cancel
+                </BTN>
+                <BTN onClick={this.chooseFileMMC} color="green">
                   choose a file
                 </BTN>
               </ButtonContainer>

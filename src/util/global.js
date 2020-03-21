@@ -315,6 +315,96 @@ const Global = {
     }
   },
 
+  scanProfile(profile) {
+    fs.readdir(path.join(profile.gameDir, '/resourcepacks'), (err, files) => {
+      if (files) {
+        if (files.length !== profile.resourcepacks.length) {
+          files.forEach(file => {
+            try {
+              FileScanner.scanResourcePack(profile, file);
+            } catch (e) {
+              console.error(e);
+            }
+          });
+        }
+      }
+    });
+
+    profile.resourcepacks.forEach(rpT => {
+      let rp = rpT;
+      if (!(rp instanceof OMAFFileAsset)) rp = new OMAFFileAsset(rp);
+
+      if (!fs.existsSync(path.join(profile.gameDir, rp.getMainFile().path))) {
+        LogManager.log(
+          'info',
+          `[scan] {${profile.id}} Found resource pack ${rp.name} where the main file is missing. Removing it from the profile...`
+        );
+        profile.deleteSubAsset('resourcepack', rp);
+      }
+    });
+
+    fs.readdir(path.join(profile.gameDir, '/mods'), (err, files) => {
+      if (files) {
+        if (files.length !== profile.mods.length) {
+          files.forEach(file => {
+            FileScanner.scanMod(profile, file);
+          });
+        }
+      }
+    });
+
+    profile.mods.forEach(modT => {
+      let mod = modT;
+      if (!(mod instanceof Mod)) mod = new Mod(mod);
+
+      if (!fs.existsSync(path.join(profile.gameDir, mod.getMainFile().path))) {
+        LogManager.log(
+          'info',
+          `[scan] {${profile.id}} Found mod ${mod.name} where the main file is missing. Removing it from the profile...`
+        );
+        profile.deleteSubAsset('mod', mod);
+      }
+    });
+
+    fs.readdir(path.join(profile.gameDir, '/saves'), (err, files) => {
+      if (files) {
+        if (files.length !== profile.worlds.length) {
+          files.forEach(file => {
+            FileScanner.scanWorld(profile, file);
+          });
+        }
+      }
+    });
+
+    profile.worlds.forEach(worldT => {
+      let world = worldT;
+      if (!(world instanceof World)) world = new World(world);
+
+      const fullPath = path.join(profile.gameDir, world.getMainFile().path);
+
+      if (!fs.existsSync(path.join(profile.gameDir, world.getMainFile().path))) {
+        LogManager.log(
+          'info',
+          `[scan] {${profile.id}} Found world ${world.name} where the folder is missing. Removing it from the profile...`
+        );
+        profile.deleteSubAsset('world', world);
+      } else if (fs.existsSync(path.join(fullPath, '/datapacks'))) {
+        fs.readdir(path.join(fullPath, '/datapacks'), (err, files) => {
+          if (files) {
+            if (files.length !== world.datapacks.length) {
+              files.forEach(file => {
+                FileScanner.scanDatapack(profile, world, file);
+              });
+            }
+          }
+        });
+      }
+    });
+
+    ProfilesManager.updateProfile(profile);
+    profile.save();
+  },
+
   // why does this function exist? you ask
   // well...... sometimes people like to mess with stuff they shouldn't mess with
   // they delete jar files, add resourcepacks, without letting minecraft manager know
@@ -324,90 +414,7 @@ const Global = {
   // with those that the user has changed
   scanProfiles() {
     ProfilesManager.loadedProfiles.forEach(profile => {
-      fs.readdir(path.join(profile.gameDir, '/resourcepacks'), (err, files) => {
-        if (files) {
-          if (files.length !== profile.resourcepacks.length) {
-            files.forEach(file => {
-              try {
-                FileScanner.scanResourcePack(profile, file);
-              } catch (e) {
-                console.error(e);
-              }
-            });
-          }
-        }
-      });
-
-      profile.resourcepacks.forEach(rpT => {
-        let rp = rpT;
-        if (!(rp instanceof OMAFFileAsset)) rp = new OMAFFileAsset(rp);
-
-        if (!fs.existsSync(path.join(profile.gameDir, rp.getMainFile().path))) {
-          LogManager.log(
-            'info',
-            `[scan] {${profile.id}} Found resource pack ${rp.name} where the main file is missing. Removing it from the profile...`
-          );
-          profile.deleteSubAsset('resourcepack', rp);
-        }
-      });
-
-      fs.readdir(path.join(profile.gameDir, '/mods'), (err, files) => {
-        if (files) {
-          if (files.length !== profile.mods.length) {
-            files.forEach(file => {
-              FileScanner.scanMod(profile, file);
-            });
-          }
-        }
-      });
-
-      profile.mods.forEach(modT => {
-        let mod = modT;
-        if (!(mod instanceof Mod)) mod = new Mod(mod);
-
-        if (!fs.existsSync(path.join(profile.gameDir, mod.getMainFile().path))) {
-          LogManager.log(
-            'info',
-            `[scan] {${profile.id}} Found mod ${mod.name} where the main file is missing. Removing it from the profile...`
-          );
-          profile.deleteSubAsset('mod', mod);
-        }
-      });
-
-      fs.readdir(path.join(profile.gameDir, '/saves'), (err, files) => {
-        if (files) {
-          if (files.length !== profile.worlds.length) {
-            files.forEach(file => {
-              FileScanner.scanWorld(profile, file);
-            });
-          }
-        }
-      });
-
-      profile.worlds.forEach(worldT => {
-        let world = worldT;
-        if (!(world instanceof World)) world = new World(world);
-
-        const fullPath = path.join(profile.gameDir, world.getMainFile().path);
-
-        if (!fs.existsSync(path.join(profile.gameDir, world.getMainFile().path))) {
-          LogManager.log(
-            'info',
-            `[scan] {${profile.id}} Found world ${world.name} where the folder is missing. Removing it from the profile...`
-          );
-          profile.deleteSubAsset('world', world);
-        } else if (fs.existsSync(path.join(fullPath, '/datapacks'))) {
-          fs.readdir(path.join(fullPath, '/datapacks'), (err, files) => {
-            if (files) {
-              if (files.length !== world.datapacks.length) {
-                files.forEach(file => {
-                  FileScanner.scanDatapack(profile, world, file);
-                });
-              }
-            }
-          });
-        }
-      });
+      this.scanProfile(profile);
     });
   },
 
