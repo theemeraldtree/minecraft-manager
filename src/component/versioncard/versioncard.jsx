@@ -10,7 +10,7 @@ import Global from '../../util/global';
 const BG = styled.div`
   margin-top: 5px;
   width: 100%;
-  height: 70px;
+  height: 90px;
   display: flex;
   background-color: #404040;
   flex-flow: column;
@@ -19,13 +19,13 @@ const BG = styled.div`
   ${props =>
     props.hideFramework &&
     `
-      height: 55px;
+      height: 70px;
     `}
 
   ${props =>
     props.extraInfo &&
     `
-        height: 310px;
+        height: 345px;
     `}
   
   transition: height 150ms ease;
@@ -60,8 +60,7 @@ const Title = styled.p`
 
 const Modloader = styled.p`
   color: #d9d9d9;
-  position: absolute;
-  top: 17px;
+  margin: 0;
 `;
 
 const Details = styled.div`
@@ -100,7 +99,7 @@ const Changelog = styled.div`
 const ButtonContainer = styled.div`
   position: absolute;
   top: 19px;
-  right: 5px;
+  right: 15px;
 
   button {
     padding: 7px;
@@ -163,6 +162,16 @@ export default class VersionCard extends PureComponent {
       }
     }
 
+    const safeModloader = m => {
+      if (m === 'forge') {
+        return 'Minecraft Forge';
+      }
+      if (m === 'fabric') {
+        return 'Fabric';
+      }
+
+      return '';
+    };
     const installed = progress === 'installed';
 
     const freeToInstall = progress !== 'installing' && progress !== 'disable-install';
@@ -171,7 +180,17 @@ export default class VersionCard extends PureComponent {
         <Details>
           <Title>{Global.cleanVersionName(version.displayName)}</Title>
           {version.hosts.curse && !hideFramework && (
-            <Modloader>framework: {version.hosts.curse.localValues.inferredModloader}</Modloader>
+            <Modloader>Modloader: {safeModloader(version.hosts.curse.localValues.inferredModloader)}</Modloader>
+          )}
+          {version.timestamp && (
+            <Modloader>
+              Released{' '}
+              {new Date(version.timestamp).toLocaleDateString('en-US', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+              })}
+            </Modloader>
           )}
         </Details>
         {!hideButtons && (

@@ -1,3 +1,5 @@
+import ToastManager from '../manager/toastManager';
+
 const { ipcRenderer } = require('electron');
 const axios = require('axios');
 
@@ -39,6 +41,18 @@ const HTTPRequest = {
     if (this.fileDownloads[download.id]) {
       this.fileDownloads[download.id].onFinish();
     }
+  },
+
+  /**
+   * A file has errored in downloading
+   * @param {obj} data - The data
+   */
+  fileDownloadError(data) {
+    if (this.fileDownloads[data.id]) {
+      this.fileDownloads[data.id].onFinish();
+    }
+
+    ToastManager.createToast('Error', `Error downloading something. It has been skipped. ID: ${data.id}`);
   },
 
   /**

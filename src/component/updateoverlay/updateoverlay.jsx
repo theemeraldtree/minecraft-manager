@@ -111,33 +111,41 @@ export default class UpdateOverlay extends Component {
 
     const { profile, cancelClick } = this.props;
 
+    let isHosted = false;
+    if (profile.hosts) {
+      if (profile.hosts.curse) {
+        isHosted = true;
+      }
+    }
     return (
       <Overlay force>
         <BG>
           {displayState === 'done' && (
             <>
               <Title>done</Title>
-              <Subtext>the profile update is complete</Subtext>
-              <Button onClick={cancelClick} color="green">
-                ok
-              </Button>
+              <Subtext>The profile update is complete</Subtext>
+              <ButtonsContainer>
+                <Button onClick={cancelClick} color="green">
+                  ok
+                </Button>
+              </ButtonsContainer>
             </>
           )}
-          {displayState === 'main' && (
+          {displayState === 'main' && isHosted && (
             <>
               {displayState !== 'done' && <Title>update your profile</Title>}
-              {!noUpdates && !updateAvailable && !noConnection && <Subtext>checking for updates...</Subtext>}
-              {noUpdates && !noConnection && <Subtext>you have the latest version. no update is available</Subtext>}
+              {!noUpdates && !updateAvailable && !noConnection && <Subtext>Checking for updates...</Subtext>}
+              {noUpdates && !noConnection && <Subtext>You have the latest version. No update is available</Subtext>}
               {noConnection && <Subtext>Unable to connect.</Subtext>}
               {updateAvailable && (
                 <Subtext>
-                  a new version is available.
+                  A new version is available.
                   <br />
-                  you have: {profile.version.displayName}
+                  You have: {profile.version.displayName}
                   <br />
-                  latest version: {updateVersion.displayName}
+                  Latest version: {updateVersion.displayName}
                   <br />
-                  would you like to update?
+                  Would you like to update?
                 </Subtext>
               )}
               <Breaker />
@@ -160,10 +168,22 @@ export default class UpdateOverlay extends Component {
               </ButtonsContainer>
             </>
           )}
+          {!isHosted && (
+            <>
+              <Title>cannot update</Title>
+              <Subtext>This profile was not downloaded from Discover. It cannot be updated.</Subtext>
+              <ButtonsContainer>
+                <Button color="green" onClick={cancelClick}>
+                  close
+                </Button>
+              </ButtonsContainer>
+            </>
+          )}
           {displayState === 'progress' && (
             <>
-              <Title>Updating...</Title>
+              <Title>updating...</Title>
               <Subtext>{updateProgress}</Subtext>
+              <Subtext>To check progress, open the Downloads viewer in the sidebar</Subtext>
             </>
           )}
         </BG>

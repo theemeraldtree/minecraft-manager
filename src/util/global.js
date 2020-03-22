@@ -403,6 +403,10 @@ const Global = {
 
     ProfilesManager.updateProfile(profile);
     profile.save();
+
+    setTimeout(() => {
+      profile.save();
+    }, 3000);
   },
 
   // why does this function exist? you ask

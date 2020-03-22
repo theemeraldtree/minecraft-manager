@@ -16,6 +16,7 @@ const LoadingText = styled.div`
   color: white;
   flex-flow: row;
   flex-flow: column;
+  text-align: center;
 `;
 
 const List = styled.div`

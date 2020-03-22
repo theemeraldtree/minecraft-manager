@@ -16,6 +16,7 @@ Changelogs for development versions are located in their corresponding branch.
 - Show Downloads info in Asset Cards
 - The option to disable News checks on start up
 - MultiMC Importing (experimental)
+- Release date is now shown on versions
 
 ### Changed
 
@@ -24,6 +25,7 @@ Changelogs for development versions are located in their corresponding branch.
 - Downloads are now logged in the main process console
 - Improve CurseForge HTML rendering
 - Improve About page
+- Improve Update dialog
 
 ### Fixes
 

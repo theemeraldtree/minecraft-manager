@@ -228,6 +228,7 @@ const AssetCard = ({
         )}
         {installed && (
           <MenuItem
+            disabled={asset.type === 'datapack'}
             onClick={e => {
               e.stopPropagation();
               copyToClick(asset.id);
@@ -238,6 +239,7 @@ const AssetCard = ({
         )}
         {installed && (
           <MenuItem
+            disabled={asset.type === 'datapack'}
             onClick={e => {
               e.stopPropagation();
               moveToClick(asset.id);

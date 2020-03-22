@@ -23,40 +23,45 @@ ipcMain.on('download-file', async (event, downloadURL, dest, id) => {
   let progressData = 0;
   const ws = fs.createWriteStream(dest);
   console.info(`Downloading ${downloadURL}`);
-  const { data, headers } = await axios(downloadURL, {
-    responseType: 'stream',
-    headers: {
-      'X-Client': 'MinecraftManager'
-    }
-  });
+  try {
+    const { data, headers } = await axios(downloadURL, {
+      responseType: 'stream',
+      headers: {
+        'X-Client': 'MinecraftManager'
+      }
+    });
 
-  const contentLength = headers['content-length'];
+    const contentLength = headers['content-length'];
 
-  data.on('data', chunk => {
-    progressData += chunk.length;
+    data.on('data', chunk => {
+      progressData += chunk.length;
 
-    const prog = Math.trunc((progressData / contentLength) * 100);
-    if (prog - downloadProgresses[id] >= 10) {
-      downloadProgresses[id] = prog;
-      if (event) {
-        if (event.sender) {
-          event.sender.send('file-download-progress', {
-            id,
-            progress: prog
-          });
+      const prog = Math.trunc((progressData / contentLength) * 100);
+      if (prog - downloadProgresses[id] >= 10) {
+        downloadProgresses[id] = prog;
+        if (event) {
+          if (event.sender) {
+            event.sender.send('file-download-progress', {
+              id,
+              progress: prog
+            });
+          }
         }
       }
-    }
-  });
-
-  data.pipe(ws);
-
-  ws.on('finish', () => {
-    console.info(`Download finished ${downloadURL}`);
-    event.sender.send('file-download-finish', {
-      id
     });
-  });
+
+    data.pipe(ws);
+
+    ws.on('finish', () => {
+      console.info(`Download finished ${downloadURL}`);
+      event.sender.send('file-download-finish', {
+        id
+      });
+    });
+  } catch (e) {
+    console.error(e);
+    event.sender.send('file-download-error', { id, error: e });
+  }
 });
 
 const dev = require('process').execPath.includes('electron');

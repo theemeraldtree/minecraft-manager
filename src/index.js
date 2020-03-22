@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import fs from 'fs';
 import path from 'path';
+import rimraf from 'rimraf';
 import App from './app';
 import ProfilesManager from './manager/profilesManager';
 import Global from './util/global';
@@ -61,8 +62,16 @@ async function load() {
     HTTPRequest.fileDownloadFinish(progress);
   });
 
+  ipcRenderer.on('file-download-error', (event, obj) => {
+    HTTPRequest.fileDownloadError(obj);
+  });
+
   try {
     if (fs.existsSync(Global.PROFILES_PATH)) {
+      // reset temp
+      rimraf.sync(path.join(Global.MCM_TEMP));
+      fs.mkdirSync(path.join(Global.MCM_TEMP));
+
       LibrariesManager.checkExist();
       Global.checkMinecraftVersions();
       Global.checkMinecraftProfiles();
