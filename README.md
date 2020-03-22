@@ -2,7 +2,7 @@
 
 ## The easiest way to manage your Minecraft Launcher
 
-### Install and manage mods, modpacks, worlds, resource packs with ease
+### Install and manage mods, modpacks, worlds, and resource packs with ease
 
 Minecraft Manager is a program used for installation of Minecraft mods/modpacks and more.
 
