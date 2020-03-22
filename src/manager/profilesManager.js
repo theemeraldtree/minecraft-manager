@@ -99,6 +99,11 @@ const ProfilesManager = {
         'info',
         `[ProfilesManager] (ProfileImport) Reading profile json file from ${path.join(extractPath, '/profile.json')}`
       );
+
+      if (!fs.existsSync(path.join(extractPath, '/profile.json'))) {
+        throw new Error('The profile is missing the essential profile.json file. It may be a corrupted file.');
+      }
+
       const obj = JSON.parse(fs.readFileSync(path.join(extractPath, '/profile.json')));
       const profPath = path.join(Global.PROFILES_PATH, `/${obj.id}/`);
       LogManager.log(
@@ -107,11 +112,13 @@ const ProfilesManager = {
       );
 
       if (fs.existsSync(profPath)) {
-        throw new Error(`There is already a profile with the name: ${obj.name}`);
+        throw new Error(`there is already a profile with the name ${obj.name}`);
       }
       fs.mkdirSync(path.join(extractPath, '/_mcm'));
       fs.mkdirSync(path.join(extractPath, '/_mcm/icons'));
       fs.mkdirSync(path.join(extractPath, '/_mcm/icons/mods'));
+      fs.mkdirSync(path.join(extractPath, '/_mcm/icons/resourcepacks'));
+      fs.mkdirSync(path.join(extractPath, '/_mcm/icons/worlds'));
 
       Global.copyDirSync(extractPath, profPath);
 
@@ -148,7 +155,7 @@ const ProfilesManager = {
                 mod.cachedID = `profile-import-${mod.id}`;
                 mod.detailedInfo = false;
                 Hosts.cache.assets[mod.cachedID] = mod;
-                curseModsToDownload.push(mod);
+                return mod;
               }
             }
 

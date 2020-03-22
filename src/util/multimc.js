@@ -7,19 +7,12 @@ import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
 import ProfilesManager from '../manager/profilesManager';
 
-/* eslint-disable */
 const AdmZip = require('adm-zip');
 
 /**
  * MultiMC-Format Importer/Exporter Utility
  */
 const MultiMC = {
-  /**
-   * Exports the profile to a MultiMC-format ZIP
-   * @param {Object} profile - The profile you want to export
-   * @param {string} dest - The destination of the ZIP
-   */
-  export(profile, dest) {},
   /**
    * Import a MultiMC-format ZIP
    * @param {string} zipPath - The path of the ZIP that's being imported
@@ -46,7 +39,7 @@ const MultiMC = {
         if (minecraftComponent) {
           minecraftVersion = minecraftComponent.version;
         } else {
-          LogManager.log('severe', `[MultiMC-Import] Missing Minecraft Version`);
+          LogManager.log('severe', '[MultiMC-Import] Missing Minecraft Version');
           return;
         }
 
@@ -72,17 +65,17 @@ const MultiMC = {
         }
 
         updateState('Reading instance.cfg');
-        let cfg = fs.readFileSync(path.join(dirPath, 'instance.cfg')).toString();
-        let cfgSplit = cfg.split('\n').map(c => c.split('='));
+        const cfg = fs.readFileSync(path.join(dirPath, 'instance.cfg')).toString();
+        const cfgSplit = cfg.split('\n').map(c => c.split('='));
 
         updateState('Finding name...');
-        let name = cfgSplit.find(c => c[0].toLowerCase() === 'name')[1];
+        const name = cfgSplit.find(c => c[0].toLowerCase() === 'name')[1];
 
         updateState('Finding notes...');
-        let notes = cfgSplit.find(c => c[0].toLowerCase() === 'notes')[1];
+        const notes = cfgSplit.find(c => c[0].toLowerCase() === 'notes')[1];
 
         updateState('Finding icon key...');
-        let iconKey = cfgSplit.find(c => c[0].toLowerCase() === 'iconkey')[1];
+        const iconKey = cfgSplit.find(c => c[0].toLowerCase() === 'iconkey')[1];
 
         const profile = await ProfilesManager.createProfile(name, minecraftVersion);
 
@@ -103,7 +96,7 @@ const MultiMC = {
           profile.description = notes;
         }
 
-        profile.blurb = `Imported from MultiMC zip`;
+        profile.blurb = 'Imported from MultiMC zip';
 
         updateState('Copying .minecraft contents...');
         fs.readdirSync(path.join(dirPath, '.minecraft')).forEach(file => {

@@ -58,7 +58,12 @@ export default withRouter(({ history }) => {
     header.setShowChildren(true);
     header.setChildren(
       <>
-        <SearchBox type="text" onChange={e => setSearchTerm(e.target.value.toLowerCase())} placeholder="search" />
+        <SearchBox
+          value={searchTerm}
+          type="text"
+          onChange={e => setSearchTerm(e.target.value.toLowerCase())}
+          placeholder="search"
+        />
         <Button onClick={() => setShowImport(true)} color="purple">
           import
         </Button>

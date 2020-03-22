@@ -64,6 +64,13 @@ export default class ImportOverlay extends Component {
     };
   }
 
+  componentDidMount() {
+    this.setState({
+      showError: false,
+      error: ''
+    });
+  }
+
   chooseFile = () => {
     const p = dialog.showOpenDialog({
       title: 'Choose a file to import',
@@ -118,7 +125,7 @@ export default class ImportOverlay extends Component {
   error = err => {
     this.setState({
       showError: true,
-      error: err.toString()
+      error: err.message
     });
   };
 
@@ -209,11 +216,13 @@ export default class ImportOverlay extends Component {
 
           {showError && (
             <>
-              <Title>Error</Title>
+              <Title>error</Title>
               <Subtext>{error}</Subtext>
-              <Button onClick={cancelClick} color="red">
-                close
-              </Button>
+              <ButtonContainer>
+                <BTN onClick={cancelClick} color="red">
+                  close
+                </BTN>
+              </ButtonContainer>
             </>
           )}
 
@@ -221,6 +230,7 @@ export default class ImportOverlay extends Component {
             <>
               <Title>importing...</Title>
               <Subtext>{updateState}</Subtext>
+              <Subtext>To check progress, open the Downloads viewer in the sidebar</Subtext>
             </>
           )}
         </BG>

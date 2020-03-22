@@ -114,12 +114,12 @@ const Wrapper = styled.div`
 `;
 
 const StateOverlay = styled.div`
-  width: 110px;
-  height: 180px;
+  width: 120px;
+  height: 190px;
   position: absolute;
   background-color: rgba(0, 0, 0, 0.7);
   z-index: 2;
-  margin: 5px;
+  margin: 3px;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -177,10 +177,10 @@ export default function About() {
             <a href="https://github.com/isaacs/rimraf">rimraf</a>
           </li>
           <li>
-            <a href="https://github.com/axios/axios">axios</a>
+            <a href="https://github.com/isaacs/node-mkdirp">mkdirp</a>
           </li>
           <li>
-            <a href="https://github.com/request/request-promise">request-promise</a>
+            <a href="https://github.com/axios/axios">axios</a>
           </li>
           <li>
             <a href="https://github.com/cthackers/adm-zip">adm-zip</a>
@@ -207,10 +207,10 @@ export default function About() {
             <a href="https://fonts.google.com/specimen/Roboto">the Roboto font</a>
           </li>
           <li>other projects</li>
-          and of course, YOU! Thank you!
+          and of course, YOU! Thank you for using Minecraft Manager, I really hope you enjoy it.
         </h3>
         <h3>
-          Also, huge credit to <a href="https://github.com/robotbrain/ForgeTheSane">robotbrain's ForgeTheSane</a> and{' '}
+          Huge credit to <a href="https://github.com/robotbrain/ForgeTheSane">robotbrain's ForgeTheSane</a> and
           <a href="https://github.com/Stonebound/ForgeTheSane">Stonebound's fork</a>. Because of these open source
           projects, we have Forge 1.13+ support!
         </h3>
@@ -235,16 +235,16 @@ export default function About() {
         <h2>Other things to check out</h2>
         <h3>
           <li>
-            <a href="https://stopmodreposts.org">#StopModReposts - stopmodreposts.org</a>
+            <a href="https://stopmodreposts.org">stopmodreposts.org</a>
           </li>
           <li>
-            <a href="https://fabricmc.net">FabricMC website</a>
+            <a href="https://fabricmc.net">fabricmc.net</a>
           </li>
           <li>
-            <a href="https://minecraftforge.net">MinecraftForge website</a>
+            <a href="https://minecraftforge.net">minecraftforge.net</a>
           </li>
           <li>
-            <a href="https://www.reddit.com/r/feedthebeast/">r/feedthebeast - modded minecraft subreddit</a>
+            <a href="https://www.reddit.com/r/feedthebeast/">r/feedthebeast</a>
           </li>
           <li>
             <a href="https://www.reddit.com/r/minecraft/">r/minecraft</a>
@@ -252,11 +252,11 @@ export default function About() {
         </h3>
       </Section>
       <Section>
-        <h2>Other information</h2>
+        <h2>Disclaimers</h2>
         <h3>
-          Minecraft Manager, theemeraldtree, and stairman06 are in no way related to, endorsed by, or otherwise
-          affiliated with Minecraft Forge, Forge Development LLC, Fabric, CurseForge, Twitch, Amazon, Mojang, or
-          Microsoft Studios. All trademarks belong to their respective owners.
+          Minecraft Manager and theemeraldtree are in no way affiliated with, endorsed by, or otherwise related to
+          Minecraft Forge, Forge Development LLC, Fabric, CurseForge, Twitch, Amazon, Mojang, or Microsoft Studios. All
+          trademarks belong to their respective owners.
         </h3>
       </Section>
     </>

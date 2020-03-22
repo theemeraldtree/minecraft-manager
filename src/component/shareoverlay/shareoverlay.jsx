@@ -36,10 +36,13 @@ const Breaker = styled.div`
 `;
 
 const ExportList = styled.div`
-  overflow-y: scroll;
+  overflow-y: auto;
   background-color: #404040;
   margin-top: 5px;
   height: min-content;
+  &::-webkit-scrollbar-track {
+    background: none;
+  }
 `;
 
 const ExportItem = styled.div`
