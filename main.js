@@ -6,7 +6,7 @@ const fs = require('fs');
 const axios = require('axios');
 const os = require('os');
 
-console.log('Starting Minecraft Manager main Node process');
+console.info('Starting Minecraft Manager main Node process');
 
 // Security warning IS DISABLED because we're loading from localhost.
 // this is only disabled so it doesn't clog the console in dev mode
@@ -22,7 +22,7 @@ ipcMain.on('download-file', async (event, downloadURL, dest, id) => {
   downloadProgresses[id] = 0;
   let progressData = 0;
   const ws = fs.createWriteStream(dest);
-  console.log(`Downloading ${downloadURL}`);
+  console.info(`Downloading ${downloadURL}`);
   const { data, headers } = await axios(downloadURL, {
     responseType: 'stream',
     headers: {
@@ -52,7 +52,7 @@ ipcMain.on('download-file', async (event, downloadURL, dest, id) => {
   data.pipe(ws);
 
   ws.on('finish', () => {
-    console.log(`Download finished ${downloadURL}`);
+    console.info(`Download finished ${downloadURL}`);
     event.sender.send('file-download-finish', {
       id
     });
@@ -104,7 +104,7 @@ function createWindow() {
   // why show a frame on linux but hide it on everything else?
   // on linux CSD (client-side decoration) causes a ton of problems without a frame
   // so unfortunately it has to be disabled
-  console.log('Creating BrowserWindow...');
+  console.info('Creating BrowserWindow...');
 
   mainWindow = new BrowserWindow({
     width: 800,

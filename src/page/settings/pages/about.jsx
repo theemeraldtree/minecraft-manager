@@ -61,6 +61,21 @@ const BrandLogo = styled.img`
   width: 200px;
 `;
 
+const SplitSection = styled(Section)`
+  display: flex;
+  div {
+    width: 50%;
+  }
+
+  div:nth-child(2) {
+    padding-left: 10px;
+
+    li {
+      margin-bottom: 5px;
+    }
+  }
+`;
+
 export default function About() {
   const [updateDisabled, setUpdateDisabled] = useState(false);
   const [updateText, setUpdateText] = useState('check for updates');
@@ -148,92 +163,101 @@ export default function About() {
         </AboutBottom>
       </Section>
       <NeedHelp />
-      <Section>
-        <h2>Credits</h2>
-        <h3>
-          Minecraft Manager is made possible thanks to:
-          <li>
-            <a href="https://electronjs.org/">Electron</a>
-          </li>
-          <li>
-            <a href="https://reactjs.org/">React</a>
-          </li>
-          <li>
-            <a href="https://www.styled-components.com/">styled-components</a>
-          </li>
-          <li>
-            <a href="https://github.com/gabiseabra/styled-transition-group">styled-transition-group</a>
-          </li>
-          <li>
-            <a href="https://babeljs.io/">Babel</a>
-          </li>
-          <li>
-            <a href="https://webpack.js.org">Webpack</a>
-          </li>
-          <li>
-            <a href="https://eslint.org/">eslint</a>
-          </li>
-          <li>
-            <a href="https://github.com/isaacs/rimraf">rimraf</a>
-          </li>
-          <li>
-            <a href="https://github.com/isaacs/node-mkdirp">mkdirp</a>
-          </li>
-          <li>
-            <a href="https://github.com/axios/axios">axios</a>
-          </li>
-          <li>
-            <a href="https://github.com/cthackers/adm-zip">adm-zip</a>
-          </li>
-          <li>
-            <a href="https://github.com/archiverjs/node-archiver">archiver</a>
-          </li>
-          <li>
-            <a href="https://github.com/PrismarineJS/prismarine-nbt">prismarine-nbt</a>
-          </li>
-          <li>
-            <a href="https://github.com/vkbansal/react-contextmenu">react-contextmenu</a>
-          </li>
-          <li>
-            <a href="https://reacttraining.com/react-router/">react-router & react-router-dom</a>
-          </li>
-          <li>
-            <a href="https://github.com/oliver-moran/jimp">jimp</a>
-          </li>
-          <li>
-            <a href="https://github.com/apostrophecms/sanitize-html">sanitize-html</a>
-          </li>
-          <li>
-            <a href="https://fonts.google.com/specimen/Roboto">the Roboto font</a>
-          </li>
-          <li>other projects</li>
-          and of course, YOU! Thank you for using Minecraft Manager, I really hope you enjoy it.
-        </h3>
-        <h3>
-          Huge credit to <a href="https://github.com/robotbrain/ForgeTheSane">robotbrain's ForgeTheSane</a> and
-          <a href="https://github.com/Stonebound/ForgeTheSane">Stonebound's fork</a>. Because of these open source
-          projects, we have Forge 1.13+ support!
-        </h3>
-        <h3>
-          CurseForge API Information thanks to <a href="https://github.com/dries007/CurseMeta">dries007's CurseMeta</a>{' '}
-          and <a href="https://twitchappapi.docs.apiary.io/">Gaz492's TwitchAppAPI Docs</a>
-        </h3>
+      <SplitSection>
+        <div>
+          <h2>Credits</h2>
+          <h3> Thanks to these open source projects:</h3>
+          <ul>
+            <li>
+              <a href="https://electronjs.org/">Electron</a>
+            </li>
+            <li>
+              <a href="https://reactjs.org/">React</a>
+            </li>
+            <li>
+              <a href="https://www.styled-components.com/">styled-components</a>
+            </li>
+            <li>
+              <a href="https://github.com/gabiseabra/styled-transition-group">styled-transition-group</a>
+            </li>
+            <li>
+              <a href="https://babeljs.io/">Babel</a>
+            </li>
+            <li>
+              <a href="https://webpack.js.org">Webpack</a>
+            </li>
+            <li>
+              <a href="https://eslint.org/">eslint</a>
+            </li>
+            <li>
+              <a href="https://github.com/isaacs/rimraf">rimraf</a>
+            </li>
+            <li>
+              <a href="https://github.com/isaacs/node-mkdirp">mkdirp</a>
+            </li>
+            <li>
+              <a href="https://github.com/axios/axios">axios</a>
+            </li>
+            <li>
+              <a href="https://github.com/cthackers/adm-zip">adm-zip</a>
+            </li>
+            <li>
+              <a href="https://github.com/archiverjs/node-archiver">archiver</a>
+            </li>
+            <li>
+              <a href="https://github.com/PrismarineJS/prismarine-nbt">prismarine-nbt</a>
+            </li>
+            <li>
+              <a href="https://github.com/vkbansal/react-contextmenu">react-contextmenu</a>
+            </li>
+            <li>
+              <a href="https://reacttraining.com/react-router/">react-router & react-router-dom</a>
+            </li>
+            <li>
+              <a href="https://github.com/oliver-moran/jimp">jimp</a>
+            </li>
+            <li>
+              <a href="https://github.com/apostrophecms/sanitize-html">sanitize-html</a>
+            </li>
+            <li>
+              <a href="https://fonts.google.com/specimen/Roboto">the Roboto font</a>
+            </li>
+            <li>other projects</li>
+          </ul>
 
-        <Button
-          onClick={() =>
-            AlertManager.messageBox(
-              'full license information',
-              `<textarea class="wrap">${licenseDisclaimer}</textarea>`
-            )
-          }
-          color="green"
-        >
-          view full license information
-        </Button>
-      </Section>
+          <Button
+            onClick={() =>
+              AlertManager.messageBox(
+                'full license information',
+                `<textarea class="wrap">${licenseDisclaimer}</textarea>`
+              )
+            }
+            color="green"
+          >
+            view full license information
+          </Button>
+        </div>
+        <div>
+          <h2>Special thanks to...</h2>
+
+          <ul>
+            <li>
+              <a href="https://github.com/robotbrain/ForgeTheSane">robotbrain's ForgeTheSane</a> and
+              <a href="https://github.com/Stonebound/ForgeTheSane"> Stonebound's fork</a>. Because of these open source
+              projects, we have Forge 1.13+ support!
+            </li>
+            <li>
+              <a href="https://github.com/dries007/CurseMeta">dries007's CurseMeta</a> and
+              <a href="https://twitchappapi.docs.apiary.io/"> Gaz492's Twitch App API Docs </a>
+              for their CurseForge API Documentation
+            </li>
+            <li>You! Thank you for using Minecraft Manager!</li>
+          </ul>
+        </div>
+      </SplitSection>
       <Section>
-        <h2>Other things to check out</h2>
-        <h3>
+        <h2>Other things to check out...</h2>
+        <ul>
           <li>
             <a href="https://stopmodreposts.org">stopmodreposts.org</a>
           </li>
@@ -249,15 +273,15 @@ export default function About() {
           <li>
             <a href="https://www.reddit.com/r/minecraft/">r/minecraft</a>
           </li>
-        </h3>
+        </ul>
       </Section>
       <Section>
         <h2>Disclaimers</h2>
-        <h3>
+        <p>
           Minecraft Manager and theemeraldtree are in no way affiliated with, endorsed by, or otherwise related to
           Minecraft Forge, Forge Development LLC, Fabric, CurseForge, Twitch, Amazon, Mojang, or Microsoft Studios. All
           trademarks belong to their respective owners.
-        </h3>
+        </p>
       </Section>
     </>
   );

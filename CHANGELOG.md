@@ -23,6 +23,7 @@ Changelogs for development versions are located in their corresponding branch.
 - "Framework is installing" persists between edit page changes
 - Downloads are now logged in the main process console
 - Improve CurseForge HTML rendering
+- Improve About page
 
 ### Fixes
 
