@@ -1,6 +1,6 @@
 {
   "name": "minecraft-manager",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "license": "GPL-3.0",
   "main": "main.js",
   "author": "theemeraldtree",
@@ -103,7 +103,7 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --mode development --inline --port 9483",
-    "compile": "webpack",
+    "compile": "webpack --mode production",
     "build": "electron-builder ./",
     "package": "npm run compile && npm run build",
     "lint": "npx eslint src",

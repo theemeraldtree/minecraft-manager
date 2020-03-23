@@ -3,6 +3,7 @@ import fs from 'fs';
 import mkdirp from 'mkdirp';
 import Profile from '../type/profile';
 import Global from '../util/global';
+import SettingsManager from '../manager/settingsManager';
 
 const SnapshotProfile = new Profile({
   type: 'profile',
@@ -42,6 +43,10 @@ function loadSnapshotProfile() {
 
   if (!fs.existsSync(path.join(SnapshotProfile.profilePath, '/_mcm/icons/worlds'))) {
     mkdirp.sync(path.join(SnapshotProfile.profilePath, '/_mcm/icons/worlds'));
+  }
+
+  if (!SettingsManager.currentSettings.runSnapshotInSeperateFplder) {
+    SnapshotProfile.gameDir = Global.getMCPath();
   }
 
   if (!fs.existsSync(SnapshotProfile.gameDir)) {

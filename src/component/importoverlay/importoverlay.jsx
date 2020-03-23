@@ -205,10 +205,10 @@ export default class ImportOverlay extends Component {
               </Subtext>
               <ButtonContainer>
                 <BTN onClick={cancelClick} color="red">
-                  no
+                  cancel
                 </BTN>
                 <BTN onClick={this.importFile} color="green">
-                  yes
+                  import
                 </BTN>
               </ButtonContainer>
             </>

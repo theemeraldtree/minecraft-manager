@@ -466,7 +466,7 @@ export default class Profile extends OAMFAsset {
       let asset = assetT;
       if (type === 'mod') {
         asset = this.mods.find(m => m.id === asset.id);
-        if (!(asset instanceof Mod)) {
+        if (asset && !(asset instanceof Mod)) {
           asset = new Mod(asset);
         }
         if (asset && asset instanceof Mod && asset.getMainFile().path !== undefined) {
@@ -486,7 +486,7 @@ export default class Profile extends OAMFAsset {
         }
       } else if (type === 'resourcepack') {
         asset = this.resourcepacks.find(a => a.id === asset.id);
-        if (!(asset instanceof OMAFFileAsset)) {
+        if (asset && !(asset instanceof OMAFFileAsset)) {
           asset = new OMAFFileAsset(asset);
         }
         if (asset && asset instanceof OMAFFileAsset && asset.getMainFile().path !== undefined) {
@@ -519,7 +519,7 @@ export default class Profile extends OAMFAsset {
         }
       } else if (type === 'world') {
         asset = this.worlds.find(a => a.id === asset.id);
-        if (!(asset instanceof World)) {
+        if (asset && !(asset instanceof World)) {
           asset = new World(asset);
         }
         if (asset && asset instanceof World && asset.getMainFile().path !== undefined) {

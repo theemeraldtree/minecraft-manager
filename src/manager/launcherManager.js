@@ -88,6 +88,9 @@ const LauncherManager = {
     this.setProfileData(profile, 'lastUsed', iso);
     this.setProfileData(profile, 'gameDir', profile.gameDir);
   },
+  updateGameDir(profile) {
+    this.setProfileData(profile, 'gameDir', profile.gameDir);
+  },
   openLauncher() {
     const launcherPath = Global.getLauncherPath();
     if (os.platform() === 'win32') {

@@ -14,7 +14,7 @@ export default class Page extends PureComponent {
   }
 
   importCancel = () => {
-    localStorage.setItem('importDone', true);
+    localStorage.setItem('importDone', 'true');
     ProfilesManager.getProfiles().then(() => {
       this.setState({
         hideOverlay: true
@@ -31,7 +31,7 @@ export default class Page extends PureComponent {
           app.process.argv[1] !== '--updated' &&
           app.process.argv[1] &&
           !hideOverlay &&
-          localStorage.getItem('importDone') === 'false' && (
+          localStorage.getItem('importDone') !== 'true' && (
             <ImportOverlay file={app.process.argv[1]} cancelClick={this.importCancel} />
           )}
         {children}

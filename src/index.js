@@ -19,6 +19,8 @@ import { loadSnapshotProfile } from './defaultProfiles/snapshotProfile';
 
 const { remote, ipcRenderer } = require('electron');
 
+localStorage.setItem('importDone', 'false');
+
 async function load() {
   await SettingsManager.loadSettings();
 

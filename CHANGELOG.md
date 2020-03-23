@@ -4,7 +4,9 @@ Changelogs for development versions are located in their corresponding branch.
 
 ## Current Development Version
 
-#### work branch
+## 2.3.5
+
+#### Released 2020-03-22
 
 ### Features
 
@@ -17,6 +19,7 @@ Changelogs for development versions are located in their corresponding branch.
 - The option to disable News checks on start up
 - MultiMC Importing (experimental)
 - Release date is now shown on versions
+- Added the option to run the Snapshot profile in the same game directory as Latest release
 
 ### Changed
 

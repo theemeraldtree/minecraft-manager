@@ -20,26 +20,30 @@ const SettingsManager = {
 
         this.MC_HOME = parsed.homeDirectory;
         this.currentSettings = parsed;
-        if (!this.currentSettings.defaultsShowTutorial) {
+        if (this.currentSettings.defaultsShowTutorial === undefined) {
           this.currentSettings.defaultsShowTutorial = false;
         }
-        if (!this.currentSettings.defaultsAutoJump) {
+        if (this.currentSettings.defaultsAutoJump === undefined) {
           this.currentSettings.defaultsAutoJump = false;
         }
-        if (!this.currentSettings.defaultsMultiplayerWarning) {
+        if (this.currentSettings.defaultsMultiplayerWarning === undefined) {
           this.currentSettings.defaultsMultiplayerWarning = false;
         }
 
-        if (!this.currentSettings.allowSnapshotProfile) {
+        if (this.currentSettings.allowSnapshotProfile === undefined) {
           this.currentSettings.allowSnapshotProfile = false;
         }
 
-        if (!this.currentSettings.checkToastNews) {
+        if (this.currentSettings.checkToastNews === undefined) {
           this.currentSettings.checkToastNews = true;
         }
 
-        if (!this.currentSettings.closeOnLaunch) {
+        if (this.currentSettings.closeOnLaunch === undefined) {
           this.currentSettings.closeOnLaunch = false;
+        }
+
+        if (this.currentSettings.runSnapshotInSeperateFolder === undefined) {
+          this.currentSettings.runSnapshotInSeperateFolder = true;
         }
 
         resolve();
@@ -95,7 +99,8 @@ const SettingsManager = {
       mcExe: '',
       lastToastNewsID: -1,
       checkToastNews: true,
-      closeOnLaunch: false
+      closeOnLaunch: false,
+      runSnapshotInSeperateFolder: true
     };
 
     fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(obj));

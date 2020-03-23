@@ -80,7 +80,6 @@ function App() {
       }}
     >
       {localStorage.setItem('showDownloads', false)}
-      {localStorage.setItem('importDone', false)}
       <div>
         <Alert />
         <Toast />

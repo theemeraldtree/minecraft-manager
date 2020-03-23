@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import path from 'path';
@@ -6,6 +6,11 @@ import { shell } from 'electron';
 import ProfilesManager from '../../../manager/profilesManager';
 import Button from '../../../component/button/button';
 import Detail from '../../../component/detail/detail';
+import Checkbox from '../../../component/checkbox/checkbox';
+import SettingsManager from '../../../manager/settingsManager';
+import InputContainer from '../components/inputcontainer';
+import Global from '../../../util/global';
+import LauncherManager from '../../../manager/launcherManager';
 
 const BG = styled.div`
   button {
@@ -16,6 +21,24 @@ const BG = styled.div`
 
 export default function EditPageAdvanced({ id }) {
   const profile = ProfilesManager.getProfileFromID(id);
+
+  const [runSnapshotInSeperateFolder, setRunSnapshotInSeperateFolder] = useState(
+    SettingsManager.currentSettings.runSnapshotInSeperateFolder
+  );
+
+  const snapshotSeperateFolderClick = () => {
+    const inverted = !SettingsManager.currentSettings.runSnapshotInSeperateFolder;
+    if (inverted) {
+      profile.gameDir = path.join(profile.profilePath, 'files');
+    } else {
+      profile.gameDir = Global.getMCPath();
+    }
+    setRunSnapshotInSeperateFolder(inverted);
+    profile.save();
+    SettingsManager.currentSettings.runSnapshotInSeperateFolder = inverted;
+    SettingsManager.save();
+    LauncherManager.updateGameDir(profile);
+  };
 
   return (
     <BG>
@@ -51,6 +74,12 @@ export default function EditPageAdvanced({ id }) {
       <Detail>version-safe name: {profile.safename}</Detail>
       <Detail>version timestamp: {profile.version.timestamp}</Detail>
       <Detail>OMAF version: {profile.omafVersion}</Detail>
+      {profile.id === '0-default-profile-snapshot' && (
+        <InputContainer>
+          <Checkbox lighter checked={runSnapshotInSeperateFolder} onClick={snapshotSeperateFolderClick} />
+          Run in a seperate game directory from Latest release
+        </InputContainer>
+      )}
     </BG>
   );
 }

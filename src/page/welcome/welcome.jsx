@@ -61,6 +61,10 @@ const Content = styled.div`
     max-width: 500px;
     text-align: center;
   }
+
+  input {
+    font-size: 13pt;
+  }
 `;
 
 const Logo = styled.div`
@@ -94,6 +98,15 @@ const AutofillText = styled.p`
   margin: 0;
   font-size: 10pt !important;
   color: white;
+`;
+
+const LeftSubText = styled(Subtext)`
+  text-align: left !important;
+  font-size: 13pt !important;
+  margin-top: 20px !important;
+  margin-bottom: 5px !important;
+  padding: 10px;
+  background-color: #404040;
 `;
 
 function WelcomePage({ history }) {
@@ -141,6 +154,8 @@ function WelcomePage({ history }) {
 
     const result = await Global.updateMCVersions(true);
 
+    fs.mkdirSync(path.join(Global.MCM_TEMP));
+
     if (result === 'no-connection') {
       setPreparing(false);
     } else {
@@ -180,15 +195,44 @@ function WelcomePage({ history }) {
                 <WelcomeBox>
                   <Logo />
                   <Title>Welcome to Minecraft Manager</Title>
-                  <Subtext>the easiest way to manage minecraft mods and modpacks</Subtext>
+                  <Subtext>The easiest way to manage your Minecraft Launcher</Subtext>
                 </WelcomeBox>
                 <GB onClick={nextStep} color="green">
-                  Continue
+                  continue
                 </GB>
               </>
             )}
 
             {step === 1 && (
+              <>
+                <WelcomeBox>
+                  <Title>A quick word about your Launcher</Title>
+                </WelcomeBox>
+                <LeftSubText>
+                  <b>
+                    Minecraft Manager is very different from any other 3rd-party Minecraft Launcher you might've used.
+                  </b>
+                  <br />
+                  <br />
+                  Minecraft Manager adds your Profiles and Modpacks directly to the vanilla Minecraft Launcher, unlike
+                  other launchers.
+                  <br />
+                  <br />
+                  This may seem strange, but it allows for everything you do that's Minecraft-related to be in one
+                  place.
+                </LeftSubText>
+                <LeftSubText>
+                  Before continuing with setup, it's recommended that you{' '}
+                  <b>backup anything in your .minecraft folder that you don't want to lose,</b> in case something goes
+                  wrong
+                </LeftSubText>
+                <GB onClick={nextStep} color="green">
+                  continue with setup
+                </GB>
+              </>
+            )}
+
+            {step === 2 && (
               <>
                 <Spacing />
                 <Title>Is this where your .minecraft folder is?</Title>
@@ -206,12 +250,12 @@ function WelcomePage({ history }) {
                 </AutofillText>
 
                 <GB onClick={nextStep} color="green">
-                  Continue
+                  continue
                 </GB>
               </>
             )}
 
-            {step === 2 && (
+            {step === 3 && (
               <>
                 <Spacing />
                 <Title>Is this where your Minecraft Executable is?</Title>
@@ -229,12 +273,12 @@ function WelcomePage({ history }) {
                 </AutofillText>
 
                 <GB onClick={nextStep} color="green">
-                  Continue
+                  continue
                 </GB>
               </>
             )}
 
-            {step === 3 && (
+            {step === 4 && (
               <>
                 <Spacing />
                 <Title>You're all set!</Title>
@@ -247,12 +291,12 @@ function WelcomePage({ history }) {
                 </p>
 
                 <GB onClick={nextStep} color="green">
-                  Next
+                  next
                 </GB>
               </>
             )}
 
-            {step === 4 && (
+            {step === 5 && (
               <>
                 <Spacing />
                 <Title>tips and tricks</Title>
@@ -265,12 +309,12 @@ function WelcomePage({ history }) {
                 <p>Share your custom-made profile with your friends through a tiny, typically less than 1 MB file</p>
 
                 <GB onClick={nextStep} color="green">
-                  Next Tip
+                  next tip
                 </GB>
               </>
             )}
 
-            {step === 5 && (
+            {step === 6 && (
               <>
                 <Spacing />
                 <Title>tips and tricks</Title>
@@ -284,7 +328,7 @@ function WelcomePage({ history }) {
                 <p>Right click various things to access hidden actions! Who knows what you'll discover!</p>
 
                 <GB onClick={start} color="green">
-                  Finish Setup
+                  finish setup
                 </GB>
               </>
             )}
