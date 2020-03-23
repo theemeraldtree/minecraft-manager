@@ -34,8 +34,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.3.5',
-  MCM_RELEASE_DATE: '3/22/2020',
+  MCM_VERSION: '2.3.6',
+  MCM_RELEASE_DATE: '3/23/2020',
 
   OMAF_VERSION: '1.0.0',
 
@@ -92,7 +92,7 @@ const Global = {
     if (!version || (semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1)) {
       ToastManager.createToast(
         `Welcome to ${this.MCM_VERSION}`,
-        `With a few improvements! <a href="https://github.com/theemeraldtree/minecraft-manager/blob/v${this.MCM_VERSION}/CHANGELOG.md">View the changelog</a>`
+        `<a href="https://github.com/theemeraldtree/minecraft-manager/blob/v${this.MCM_VERSION}/CHANGELOG.md">View the changelog here</a>`
       );
       SettingsManager.setLastVersion(this.MCM_VERSION);
     }

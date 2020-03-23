@@ -48,7 +48,10 @@ const DownloadsManager = {
     });
   },
   removeDownload(downloadName) {
-    this.activeDownloads.splice(this.activeDownloads.find(download => download.name === downloadName));
+    this.activeDownloads.splice(
+      this.activeDownloads.findIndex(download => download.name === downloadName),
+      1
+    );
     this.downloadUpdate();
   },
   createProgressiveDownload(downloadName) {
@@ -100,6 +103,7 @@ const DownloadsManager = {
           if (type === 'world') {
             FileScanner.scanInstallingWorld(profile, downloadPath, mod);
           }
+
           resolve();
         });
       }

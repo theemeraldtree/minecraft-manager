@@ -2,7 +2,14 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
-## Current Development Version
+## 2.3.6
+
+#### Released 2020-03-23
+
+### Fixes
+
+- Fixed Downloads not appearing in the viewer
+- Fixed a small Toast bug
 
 ## 2.3.5
 

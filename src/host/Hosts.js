@@ -307,7 +307,6 @@ const Hosts = {
           }
 
           DownloadsManager.removeDownload(download.name);
-
           if (!mod.downloadTemp) {
             if (host === 'curse') {
               mod = await Curse.addFileInfo(mod, mod.hosts.curse.fileID);
@@ -326,20 +325,28 @@ const Hosts = {
           DownloadsManager.startAssetDownload(profile, mod, type, mod.downloadTemp, false).then(async () => {
             if (type === 'mod') {
               modObj.setJARFile(`${mod.id}.jar`);
-              modObj.icon = `_mcm/icons/mods/${mod.id}${path.extname(mod.iconPath)}`;
+              if (modObj.iconPath) {
+                modObj.icon = `_mcm/icons/mods/${mod.id}${path.extname(mod.iconPath)}`;
+              }
             } else if (type === 'resourcepack') {
               modObj.setMainFile('resourcepacks', 'resourcepackzip', `${mod.id}.zip`);
-              modObj.icon = `_mcm/icons/resourcepacks/${mod.id}${path.extname(mod.iconPath)}`;
+              if (modObj.iconPath) {
+                modObj.icon = `_mcm/icons/resourcepacks/${mod.id}${path.extname(mod.iconPath)}`;
+              }
             } else if (type === 'world') {
               modObj.setMainFile('saves', 'worldfolder', mod.id);
-              modObj.icon = `_mcm/icons/worlds/${mod.id}${path.extname(mod.iconPath)}`;
+              if (modObj.iconPath) {
+                modObj.icon = `_mcm/icons/worlds/${mod.id}${path.extname(mod.iconPath)}`;
+              }
             }
 
-            DownloadsManager.startFileDownload(
-              `${mod.name} Icon\n_A_${profile.name}`,
-              mod.iconPath,
-              path.join(profile.profilePath, modObj.icon)
-            );
+            if (mod.iconPath) {
+              DownloadsManager.startFileDownload(
+                `${mod.name} Icon\n_A_${profile.name}`,
+                mod.iconPath,
+                path.join(profile.profilePath, modObj.icon)
+              );
+            }
 
             if (!profile.getSubAssetFromID(type, mod.id)) {
               profile.addSubAsset(type, modObj);

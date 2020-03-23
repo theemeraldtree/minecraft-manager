@@ -12,7 +12,7 @@ const ToastManager = {
   },
   dismissToast(id) {
     this.toasts.splice(
-      this.toasts.find(toast => toast.id === id),
+      this.toasts.findIndex(toast => toast.id === id),
       1
     );
     this.updateHandler();

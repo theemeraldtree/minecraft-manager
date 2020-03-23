@@ -27,7 +27,9 @@ export default class Page extends PureComponent {
     const { hideOverlay } = this.state;
     return (
       <>
-        {app.process.argv[1] !== '.' &&
+        {app.process &&
+          app.process.argv &&
+          app.process.argv[1] !== '.' &&
           app.process.argv[1] !== '--updated' &&
           app.process.argv[1] &&
           !hideOverlay &&
