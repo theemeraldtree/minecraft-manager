@@ -2,6 +2,26 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.3.7
+
+#### Released 2020-04-08
+
+### Fixes
+
+- Fixed Dependencies not downloading correctly
+- Fixed Fabric not showing install complete
+- Fixed Snapshots running in seperate folders
+- Fixed "Open Profile Folder" button
+
+### Features
+
+- Allow syncing of Minecraft Options, OptiFine Options, and Servers
+- Allow copying of Options and Servers
+
+### Changed
+
+- Reorganized Edit Advanced page
+
 ## 2.3.6
 
 #### Released 2020-03-23

@@ -17,6 +17,7 @@ import Overlay from '../../../component/overlay/overlay';
 import ProfileSelector from '../../../component/profileSelector/profileSelector';
 import AlertBackground from '../../../component/alert/alertbackground';
 import ToastManager from '../../../manager/toastManager';
+import LatestProfile from '../../../defaultProfiles/latestProfile';
 
 const Panel = styled.div`
   background-color: #2b2b2b;
@@ -63,8 +64,14 @@ export default function EditPageAdvanced({ id }) {
     const inverted = !SettingsManager.currentSettings.runSnapshotInSeperateFolder;
     if (inverted) {
       profile.gameDir = path.join(profile.profilePath, 'files');
+      profile.worlds = [];
+      profile.resourcepacks = [];
+      profile.save();
+      Global.scanProfile(profile);
     } else {
       profile.gameDir = Global.getMCPath();
+      profile.worlds = LatestProfile.worlds;
+      profile.resourcepacks = LatestProfile.resourcepacks;
     }
     setRunSnapshotInSeperateFolder(inverted);
     profile.save();
@@ -159,85 +166,87 @@ export default function EditPageAdvanced({ id }) {
           </div>
         </AlertBackground>
       </Overlay>
-      <Panel>
-        <h3>Sync Options</h3>
+      <div>
+        <Panel>
+          <h3>Sync Options</h3>
 
-        {profile.id !== '0-default-profile-latest' && (
-          <>
+          {profile.id !== '0-default-profile-latest' && (
+            <>
+              <InputContainer>
+                <Checkbox lighter checked={syncOptionsTXT} onClick={syncOptionsTXTClick} />
+                Sync in-game Minecraft Options with this profile
+              </InputContainer>
+
+              <InputContainer>
+                <Checkbox lighter checked={syncOptionsOF} onClick={syncOptionsOFClick} />
+                Sync in-game OptiFine Options with this profile
+              </InputContainer>
+
+              <InputContainer>
+                <Checkbox lighter checked={syncServers} onClick={syncServersClick} />
+                Sync in-game server list with this profile
+              </InputContainer>
+              <br />
+            </>
+          )}
+
+          <Button color="green" onClick={copyOptionsTXT}>
+            Copy in-game Minecraft Options to...
+          </Button>
+
+          <Button color="green" onClick={copyOptionsOF}>
+            Copy in-game OptiFine Options to...
+          </Button>
+
+          <Button color="green" onClick={copyServers}>
+            Copy in-game servers list to...
+          </Button>
+        </Panel>
+        <Panel>
+          <h3>Advanced Info</h3>
+          <Button color="red" onClick={() => profile.openGameDir()}>
+            Open Profile Folder
+          </Button>
+
+          <Detail>internal id: {profile.id}</Detail>
+          <Detail>version-safe name: {profile.safename}</Detail>
+          <Detail>version timestamp: {profile.version.timestamp}</Detail>
+          <Detail>OMAF version: {profile.omafVersion}</Detail>
+          {profile.id === '0-default-profile-snapshot' && (
             <InputContainer>
-              <Checkbox lighter checked={syncOptionsTXT} onClick={syncOptionsTXTClick} />
-              Sync in-game Minecraft Options with this profile
+              <Checkbox lighter checked={runSnapshotInSeperateFolder} onClick={snapshotSeperateFolderClick} />
+              Run in a seperate game directory from Latest release
             </InputContainer>
-
-            <InputContainer>
-              <Checkbox lighter checked={syncOptionsOF} onClick={syncOptionsOFClick} />
-              Sync in-game OptiFine Options with this profile
-            </InputContainer>
-
-            <InputContainer>
-              <Checkbox lighter checked={syncServers} onClick={syncServersClick} />
-              Sync in-game server list with this profile
-            </InputContainer>
-            <br />
-          </>
-        )}
-
-        <Button color="green" onClick={copyOptionsTXT}>
-          Copy in-game Minecraft Options to...
-        </Button>
-
-        <Button color="green" onClick={copyOptionsOF}>
-          Copy in-game OptiFine Options to...
-        </Button>
-
-        <Button color="green" onClick={copyServers}>
-          Copy in-game servers list to...
-        </Button>
-      </Panel>
-      <Panel>
-        <h3>Advanced Info</h3>
-        <Button color="red" onClick={() => profile.openGameDir()}>
-          Open Profile Folder
-        </Button>
-
-        <Detail>internal id: {profile.id}</Detail>
-        <Detail>version-safe name: {profile.safename}</Detail>
-        <Detail>version timestamp: {profile.version.timestamp}</Detail>
-        <Detail>OMAF version: {profile.omafVersion}</Detail>
-        {profile.id === '0-default-profile-snapshot' && (
-          <InputContainer>
-            <Checkbox lighter checked={runSnapshotInSeperateFolder} onClick={snapshotSeperateFolderClick} />
-            Run in a seperate game directory from Latest release
-          </InputContainer>
-        )}
-      </Panel>
-      <Panel>
-        <h3>Technical Functions</h3>
-        <Button color="red" onClick={() => shell.openExternal(path.join(profile.profilePath, '/profile.json'))}>
-          Open profile.json
-        </Button>
-        <Button
-          color="red"
-          onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/mods.json'))}
-        >
-          Open subAssets/mods.json
-        </Button>
-        <Button
-          color="red"
-          onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/resourcepacks.json'))}
-        >
-          Open subAssets/resourcepacks.json
-        </Button>
-        <Button
-          color="red"
-          onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/worlds.json'))}
-        >
-          Open subAssets/worlds.json
-        </Button>
-        <Button color="red" onClick={() => shell.openExternal(profile.profilePath)}>
-          Open OMAF data folder
-        </Button>
-      </Panel>
+          )}
+        </Panel>
+        <Panel>
+          <h3>Technical Functions</h3>
+          <Button color="red" onClick={() => shell.openExternal(path.join(profile.profilePath, '/profile.json'))}>
+            Open profile.json
+          </Button>
+          <Button
+            color="red"
+            onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/mods.json'))}
+          >
+            Open subAssets/mods.json
+          </Button>
+          <Button
+            color="red"
+            onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/resourcepacks.json'))}
+          >
+            Open subAssets/resourcepacks.json
+          </Button>
+          <Button
+            color="red"
+            onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/worlds.json'))}
+          >
+            Open subAssets/worlds.json
+          </Button>
+          <Button color="red" onClick={() => shell.openExternal(profile.profilePath)}>
+            Open OMAF data folder
+          </Button>
+        </Panel>
+      </div>
     </>
   );
 }

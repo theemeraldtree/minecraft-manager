@@ -45,6 +45,7 @@ export default class Profile extends OAMFAsset {
     this.profilePath = path.join(Global.PROFILES_PATH, `/${this.id}`);
 
     if (!this.gameDir) this.gameDir = path.join(this.profilePath, '/files');
+
     if (!this.mcm) this.mcm = {};
 
     this.subAssetsPath = path.join(this.profilePath, '/_omaf/subAssets');
@@ -167,24 +168,6 @@ export default class Profile extends OAMFAsset {
       this.readSubAsset('mods.json');
       this.readSubAsset('resourcepacks.json');
       this.readSubAsset('worlds.json');
-    }
-  }
-
-  /**
-   * Set whether this profile should be run in a seperate directory from Latest Release
-   * @param {boolean} seperateFolder - Run this profile in a seperate folder
-   */
-  setRunInSeperateFolder(seperateFolder) {
-    if (this.mcmRunInSeperateFolder !== seperateFolder) {
-      this.mcmRunInSeperateFolder = seperateFolder;
-      if (seperateFolder) {
-        this.gameDir = path.join(this.profilePath, 'files');
-      } else {
-        this.gameDir = Global.getMCPath();
-      }
-
-      this.save();
-      LauncherManager.updateGameDir(this);
     }
   }
 

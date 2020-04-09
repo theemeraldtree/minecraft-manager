@@ -34,8 +34,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.3.6',
-  MCM_RELEASE_DATE: '3/23/2020',
+  MCM_VERSION: '2.3.7',
+  MCM_RELEASE_DATE: '4/8/2020',
 
   OMAF_VERSION: '1.0.0',
 
@@ -421,7 +421,12 @@ const Global = {
   // with those that the user has changed
   scanProfiles() {
     ProfilesManager.loadedProfiles.forEach(profile => {
-      this.scanProfile(profile);
+      if (
+        (profile.id === '0-default-profile-snapshot' && SettingsManager.currentSettings.runSnapshotInSeperateFolder) ||
+        profile.id !== '0-default-profile-snapshot'
+      ) {
+        this.scanProfile(profile);
+      }
     });
   },
 

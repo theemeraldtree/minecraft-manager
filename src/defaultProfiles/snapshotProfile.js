@@ -3,6 +3,8 @@ import fs from 'fs';
 import mkdirp from 'mkdirp';
 import Profile from '../type/profile';
 import Global from '../util/global';
+import SettingsManager from '../manager/settingsManager';
+import LatestProfile from './latestProfile';
 
 const SnapshotProfile = new Profile({
   type: 'profile',
@@ -13,7 +15,6 @@ const SnapshotProfile = new Profile({
   description: 'The Latest Snapshot Version of Minecraft. May be unstable!',
   omafVersion: '1.0.0',
   isDefaultProfile: true,
-  mcmRunInSeperateFolder: false,
   version: {
     displayName: 'Snapshot',
     timestamp: 0,
@@ -53,6 +54,13 @@ function loadSnapshotProfile() {
   SnapshotProfile.minecraftVersion = Global.ALL_VERSIONS[0];
 
   SnapshotProfile.save();
+
+  if (!SettingsManager.currentSettings.runSnapshotInSeperateFolder) {
+    SnapshotProfile.worlds = LatestProfile.worlds;
+    SnapshotProfile.resourcespacks = LatestProfile.resourcepacks;
+  } else {
+    SnapshotProfile.gameDir = Global.getMCPath();
+  }
 }
 
 export { loadSnapshotProfile };
