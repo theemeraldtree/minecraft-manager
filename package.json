@@ -94,7 +94,9 @@
     "styled-transition-group": "^2.0.0",
     "stylis": "^3.5.4",
     "webpack": "4.29.0",
-    "webpack-dev-server": "3.1.14"
+    "webpack-dev-server": "3.1.14",
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^4.4.2"
   },
   "devDependencies": {
     "electron": "^4.0.1",

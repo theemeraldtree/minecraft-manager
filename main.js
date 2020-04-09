@@ -5,8 +5,31 @@ const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
 const os = require('os');
+const winston = require('winston');
+require('winston-daily-rotate-file');
 
-console.info('Starting Minecraft Manager main Node process');
+const logformat = winston.format.printf(
+  ({ timestamp, level, message }) => `[${timestamp}] [${level.toUpperCase()}]: ${message}`
+);
+
+const rotateFile = new winston.transports.DailyRotateFile({
+  filename: '%DATE%-main.log',
+  datePattern: 'YYYY-MM-DD',
+  maxFiles: '7d',
+  createSymlink: true,
+  symlinkName: 'latest-main.log',
+  auditFile: path.join(app.getPath('userData'), '/logs/main-node-process/.mcm-main-log-audit.json'),
+  dirname: path.join(app.getPath('userData'), '/logs/main-node-process')
+});
+
+const mainLogger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(winston.format.timestamp(), winston.format.align(), logformat),
+  transports: [rotateFile, new winston.transports.Console({ colorize: true, prettyPrint: true, level: 'info' })]
+});
+
+mainLogger.info('Launching Minecraft Manager');
+mainLogger.info('Starting Main Node Process');
 
 // Security warning IS DISABLED because we're loading from localhost.
 // this is only disabled so it doesn't clog the console in dev mode
@@ -19,10 +42,11 @@ ipcMain.on('install-update', () => {
 const downloadProgresses = {};
 
 ipcMain.on('download-file', async (event, downloadURL, dest, id) => {
+  mainLogger.info('Received Download File IPC');
   downloadProgresses[id] = 0;
   let progressData = 0;
   const ws = fs.createWriteStream(dest);
-  console.info(`Downloading ${downloadURL}`);
+  mainLogger.info(`Starting download of ${downloadURL}`);
   try {
     const { data, headers } = await axios(downloadURL, {
       responseType: 'stream',
@@ -53,13 +77,13 @@ ipcMain.on('download-file', async (event, downloadURL, dest, id) => {
     data.pipe(ws);
 
     ws.on('finish', () => {
-      console.info(`Download finished ${downloadURL}`);
+      mainLogger.info(`Finished download of ${downloadURL}`);
       event.sender.send('file-download-finish', {
         id
       });
     });
   } catch (e) {
-    console.error(e);
+    mainLogger.error(e);
     event.sender.send('file-download-error', { id, error: e });
   }
 });
@@ -100,6 +124,8 @@ function navigation(event, navURL) {
       finalUrl = navURL.substring(51);
     }
 
+    mainLogger.info(`Navigating externally to ${finalUrl}`);
+
     event.preventDefault();
     shell.openExternal(finalUrl);
   }
@@ -109,7 +135,7 @@ function createWindow() {
   // why show a frame on linux but hide it on everything else?
   // on linux CSD (client-side decoration) causes a ton of problems without a frame
   // so unfortunately it has to be disabled
-  console.info('Creating BrowserWindow...');
+  mainLogger.info('Creating Electron BrowserWindow');
 
   mainWindow = new BrowserWindow({
     width: 800,
@@ -133,10 +159,12 @@ function createWindow() {
     // }
 
     if (fs.existsSync('.reactDevtools.json')) {
+      mainLogger.info('Attempting to add React DevTools to BrowserWindow');
       const json = JSON.parse(fs.readFileSync('.reactDevtools.json'));
       BrowserWindow.addDevToolsExtension(path.join(json.extPath));
     }
 
+    mainLogger.info('Opening DevTools in BrowserWindow');
     mainWindow.openDevTools();
   }
 
@@ -174,41 +202,48 @@ function createWindow() {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
+    mainLogger.info('Quitting Minecraft Manager...');
     app.quit();
   }
 });
 
 function checkForUpdates() {
-  autoUpdater.checkForUpdates();
-  autoUpdater.on('checking-for-update', () => {
-    mainWindow.webContents.send('checking-for-update');
-  });
-
-  autoUpdater.on('update-available', () => {
-    mainWindow.webContents.send('update-available');
-  });
-
-  autoUpdater.on('update-downloaded', () => {
-    const notif = new Notification({
-      title: 'Minecraft Manager',
-      body:
-        'An update is available for Minecraft Manager. It has been downloaded and will be installed next time you start the app.'
+  if (dev) {
+    mainLogger.info('[Updater] Cannot update while in dev mode');
+    mainWindow.webContents.send('in-dev');
+  } else {
+    mainLogger.info('[Updater] Checking for updates...');
+    autoUpdater.checkForUpdates();
+    autoUpdater.on('checking-for-update', () => {
+      mainWindow.webContents.send('checking-for-update');
     });
-    notif.show();
-    mainWindow.webContents.send('update-downloaded');
-  });
 
-  autoUpdater.on('update-not-available', () => {
-    mainWindow.webContents.send('update-not-available');
-  });
+    autoUpdater.on('update-available', () => {
+      mainLogger.info('[Updater] Found an update. Sending IPC...');
+      mainWindow.webContents.send('update-available');
+    });
 
-  autoUpdater.on('error', error => {
-    if (dev) {
-      mainWindow.webContents.send('in-dev');
-    } else {
+    autoUpdater.on('update-downloaded', () => {
+      mainLogger.info('[Updater] Successfully downloaded update. Sending Notification and IPC...');
+      const notif = new Notification({
+        title: 'Minecraft Manager',
+        body:
+          'An update is available for Minecraft Manager. It has been downloaded and will be installed next time you start the app.'
+      });
+      notif.show();
+      mainWindow.webContents.send('update-downloaded');
+    });
+
+    autoUpdater.on('update-not-available', () => {
+      mainLogger.info('[Updater] No updates available');
+      mainWindow.webContents.send('update-not-available');
+    });
+
+    autoUpdater.on('error', error => {
+      mainLogger.error(`[Updater] Error checking for updates:\n${error.toString()}`);
       mainWindow.webContents.send('error', error);
-    }
-  });
+    });
+  }
 }
 
 ipcMain.on('check-for-updates', () => {
