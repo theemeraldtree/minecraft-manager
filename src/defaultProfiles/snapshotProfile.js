@@ -3,7 +3,6 @@ import fs from 'fs';
 import mkdirp from 'mkdirp';
 import Profile from '../type/profile';
 import Global from '../util/global';
-import SettingsManager from '../manager/settingsManager';
 
 const SnapshotProfile = new Profile({
   type: 'profile',
@@ -14,6 +13,7 @@ const SnapshotProfile = new Profile({
   description: 'The Latest Snapshot Version of Minecraft. May be unstable!',
   omafVersion: '1.0.0',
   isDefaultProfile: true,
+  mcmRunInSeperateFolder: false,
   version: {
     displayName: 'Snapshot',
     timestamp: 0,
@@ -43,10 +43,6 @@ function loadSnapshotProfile() {
 
   if (!fs.existsSync(path.join(SnapshotProfile.profilePath, '/_mcm/icons/worlds'))) {
     mkdirp.sync(path.join(SnapshotProfile.profilePath, '/_mcm/icons/worlds'));
-  }
-
-  if (!SettingsManager.currentSettings.runSnapshotInSeperateFplder) {
-    SnapshotProfile.gameDir = Global.getMCPath();
   }
 
   if (!fs.existsSync(SnapshotProfile.gameDir)) {

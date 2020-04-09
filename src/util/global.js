@@ -60,7 +60,10 @@ const Global = {
       return `${(number / greaterRange.divider).toFixed()}${greaterRange.suffix}`;
     }
 
-    return number.toLocaleString();
+    if (number) {
+      return number.toLocaleString();
+    }
+    return undefined;
   },
   dateMatches(d1) {
     const d2 = new Date();
@@ -308,7 +311,7 @@ const Global = {
           this.copyDirSync(path.join(src, childItem), path.join(dest, childItem));
         });
       } else if (!fs.existsSync(dest)) {
-        fs.linkSync(src, dest);
+        fs.copyFileSync(src, dest);
       }
     } catch (e) {
       ToastManager.createToast('Error', ErrorManager.makeReadable(e));

@@ -250,59 +250,61 @@ const FileScanner = {
         `[scan] {${profile.id}} Found world ${file} which does not exist in subassets file. Adding it...`
       );
 
-      const rawleveldat = fs.readFileSync(path.join(fullPath, 'level.dat'));
-      nbt.parse(rawleveldat, (err, leveldat) => {
-        const data = leveldat.value.Data.value;
-        const worldID = `${Global.createID(path.parse(file).name)}-${Math.floor(
-          Math.random() * (999 - 100 + 1) + 100
-        )}`;
-        let supportedVersion = profile.version.minecraft.version;
-        let name;
+      if (fs.lstatSync(fullPath).isDirectory()) {
+        const rawleveldat = fs.readFileSync(path.join(fullPath, 'level.dat'));
+        nbt.parse(rawleveldat, (err, leveldat) => {
+          const data = leveldat.value.Data.value;
+          const worldID = `${Global.createID(path.parse(file).name)}-${Math.floor(
+            Math.random() * (999 - 100 + 1) + 100
+          )}`;
+          let supportedVersion = profile.version.minecraft.version;
+          let name;
 
-        if (data.LevelName && data.LevelName.value) {
-          name = data.LevelName.value;
-        } else {
-          name = file;
-        }
+          if (data.LevelName && data.LevelName.value) {
+            name = data.LevelName.value;
+          } else {
+            name = file;
+          }
 
-        if (data.Version && data.Version.value && data.Version.value.Name) {
-          supportedVersion = data.Version.value.Name.value;
-        }
+          if (data.Version && data.Version.value && data.Version.value.Name) {
+            supportedVersion = data.Version.value.Name.value;
+          }
 
-        let icon = '';
+          let icon = '';
 
-        if (fs.existsSync(path.join(fullPath, '/icon.png'))) {
-          icon = `game:saves/${file}/icon.png`;
-        }
+          if (fs.existsSync(path.join(fullPath, '/icon.png'))) {
+            icon = `game:saves/${file}/icon.png`;
+          }
 
-        profile.worlds.push(
-          new World({
-            id: worldID,
-            name,
-            version: {
-              displayName: file,
-              minecraft: {
-                supportedVersions: supportedVersion
-              }
-            },
-            blurb: `${file}`,
-            icon,
-            description: name,
-            hosts: {},
-            datapacks: [],
-            type: 'world',
-            files: [
-              {
-                displayName: 'World Folder',
-                type: 'worldfolder',
-                priority: 'mainFile',
-                path: `saves/${file}`
-              }
-            ],
-            dependencies: []
-          })
-        );
-      });
+          profile.worlds.push(
+            new World({
+              id: worldID,
+              name,
+              version: {
+                displayName: file,
+                minecraft: {
+                  supportedVersions: supportedVersion
+                }
+              },
+              blurb: `${file}`,
+              icon,
+              description: name,
+              hosts: {},
+              datapacks: [],
+              type: 'world',
+              files: [
+                {
+                  displayName: 'World Folder',
+                  type: 'worldfolder',
+                  priority: 'mainFile',
+                  path: `saves/${file}`
+                }
+              ],
+              dependencies: []
+            })
+          );
+        });
+      }
     }
   },
   scanDatapack(profile, world, file) {

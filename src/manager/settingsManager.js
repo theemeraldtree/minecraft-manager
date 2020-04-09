@@ -42,10 +42,6 @@ const SettingsManager = {
           this.currentSettings.closeOnLaunch = false;
         }
 
-        if (this.currentSettings.runSnapshotInSeperateFolder === undefined) {
-          this.currentSettings.runSnapshotInSeperateFolder = true;
-        }
-
         resolve();
       });
     });
@@ -99,8 +95,7 @@ const SettingsManager = {
       mcExe: '',
       lastToastNewsID: -1,
       checkToastNews: true,
-      closeOnLaunch: false,
-      runSnapshotInSeperateFolder: true
+      closeOnLaunch: false
     };
 
     fs.writeFileSync(this.SETTINGS_PATH, JSON.stringify(obj));

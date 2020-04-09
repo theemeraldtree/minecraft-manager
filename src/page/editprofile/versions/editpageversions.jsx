@@ -72,7 +72,7 @@ export default function EditPageVersions({ id }) {
   const [showConfirmForge, setShowConfirmForge] = useState(false);
   const [showConfirmFabric, setShowConfirmFabric] = useState(false);
 
-  let isMounted = false;
+  let isMounted = true;
 
   const reloadCurseVersionsList = async () => {
     if (profile.hosts) {

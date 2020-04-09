@@ -303,7 +303,7 @@ const Hosts = {
 
         DownloadsManager.createProgressiveDownload(`${mod.name}\n_A_`).then(async download => {
           if (dependencies) {
-            this.installDependencies(host, profile, mod);
+            this.installDependencies(host, profile, mod, type);
           }
 
           DownloadsManager.removeDownload(download.name);

@@ -19,7 +19,8 @@ export default class OAMFAsset {
     files,
     datapacks,
     iconURL,
-    iconPath
+    iconPath,
+    mcm
   }) {
     this.omafVersion = omafVersion;
     this.type = type;
@@ -46,6 +47,9 @@ export default class OAMFAsset {
     // this solely exists out of laziness
     this.iconURL = iconURL;
     this.iconPath = iconPath;
+
+    // local mcm values (used for mcm-only stuff like profile syncing)
+    this.mcm = mcm;
   }
 
   /**
@@ -66,7 +70,8 @@ export default class OAMFAsset {
       dependencies,
       files,
       frameworks,
-      datapacks
+      datapacks,
+      mcm
     } = this;
 
     const returnObject = {
@@ -82,7 +87,8 @@ export default class OAMFAsset {
       dependencies,
       files,
       frameworks,
-      datapacks
+      datapacks,
+      mcm
     };
 
     // Cleanup regarding local values on hosts

@@ -50,10 +50,26 @@ const FSU = {
 
   /**
    * Creates a directory if it doesn't exist
-   * @param {stirng} dirPath - The directory to create
+   * @param {string} dirPath - The directory to create
    */
   createDirIfMissing(dirPath) {
     if (!fs.existsSync(dirPath)) mkdirp.sync(dirPath);
+  },
+
+  /**
+   * Creates an empty file if it doesn't exist
+   * @param {string} filePath - The file to create
+   */
+  createFileIfMissing(filePath) {
+    if (!fs.existsSync(filePath)) fs.writeFileSync(filePath, '');
+  },
+
+  /**
+   * Deletes a file if it exists
+   * @param {string} filePath - The file to delete
+   */
+  deleteFileIfExists(filePath) {
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   }
 };
 

@@ -29,6 +29,7 @@ export default class Profile extends OAMFAsset {
     super(json);
 
     if (json.isDefaultProfile) this.isDefaultProfile = json.isDefaultProfile;
+    if (json.mcmSyncOptionsTXT) this.mcmSyncOptionsTXT = json.mcmSyncOptionsTXT;
 
     this.error = false;
 
@@ -44,6 +45,7 @@ export default class Profile extends OAMFAsset {
     this.profilePath = path.join(Global.PROFILES_PATH, `/${this.id}`);
 
     if (!this.gameDir) this.gameDir = path.join(this.profilePath, '/files');
+    if (!this.mcm) this.mcm = {};
 
     this.subAssetsPath = path.join(this.profilePath, '/_omaf/subAssets');
 
@@ -168,6 +170,24 @@ export default class Profile extends OAMFAsset {
     }
   }
 
+  /**
+   * Set whether this profile should be run in a seperate directory from Latest Release
+   * @param {boolean} seperateFolder - Run this profile in a seperate folder
+   */
+  setRunInSeperateFolder(seperateFolder) {
+    if (this.mcmRunInSeperateFolder !== seperateFolder) {
+      this.mcmRunInSeperateFolder = seperateFolder;
+      if (seperateFolder) {
+        this.gameDir = path.join(this.profilePath, 'files');
+      } else {
+        this.gameDir = Global.getMCPath();
+      }
+
+      this.save();
+      LauncherManager.updateGameDir(this);
+    }
+  }
+
   // TODO: Write JSDoc info for these functions
 
   hasFramework() {
@@ -175,7 +195,12 @@ export default class Profile extends OAMFAsset {
   }
 
   openGameDir() {
-    return remote.shell.openExternal(this.gameDir);
+    try {
+      return remote.shell.openExternal(this.gameDir);
+    } catch (e) {
+      ToastManager.createToast('Error', ErrorManager.makeReadable(e));
+      return undefined;
+    }
   }
 
   getPrimaryFramework() {
