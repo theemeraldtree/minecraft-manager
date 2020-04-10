@@ -4,8 +4,10 @@ import rimraf from 'rimraf';
 import mkdirp from 'mkdirp';
 import Global from '../util/global';
 import ProfilesManager from './profilesManager';
-import LogManager from './logManager';
 import DownloadsManager from './downloadsManager';
+import logInit from '../util/logger';
+
+const logger = logInit('LibrariesManager');
 
 const LibrariesManager = {
   getLibrariesPath() {
@@ -81,12 +83,12 @@ const LibrariesManager = {
     });
   },
   cleanLibraries() {
-    LogManager.log('info', '[LibrariesManager] [CleanLibraries] Starting clean libraries...');
+    logger.info('Cleaning libraries...');
     fs.readdirSync(this.getMCMLibraries()).forEach(file => {
       if (file.substring(0, 4) === 'mcm-') {
         if (!ProfilesManager.loadedProfiles.find(prof => file === `mcm-${prof.id}`)) {
           rimraf.sync(path.join(this.getMCMLibraries(), file));
-          LogManager.log('info', `[LibrariesManager] [CleanLibraries] Removed library ${file}`);
+          logger.info(`Removed library ${file}`);
         }
       }
     });

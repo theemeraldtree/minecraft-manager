@@ -2,12 +2,14 @@ import path from 'path';
 import fs from 'fs';
 import Global from './global';
 import FSU from './fsu';
-import LogManager from '../manager/logManager';
 import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
 import ProfilesManager from '../manager/profilesManager';
+import logInit from './logger';
 
 const AdmZip = require('adm-zip');
+
+const logger = logInit('MultiMC-Compat');
 
 /**
  * MultiMC-Format Importer/Exporter Utility
@@ -39,7 +41,7 @@ const MultiMC = {
         if (minecraftComponent) {
           minecraftVersion = minecraftComponent.version;
         } else {
-          LogManager.log('severe', '[MultiMC-Import] Missing Minecraft Version');
+          logger.error('[Import] Missing Minecraft Version');
           return;
         }
 

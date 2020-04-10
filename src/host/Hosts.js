@@ -11,6 +11,9 @@ import OMAFFileAsset from '../type/omafFileAsset';
 import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
 import World from '../type/world';
+import logInit from '../util/logger';
+
+const logger = logInit('Hosts');
 
 const Hosts = {
   /* shared functions for hosts */
@@ -24,6 +27,7 @@ const Hosts = {
   concurrentDownloads: [],
 
   async sendCantConnect() {
+    logger.error('Unable to connect to Curse');
     ToastManager.createToast(
       'Whoops!',
       "Looks like we can't connect to Curse right now. Check your internet connection and try again."
@@ -50,6 +54,7 @@ const Hosts = {
 
   /* functions for using hosts */
   async getTopAssets(host, assetType, options = { sort: 'popular', minecraftVersion: 'All' }) {
+    logger.info(`Getting Top Assets of type ${assetType} in host ${host} and options ${JSON.stringify(options)}`);
     if (host === 'curse') {
       if (
         !this.cache.popular.curse[assetType] ||
@@ -65,9 +70,13 @@ const Hosts = {
   },
 
   async getDependencies(host, asset) {
+    logger.info(`Getting dependencies for ${asset.id} and host ${host}`);
     if (host === 'curse') {
       const cachedAsset = this.cache.assets[asset.cachedID];
-      if (cachedAsset && cachedAsset.dependencies) return cachedAsset.dependencies;
+      if (cachedAsset && cachedAsset.dependencies) {
+        return Promise.all(cachedAsset.dependencies.map(async depend => Curse.getFullAsset(depend, 'unknown')));
+      }
+
       return Curse.getDependencies(asset);
     }
 
@@ -75,6 +84,7 @@ const Hosts = {
   },
 
   async getVersions(host, asset) {
+    logger.info(`Getting versions for ${asset.id} and host ${host}`);
     if (host === 'curse') {
       if (this.cache.assets[asset.cachedID]) {
         const { versionCache } = this.cache.assets[asset.cachedID].hosts.curse;

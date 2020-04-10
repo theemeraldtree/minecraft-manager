@@ -4,12 +4,14 @@ import rimraf from 'rimraf';
 import Global from '../util/global';
 import LauncherManager from './launcherManager';
 import ProfilesManager from './profilesManager';
-import LogManager from './logManager';
+import logInit from '../util/logger';
 
 const semver = require('semver');
 const defaultVersionForge = require('../assets/defaultVersion.json');
 const defaultVersionFabric = require('../assets/defaultVersionFabric.json');
 const version1710 = require('../assets/1710version.json');
+
+const logger = logInit('VersionsManager');
 
 const VersionsManager = {
   getVersionsPath() {
@@ -143,12 +145,12 @@ const VersionsManager = {
     });
   },
   cleanVersions() {
-    LogManager.log('info', '[VersionsManager] [CleanVersions] Cleaning Launcher Versions...');
+    logger.info('Cleaning Launcher Versions...');
     fs.readdirSync(this.getVersionsPath()).forEach(file => {
       if (file.indexOf('[Minecraft Manager]') !== -1) {
         if (!ProfilesManager.loadedProfiles.find(prof => prof.versionname === file)) {
           rimraf.sync(path.join(this.getVersionsPath(), file));
-          LogManager.log('info', `[VersionsManager] [CleanVersions] Removed version ${file}`);
+          logger.info(`Removed version ${file}`);
         }
       }
     });

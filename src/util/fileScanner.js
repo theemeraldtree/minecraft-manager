@@ -2,11 +2,13 @@ import path from 'path';
 import fs from 'fs';
 import AdmZip from 'adm-zip';
 import rimraf from 'rimraf';
-import LogManager from '../manager/logManager';
 import OMAFFileAsset from '../type/omafFileAsset';
 import Global from './global';
 import Mod from '../type/mod';
 import World from '../type/world';
+import logInit from './logger';
+
+const logger = logInit('FileScanner');
 
 const nbt = require('prismarine-nbt');
 
@@ -14,7 +16,8 @@ const nbt = require('prismarine-nbt');
 to convert them to OMAF-compliant data using the available information */
 
 const FileScanner = {
-  scanResourcePack: (profile, file) => {
+  scanResourcePack: (profileT, file) => {
+    const profile = profileT;
     const fullPath = path.join(profile.gameDir, `/resourcepacks/${file}`);
     const doesExist = profile.resourcepacks.find(rp => path.join(profile.gameDir, rp.getMainFile().path) === fullPath);
     if (!doesExist) {
@@ -44,11 +47,11 @@ const FileScanner = {
           }
         });
 
-        LogManager.log(
-          'info',
-          `[scan] {${profile.name}} Found resource pack ${file} which does not exist in subassets file. Adding it...`
+        logger.info(
+          `{${profile.name}} Found resource pack ${file} which does not exist in subassets file. Adding it...`
         );
 
+        profile.tempNewScanData = true;
         profile.resourcepacks.push(
           new OMAFFileAsset({
             icon: iconPath,
@@ -102,6 +105,7 @@ const FileScanner = {
         });
 
         if (containsMCMeta) {
+          profile.tempNewScanData = true;
           profile.resourcepacks.push(
             new OMAFFileAsset({
               icon: iconPath,
@@ -132,17 +136,14 @@ const FileScanner = {
       }
     }
   },
-  scanMod: (profile, file) => {
+  scanMod: (profileT, file) => {
+    const profile = profileT;
     const fullPath = path.join(profile.gameDir, `/mods/${file}`);
     const doesExist = profile.mods.find(mod => path.join(profile.gameDir, mod.getMainFile().path) === fullPath);
     if (!doesExist) {
-      LogManager.log(
-        'info',
-        `[scan] {${profile.id}} Found mod file ${file} which does not exist in subassets file. Adding it...`
-      );
-
       // only do jar files, nothing else
       if (path.extname(file) === '.jar') {
+        logger.info(`{${profile.id}} Found mod file ${file} which does not exist in subassets file. Adding it...`);
         const zip = new AdmZip(fullPath);
         const entries = zip.getEntries();
 
@@ -211,6 +212,7 @@ const FileScanner = {
           name = path.parse(file).name;
         }
 
+        profile.tempNewScanData = true;
         profile.mods.push(
           new Mod({
             id: Global.createID(path.parse(file).name),
@@ -241,16 +243,14 @@ const FileScanner = {
       }
     }
   },
-  scanWorld(profile, file) {
+  scanWorld(profileT, file) {
+    const profile = profileT;
     const fullPath = path.join(profile.gameDir, `/saves/${file}`);
     const doesExist = profile.worlds.find(world => path.join(profile.gameDir, world.getMainFile().path) === fullPath);
     if (!doesExist) {
       if (fs.lstatSync(fullPath).isDirectory()) {
         if (fs.existsSync(path.join(fullPath, 'level.dat'))) {
-          LogManager.log(
-            'info',
-            `[scan] {${profile.id}} Found world ${file} which does not exist in subassets file. Adding it...`
-          );
+          logger.info(`{${profile.id}} Found world ${file} which does not exist in subassets file. Adding it...`);
 
           const rawleveldat = fs.readFileSync(path.join(fullPath, 'level.dat'));
           nbt.parse(rawleveldat, (err, leveldat) => {
@@ -276,6 +276,8 @@ const FileScanner = {
             if (fs.existsSync(path.join(fullPath, '/icon.png'))) {
               icon = `game:saves/${file}/icon.png`;
             }
+
+            profile.tempNewScanData = true;
 
             profile.worlds.push(
               new World({
@@ -309,15 +311,15 @@ const FileScanner = {
       }
     }
   },
-  scanDatapack(profile, world, file) {
+  scanDatapack(profileT, world, file) {
+    const profile = profileT;
     const fullPath = path.join(profile.gameDir, `${world.getMainFile().path}/datapacks/${file}`);
     const doesExist = world.datapacks.find(
       dp => path.join(profile.gameDir, `${world.getMainFile().path}/${dp.getMainFile().path}`) === fullPath
     );
     if (!doesExist) {
-      LogManager.log(
-        'info',
-        `[scan] {${profile.id}} Found datapack ${file} in world ${world.id} which does not exist in subassets file. Adding it...`
+      logger.info(
+        `{${profile.id}} Found datapack ${file} in world ${world.id} which does not exist in subassets file. Adding it...`
       );
 
       let name = file;
@@ -325,6 +327,7 @@ const FileScanner = {
         name = name.substring(0, name.length - 4);
       }
 
+      profile.tempNewScanData = true;
       world.datapacks.push(
         new OMAFFileAsset({
           id: Global.createID(file),

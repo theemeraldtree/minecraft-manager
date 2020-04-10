@@ -48,8 +48,6 @@ function loadLatestProfile() {
 
   LatestProfile.version.minecraft.version = Global.MC_VERSIONS[0];
   LatestProfile.minecraftVersion = Global.MC_VERSIONS[0];
-
-  LatestProfile.save();
 }
 
 export { loadLatestProfile };

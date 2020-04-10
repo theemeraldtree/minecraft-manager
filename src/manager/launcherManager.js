@@ -5,7 +5,9 @@ import exec from 'child_process';
 import Global from '../util/global';
 import ProfilesManager from './profilesManager';
 import SettingsManager from './settingsManager';
-import LogManager from './logManager';
+import logInit from '../util/logger';
+
+const logger = logInit('LauncherManager');
 
 const LauncherManager = {
   DEFAULT_JAVA_ARGS:
@@ -110,19 +112,19 @@ const LauncherManager = {
     });
   },
   cleanMinecraftProfiles() {
-    LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Starting clean...');
+    logger.info('Cleaning Minecraft profiles...');
     const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
     Object.keys(obj.profiles).forEach(key => {
       if (key.substring(0, 4) === 'mcm-') {
         if (!ProfilesManager.loadedProfiles.find(prof => key === `mcm-${prof.id}`)) {
           delete obj.profiles[key];
-          LogManager.log('info', `[LauncherManager] [CleanMinecraftProfiles] Removed profile key ${key}`);
+          logger.info(`Removed profile key ${key}`);
         }
       }
     });
-    LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Writing changes...');
+
+    logger.info('Saving changes to disk...');
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
-    LogManager.log('info', '[LauncherManager] [CleanMinecraftProfiles] Successfully written');
   }
 };
 

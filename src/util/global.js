@@ -8,10 +8,10 @@ import VersionsManager from '../manager/versionsManager';
 import LauncherManager from '../manager/launcherManager';
 import LibrariesManager from '../manager/librariesManager';
 import ErrorManager from '../manager/errorManager';
-import LogManager from '../manager/logManager';
 import OMAFFileAsset from '../type/omafFileAsset';
 import FileScanner from './fileScanner';
 import World from '../type/world';
+import logInit from './logger';
 
 const semver = require('semver');
 const { remote } = require('electron');
@@ -20,6 +20,8 @@ const { app } = remote;
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+
+const logger = logInit('Global');
 
 const Global = {
   MCM_PATH: app.getPath('userData'),
@@ -318,7 +320,8 @@ const Global = {
     }
   },
 
-  scanProfile(profile) {
+  scanProfile(profileT) {
+    const profile = profileT;
     fs.readdir(path.join(profile.gameDir, '/resourcepacks'), (err, files) => {
       if (files) {
         if (files.length !== profile.resourcepacks.length) {
@@ -326,7 +329,7 @@ const Global = {
             try {
               FileScanner.scanResourcePack(profile, file);
             } catch (e) {
-              console.error(e);
+              logger.error(`[Scan] {${profileT.id}} ${e.toString()}`);
             }
           });
         }
@@ -338,11 +341,12 @@ const Global = {
       if (!(rp instanceof OMAFFileAsset)) rp = new OMAFFileAsset(rp);
 
       if (!fs.existsSync(path.join(profile.gameDir, rp.getMainFile().path))) {
-        LogManager.log(
-          'info',
-          `[scan] {${profile.id}} Found resource pack ${rp.name} where the main file is missing. Removing it from the profile...`
+        logger.info(
+          `[Scan] {${profile.id}} Found resource pack ${rp.id} where the main file is missing. Removing it from the profile...`
         );
-        profile.deleteSubAsset('resourcepack', rp);
+        profile.deleteSubAsset('resourcepack', rp, false);
+
+        profile.tempNewScanData = true;
       }
     });
 
@@ -361,11 +365,12 @@ const Global = {
       if (!(mod instanceof Mod)) mod = new Mod(mod);
 
       if (!fs.existsSync(path.join(profile.gameDir, mod.getMainFile().path))) {
-        LogManager.log(
-          'info',
-          `[scan] {${profile.id}} Found mod ${mod.name} where the main file is missing. Removing it from the profile...`
+        logger.info(
+          `[Scan] {${profile.id}} Found mod ${mod.id} where the main file is missing. Removing it from the profile...`
         );
-        profile.deleteSubAsset('mod', mod);
+        profile.deleteSubAsset('mod', mod, false);
+
+        profile.tempNewScanData = true;
       }
     });
 
@@ -386,11 +391,11 @@ const Global = {
       const fullPath = path.join(profile.gameDir, world.getMainFile().path);
 
       if (!fs.existsSync(path.join(profile.gameDir, world.getMainFile().path))) {
-        LogManager.log(
-          'info',
-          `[scan] {${profile.id}} Found world ${world.name} where the folder is missing. Removing it from the profile...`
+        logger.info(
+          `[Scan] {${profile.id}} Found world ${world.name} where the folder is missing. Removing it from the profile...`
         );
-        profile.deleteSubAsset('world', world);
+        profile.deleteSubAsset('world', world, false);
+        profile.tempNewScanData = true;
       } else if (fs.existsSync(path.join(fullPath, '/datapacks'))) {
         fs.readdir(path.join(fullPath, '/datapacks'), (err, files) => {
           if (files) {
@@ -402,13 +407,27 @@ const Global = {
           }
         });
       }
+
+      worldT.datapacks.forEach(datapackT => {
+        let datapack = datapackT;
+        if (!(datapack instanceof OMAFFileAsset)) datapack = new OMAFFileAsset(datapack);
+
+        if (!fs.existsSync(path.join(fullPath, datapack.getMainFile().path))) {
+          logger.info(
+            `[Scan] {${profile.id}} Found datapack ${datapack.name} where the main file is missing. Removing it from the profile...`
+          );
+          world.deleteDatapack(profile, datapack);
+          profile.tempNewScanData = true;
+        }
+      });
     });
 
     ProfilesManager.updateProfile(profile);
-    profile.save();
 
     setTimeout(() => {
-      profile.save();
+      if (profile.tempNewScanData) {
+        profile.save();
+      }
     }, 3000);
   },
 
@@ -484,7 +503,7 @@ const Global = {
 
         showMigrationmessage = true;
       } else if (profile.omafVersion === '0.1.3') {
-        LogManager.log('info', `[GLOBAL] Running migration on ${profile.name}`);
+        logger.info(`Running migration on ${profile.id}`);
         if (!fs.existsSync(path.join(profile.profilePath, '/_mcm'))) {
           fs.mkdirSync(path.join(profile.profilePath, '/_mcm'));
           fs.mkdirSync(path.join(profile.profilePath, '/_mcm/icons'));

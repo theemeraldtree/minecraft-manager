@@ -4,8 +4,10 @@ import mkdirp from 'mkdirp';
 import HTTPRequest from '../host/httprequest';
 import Download from '../type/download';
 import Global from '../util/global';
-import LogManager from './logManager';
 import FileScanner from '../util/fileScanner';
+import logInit from '../util/logger';
+
+const logger = logInit('DownloadsManager');
 
 const DownloadsManager = {
   activeDownloads: [],
@@ -43,7 +45,7 @@ const DownloadsManager = {
             }
           });
       } else {
-        LogManager.log('severe', '[DownloadsManager] [StartFileDownload] Missing file download path!');
+        logger.error('Missing file download path');
       }
     });
   },

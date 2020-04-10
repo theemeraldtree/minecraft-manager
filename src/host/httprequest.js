@@ -1,7 +1,10 @@
 import ToastManager from '../manager/toastManager';
+import logInit from '../util/logger';
 
 const { ipcRenderer } = require('electron');
 const axios = require('axios');
+
+const logger = logInit('HTTPRequest');
 
 const HTTPRequest = {
   fileDownloads: {},
@@ -39,6 +42,7 @@ const HTTPRequest = {
    */
   fileDownloadFinish(download) {
     if (this.fileDownloads[download.id]) {
+      logger.info(`Finished downloading: ${download.id}`);
       this.fileDownloads[download.id].onFinish();
     }
   },

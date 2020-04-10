@@ -10,7 +10,6 @@ import FSU from '../util/fsu';
 import Mod from './mod';
 import OMAFFileAsset from './omafFileAsset';
 import World from './world';
-import LogManager from '../manager/logManager';
 import LauncherManager from '../manager/launcherManager';
 import ToastManager from '../manager/toastManager';
 import ErrorManager from '../manager/errorManager';
@@ -19,6 +18,7 @@ import VersionsManager from '../manager/versionsManager';
 import LibrariesManager from '../manager/librariesManager';
 import Hosts from '../host/Hosts';
 import SettingsManager from '../manager/settingsManager';
+import logInit from '../util/logger';
 
 export default class Profile extends OAMFAsset {
   /**
@@ -36,6 +36,8 @@ export default class Profile extends OAMFAsset {
     this.initLocalValues();
     this.loadSubAssets();
     this.checkMissingDirectories();
+
+    this.logger = logInit(`{${json.id}}`);
   }
 
   /**
@@ -198,7 +200,7 @@ export default class Profile extends OAMFAsset {
   }
 
   save() {
-    LogManager.log('info', `{${this.id}} saving...`);
+    this.logger.info('Saving...');
     return new Promise(resolve => {
       fs.writeFile(path.join(this.profilePath, 'profile.json'), JSON.stringify(this.toJSON()), () => {
         if (this.mods) {
@@ -469,9 +471,12 @@ export default class Profile extends OAMFAsset {
     }
   }
 
-  deleteSubAsset(type, assetT) {
+  deleteSubAsset(type, assetT, doSave = true) {
     return new Promise(resolve => {
       let asset = assetT;
+
+      this.logger.info(`Removing subAsset ${asset.id} with type ${type}`);
+
       if (type === 'mod') {
         asset = this.mods.find(m => m.id === asset.id);
         if (asset && !(asset instanceof Mod)) {
@@ -486,7 +491,8 @@ export default class Profile extends OAMFAsset {
                 fs.unlinkSync(path.join(this.profilePath, asset.icon));
               }
             }
-            this.save();
+
+            if (doSave) this.save();
             resolve();
           });
         } else {
@@ -508,7 +514,7 @@ export default class Profile extends OAMFAsset {
                 }
               }
 
-              this.save();
+              if (doSave) this.save();
 
               resolve();
             };
@@ -519,7 +525,7 @@ export default class Profile extends OAMFAsset {
               fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), callback);
             }
           } else {
-            this.save();
+            if (doSave) this.save();
             resolve();
           }
         } else {
@@ -543,7 +549,7 @@ export default class Profile extends OAMFAsset {
                 }
               }
 
-              this.save();
+              if (doSave) this.save();
 
               resolve();
             });
@@ -554,7 +560,7 @@ export default class Profile extends OAMFAsset {
               }
             }
 
-            this.save();
+            if (doSave) this.save();
             resolve();
           }
         }

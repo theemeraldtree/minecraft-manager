@@ -16,38 +16,47 @@ import LibrariesManager from './manager/librariesManager';
 import './font/fonts.css';
 import { loadLatestProfile } from './defaultProfiles/latestProfile';
 import { loadSnapshotProfile } from './defaultProfiles/snapshotProfile';
+import logInit from './util/logger';
+import FSU from './util/fsu';
+
+const logger = logInit('index');
 
 const { remote, ipcRenderer } = require('electron');
 
 localStorage.setItem('importDone', 'false');
 
 async function load() {
+  logger.info('Loading React app...');
+
+  logger.info('Loading settings...');
   await SettingsManager.loadSettings();
+  logger.info('Done loading settings');
 
   try {
+    logger.info('Attempting to update MC versions...');
     Global.updateMCVersions();
+
     if (fs.existsSync(Global.PROFILES_PATH)) {
-      // LogManager.log('info', '[index] Getting profiles...');
-
       // Check for directories - we need to make sure everything exists
-      if (!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
-        fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
-      }
+      logger.info('Checking for missing essential library directories...');
 
-      if (!fs.existsSync(Global.getMCPath(), '/libraries/minecraftmanager/profiles')) {
-        fs.mkdirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
-      }
+      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
+      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
     }
   } catch (e) {
+    logger.error('Something went wrong');
+    logger.error(e.toString());
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
-    console.error(e);
   }
 
   if (fs.existsSync(Global.PROFILES_PATH)) {
+    logger.info('Attempting to load default profiles...');
+
     loadLatestProfile();
     loadSnapshotProfile();
   }
 
+  logger.info('Loading profiles...');
   await ProfilesManager.getProfiles();
 
   document.addEventListener('keydown', e => {
@@ -65,35 +74,46 @@ async function load() {
   });
 
   ipcRenderer.on('file-download-error', (event, obj) => {
+    logger.info(`Received FileDownloadError IPC, ${JSON.stringify(obj)}`);
     HTTPRequest.fileDownloadError(obj);
   });
 
   try {
     if (fs.existsSync(Global.PROFILES_PATH)) {
+      logger.info('Resetting temporary directories...');
       // reset temp
       rimraf.sync(path.join(Global.MCM_TEMP));
       fs.mkdirSync(path.join(Global.MCM_TEMP));
 
+      logger.info('Checking for libraries...');
       LibrariesManager.checkExist();
+
+      logger.info('Checking for extra versions, profiles, and libraries...');
       Global.checkMinecraftVersions();
       Global.checkMinecraftProfiles();
       Global.checkMinecraftLibraries();
 
       if (SettingsManager.currentSettings.checkToastNews) {
+        logger.info('Checking for Toast news...');
         Global.checkToastNews();
       }
 
+      logger.info('Checking to show a changelog...');
       Global.checkChangelog();
+
+      logger.info('Checking for migration...');
       // We call this function in order to see if any changes to OMAF or any other method have been made since the last version
       Global.checkMigration();
 
+      logger.info('Scanning profiles...');
       Global.scanProfiles();
 
       ProfilesManager.updateReloadListeners();
     }
   } catch (e) {
+    logger.error('Something went wrong[1]');
+    logger.error(e.toString());
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
-    console.error(e);
   }
 
   // eslint-disable-next-line react/jsx-filename-extension

@@ -4,12 +4,14 @@ import path from 'path';
 import AdmZip from 'adm-zip';
 import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
-import LogManager from '../../manager/logManager';
 import DownloadsManager from '../../manager/downloadsManager';
 import Global from '../../util/global';
 import VersionsManager from '../../manager/versionsManager';
 import HTTPRequest from '../../host/httprequest';
 import LibrariesManager from '../../manager/librariesManager';
+import logInit from '../../util/logger';
+
+const logger = logInit('ForgeComplex');
 
 const { exec } = require('child_process');
 /*
@@ -28,11 +30,8 @@ const { exec } = require('child_process');
 
 const ForgeComplex = {
   installState: {},
-  log(msg) {
-    LogManager.log('info', `[ForgeComplex] ${msg}`);
-  },
   calculateMavenPath(mvn) {
-    this.log(`Calculating maven path for ${mvn}`);
+    logger.info(`Calculating maven path for ${mvn}`);
     const split = mvn.split(':');
     let EXTENSION = '.jar';
     let isSpecial = false;
@@ -52,7 +51,7 @@ const ForgeComplex = {
     return `${split[0].replace(/\./g, '/')}/${split[1]}/${split[2]}/${split[1]}-${split[2]}${EXTENSION}`;
   },
   setupForge(profile, callback) {
-    this.log('Downloading installer jar');
+    logger.info('Downloading installer jar');
 
     const workFolder = path.join(Global.MCM_TEMP, `/forge-install-${profile.id}-${new Date().getTime()}`);
     if (!fs.existsSync(Global.MCM_TEMP)) {
@@ -66,8 +65,8 @@ const ForgeComplex = {
       `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`,
       path.join(workFolder, 'installer.jar')
     ).then(() => {
-      this.log('Installer Jar download finished');
-      this.log('Extracting installer jar');
+      logger.info('Installer Jar download finished');
+      logger.info('Extracting installer jar');
 
       const TEMP_PATH = path.join(workFolder);
       const JAR_PATH = path.join(TEMP_PATH, '/jar');
@@ -91,15 +90,15 @@ const ForgeComplex = {
       const zip = new AdmZip(path.join(workFolder, 'installer.jar'));
       zip.extractAllTo(JAR_PATH);
 
-      this.log('Reading install_profile.json');
+      logger.info('Reading install_profile.json');
       const INSTALL_PROFILE = JSON.parse(fs.readFileSync(path.join(JAR_PATH, '/install_profile.json')));
 
       this.installState[profile.id].INSTALL_PROFILE = INSTALL_PROFILE;
-      this.log('Starting read of libraries and downloading them');
+      logger.info('Starting read of libraries and downloading them');
       for (const library of INSTALL_PROFILE.libraries) {
-        this.log(`Reading library ${library.name}`);
+        logger.info(`Reading library ${library.name}`);
         const mvnPath = path.join(DATA_PATH, library.downloads.artifact.path);
-        this.log(`Starting download of library ${library.name} from ${library.downloads.artifact.url}`);
+        logger.info(`Starting download of library ${library.name} from ${library.downloads.artifact.url}`);
 
         mkdirp(path.dirname(path.join(DATA_PATH, library.downloads.artifact.path)), () => {
           if (library.downloads.artifact.url) {
@@ -113,7 +112,7 @@ const ForgeComplex = {
               this.checkLibraryDone(profile);
             });
           } else {
-            this.log(`Library ${library.name} is a local file. Finding it...`);
+            logger.info(`Library ${library.name} is a local file. Finding it...`);
 
             LIBRARIES[library.name] = mvnPath;
             fs.copyFileSync(
@@ -130,24 +129,24 @@ const ForgeComplex = {
   checkLibraryDone(profile) {
     const { totalLibraryCount, INSTALL_PROFILE, DATA, TEMP_PATH } = this.installState[profile.id];
     if (totalLibraryCount >= INSTALL_PROFILE.libraries.length) {
-      this.log('Libraries are done downloading');
-      this.log('Parsing data');
+      logger.info('Libraries are done downloading');
+      logger.info('Parsing data');
       for (const datumName of Object.keys(INSTALL_PROFILE.data)) {
-        this.log(`Reading datum ${datumName}`);
+        logger.info(`Reading datum ${datumName}`);
         const datum = INSTALL_PROFILE.data[datumName];
         const p = datum.client;
         if (p.substring(0, 1) === '[') {
           let mvnPath = p.split('[')[1];
           mvnPath = mvnPath.substring(0, mvnPath.length - 1);
           mvnPath = this.calculateMavenPath(mvnPath);
-          this.log(`Maven path for datum ${datumName} is ${mvnPath}`);
+          logger.info(`Maven path for datum ${datumName} is ${mvnPath}`);
           DATA[datumName] = path.join(`${TEMP_PATH}/data/${mvnPath}`);
           this.installState[profile.id].totalDataCount++;
           this.checkDataDone(profile);
         } else if (p.substring(0, 1) === '/') {
           const outPath = path.join(`${TEMP_PATH}/data${p}`);
           mkdirp(path.dirname(outPath), () => {
-            this.log(`Copying local datafile from TEMP/jar${p} to ${outPath}`);
+            logger.info(`Copying local datafile from TEMP/jar${p} to ${outPath}`);
             fs.copyFileSync(path.join(`${TEMP_PATH}/jar${p}`), outPath);
             DATA[datumName] = outPath;
             this.installState[profile.id].totalDataCount++;
@@ -163,8 +162,8 @@ const ForgeComplex = {
   checkDataDone(profile) {
     const { INSTALL_PROFILE, DATA, TEMP_PATH, totalDataCount } = this.installState[profile.id];
     if (totalDataCount >= Object.keys(INSTALL_PROFILE.data).length) {
-      this.log('Data is done being parsed');
-      this.log('Downloading Minecraft JAR');
+      logger.info('Data is done being parsed');
+      logger.info('Downloading Minecraft JAR');
 
       HTTPRequest.get('https://launchermeta.mojang.com/mc/game/version_manifest.json').then(vers => {
         const versions = vers.data;
@@ -176,7 +175,7 @@ const ForgeComplex = {
             verData.downloads.client.url,
             path.join(TEMP_PATH, '/client.jar')
           ).then(() => {
-            this.log('Running processors');
+            logger.info('Running processors');
             DATA.MINECRAFT_JAR = path.join(TEMP_PATH, '/client.jar');
 
             this.executeNextProcessor(profile);
@@ -217,8 +216,8 @@ const ForgeComplex = {
       });
 
       const commandArguments = `-cp "${jar};${classpath.join(';')}" "${getMainClass(jar)}" ${args.join(' ')}`;
-      this.log(`Java path is: ${Global.getJavaPath()}`);
-      this.log(`Running: java ${commandArguments}`);
+      logger.info(`Java path is: ${Global.getJavaPath()}`);
+      logger.info(`Running: java ${commandArguments}`);
 
       DownloadsManager.createProgressiveDownload(`Running ${path.basename(jar)}\n_A_${profile.name}`).then(download => {
         DownloadsManager.setDownloadProgress(download.name, 100);
@@ -230,28 +229,28 @@ const ForgeComplex = {
           },
           (err, stdout, stderr) => {
             if (err || stderr) {
-              LogManager.log('error', err);
+              logger.error(err);
             }
             DownloadsManager.removeDownload(download.name);
-            this.log(`Finished running processor ${jar}`);
+            logger.info(`Finished running processor ${jar}`);
             this.installState[profile.id].processorNumber++;
             this.executeNextProcessor(profile);
           }
         );
       });
     } else {
-      this.log('Finished processors');
+      logger.info('Finished processors');
 
-      this.log('Creating version...');
+      logger.info('Creating version...');
       VersionsManager.createVersion(profile, 'forgeComplex', {
         version: JSON.parse(fs.readFileSync(path.join(TEMP_PATH, '/jar/version.json')))
       });
 
-      this.log('Creating library...');
+      logger.info('Creating library...');
       const libraryPath = LibrariesManager.createLibraryPath(profile);
       fs.mkdirSync(path.join(libraryPath, '/forge'));
 
-      this.log('Copying Forge jar...');
+      logger.info('Copying Forge jar...');
       fs.copyFileSync(
         path.join(
           TEMP_PATH,
@@ -260,14 +259,14 @@ const ForgeComplex = {
         path.join(libraryPath, `/forge/mcm-${profile.id}-forge.jar`)
       );
 
-      this.log('Copying Forge Client and Universal...');
+      logger.info('Copying Forge Client and Universal...');
 
       const mcfpath = path.join(LibrariesManager.getLibrariesPath(), '/net/minecraftforge');
 
       mkdirp(mcfpath, () => {
         Global.copyDirSync(path.join(TEMP_PATH, '/data/net/minecraftforge'), mcfpath);
 
-        this.log('Copying Minecraft Client Jars...');
+        logger.info('Copying Minecraft Client Jars...');
 
         const clientpath = path.join(LibrariesManager.getLibrariesPath(), '/net/minecraft/client');
         mkdirp(clientpath, () => {
@@ -277,7 +276,7 @@ const ForgeComplex = {
           );
 
           rimraf.sync(TEMP_PATH);
-          this.log('Done installing Forge!');
+          logger.info('Done installing Forge!');
           callback();
         });
       });

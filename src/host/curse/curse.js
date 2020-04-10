@@ -5,11 +5,12 @@ import Global from '../../util/global';
 import Profile from '../../type/profile';
 import Mod from '../../type/mod';
 import Hosts from '../Hosts';
-import LogManager from '../../manager/logManager';
 import DownloadsManager from '../../manager/downloadsManager';
 import OMAFFileAsset from '../../type/omafFileAsset';
 import World from '../../type/world';
+import logInit from '../../util/logger';
 
+const logger = logInit('CurseFramework');
 const ADMZip = require('adm-zip');
 
 // the curse object is used as a sort of "translator" to convert curse's data format to work with OMAF
@@ -234,7 +235,7 @@ const Curse = {
       params.gameVersion = options.minecraftVersion;
     }
 
-    LogManager.log('info', `[Curse] Searching ${type}s for ${term}`);
+    logger.info(`Searching ${type}s for "${term}"`);
     const result = await Hosts.HTTPGet(`${this.URL_BASE}/search`, params);
 
     if (result) return this.readAssetList(result);
@@ -243,6 +244,7 @@ const Curse = {
 
   // add potentially missing info (e.g. description) to an asset
   async addMissingInfo(info, assetT) {
+    logger.info(`Adding missing info "${info}" to asset ${assetT.id}`);
     const asset = assetT;
     if (info === 'description') {
       const desc = await this.getDescription(asset);
@@ -259,6 +261,7 @@ const Curse = {
 
   // gets the popular assets for a certain asset type (e.g. mod)
   async getPopularAssets(type, options = { sort: 'popular', minecraftVersion: 'All' }) {
+    logger.info('Getting popular assets');
     const res = await this.search(type, '', options);
     if (res) {
       Hosts.cache.popular.curse[type] = res;
@@ -273,6 +276,8 @@ const Curse = {
   // gets the dependencies required for an asset
   async getDependencies(assetT) {
     const asset = assetT;
+    logger.info(`Getting dependencies for ${asset.hosts.curse.slug}`);
+
     let newAsset;
     if (!asset.installed) {
       newAsset = await this.addFileInfo(asset, asset.hosts.curse.latestFileID);
@@ -297,6 +302,7 @@ const Curse = {
   // gets the versions for an asset
   async getVersions(assetT) {
     const asset = assetT;
+    logger.info(`Getting versions for ${asset.id}`);
     const results = await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/files`);
     if (results) {
       const sorted = results.sort((a, b) => new Date(b.fileDate).getTime() - new Date(a.fileDate).getTime());
@@ -320,6 +326,7 @@ const Curse = {
 
   // gets the latest version of the asset available for a specific minecraft version
   async getLatestVersionForMCVersion(asset, mcVersion, modloader) {
+    logger.info(`Getting latest version of ${asset.id} for MC version ${mcVersion} and modloader ${modloader}`);
     if (asset.hosts.curse.localValues && asset.hosts.curse.localValues.gameVerLatestFiles) {
       // curse does a terrible job indicating whether a file is forge or fabric
       // we have to make a bunch of guesses

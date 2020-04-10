@@ -53,8 +53,6 @@ function loadSnapshotProfile() {
   SnapshotProfile.version.minecraft.version = Global.ALL_VERSIONS[0];
   SnapshotProfile.minecraftVersion = Global.ALL_VERSIONS[0];
 
-  SnapshotProfile.save();
-
   if (!SettingsManager.currentSettings.runSnapshotInSeperateFolder) {
     SnapshotProfile.worlds = LatestProfile.worlds;
     SnapshotProfile.resourcespacks = LatestProfile.resourcepacks;
