@@ -2,6 +2,18 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.3.8
+
+#### Currently WIP
+
+### Security
+
+- Fixed "kind-of" security vulnerability (CVE-2019-20149)
+
+### Features
+
+- Detailed logging is now saved to disk
+
 ## 2.3.7
 
 #### Released 2020-04-08
