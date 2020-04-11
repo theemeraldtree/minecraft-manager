@@ -17,6 +17,7 @@ const LibrariesManager = {
     return path.join(this.getLibrariesPath(), '/minecraftmanager/profiles/');
   },
   createLibraryPath(profile) {
+    logger.info(`Creating Library path for ${profile.id}`);
     this.checkExist();
     const p = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
     if (!fs.existsSync(p)) {
@@ -72,6 +73,7 @@ const LibrariesManager = {
   },
   deleteLibrary(profile) {
     return new Promise(resolve => {
+      logger.info(`Deleting Library for ${profile.id}`);
       const libraryPath = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
       if (fs.existsSync(libraryPath)) {
         rimraf(libraryPath, () => {

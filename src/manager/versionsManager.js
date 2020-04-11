@@ -18,12 +18,14 @@ const VersionsManager = {
     return path.join(Global.getMCPath(), '/versions');
   },
   createVersion(profile, type, meta) {
+    logger.info(`Starting creation of launcher version for ${profile.id}`);
     const versionname = `${profile.safename} [Minecraft Manager]`;
     if (!fs.existsSync(path.join(this.getVersionsPath(), versionname))) {
       fs.mkdirSync(path.join(this.getVersionsPath(), versionname));
     }
     let obj;
     if (type === 'forge') {
+      logger.info(`Assigning standard Forge version properties for ${profile.id}`);
       obj = defaultVersionForge;
       if (this.checkIs1710OrLower(profile)) {
         obj = version1710;
@@ -34,6 +36,7 @@ const VersionsManager = {
       obj.assets = profile.version.minecraft.version;
       obj.libraries[0].name = `minecraftmanager.profiles:mcm-${profile.id}:forge`;
     } else if (type === 'forgeComplex') {
+      logger.info(`Assigning complex Forge version properties for ${profile.id}`);
       obj = meta.version;
       obj.time = undefined;
       obj.releaseTime = undefined;
@@ -43,6 +46,7 @@ const VersionsManager = {
       obj.id = versionname;
       obj.jar = profile.version.minecraft.version;
     } else if (type === 'fabric') {
+      logger.info(`Assigning Fabric version properties for ${profile.id}`);
       obj = defaultVersionFabric;
       obj.libraries = meta.launcherMeta.libraries.common;
       obj.id = versionname;
@@ -58,6 +62,8 @@ const VersionsManager = {
         url: 'https://maven.fabricmc.net'
       });
     }
+
+    logger.info(`Writing version for ${profile.id}`);
     fs.writeFile(path.join(this.getVersionsPath(), versionname, `${versionname}.json`), JSON.stringify(obj), () => {
       LauncherManager.setProfileData(profile, 'lastVersionId', versionname);
     });

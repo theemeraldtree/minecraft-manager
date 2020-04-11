@@ -374,6 +374,7 @@ const Curse = {
 
   // gets the changelog from a file id
   async getFileChangelog(asset, fileID) {
+    logger.info(`Getting changelog for ${asset.id} and file ${fileID}`);
     return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}/changelog`);
   },
 

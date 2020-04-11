@@ -18,6 +18,9 @@ import ProfileSelector from '../../../component/profileSelector/profileSelector'
 import AlertBackground from '../../../component/alert/alertbackground';
 import ToastManager from '../../../manager/toastManager';
 import LatestProfile from '../../../defaultProfiles/latestProfile';
+import logInit from '../../../util/logger';
+
+const logger = logInit('EditPageAdvanced');
 
 const Panel = styled.div`
   background-color: #2b2b2b;
@@ -62,6 +65,8 @@ export default function EditPageAdvanced({ id }) {
 
   const snapshotSeperateFolderClick = () => {
     const inverted = !SettingsManager.currentSettings.runSnapshotInSeperateFolder;
+
+    logger.info(`Setting runSnapshotInSeperateFolder to ${inverted}`);
     if (inverted) {
       profile.gameDir = path.join(profile.profilePath, 'files');
       profile.worlds = [];
@@ -91,6 +96,7 @@ export default function EditPageAdvanced({ id }) {
   const syncOptionsTXTClick = () => {
     const inverted = !syncOptionsTXT;
 
+    logger.info(`{${profile.id}} Setting options.txt sync to ${inverted}`);
     symlinkFile(inverted, 'options.txt');
     profile.mcm.syncOptionsTXT = inverted;
     profile.save();
@@ -101,6 +107,8 @@ export default function EditPageAdvanced({ id }) {
   const syncOptionsOFClick = () => {
     const inverted = !syncOptionsOF;
 
+    logger.info(`{${profile.id}} Setting optionsof.txt sync to ${inverted}`);
+
     symlinkFile(inverted, 'optionsof.txt');
     profile.mcm.syncOptionsOF = inverted;
     profile.save();
@@ -110,6 +118,8 @@ export default function EditPageAdvanced({ id }) {
 
   const syncServersClick = () => {
     const inverted = !syncServers;
+
+    logger.info(`{${profile.id}} Setting servers.dat sync to ${inverted}`);
 
     symlinkFile(inverted, 'servers.dat');
     profile.mcm.syncServers = inverted;
@@ -139,6 +149,8 @@ export default function EditPageAdvanced({ id }) {
   const onCopySelect = prof => {
     const destGameDir = prof.gameDir;
     const destObject = path.join(destGameDir, currentCopyObject);
+
+    logger.info(`{${profile.id}} Copying ${currentCopyObject} to ${prof.id}`);
 
     FSU.deleteFileIfExists(destObject);
     fs.copyFileSync(path.join(profile.gameDir, currentCopyObject), destObject);
@@ -174,38 +186,38 @@ export default function EditPageAdvanced({ id }) {
             <>
               <InputContainer>
                 <Checkbox lighter checked={syncOptionsTXT} onClick={syncOptionsTXTClick} />
-                Sync in-game Minecraft Options with this profile
+                sync in-game minecraft options with this profile
               </InputContainer>
 
               <InputContainer>
                 <Checkbox lighter checked={syncOptionsOF} onClick={syncOptionsOFClick} />
-                Sync in-game OptiFine Options with this profile
+                sync in-game optifine Options with this profile
               </InputContainer>
 
               <InputContainer>
                 <Checkbox lighter checked={syncServers} onClick={syncServersClick} />
-                Sync in-game server list with this profile
+                sync in-game server list with this profile
               </InputContainer>
               <br />
             </>
           )}
 
           <Button color="green" onClick={copyOptionsTXT}>
-            Copy in-game Minecraft Options to...
+            copy in-game minecraft options to...
           </Button>
 
           <Button color="green" onClick={copyOptionsOF}>
-            Copy in-game OptiFine Options to...
+            copy in-game optifine options to...
           </Button>
 
           <Button color="green" onClick={copyServers}>
-            Copy in-game servers list to...
+            copy in-game servers list to...
           </Button>
         </Panel>
         <Panel>
           <h3>Advanced Info</h3>
           <Button color="red" onClick={() => profile.openGameDir()}>
-            Open Profile Folder
+            open profile folder
           </Button>
 
           <Detail>internal id: {profile.id}</Detail>
@@ -222,28 +234,28 @@ export default function EditPageAdvanced({ id }) {
         <Panel>
           <h3>Technical Functions</h3>
           <Button color="red" onClick={() => shell.openExternal(path.join(profile.profilePath, '/profile.json'))}>
-            Open profile.json
+            open profile.json
           </Button>
           <Button
             color="red"
             onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/mods.json'))}
           >
-            Open subAssets/mods.json
+            open subAssets/mods.json
           </Button>
           <Button
             color="red"
             onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/resourcepacks.json'))}
           >
-            Open subAssets/resourcepacks.json
+            open subAssets/resourcepacks.json
           </Button>
           <Button
             color="red"
             onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/worlds.json'))}
           >
-            Open subAssets/worlds.json
+            open subAssets/worlds.json
           </Button>
           <Button color="red" onClick={() => shell.openExternal(profile.profilePath)}>
-            Open OMAF data folder
+            open OMAF data folder
           </Button>
         </Panel>
       </div>

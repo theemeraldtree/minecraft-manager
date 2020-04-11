@@ -180,6 +180,7 @@ export default class Profile extends OAMFAsset {
   }
 
   openGameDir() {
+    this.logger.info('Opening Game Directory');
     try {
       return remote.shell.openExternal(this.gameDir);
     } catch (e) {
@@ -572,6 +573,7 @@ export default class Profile extends OAMFAsset {
   changeHostVersion(host, versionToChangeTo, onUpdate) {
     if (host === 'curse') {
       return new Promise(async (resolve, reject) => {
+        this.logger.info(`Changing Curse host version to ${versionToChangeTo}`);
         onUpdate('Creating backup...');
         ProfilesManager.createBackup(this);
         this.hideFromClient = true;
@@ -611,6 +613,7 @@ export default class Profile extends OAMFAsset {
   // ugh.. renaming...
   rename(newName) {
     return new Promise(resolve => {
+      this.logger.info(`Renaming to ${newName}...`);
       const newID = Global.createID(newName);
       const safeName = Global.createSafeName(newName);
       if (!LauncherManager.profileExists(this)) {
@@ -641,6 +644,7 @@ export default class Profile extends OAMFAsset {
   }
 
   applyDefaults() {
+    this.logger.info('Applying defaults...');
     const { currentSettings } = SettingsManager;
     const options = `
             autoJump:${currentSettings.defaultsAutoJump}\n

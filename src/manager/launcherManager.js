@@ -24,6 +24,7 @@ const LauncherManager = {
     return false;
   },
   updateVersion(profile) {
+    logger.info(`Updating Launcher Profile version for ${profile.id}`);
     let verId;
     if (profile.hasFramework()) {
       verId = `${profile.safename} [Minecraft Manager]`;
@@ -41,6 +42,7 @@ const LauncherManager = {
   },
   createProfile(profile) {
     if (!profile.isDefaultProfile) {
+      logger.info(`Creating Launcher Profile for ${profile.id}`);
       const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
       obj.profiles[`mcm-${profile.id}`] = {
         name: profile.name,
@@ -54,11 +56,13 @@ const LauncherManager = {
     }
   },
   deleteProfile(profile) {
+    logger.info(`Deleting Launcher Profile for ${profile.id}`);
     const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
     delete obj.profiles[`mcm-${profile.id}`];
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
   },
   renameProfile(profile, newID) {
+    logger.info(`Renaming Launcher Profile for ${profile.id}`);
     const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
     const oldID = `mcm-${profile.id}`;
     const oldData = obj.profiles[oldID];
@@ -71,6 +75,7 @@ const LauncherManager = {
     const id = `mcm-${profile.id}`;
     const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
 
+    logger.info(`Setting "${tag}" of ${profile.id} to "${val}"`);
     if (!profile.isDefaultProfile) {
       if (obj.profiles[id]) {
         obj.profiles[id][tag] = val;
@@ -85,6 +90,7 @@ const LauncherManager = {
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
   },
   setMostRecentProfile(profile) {
+    logger.info(`Setting most recent profile to ${profile.id}`);
     const date = new Date();
     const iso = date.toISOString();
     this.setProfileData(profile, 'lastUsed', iso);
@@ -94,6 +100,7 @@ const LauncherManager = {
     this.setProfileData(profile, 'gameDir', profile.gameDir);
   },
   openLauncher() {
+    logger.info('Opening launcher');
     const launcherPath = Global.getLauncherPath();
     if (os.platform() === 'win32') {
       exec.exec(`"${launcherPath}"`);
@@ -107,6 +114,7 @@ const LauncherManager = {
     this.setProfileData(profile, 'javaArgs', args);
   },
   setDedicatedRam(amount) {
+    logger.info('Setting Dedicated RAM');
     ProfilesManager.loadedProfiles.forEach(profile => {
       this.setLaunchArguments(profile, `-Xmx${amount}G ${this.DEFAULT_JAVA_ARGS}`);
     });

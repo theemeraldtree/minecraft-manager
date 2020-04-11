@@ -51,6 +51,7 @@ const ForgeComplex = {
     return `${split[0].replace(/\./g, '/')}/${split[1]}/${split[2]}/${split[1]}-${split[2]}${EXTENSION}`;
   },
   setupForge(profile, callback) {
+    logger.info(`Installing Forge for ${profile.id}`);
     logger.info('Downloading installer jar');
 
     const workFolder = path.join(Global.MCM_TEMP, `/forge-install-${profile.id}-${new Date().getTime()}`);
