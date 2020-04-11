@@ -11,10 +11,14 @@ import Global from '../../../util/global';
 import FSU from '../../../util/fsu';
 import modVersionCheck from './modVersionCheck';
 import ToastManager from '../../../manager/toastManager';
+import logInit from '../../../util/logger';
+
+const logger = logInit('CopyToOverlay');
 
 export default function CopyToOverlay({ show, profile, asset, assetType, cancelClick }) {
   const onSelect = (newProfile, e) => {
     if ((assetType === 'mod' && modVersionCheck(profile, newProfile, asset)) || assetType !== 'mod') {
+      logger.info(`Copying ${asset.id} from ${profile.id} to ${newProfile.id}`);
       if (!fs.lstatSync(path.join(profile.gameDir, asset.getMainFile().path)).isDirectory()) {
         FSU.copyFileMakeDirSync(
           path.join(profile.gameDir, asset.getMainFile().path),

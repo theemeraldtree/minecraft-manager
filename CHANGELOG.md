@@ -4,7 +4,7 @@ Changelogs for development versions are located in their corresponding branch.
 
 ## 2.3.8
 
-#### Currently WIP
+#### Released 2020-04-10
 
 ### Security
 
@@ -13,6 +13,10 @@ Changelogs for development versions are located in their corresponding branch.
 ### Features
 
 - Detailed logging is now saved to disk
+
+### Fixes
+
+- Fixed inconsistencies in capitalization
 
 ## 2.3.7
 

@@ -75,7 +75,12 @@ const LauncherManager = {
     const id = `mcm-${profile.id}`;
     const obj = JSON.parse(fs.readFileSync(this.getLauncherProfiles()));
 
-    logger.info(`Setting "${tag}" of ${profile.id} to "${val}"`);
+    if (tag !== 'icon') {
+      logger.info(`Setting "${tag}" of ${profile.id} to "${val}"`);
+    } else {
+      logger.info(`Setting "icon" of ${profile.id} to [icon base64 string]`);
+    }
+
     if (!profile.isDefaultProfile) {
       if (obj.profiles[id]) {
         obj.profiles[id][tag] = val;

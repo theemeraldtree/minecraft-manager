@@ -70,11 +70,13 @@ Loaded Profiles: ${ProfilesManager.loadedProfiles
 	modsPath: ${profile.modsPath}
 	versionname: ${profile.versionname}
 	iconPath: ${profile.iconPath}
-
+	
 	hosts: ${JSON.stringify(profile.hosts)}
 	frameworks: ${JSON.stringify(profile.frameworks)}
 
 	version: ${JSON.stringify(profile.version)}
+	
+	mcm: ${JSON.stringify(profile.mcm)}
 	---
 `
       )

@@ -56,6 +56,12 @@ export default function Help() {
       case 'open-profiles-folder':
         shell.openItem(path.join(Global.PROFILES_PATH));
         break;
+      case 'open-electron-logs-folder':
+        shell.openItem(path.join(Global.MCM_PATH, '/logs/electron-process/'));
+        break;
+      case 'open-main-logs-folder':
+        shell.openItem(path.join(Global.MCM_PATH, '/logs/main-node-process'));
+        break;
       default:
         break;
     }
@@ -72,7 +78,13 @@ export default function Help() {
         <h2>Technical Troubleshooting</h2>
         <List>
           <Button onClick={() => technicalAction('open-profiles-folder')} color="green">
-            Open Profiles Folder
+            open profiles folder
+          </Button>
+          <Button onClick={() => technicalAction('open-electron-logs-folder')} color="green">
+            open electron logs folder
+          </Button>
+          <Button onClick={() => technicalAction('open-main-logs-folder')} color="green">
+            open main node logs folder
           </Button>
         </List>
       </Section>

@@ -9,10 +9,14 @@ import ProfileSelector from '../../../component/profileSelector/profileSelector'
 import FSU from '../../../util/fsu';
 import ToastManager from '../../../manager/toastManager';
 import modVersionCheck from './modVersionCheck';
+import logInit from '../../../util/logger';
+
+const logger = logInit('MoveToOverlay');
 
 export default function MoveToOverlay({ show, profile, asset, assetType, cancelClick }) {
   const onSelect = newProfile => {
     if ((assetType === 'mod' && modVersionCheck(profile, newProfile, asset)) || assetType !== 'mod') {
+      logger.info(`Moving ${asset.id} from ${profile.id} to ${newProfile.id}`);
       const newPath = path.join(newProfile.gameDir, asset.getMainFile().path);
       if (!fs.existsSync(newPath)) {
         FSU.renameMakeDirSync(

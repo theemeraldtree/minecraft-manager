@@ -191,6 +191,8 @@ const Hosts = {
   /* installers */
   async installAssetToProfile(host, profile, assetT, type) {
     let asset = assetT;
+    logger.info(`Installing latest compatible version of ${asset.id} to ${profile.id} and host ${host}`);
+
     if (!asset.name) {
       if (host === 'curse') {
         asset = await Curse.getFullAsset(asset, type);
@@ -262,6 +264,8 @@ const Hosts = {
   async installAssetVersionToProfile(host, profileT, modT, typeT, dependencies) {
     return new Promise(async resolve => {
       let mod = modT;
+
+      logger.info(`Installing ${mod.id} assigned version to ${profileT.id} with host ${host}`);
       let type = typeT;
       const profile = profileT;
       let pathroot;
