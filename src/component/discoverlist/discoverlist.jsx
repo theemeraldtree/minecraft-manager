@@ -6,6 +6,7 @@ import AssetInfo from '../assetinfo/assetinfo';
 import Hosts from '../../host/Hosts';
 import CustomDropdown from '../customdropdown/customdropdown';
 import MCVersionSelector from '../mcVersionSelector/mcVersionSelector';
+import Spinner from '../spinner/spinner';
 
 const LoadingText = styled.div`
   font-size: 23pt;
@@ -333,7 +334,11 @@ export default class DiscoverList extends Component {
                 })}
               {assets && assets.length === 0 && !loading && <LoadingText key="none">No Results</LoadingText>}
             </List>
-            {loading && !cantConnect && <LoadingText>loading...</LoadingText>}
+            {loading && !cantConnect && (
+              <LoadingText>
+                <Spinner />
+              </LoadingText>
+            )}
             {cantConnect && (
               <LoadingText>
                 can't connect

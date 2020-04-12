@@ -2,6 +2,14 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.4.0
+
+#### Currently WIP
+
+### Features
+
+- Added a cool loading spinner
+
 ## 2.3.8
 
 #### Released 2020-04-10

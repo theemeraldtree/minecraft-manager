@@ -156,7 +156,7 @@ export default function EditPageVersions({ id }) {
       cancel();
       AlertManager.alert(
         'warning',
-        'changing your minecraft version will remove forge/fabric and all your mods. are you sure you want to change?',
+        'Changing your Minecraft version will remove Forge/Fabric and all of your mods. Are you sure you want to change?',
         () => confirmVersionChange(version),
         'change',
         "don't change"

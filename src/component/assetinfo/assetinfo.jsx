@@ -11,6 +11,7 @@ import ToastManager from '../../manager/toastManager';
 import SubAssetEditor from '../../page/editprofile/components/subAssetEditor';
 import MCVersionSelector from '../mcVersionSelector/mcVersionSelector';
 import HeaderButton from '../headerButton/headerButton';
+import Spinner from '../spinner/spinner';
 
 const LoadingText = styled.div`
   font-size: 23pt;
@@ -119,7 +120,11 @@ export default class AssetInfo extends Component {
     const { activeAsset } = this.state;
     const newAsset = { ...activeAsset };
     this.setState({
-      assetDependencies: [<LoadingText key="loading">loading...</LoadingText>]
+      assetDependencies: [
+        <LoadingText key="loading">
+          <Spinner />
+        </LoadingText>
+      ]
     });
 
     const res = await Hosts.getDependencies(host, activeAsset);
@@ -152,7 +157,11 @@ export default class AssetInfo extends Component {
     const { specificMCVer, allowVersionReinstallation, host } = this.props;
     if (activeAsset.hosts.curse) {
       this.setState({
-        versions: [<LoadingText key="loading1">loading</LoadingText>]
+        versions: [
+          <LoadingText key="loading1">
+            <Spinner />
+          </LoadingText>
+        ]
       });
       const versions = await Hosts.getVersions(host, activeAsset);
       if (versions) {
@@ -325,7 +334,11 @@ export default class AssetInfo extends Component {
                 <SanitizedHTML html={activeAsset.description} />
               </Description>
             )}
-            {!description && !cantConnect && <LoadingText>loading...</LoadingText>}
+            {!description && !cantConnect && (
+              <LoadingText>
+                <Spinner />
+              </LoadingText>
+            )}
           </>
         )}
 
