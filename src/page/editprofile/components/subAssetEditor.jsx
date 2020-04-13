@@ -20,6 +20,7 @@ import World from '../../../type/world';
 import CopyToOverlay from './copyToOverlay';
 import MoveToOverlay from './moveToOverlay';
 import CustomDropdown from '../../../component/customdropdown/customdropdown';
+import ErrorManager from '../../../manager/errorManager';
 
 const { dialog } = require('electron').remote;
 
@@ -306,9 +307,14 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
   const deleteClick = assetid => {
     if (assetType !== 'datapack') {
       const asset = profile.getSubAssetFromID(assetType, assetid);
-      profile.deleteSubAsset(assetType, asset).then(() => {
-        updateProgressStates();
-      });
+      profile
+        .deleteSubAsset(assetType, asset)
+        .then(() => {
+          updateProgressStates();
+        })
+        .catch(e => {
+          ToastManager.createToast('Unable to delete', ErrorManager.makeReadable(e, 'subasset'));
+        });
     } else {
       const asset = dpWorld.datapacks.find(dp => dp.id === assetid);
       dpWorld.deleteDatapack(profile, asset);
@@ -317,20 +323,25 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
   };
 
   const versionInstall = (version, asset) => {
-    profile.deleteSubAsset(assetType, asset).then(() => {
-      profile.progressState[asset.id] = {
-        progress: 'installing',
-        version: version.displayName
-      };
-      updateProgressStates();
-      const newAsset = { ...asset };
-      newAsset.version = version;
-      newAsset.hosts.curse.fileID = version.hosts.curse.fileID;
-      Hosts.installAssetVersionToProfile('curse', profile, newAsset, assetType, true).then(m => {
+    profile
+      .deleteSubAsset(assetType, asset)
+      .then(() => {
+        profile.progressState[asset.id] = {
+          progress: 'installing',
+          version: version.displayName
+        };
         updateProgressStates();
-        installErrorHandler(m, asset);
+        const newAsset = { ...asset };
+        newAsset.version = version;
+        newAsset.hosts.curse.fileID = version.hosts.curse.fileID;
+        Hosts.installAssetVersionToProfile('curse', profile, newAsset, assetType, true).then(m => {
+          updateProgressStates();
+          installErrorHandler(m, asset);
+        });
+      })
+      .catch(e => {
+        ToastManager.createToast('Unable to install', ErrorManager.makeReadable(e, 'subasset'));
       });
-    });
   };
 
   const copyToClick = assetid => {

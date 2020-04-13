@@ -306,8 +306,8 @@ export default class Profile extends OAMFAsset {
         .then(() => {
           if (SettingsManager.currentSettings.closeOnLaunch) {
             remote.getCurrentWindow().close();
-            resolve();
           }
+          resolve();
         })
         .catch(e => {
           this.logger.info(`Unable to launch Minecraft directly. Opening Launcher instead. Error: ${e.toString()}`);
@@ -486,7 +486,7 @@ export default class Profile extends OAMFAsset {
   }
 
   deleteSubAsset(type, assetT, doSave = true) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       let asset = assetT;
 
       this.logger.info(`Removing subAsset ${asset.id} with type ${type}`);
@@ -499,15 +499,25 @@ export default class Profile extends OAMFAsset {
         if (asset && asset instanceof Mod && asset.getMainFile().path !== undefined) {
           this.mods.splice(this.mods.indexOf(asset), 1);
           this.progressState[asset.id] = undefined;
-          fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), () => {
-            if (asset.icon) {
-              if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
-                fs.unlinkSync(path.join(this.profilePath, asset.icon));
+          fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), e => {
+            if (e) {
+              this.logger.error(`Unable to delete subasset ${asset.id}: ${e.toString()}`);
+              this.mods.push(asset);
+              this.progressState[asset.id] = {
+                progress: 'installed',
+                version: asset.version.displayName
+              };
+              reject(e);
+            } else {
+              if (asset.icon) {
+                if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
+                  fs.unlinkSync(path.join(this.profilePath, asset.icon));
+                }
               }
-            }
 
-            if (doSave) this.save();
-            resolve();
+              if (doSave) this.save();
+              resolve();
+            }
           });
         } else {
           resolve();

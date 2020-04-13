@@ -381,6 +381,10 @@ const Hosts = {
             });
         });
       } else {
+        profile.progressState[mod.id] = {
+          progress: 'installed',
+          version: mod.version.displayName
+        };
         resolve(mod);
       }
     });
