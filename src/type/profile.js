@@ -293,22 +293,32 @@ export default class Profile extends OAMFAsset {
   }
 
   launch() {
-    // if (!LauncherManager.profileExists(this)) {
-    //   LauncherManager.createProfile(this);
-    // }
+    if (!LauncherManager.profileExists(this)) {
+      LauncherManager.createProfile(this);
+    }
 
-    // this.addIconToLauncher();
-    // LauncherManager.updateVersion(this);
-    // LauncherManager.setMostRecentProfile(this);
-    // LauncherManager.openLauncher();
+    this.addIconToLauncher();
+    LauncherManager.updateVersion(this);
+    LauncherManager.setMostRecentProfile(this);
 
-    // if (SettingsManager.currentSettings.closeOnLaunch) {
-    //   setTimeout(() => {
-    //     remote.getCurrentWindow().close();
-    //   }, 3000);
-    // }
-
-    return DirectLauncherManager.launch(this);
+    return new Promise(resolve => {
+      DirectLauncherManager.launch(this)
+        .then(() => {
+          if (SettingsManager.currentSettings.closeOnLaunch) {
+            remote.getCurrentWindow().close();
+            resolve();
+          }
+        })
+        .catch(e => {
+          this.logger.info(`Unable to launch Minecraft directly. Opening Launcher instead. Error: ${e.toString()}`);
+          LauncherManager.openLauncher();
+          if (SettingsManager.currentSettings.closeOnLaunch) {
+            remote.getCurrentWindow().close();
+            resolve();
+          }
+          resolve();
+        });
+    });
   }
 
   removeAllMods() {

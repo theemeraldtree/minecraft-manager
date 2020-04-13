@@ -9,6 +9,8 @@ Changelogs for development versions are located in their corresponding branch.
 ### Features
 
 - Added a cool loading spinner
+- Launch directly (bypass the Minecraft Launcher)
+- Better error handling
 
 ## 2.3.8
 

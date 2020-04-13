@@ -12,7 +12,7 @@ const logger = logInit('DownloadsManager');
 const DownloadsManager = {
   activeDownloads: [],
   downloadUpdateFunc: null,
-  startFileDownload(downloadName, file, downloadPath, tries) {
+  startFileDownload(downloadName, file, downloadPath) {
     return new Promise((resolve, reject) => {
       if (file) {
         const download = new Download(downloadName, file, downloadPath);
@@ -29,20 +29,9 @@ const DownloadsManager = {
             resolve();
           })
           .catch(() => {
-            if (tries === 3) {
-              reject(new Error('try-limit'));
-            } else {
-              this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
-              this.startFileDownload(downloadName, file, downloadPath, tries + 1)
-                .then(res => {
-                  resolve(res);
-                })
-                .catch(() => {
-                  if (tries + 1 >= 3) {
-                    reject();
-                  }
-                });
-            }
+            this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
+            this.downloadUpdate();
+            reject();
           });
       } else {
         logger.error('Missing file download path');
@@ -78,7 +67,7 @@ const DownloadsManager = {
     this.downloadUpdate();
   },
   startAssetDownload(profile, mod, type, url, modpack) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       let downloadPath;
       if (type === 'mod') {
         if (!fs.existsSync(path.join(profile.gameDir, '/mods'))) {
@@ -101,13 +90,17 @@ const DownloadsManager = {
         downloadPath = path.join(Global.MCM_TEMP, `/world-install/${Global.createID(mod.name)}-world-install.zip`);
       }
       if (modpack === false) {
-        this.startFileDownload(`${mod.name}\n_A_${profile.name}`, url, downloadPath).then(() => {
-          if (type === 'world') {
-            FileScanner.scanInstallingWorld(profile, downloadPath, mod);
-          }
+        this.startFileDownload(`${mod.name}\n_A_${profile.name}`, url, downloadPath)
+          .then(() => {
+            if (type === 'world') {
+              FileScanner.scanInstallingWorld(profile, downloadPath, mod);
+            }
 
-          resolve();
-        });
+            resolve();
+          })
+          .catch(() => {
+            reject();
+          });
       }
     });
   },

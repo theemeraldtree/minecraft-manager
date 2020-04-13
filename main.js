@@ -85,6 +85,12 @@ ipcMain.on('download-file', async (event, downloadURL, dest, id) => {
   } catch (e) {
     mainLogger.error(e);
     event.sender.send('file-download-error', { id, error: e });
+
+    ws.close();
+
+    if (fs.existsSync(dest)) {
+      fs.unlinkSync(dest);
+    }
   }
 });
 

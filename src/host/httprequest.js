@@ -16,11 +16,12 @@ const HTTPRequest = {
    * @param {function} onProgress - Called when progress occurs during download
    */
   download(url, dest, onProgress) {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       const id = `${url}-${dest}`;
       this.fileDownloads[id] = {
         onProgress,
-        onFinish: resolve
+        onFinish: resolve,
+        onError: reject
       };
       ipcRenderer.send('download-file', url, dest, id);
     });
@@ -53,7 +54,7 @@ const HTTPRequest = {
    */
   fileDownloadError(data) {
     if (this.fileDownloads[data.id]) {
-      this.fileDownloads[data.id].onFinish();
+      this.fileDownloads[data.id].onError();
     }
 
     ToastManager.createToast('Error', `Error downloading something. It has been skipped. ID: ${data.id}`);

@@ -262,7 +262,7 @@ const Hosts = {
   },
 
   async installAssetVersionToProfile(host, profileT, modT, typeT, dependencies) {
-    return new Promise(async resolve => {
+    return new Promise(async (resolve, reject) => {
       let mod = modT;
 
       logger.info(`Installing ${mod.id} assigned version to ${profileT.id} with host ${host}`);
@@ -336,45 +336,49 @@ const Hosts = {
             modObj = new World(mod);
           }
 
-          DownloadsManager.startAssetDownload(profile, mod, type, mod.downloadTemp, false).then(async () => {
-            if (type === 'mod') {
-              modObj.setJARFile(`${mod.id}.jar`);
-              if (modObj.iconPath) {
-                modObj.icon = `_mcm/icons/mods/${mod.id}${path.extname(mod.iconPath)}`;
+          DownloadsManager.startAssetDownload(profile, mod, type, mod.downloadTemp, false)
+            .then(async () => {
+              if (type === 'mod') {
+                modObj.setJARFile(`${mod.id}.jar`);
+                if (modObj.iconPath) {
+                  modObj.icon = `_mcm/icons/mods/${mod.id}${path.extname(mod.iconPath)}`;
+                }
+              } else if (type === 'resourcepack') {
+                modObj.setMainFile('resourcepacks', 'resourcepackzip', `${mod.id}.zip`);
+                if (modObj.iconPath) {
+                  modObj.icon = `_mcm/icons/resourcepacks/${mod.id}${path.extname(mod.iconPath)}`;
+                }
+              } else if (type === 'world') {
+                modObj.setMainFile('saves', 'worldfolder', mod.id);
+                if (modObj.iconPath) {
+                  modObj.icon = `_mcm/icons/worlds/${mod.id}${path.extname(mod.iconPath)}`;
+                }
               }
-            } else if (type === 'resourcepack') {
-              modObj.setMainFile('resourcepacks', 'resourcepackzip', `${mod.id}.zip`);
-              if (modObj.iconPath) {
-                modObj.icon = `_mcm/icons/resourcepacks/${mod.id}${path.extname(mod.iconPath)}`;
+
+              if (mod.iconPath) {
+                DownloadsManager.startFileDownload(
+                  `${mod.name} Icon\n_A_${profile.name}`,
+                  mod.iconPath,
+                  path.join(profile.profilePath, modObj.icon)
+                );
               }
-            } else if (type === 'world') {
-              modObj.setMainFile('saves', 'worldfolder', mod.id);
-              if (modObj.iconPath) {
-                modObj.icon = `_mcm/icons/worlds/${mod.id}${path.extname(mod.iconPath)}`;
+
+              if (!profile.getSubAssetFromID(type, mod.id)) {
+                profile.addSubAsset(type, modObj);
               }
-            }
 
-            if (mod.iconPath) {
-              DownloadsManager.startFileDownload(
-                `${mod.name} Icon\n_A_${profile.name}`,
-                mod.iconPath,
-                path.join(profile.profilePath, modObj.icon)
-              );
-            }
+              if (profile.progressState[mod.id]) {
+                profile.progressState[mod.id] = {
+                  progress: 'installed',
+                  version: mod.version.displayName
+                };
+              }
 
-            if (!profile.getSubAssetFromID(type, mod.id)) {
-              profile.addSubAsset(type, modObj);
-            }
-
-            if (profile.progressState[mod.id]) {
-              profile.progressState[mod.id] = {
-                progress: 'installed',
-                version: mod.version.displayName
-              };
-            }
-
-            resolve(mod);
-          });
+              resolve(mod);
+            })
+            .catch(() => {
+              reject();
+            });
         });
       } else {
         resolve(mod);

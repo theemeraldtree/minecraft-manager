@@ -366,7 +366,7 @@ export default class DiscoverList extends Component {
           <AssetInfo
             host={host}
             allowVersionReinstallation={allowVersionReinstallation}
-            specificMCVer={specificMCVer}
+            specificMCVer={type === 'mod' ? specificMCVer : undefined}
             versionInstall={versionInstall}
             progressState={progressState[activeAsset.id]}
             localAsset={false}

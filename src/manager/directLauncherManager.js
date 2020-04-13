@@ -281,22 +281,26 @@ const DirectLauncherManager = {
    * @param {object} profile - The profile to launch
    */
   launch(profile) {
-    return new Promise(async resolve => {
-      logger.info(`Launching ${profile.id} directly`);
-      const versionJSON = await this.getVersionJSON(profile);
+    return new Promise(async (resolve, reject) => {
+      try {
+        logger.info(`Launching ${profile.id} directly`);
+        const versionJSON = await this.getVersionJSON(profile);
 
-      logger.info(`Verifying downloaded libraries...`);
-      await this.verifyDownloadedLibraries(profile, versionJSON);
-      logger.info(`Downloaded libraries verification complete`);
-      logger.info(`Extracting natives...`);
-      await this.extractNatives(profile, versionJSON);
-      logger.info(`Finished extracting natives`);
-      logger.info(`Generating and running command`);
-      await this.runCommand(profile, versionJSON);
+        logger.info(`Verifying downloaded libraries...`);
+        await this.verifyDownloadedLibraries(profile, versionJSON);
+        logger.info(`Downloaded libraries verification complete`);
+        logger.info(`Extracting natives...`);
+        await this.extractNatives(profile, versionJSON);
+        logger.info(`Finished extracting natives`);
+        logger.info(`Generating and running command`);
+        await this.runCommand(profile, versionJSON);
 
-      setTimeout(() => {
-        resolve();
-      }, 3000);
+        setTimeout(() => {
+          resolve();
+        }, 3000);
+      } catch (e) {
+        reject(e);
+      }
     });
   },
 

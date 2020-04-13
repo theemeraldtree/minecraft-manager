@@ -287,16 +287,20 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
     e.stopPropagation();
     const cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
     const asset = Hosts.cache.assets[cachedID];
+    try {
+      profile.progressState[asset.id] = {
+        progress: 'installing',
+        version: `temp-${new Date().getTime()}`
+      };
 
-    profile.progressState[asset.id] = {
-      progress: 'installing',
-      version: `temp-${new Date().getTime()}`
-    };
-
-    updateProgressStates();
-    const m = await Hosts.installAssetToProfile('curse', profile, asset, assetType);
-    updateProgressStates();
-    installErrorHandler(m, asset);
+      updateProgressStates();
+      const m = await Hosts.installAssetToProfile('curse', profile, asset, assetType);
+      updateProgressStates();
+      installErrorHandler(m, asset);
+    } catch (err) {
+      profile.progressState[asset.id] = {};
+      updateProgressStates();
+    }
   };
 
   const deleteClick = assetid => {
