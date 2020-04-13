@@ -6,6 +6,7 @@ import ProfileCard from '../../../component/profilecard/profilecard';
 import ShareOverlay from '../../../component/shareoverlay/shareoverlay';
 import UpdateOverlay from '../../../component/updateoverlay/updateoverlay';
 import AlertManager from '../../../manager/alertManager';
+import LaunchingOverlay from '../../../component/launchingOverlay/launchingOverlay';
 
 const BG = styled.div`
   overflow-y: auto;
@@ -23,7 +24,8 @@ export default class ProfileGrid extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      profiles: []
+      profiles: [],
+      showLaunchingOverlay: false
     };
   }
 
@@ -80,11 +82,24 @@ export default class ProfileGrid extends Component {
     ProfilesManager.deleteProfile(this.state.deletingProfile);
   };
 
+  showLaunching = () => {
+    this.setState({
+      showLaunchingOverlay: true
+    });
+  };
+
+  hideLaunching = () => {
+    this.setState({
+      showLaunchingOverlay: false
+    });
+  };
+
   render() {
-    const { showShare, showUpdate, activeProfile, profiles } = this.state;
+    const { showShare, showUpdate, activeProfile, profiles, showLaunchingOverlay } = this.state;
     const { searchTerm } = this.props;
     return (
       <BG>
+        <LaunchingOverlay show={showLaunchingOverlay} />
         {showShare && <ShareOverlay profile={activeProfile} cancelClick={this.cancelShare} />}
         {showUpdate && <UpdateOverlay profile={activeProfile} cancelClick={this.cancelUpdate} />}
         {profiles.length >= 1 &&
@@ -96,6 +111,8 @@ export default class ProfileGrid extends Component {
                     showUpdate={this.showUpdate}
                     showShare={this.showShare}
                     showDeletion={this.showDeletion}
+                    showLaunching={this.showLaunching}
+                    hideLaunching={this.hideLaunching}
                     key={profile.id}
                     profile={profile}
                   />

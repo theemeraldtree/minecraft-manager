@@ -581,7 +581,7 @@ const Global = {
   },
   getJavaPath() {
     const platforms = {
-      win32: 'C:\\Program Files (x86)\\Minecraft Launcher\\runtime\\jre-x64\\bin\\java.exe'
+      win32: 'C:\\Program Files (x86)\\Minecraft\\runtime\\jre-x64\\bin\\java.exe'
     };
 
     return platforms[os.platform()];

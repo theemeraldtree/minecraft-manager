@@ -165,9 +165,11 @@ const FileScanner = {
               version = info.version;
               blurb = `Imported from ${file}`;
               description = info.description;
-              authors = info.authorList.map(author => ({
-                name: author
-              }));
+              if (info.authorList) {
+                authors = info.authorList.map(author => ({
+                  name: author
+                }));
+              }
               iconPath = info.logoFile;
               mcVersion = info.mcversion;
               credits = info.credits;

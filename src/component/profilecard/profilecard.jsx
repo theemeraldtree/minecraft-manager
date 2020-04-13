@@ -128,7 +128,7 @@ const StateOverlay = styled.div`
   flex-flow: column;
 `;
 
-const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate }) => (
+const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate, showLaunching, hideLaunching }) => (
   <Wrapper>
     <ContextMenuTrigger holdToDisplay={-1} id={`profilecard${profile.id}`}>
       {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && (
@@ -148,9 +148,11 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate }) 
         <Buttons className="buttons">
           <LaunchButton
             color="green"
-            onClick={e => {
+            onClick={async e => {
               e.stopPropagation();
-              profile.launch();
+              showLaunching();
+              await profile.launch();
+              hideLaunching();
             }}
           >
             <img alt="Launch" src={launch} />
@@ -225,7 +227,9 @@ ProfileCard.propTypes = {
   history: PropTypes.object.isRequired,
   showDeletion: PropTypes.func,
   showShare: PropTypes.func,
-  showUpdate: PropTypes.func
+  showUpdate: PropTypes.func,
+  showLaunching: PropTypes.func,
+  hideLaunching: PropTypes.func
 };
 
 export default withRouter(ProfileCard);

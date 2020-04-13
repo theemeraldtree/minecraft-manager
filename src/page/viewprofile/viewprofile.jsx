@@ -11,6 +11,7 @@ import ShareOverlay from '../../component/shareoverlay/shareoverlay';
 import UpdateOverlay from '../../component/updateoverlay/updateoverlay';
 import NavContext from '../../navContext';
 import Global from '../../util/global';
+import LaunchingOverlay from '../../component/launchingOverlay/launchingOverlay';
 
 const Image = styled.img`
   min-width: 193px;
@@ -80,6 +81,7 @@ function ViewProfilePage({ match, history }) {
   const [showDelete, setShowDelete] = useState(false);
   const [showShareOverlay, setShowShareOverlay] = useState(false);
   const [showUpdateOverlay, setShowUpdateOverlay] = useState(false);
+  const [showLaunching, setShowLaunching] = useState(false);
 
   useEffect(() => {
     const prof = ProfilesManager.getProfileFromID(match.params.id);
@@ -113,6 +115,8 @@ function ViewProfilePage({ match, history }) {
             confirmDelete={confirmDelete}
           />
         )}
+
+        <LaunchingOverlay show={showLaunching} />
         <ProfileHeader>
           {profile.iconPath && <Image src={`file:///${profile.iconPath}#${Global.cacheUpdateTime}`} />}
           <PHSide>
@@ -123,7 +127,14 @@ function ViewProfilePage({ match, history }) {
 
         <MiddlePanel>
           <ButtonGroup>
-            <CustomButton onClick={() => profile.launch()} color="green">
+            <CustomButton
+              onClick={async () => {
+                setShowLaunching(true);
+                await profile.launch();
+                setShowLaunching(false);
+              }}
+              color="green"
+            >
               launch
             </CustomButton>
             <CustomButton onClick={editProfile} color="yellow">

@@ -19,6 +19,7 @@ import LibrariesManager from '../manager/librariesManager';
 import Hosts from '../host/Hosts';
 import SettingsManager from '../manager/settingsManager';
 import logInit from '../util/logger';
+import DirectLauncherManager from '../manager/directLauncherManager';
 
 export default class Profile extends OAMFAsset {
   /**
@@ -292,20 +293,22 @@ export default class Profile extends OAMFAsset {
   }
 
   launch() {
-    if (!LauncherManager.profileExists(this)) {
-      LauncherManager.createProfile(this);
-    }
+    // if (!LauncherManager.profileExists(this)) {
+    //   LauncherManager.createProfile(this);
+    // }
 
-    this.addIconToLauncher();
-    LauncherManager.updateVersion(this);
-    LauncherManager.setMostRecentProfile(this);
-    LauncherManager.openLauncher();
+    // this.addIconToLauncher();
+    // LauncherManager.updateVersion(this);
+    // LauncherManager.setMostRecentProfile(this);
+    // LauncherManager.openLauncher();
 
-    if (SettingsManager.currentSettings.closeOnLaunch) {
-      setTimeout(() => {
-        remote.getCurrentWindow().close();
-      }, 3000);
-    }
+    // if (SettingsManager.currentSettings.closeOnLaunch) {
+    //   setTimeout(() => {
+    //     remote.getCurrentWindow().close();
+    //   }, 3000);
+    // }
+
+    return DirectLauncherManager.launch(this);
   }
 
   removeAllMods() {
