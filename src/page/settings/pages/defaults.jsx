@@ -1,8 +1,24 @@
 import React, { useReducer } from 'react';
+import styled from 'styled-components';
 import InputContainer from '../../editprofile/components/inputcontainer';
 import Checkbox from '../../../component/checkbox/checkbox';
 import Detail from '../../../component/detail/detail';
 import SettingsManager from '../../../manager/settingsManager';
+
+const Panel = styled.div`
+  background-color: #2b2b2b;
+  padding: 10px;
+  width: 380px;
+  margin-bottom: 5px;
+
+  h3 {
+    margin: 0;
+  }
+
+  & > div {
+    margin-top: 5px;
+  }
+`;
 
 export default function Defaults() {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
@@ -18,30 +34,33 @@ export default function Defaults() {
       <p>
         The following are default settings that are used for <b>new</b> profiles only
       </p>
-      <InputContainer>
-        <Checkbox
-          checked={SettingsManager.currentSettings.defaultsShowTutorial}
-          lighter
-          onClick={() => toggleItem('defaultsShowTutorial')}
-        />
-        <Detail>Show tutorial in top right corner</Detail>
-      </InputContainer>
-      <InputContainer>
-        <Checkbox
-          checked={SettingsManager.currentSettings.defaultsAutoJump}
-          lighter
-          onClick={() => toggleItem('defaultsAutoJump')}
-        />
-        <Detail>Auto-jump</Detail>
-      </InputContainer>
-      <InputContainer>
-        <Checkbox
-          checked={SettingsManager.currentSettings.defaultsMultiplayerWarning}
-          lighter
-          onClick={() => toggleItem('defaultsMultiplayerWarning')}
-        />
-        <Detail>Show Multiplayer Content Warning Screen</Detail>
-      </InputContainer>
+      <Panel>
+        <h3>Sync Options</h3>
+        <InputContainer>
+          <Checkbox
+            checked={SettingsManager.currentSettings.defaultsSyncOptionsTXT}
+            lighter
+            onClick={() => toggleItem('defaultsSyncOptionsTXT')}
+          />
+          <Detail>Sync in-game Minecraft Options</Detail>
+        </InputContainer>
+        <InputContainer>
+          <Checkbox
+            checked={SettingsManager.currentSettings.defaultsSyncOptionsOF}
+            lighter
+            onClick={() => toggleItem('defaultsSyncOptionsOF')}
+          />
+          <Detail>Sync in-game OptiFine Options</Detail>
+        </InputContainer>
+        <InputContainer>
+          <Checkbox
+            checked={SettingsManager.currentSettings.defaultsSyncServers}
+            lighter
+            onClick={() => toggleItem('defaultsSyncServers')}
+          />
+          <Detail>Sync in-game server list</Detail>
+        </InputContainer>
+      </Panel>
     </>
   );
 }

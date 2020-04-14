@@ -100,6 +100,13 @@ const DirectLauncherManager = {
         return await FSU.readJSON(
           path.join(VersionsManager.getVersionsPath(), `/${latestSnapshot}/${latestSnapshot}.json`)
         );
+      } else {
+        return await FSU.readJSON(
+          path.join(
+            VersionsManager.getVersionsPath(),
+            `/${profile.version.minecraft.version}/${profile.version.minecraft.version}.json`
+          )
+        );
       }
     }
   },

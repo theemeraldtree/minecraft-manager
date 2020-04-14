@@ -61,6 +61,21 @@ const SettingsManager = {
           this.currentSettings.runSnapshotInSeperateFolder = false;
         }
 
+        if (this.currentSettings.defaultsSyncOptionsTXT) {
+          logger.info('Setting "defaultsSyncOptionsTXT" was missing. Adding it...');
+          this.currentSettings.defaultsSyncOptionsTXT = false;
+        }
+
+        if (this.currentSettings.defaultsSyncOptionsOF) {
+          logger.info('Setting "defaultsSyncOptionsOF" was missing. Adding it...');
+          this.currentSettings.defaultsSyncOptionsOF = false;
+        }
+
+        if (this.currentSettings.defaultsSyncServers) {
+          logger.info('Setting "defaultsSyncServers" was missing. Adding it...');
+          this.currentSettings.defaultsSyncServers = false;
+        }
+
         logger.info('Finished loading settings');
         resolve();
       });
@@ -125,7 +140,10 @@ const SettingsManager = {
       lastToastNewsID: -1,
       checkToastNews: true,
       closeOnLaunch: false,
-      runSnapshotInSeperateFolder: false
+      runSnapshotInSeperateFolder: false,
+      defaultsSyncOptionsTXT: false,
+      defaultsSyncOptionsOF: false,
+      defaultsSyncServers: false
     };
 
     logger.info('Saving new settings...');

@@ -669,14 +669,28 @@ export default class Profile extends OAMFAsset {
   applyDefaults() {
     this.logger.info('Applying defaults...');
     const { currentSettings } = SettingsManager;
-    const options = `
-            autoJump:${currentSettings.defaultsAutoJump}\n
-            tutorialStep:${currentSettings.defaultsShowTutorial ? 'movement' : 'none'}\n
-            skipMultiplayerWarning:${!currentSettings.defaultsMultiplayerWarning}
-        `
-      .replace(/ /g, '')
-      .replace(/(^[ \t]*\n)/gm, '');
 
-    fs.writeFileSync(path.join(this.gameDir, 'options.txt'), options);
+    this.mcm = {
+      syncOptionsTXT: currentSettings.defaultsSyncOptionsTXT,
+      syncOptionsOF: currentSettings.defaultsSyncOptionsOF,
+      syncServers: currentSettings.defaultsSyncServers
+    };
+    if (currentSettings.defaultsSyncOptionsTXT) {
+      fs.linkSync(path.join(Global.getMCPath(), 'options.txt'), path.join(this.gameDir, 'options.txt'));
+    } else {
+      fs.copyFileSync(path.join(Global.getMCPath(), 'options.txt'), path.join(this.gameDir, 'options.txt'));
+    }
+
+    if (currentSettings.defaultsSyncOptionsOF) {
+      fs.linkSync(path.join(Global.getMCPath(), 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
+    } else if (fs.existsSync(path.join(Global.getMCPath(), 'optionsof.txt'))) {
+      fs.copyFileSync(path.join(Global.getMCPath(), 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
+    }
+
+    if (currentSettings.defaultsSyncServers) {
+      fs.linkSync(path.join(Global.getMCPath(), 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
+    } else {
+      fs.copyFileSync(path.join(Global.getMCPath(), 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
+    }
   }
 }

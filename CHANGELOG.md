@@ -11,6 +11,11 @@ Changelogs for development versions are located in their corresponding branch.
 - Added a cool loading spinner
 - Launch directly (bypass the Minecraft Launcher)
 - Better error handling
+- Minecraft Options, OptiFine Options, and Servers list are automatically copied on Profile creation
+
+### Removed
+
+- Removed "in-game defaults" (e.g. autojump, tutorial) as those are now inferred from your Latest release Options
 
 ## 2.3.8
 
