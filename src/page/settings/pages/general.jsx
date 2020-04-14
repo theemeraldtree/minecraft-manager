@@ -9,6 +9,8 @@ import Global from '../../../util/global';
 import Checkbox from '../../../component/checkbox/checkbox';
 import ProfilesManager from '../../../manager/profilesManager';
 import InputContainer from '../../editprofile/components/inputcontainer';
+import CustomDropdown from '../../../component/customdropdown/customdropdown';
+import LauncherManager from '../../../manager/launcherManager';
 
 const { dialog } = require('electron').remote;
 const os = require('os');
@@ -26,6 +28,23 @@ const PathInput = styled(TextInput)`
   font-size: 13pt;
 `;
 
+const LaunchContainer = styled.div`
+  margin-top: 30px;
+`;
+
+function getMCAccounts() {
+  const final = [];
+  const accounts = LauncherManager.getMCAccounts();
+  Object.keys(accounts).forEach(acc => {
+    final.push({
+      id: acc,
+      name: Object.values(accounts[acc].profiles)[0].displayName
+    });
+  });
+
+  return final;
+}
+
 export default function General() {
   const [mcHome, setMCHome] = useState(SettingsManager.MC_HOME);
   const [mcExe, setMCExe] = useState(SettingsManager.currentSettings.mcExe);
@@ -33,6 +52,7 @@ export default function General() {
   const [ramChangeDisabled, setRamChangeDisabled] = useState(true);
   const [warningMessage, setWarningMessage] = useState('');
   const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const [minecraftAccounts] = useState(getMCAccounts());
 
   const chooseHomeDirectory = () => {
     const p = dialog.showOpenDialog({
@@ -115,6 +135,12 @@ export default function General() {
     toggleSetting('closeOnLaunch');
   };
 
+  const changeMCAccount = acc => {
+    SettingsManager.currentSettings.mcAccount = acc;
+    SettingsManager.save();
+    forceUpdate();
+  };
+
   return (
     <>
       <Settings>
@@ -162,6 +188,15 @@ export default function General() {
           <Checkbox checked={SettingsManager.currentSettings.closeOnLaunch} lighter onClick={closeOnLaunchClick} />
           <Detail>close minecraft manager on profile launch</Detail>
         </InputContainer>
+        <LaunchContainer>
+          <Detail>Minecraft account to use for Launching</Detail>
+          <CustomDropdown
+            items={minecraftAccounts}
+            value={SettingsManager.currentSettings.mcAccount}
+            onChange={changeMCAccount}
+          />
+          <Detail>Add an account via the standard Minecraft Launcher</Detail>
+        </LaunchContainer>
       </Settings>
     </>
   );

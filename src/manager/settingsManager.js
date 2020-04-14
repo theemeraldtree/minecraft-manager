@@ -28,19 +28,6 @@ const SettingsManager = {
         this.MC_HOME = parsed.homeDirectory;
         this.currentSettings = parsed;
 
-        if (this.currentSettings.defaultsShowTutorial === undefined) {
-          logger.info('Setting "defaultsShowTutorial" was missing. Adding it...');
-          this.currentSettings.defaultsShowTutorial = false;
-        }
-        if (this.currentSettings.defaultsAutoJump === undefined) {
-          logger.info('Setting "defaultsAutoJump" was missing. Adding it...');
-          this.currentSettings.defaultsAutoJump = false;
-        }
-        if (this.currentSettings.defaultsMultiplayerWarning === undefined) {
-          logger.info('Setting "defaultsMultiplayerWarning" was missing. Adding it...');
-          this.currentSettings.defaultsMultiplayerWarning = false;
-        }
-
         if (this.currentSettings.allowSnapshotProfile === undefined) {
           logger.info('Setting "allowSnapshotProfile" was missing. Adding it...');
           this.currentSettings.allowSnapshotProfile = false;
@@ -61,19 +48,24 @@ const SettingsManager = {
           this.currentSettings.runSnapshotInSeperateFolder = false;
         }
 
-        if (this.currentSettings.defaultsSyncOptionsTXT) {
+        if (this.currentSettings.defaultsSyncOptionsTXT === undefined) {
           logger.info('Setting "defaultsSyncOptionsTXT" was missing. Adding it...');
           this.currentSettings.defaultsSyncOptionsTXT = false;
         }
 
-        if (this.currentSettings.defaultsSyncOptionsOF) {
+        if (this.currentSettings.defaultsSyncOptionsOF === undefined) {
           logger.info('Setting "defaultsSyncOptionsOF" was missing. Adding it...');
           this.currentSettings.defaultsSyncOptionsOF = false;
         }
 
-        if (this.currentSettings.defaultsSyncServers) {
+        if (this.currentSettings.defaultsSyncServers === undefined) {
           logger.info('Setting "defaultsSyncServers" was missing. Adding it...');
           this.currentSettings.defaultsSyncServers = false;
+        }
+
+        if (this.currentSettings.mcAccount === undefined) {
+          logger.info('Setting "mcAccount" was missing. Adding it...');
+          this.currentSettings.mcAccount = Object.keys(LauncherManager.getMCAccounts())[0];
         }
 
         logger.info('Finished loading settings');
@@ -143,7 +135,8 @@ const SettingsManager = {
       runSnapshotInSeperateFolder: false,
       defaultsSyncOptionsTXT: false,
       defaultsSyncOptionsOF: false,
-      defaultsSyncServers: false
+      defaultsSyncServers: false,
+      mcAccount: Object.keys(LauncherManager.getMCAccounts())[0]
     };
 
     logger.info('Saving new settings...');

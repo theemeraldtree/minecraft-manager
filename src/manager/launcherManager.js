@@ -6,6 +6,7 @@ import Global from '../util/global';
 import ProfilesManager from './profilesManager';
 import SettingsManager from './settingsManager';
 import logInit from '../util/logger';
+import FSU from '../util/fsu';
 
 const logger = logInit('LauncherManager');
 
@@ -138,6 +139,10 @@ const LauncherManager = {
 
     logger.info('Saving changes to disk...');
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
+  },
+  getMCAccounts() {
+    logger.info('Getting Minecraft accounts...');
+    return FSU.readJSONSync(this.getLauncherProfiles()).authenticationDatabase;
   }
 };
 

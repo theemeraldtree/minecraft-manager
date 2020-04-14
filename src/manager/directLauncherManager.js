@@ -11,6 +11,7 @@ import DownloadsManager from './downloadsManager';
 import rimraf from 'rimraf';
 import LauncherManager from './launcherManager';
 import Global from '../util/global';
+import SettingsManager from './settingsManager';
 const { exec } = require('child_process');
 const admzip = require('adm-zip');
 /**
@@ -197,7 +198,8 @@ const DirectLauncherManager = {
 
       mcArgs = mcArgs.replace(
         '${auth_player_name}',
-        Object.values(Object.values(launcherProfiles.authenticationDatabase)[0].profiles)[0].displayName
+        Object.values(launcherProfiles.authenticationDatabase[SettingsManager.currentSettings.mcAccount].profiles)[0]
+          .displayName
       );
       mcArgs = mcArgs.replace('${version_name}', `"${profile.versionname}"`);
       mcArgs = mcArgs.replace('${game_directory}', `"${profile.gameDir}"`);
@@ -205,11 +207,11 @@ const DirectLauncherManager = {
       mcArgs = mcArgs.replace('${assets_index_name}', versionJSON.assets);
       mcArgs = mcArgs.replace(
         '${auth_uuid}',
-        Object.keys(Object.values(launcherProfiles.authenticationDatabase)[0].profiles)[0]
+        Object.keys(launcherProfiles.authenticationDatabase[SettingsManager.currentSettings.mcAccount].profiles)[0]
       );
       mcArgs = mcArgs.replace(
         '${auth_access_token}',
-        Object.values(launcherProfiles.authenticationDatabase)[0].accessToken
+        launcherProfiles.authenticationDatabase[SettingsManager.currentSettings.mcAccount].accessToken
       );
       mcArgs = mcArgs.replace('${user_type}', 'mojang');
       mcArgs = mcArgs.replace('${user_properties}', '{}');
