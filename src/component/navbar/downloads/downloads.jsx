@@ -59,12 +59,13 @@ const AnimationBar = styled.div`
 const DownloadsOverlay = styled.div`
   width: 350px;
   height: 350px;
-  background-color: #1d1d1d;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
   z-index: 10000;
   cursor: default;
   position: absolute;
-  left: 120px;
-  bottom: 20px;
+  left: 110px;
+  bottom: 10px;
   color: white;
   display: flex;
   flex-flow: column;

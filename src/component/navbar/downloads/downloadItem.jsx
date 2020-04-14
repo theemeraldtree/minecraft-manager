@@ -6,7 +6,7 @@ import ProgressBar from '../../progressbar/progressbar';
 const BG = styled.div`
   width: 100%;
   height: 70px;
-  background-color: #313131;
+  background-color: rgba(0, 0, 0, 0.3);
   color: white;
   padding-top: 2px;
   padding-left: 5px;

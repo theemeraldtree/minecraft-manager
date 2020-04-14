@@ -23,6 +23,9 @@ const CC = styled.div`
   padding-top: 10px;
   overflow-y: auto;
   flex: 1 1 auto;
+  &::-webkit-scrollbar-track {
+    background: none;
+  }
 `;
 export default function EditPage({ match }) {
   const { header } = useContext(NavContext);

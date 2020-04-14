@@ -12,6 +12,7 @@ Changelogs for development versions are located in their corresponding branch.
 - Launch directly (bypass the Minecraft Launcher)
 - Better error handling
 - Minecraft Options, OptiFine Options, and Servers list are automatically copied on Profile creation
+- Downloads Viewer is now transparent
 
 ### Removed
 
