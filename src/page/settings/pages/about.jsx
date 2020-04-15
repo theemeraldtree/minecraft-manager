@@ -59,6 +59,7 @@ const Updates = styled.div`
 
 const BrandLogo = styled.img`
   width: 200px;
+  height: 23px;
 `;
 
 const SplitSection = styled(Section)`

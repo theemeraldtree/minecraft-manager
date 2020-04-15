@@ -18,6 +18,8 @@ import { loadLatestProfile } from './defaultProfiles/latestProfile';
 import { loadSnapshotProfile } from './defaultProfiles/snapshotProfile';
 import logInit from './util/logger';
 import FSU from './util/fsu';
+import dropdownArrow from './component/customdropdown/img/arrow.png';
+import theemeraldtreeLogo from './page/settings/img/theemeraldtree-logo.png';
 
 const logger = logInit('index');
 
@@ -115,6 +117,10 @@ async function load() {
     logger.error(e.toString());
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
   }
+
+  logger.info('Caching images...');
+  Global.cacheImage(dropdownArrow);
+  Global.cacheImage(theemeraldtreeLogo);
 
   // eslint-disable-next-line react/jsx-filename-extension
   ReactDOM.render(<App />, document.getElementById('app'));

@@ -79,38 +79,10 @@ export default class ShareOverlay extends Component {
     };
   }
 
-  componentDidMount() {
+  componentDidUpdate(prevProps) {
     const { profile } = this.props;
-    const files = fs.readdirSync(profile.gameDir);
-    if (files.length) {
-      const exportFolders = [];
-      const exportItems = [];
-
-      files.forEach(file => {
-        if (file !== 'mods') {
-          if (fs.lstatSync(path.join(profile.gameDir, file)).isDirectory()) {
-            exportFolders[file] = false;
-            exportItems.push(
-              <ExportItem key={file}>
-                <Checkbox info={file} onClick={this.enableFolder} type="checkbox" />
-                <Label>{file}</Label>
-              </ExportItem>
-            );
-          }
-        } else {
-          exportItems.unshift(
-            <ExportItem key="mods">
-              <Checkbox type="checkbox" checked disabled />
-              <Label>mods</Label>
-            </ExportItem>
-          );
-        }
-      });
-
-      this.setState({
-        exportFolders,
-        exportItems
-      });
+    if (prevProps.profile !== profile && profile !== undefined) {
+      this.useProfile();
     }
   }
 
@@ -155,9 +127,44 @@ export default class ShareOverlay extends Component {
     }
   };
 
+  useProfile() {
+    const { profile } = this.props;
+    const files = fs.readdirSync(profile.gameDir);
+    if (files.length) {
+      const exportFolders = [];
+      const exportItems = [];
+
+      files.forEach(file => {
+        if (file !== 'mods') {
+          if (fs.lstatSync(path.join(profile.gameDir, file)).isDirectory()) {
+            exportFolders[file] = false;
+            exportItems.push(
+              <ExportItem key={file}>
+                <Checkbox info={file} onClick={this.enableFolder} type="checkbox" />
+                <Label>{file}</Label>
+              </ExportItem>
+            );
+          }
+        } else {
+          exportItems.unshift(
+            <ExportItem key="mods">
+              <Checkbox type="checkbox" checked disabled />
+              <Label>mods</Label>
+            </ExportItem>
+          );
+        }
+      });
+
+      this.setState({
+        exportFolders,
+        exportItems
+      });
+    }
+  }
+
   render() {
     return (
-      <Overlay force>
+      <Overlay force in={this.props.show}>
         <BG>
           {this.state.displayState === 'main' && (
             <>
@@ -200,6 +207,7 @@ export default class ShareOverlay extends Component {
 }
 
 ShareOverlay.propTypes = {
-  profile: PropTypes.object.isRequired,
-  cancelClick: PropTypes.func
+  profile: PropTypes.object,
+  cancelClick: PropTypes.func,
+  show: PropTypes.bool.isRequired
 };

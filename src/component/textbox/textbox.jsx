@@ -10,11 +10,7 @@ const TextBox = styled.textarea`
   padding-left: 3px;
   resize: none;
   &::placeholder {
-    color: white;
-  }
-  &:hover:not(:disabled),
-  &:focus {
-    filter: brightness(0.85);
+    color: #cfcfcf;
   }
   &:disabled {
     filter: brightness(0.75);

@@ -37,7 +37,7 @@ const ButtonsContainer = styled.div`
   justify-content: flex-end;
   margin-top: 5px;
   flex-shrink: 0;
-  div {
+  button {
     margin-right: 5px;
   }
 `;
@@ -51,31 +51,9 @@ export default class UpdateOverlay extends Component {
     };
   }
 
-  async componentDidMount() {
-    const { profile } = this.props;
-    if (profile.hosts.curse) {
-      const update = await Hosts.checkForAssetUpdates('curse', profile);
-      if (update) {
-        if (update === 'no-connection') {
-          this.setState({
-            noConnection: true,
-            updateAvailable: false
-          });
-        } else {
-          this.setState({
-            updateAvailable: true,
-            updateVersion: update
-          });
-        }
-      } else {
-        this.setState({
-          noUpdates: true
-        });
-      }
-    } else {
-      this.setState({
-        noUpdates: true
-      });
+  componentDidUpdate(prevProps) {
+    if (prevProps.profile !== this.props.profile && this.props.profile !== undefined) {
+      this.useProfile();
     }
   }
 
@@ -106,19 +84,47 @@ export default class UpdateOverlay extends Component {
       });
   };
 
+  async useProfile() {
+    const { profile } = this.props;
+    if (profile.hosts.curse) {
+      const update = await Hosts.checkForAssetUpdates('curse', profile);
+      if (update) {
+        if (update === 'no-connection') {
+          this.setState({
+            noConnection: true,
+            updateAvailable: false
+          });
+        } else {
+          this.setState({
+            updateAvailable: true,
+            updateVersion: update
+          });
+        }
+      } else {
+        this.setState({
+          noUpdates: true
+        });
+      }
+    } else {
+      this.setState({
+        noUpdates: true
+      });
+    }
+  }
+
   render() {
     const { noUpdates, updateAvailable, updateVersion, displayState, noConnection, updateProgress } = this.state;
 
-    const { profile, cancelClick } = this.props;
+    const { profile, cancelClick, show } = this.props;
 
     let isHosted = false;
-    if (profile.hosts) {
+    if (profile && profile.hosts) {
       if (profile.hosts.curse) {
         isHosted = true;
       }
     }
     return (
-      <Overlay force>
+      <Overlay force in={show}>
         <BG>
           {displayState === 'done' && (
             <>
@@ -193,6 +199,7 @@ export default class UpdateOverlay extends Component {
 }
 
 UpdateOverlay.propTypes = {
-  profile: PropTypes.object.isRequired,
-  cancelClick: PropTypes.func.isRequired
+  profile: PropTypes.object,
+  cancelClick: PropTypes.func.isRequired,
+  show: PropTypes.bool.isRequired
 };

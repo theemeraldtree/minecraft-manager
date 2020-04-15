@@ -11,7 +11,6 @@ const BG = styled.div`
 `;
 
 const Item = styled(NavLink)`
-  margin-top: 10px;
   width: 100%;
   display: block;
   height: 25px;
@@ -28,7 +27,10 @@ const Item = styled(NavLink)`
     filter: brightness(1);
     font-weight: 900;
   }
-  margin-bottom: 15px;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-top: 5px;
+  padding-bottom: 10px;
   transition: font-weight 150ms;
 `;
 

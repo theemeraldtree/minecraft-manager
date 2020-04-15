@@ -77,18 +77,13 @@ const Description = styled.div`
 function ViewProfilePage({ match, history }) {
   const { header } = useContext(NavContext);
 
-  const [profile, setProfile] = useState({ name: 'loading...' });
+  const [profile] = useState(ProfilesManager.getProfileFromID(match.params.id));
   const [showDelete, setShowDelete] = useState(false);
   const [showShareOverlay, setShowShareOverlay] = useState(false);
   const [showUpdateOverlay, setShowUpdateOverlay] = useState(false);
   const [showLaunching, setShowLaunching] = useState(false);
 
   useEffect(() => {
-    const prof = ProfilesManager.getProfileFromID(match.params.id);
-    if (prof) {
-      setProfile(prof);
-    }
-
     header.setTitle('profile');
     header.setShowChildren(false);
     header.setBackLink('/');
@@ -115,7 +110,6 @@ function ViewProfilePage({ match, history }) {
             confirmDelete={confirmDelete}
           />
         )}
-
         <LaunchingOverlay show={showLaunching} />
         <ProfileHeader>
           {profile.iconPath && <Image src={`file:///${profile.iconPath}#${Global.cacheUpdateTime}`} />}
@@ -124,7 +118,6 @@ function ViewProfilePage({ match, history }) {
             <Blurb>{profile.blurb}</Blurb>
           </PHSide>
         </ProfileHeader>
-
         <MiddlePanel>
           <ButtonGroup>
             <CustomButton
@@ -158,8 +151,8 @@ function ViewProfilePage({ match, history }) {
             <SanitizedHTML html={profile.description} />
           </Description>
         </MiddlePanel>
-        {showShareOverlay && <ShareOverlay cancelClick={() => setShowShareOverlay(false)} profile={profile} />}
-        {showUpdateOverlay && <UpdateOverlay cancelClick={() => setShowUpdateOverlay(false)} profile={profile} />}
+        <ShareOverlay show={showShareOverlay} cancelClick={() => setShowShareOverlay(false)} profile={profile} />}
+        <UpdateOverlay show={showUpdateOverlay} cancelClick={() => setShowUpdateOverlay(false)} profile={profile} />
       </Page>
     );
   }

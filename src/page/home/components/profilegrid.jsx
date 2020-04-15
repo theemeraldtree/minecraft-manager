@@ -25,7 +25,9 @@ export default class ProfileGrid extends Component {
     super(props);
     this.state = {
       profiles: [],
-      showLaunchingOverlay: false
+      showLaunchingOverlay: false,
+      showUpdate: false,
+      showShare: false
     };
   }
 
@@ -100,8 +102,8 @@ export default class ProfileGrid extends Component {
     return (
       <BG>
         <LaunchingOverlay show={showLaunchingOverlay} />
-        {showShare && <ShareOverlay profile={activeProfile} cancelClick={this.cancelShare} />}
-        {showUpdate && <UpdateOverlay profile={activeProfile} cancelClick={this.cancelUpdate} />}
+        <ShareOverlay show={showShare} profile={activeProfile} cancelClick={this.cancelShare} />
+        <UpdateOverlay show={showUpdate} profile={activeProfile} cancelClick={this.cancelUpdate} />
         {profiles.length >= 1 &&
           profiles.map(profile => {
             if (profile) {

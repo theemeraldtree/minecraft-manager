@@ -56,7 +56,7 @@ export default function EditPageVersions({ id }) {
   const { header } = useContext(NavContext);
 
   const [profile, setProfile] = useState(ProfilesManager.getProfileFromID(id));
-  const [mcverValue, setMCVerValue] = useState('');
+  const [mcverValue, setMCVerValue] = useState(profile.version.minecraft.version);
   const [curseVerValue, setCurseVerValue] = useState('');
   const [hostVersionValues, setHostVersionValues] = useState(undefined);
 
@@ -296,14 +296,12 @@ export default function EditPageVersions({ id }) {
         {!profile.hosts.curse && (
           <>
             <Detail>minecraft version</Detail>
-            {mcverValue && (
-              <MCVersionSelector
-                onChange={mcverChange}
-                value={mcverValue}
-                disabled={forgeIsInstalling || fabricIsInstalling}
-                dontAutoSelectFirst
-              />
-            )}
+            <MCVersionSelector
+              onChange={mcverChange}
+              value={mcverValue}
+              disabled={forgeIsInstalling || fabricIsInstalling}
+              dontAutoSelectFirst
+            />
             <OptionBreak />
           </>
         )}

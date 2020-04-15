@@ -13,10 +13,6 @@ const TextInput = styled.input.attrs({
   &::placeholder {
     color: #cfcfcf;
   }
-  &:hover:not(:disabled),
-  &:focus {
-    filter: brightness(0.85);
-  }
   &:disabled {
     cursor: not-allowed;
     filter: brightness(0.75);

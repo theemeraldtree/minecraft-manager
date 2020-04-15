@@ -68,7 +68,6 @@ const ProfilesManager = {
     });
   },
   updateReloadListeners() {
-    Global.updateCache();
     this.reloadListeners.forEach(listener => listener());
   },
   registerReloadListener(listener) {
