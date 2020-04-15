@@ -2,6 +2,15 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.4.1
+
+#### Currently WIP
+
+### Features
+
+- Improved UI consistency
+- Better usage via keyboard
+
 ## 2.4.0
 
 #### Released 2020-04-13

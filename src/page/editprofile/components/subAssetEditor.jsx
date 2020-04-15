@@ -1,4 +1,4 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import transition from 'styled-transition-group';
@@ -21,6 +21,7 @@ import CopyToOverlay from './copyToOverlay';
 import MoveToOverlay from './moveToOverlay';
 import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import ErrorManager from '../../../manager/errorManager';
+import useKeyPress from '../../../util/useKeyPress';
 
 const { dialog } = require('electron').remote;
 
@@ -99,6 +100,7 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
   const [showMoveToOverlay, setShowMoveToOverlay] = useState(false);
   const [actionAsset, setActionAsset] = useState({});
   const [sortValue, setSortValue] = useState('a-z');
+  const escPress = useKeyPress('Escape');
 
   let po;
   let selobj = profile;
@@ -369,6 +371,21 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
     }
   ];
 
+  useEffect(() => {
+    if (escPress) {
+      if (displayState === 'addMods') {
+        if (listState === 'viewAsset') {
+          setListState('browseAssets');
+          return;
+        }
+
+        setDisplayState('assetsList');
+      } else if (displayState === 'modInfo') {
+        setDisplayState('assetsList');
+      }
+    }
+  }, [escPress]);
+
   return (
     <>
       <Wrapper>
@@ -399,7 +416,12 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
             )}
 
             {displayState === 'assetsList' && (
-              <Search value={liveSearchTerm} onChange={searchChange} onKeyPress={searchChange} placeholder="search" />
+              <Search
+                value={liveSearchTerm}
+                onChange={searchChange}
+                onKeyPress={searchChange}
+                placeholder="search installed"
+              />
             )}
             {displayState === 'addMods' && listState !== 'viewAsset' && (
               <Button timeout={150} unmountOnExit onClick={addFromFile} color="green">

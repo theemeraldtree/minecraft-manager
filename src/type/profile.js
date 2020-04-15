@@ -647,9 +647,9 @@ export default class Profile extends OAMFAsset {
       if (this.hasFramework()) {
         LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
         if (this.frameworks.forge) {
-          VersionsManager.renameVersion(this, safeName);
+          VersionsManager.renameVersion(this, safeName, 'forge');
         } else if (this.frameworks.fabric) {
-          VersionsManager.renameVersionFabric(this, safeName);
+          VersionsManager.renameVersion(this, safeName, 'fabric');
         }
         LibrariesManager.renameLibrary(this, newID);
       }

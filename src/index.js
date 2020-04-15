@@ -20,6 +20,7 @@ import logInit from './util/logger';
 import FSU from './util/fsu';
 import dropdownArrow from './component/customdropdown/img/arrow.png';
 import theemeraldtreeLogo from './page/settings/img/theemeraldtree-logo.png';
+import checkmark from './component/checkbox/checkmark.png';
 
 const logger = logInit('index');
 
@@ -121,6 +122,7 @@ async function load() {
   logger.info('Caching images...');
   Global.cacheImage(dropdownArrow);
   Global.cacheImage(theemeraldtreeLogo);
+  Global.cacheImage(checkmark);
 
   // eslint-disable-next-line react/jsx-filename-extension
   ReactDOM.render(<App />, document.getElementById('app'));

@@ -10,6 +10,9 @@ import Detail from '../../../component/detail/detail';
 import InputContainer from '../components/inputcontainer';
 import Global from '../../../util/global';
 import Overlay from '../../../component/overlay/overlay';
+import Spinner from '../../../component/spinner/spinner';
+import ToastManager from '../../../manager/toastManager';
+import ErrorManager from '../../../manager/errorManager';
 
 const { dialog } = require('electron').remote;
 
@@ -21,7 +24,11 @@ const DescContainer = styled.div`
 const Renaming = styled.div`
   background-color: #222;
   font-size: 21pt;
-  color: white;
+  width: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
 `;
 
 const LongDesc = styled(TextBox)`
@@ -146,13 +153,21 @@ const EditPageGeneral = ({ id, history }) => {
   const confirmNameChange = () => {
     setNameDisabled(true);
     setRenaming(true);
-    profile.rename(nameValue).then(prof => {
-      history.push(`/edit/general/${prof.id}`);
+    profile
+      .rename(nameValue)
+      .then(prof => {
+        history.push(`/edit/general/${prof.id}`);
 
-      // *unfortunately* a page reload is required to my knowledge
-      // react-router doesn't want to refresh the page otherwise
-      window.location.reload();
-    });
+        // *unfortunately* a page reload is required to my knowledge
+        // react-router doesn't want to refresh the page otherwise
+        window.location.reload();
+      })
+      .catch(err => {
+        setNameValue(profile.name);
+        setNameDisabled(false);
+        setRenaming(false);
+        ToastManager.createToast('Error Renaming', ErrorManager.makeReadable(err, 'renaming'));
+      });
   };
 
   const resetIcon = () => {
@@ -166,7 +181,9 @@ const EditPageGeneral = ({ id, history }) => {
       {renaming && (
         <>
           <Overlay force>
-            <Renaming>renaming...</Renaming>
+            <Renaming>
+              <Spinner />
+            </Renaming>
           </Overlay>
         </>
       )}

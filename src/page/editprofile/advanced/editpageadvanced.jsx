@@ -24,7 +24,7 @@ const logger = logInit('EditPageAdvanced');
 
 const Panel = styled.div`
   background-color: #2b2b2b;
-  width: 380px;
+  width: 400px;
   padding: 10px;
   margin-bottom: 5px;
 
@@ -182,21 +182,21 @@ export default function EditPageAdvanced({ id }) {
         <Panel>
           <h3>Sync Options</h3>
 
-          {profile.id !== '0-default-profile-latest' && (
+          {profile.id !== '0-default-profile-latest' && runSnapshotInSeperateFolder && (
             <>
               <InputContainer>
                 <Checkbox lighter checked={syncOptionsTXT} onClick={syncOptionsTXTClick} />
-                sync in-game minecraft options with this profile
+                Sync in-game Minecraft Options with this profile
               </InputContainer>
 
               <InputContainer>
                 <Checkbox lighter checked={syncOptionsOF} onClick={syncOptionsOFClick} />
-                sync in-game optifine Options with this profile
+                Sync in-game OptiFine Options with this profile
               </InputContainer>
 
               <InputContainer>
                 <Checkbox lighter checked={syncServers} onClick={syncServersClick} />
-                sync in-game server list with this profile
+                Sync in-game Server List with this profile
               </InputContainer>
               <br />
             </>
