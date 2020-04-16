@@ -58,6 +58,8 @@
       }
 
       .react-contextmenu {
+        transform: scaleY(0);
+        transform-origin: top;
         opacity: 0;
       }
 
@@ -68,7 +70,8 @@
         color: white;
         outline: none;
         z-index: 999;
-        transition: opacity 75ms;
+        transform: scaleY(1);
+        transition: transform 75ms;
         opacity: 1;
       }
 

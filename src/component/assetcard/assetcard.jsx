@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { ContextMenu, ContextMenuTrigger, MenuItem, SubMenu } from 'react-contextmenu';
 import { shell, clipboard } from 'electron';
 import Button from '../button/button';
@@ -24,16 +24,25 @@ const BG = styled.div`
   transition: transform 150ms;
   ${props =>
     !props.disableHover &&
-    `
-        cursor: pointer;
-        &:hover {
-            background-color: #5b5b5b;
-            transform: scale(1.02);
-        }
+    css`
+      cursor: pointer;
+      &:hover {
+        background-color: #5b5b5b;
+        transform: scale(1.02);
+      }
     `}
   &:focus-visible {
     outline: 2px solid yellow;
   }
+  ${props =>
+    props.compact &&
+    css`
+      height: 70px;
+
+      &:hover {
+        transform: scale(1);
+      }
+    `}
 `;
 
 const Image = styled.div.attrs(props => ({
@@ -47,6 +56,13 @@ const Image = styled.div.attrs(props => ({
   background-repeat: no-repeat;
   background-position: center;
   flex-shrink: 0;
+
+  ${props =>
+    props.compact &&
+    css`
+      height: 70px;
+      width: 70px;
+    `}
 `;
 
 const Title = styled.p`
@@ -63,6 +79,12 @@ const Title = styled.p`
   user-select: none;
   display: inline-block;
   white-space: nowrap;
+
+  ${props =>
+    props.compact &&
+    css`
+      font-size: 11pt;
+    `}
 `;
 
 const Version = styled.p`
@@ -141,7 +163,8 @@ const AssetCard = ({
   deleteClick,
   showBlurb,
   copyToClick,
-  moveToClick
+  moveToClick,
+  compact
 }) => (
   <>
     <ContextMenuTrigger holdToDisplay={-1} id={`assetcard${asset.id}`}>
@@ -158,9 +181,13 @@ const AssetCard = ({
         }}
         role="button"
         aria-pressed="false"
+        compact={compact}
       >
         {asset.iconPath && (
-          <Image src={`${asset.iconPath.substring(0, 1) === '/' ? 'file:///' : ''}${asset.iconPath}`} />
+          <Image
+            src={`${asset.iconPath.substring(0, 1) === '/' ? 'file:///' : ''}${asset.iconPath}`}
+            compact={compact}
+          />
         )}
         <Details>
           {!installed && asset.hosts && asset.hosts.curse && (
@@ -169,7 +196,7 @@ const AssetCard = ({
               <p>{Global.abbreviateNumber(asset.hosts.curse.downloadCount)}</p>
             </ExtraInfo>
           )}
-          <Title>{asset.name}</Title>
+          <Title compact={compact}>{asset.name}</Title>
           <Version buttonShown={showInstall || showDelete}>
             {!showBlurb && asset.version && asset.version.displayName}
             {showBlurb && asset.blurb}
@@ -295,7 +322,8 @@ AssetCard.propTypes = {
   deleteClick: PropTypes.func,
   showBlurb: PropTypes.bool,
   copyToClick: PropTypes.func,
-  moveToClick: PropTypes.func
+  moveToClick: PropTypes.func,
+  compact: PropTypes.bool
 };
 
 export default AssetCard;

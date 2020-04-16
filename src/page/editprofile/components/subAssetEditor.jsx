@@ -464,6 +464,7 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
                             installed
                             copyToClick={copyToClick}
                             moveToClick={moveToClick}
+                            compact
                           />
                         );
                       }
