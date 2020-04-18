@@ -169,7 +169,15 @@ export default function EditPageVersions({ id }) {
 
     let version = versionT;
     if (versionT === 'latest') {
-      const versions = await FabricFramework.getFabricLoaderVersions(profile.version.minecraft.version);
+      let versions;
+      try {
+        versions = await FabricFramework.getFabricLoaderVersions(profile.version.minecraft.version);
+      } catch (err) {
+        ToastManager.createToast('Error', 'Unable to get the latest Fabric versions');
+        setFabricIsInstalling(false);
+
+        return;
+      }
       if (versions) {
         if (versions[0]) {
           version = versions[0].loader.version;

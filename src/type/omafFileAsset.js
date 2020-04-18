@@ -42,11 +42,13 @@ export default class OMAFFileAsset extends OAMFAsset {
    * @returns {object}
    */
   getMainFile() {
-    const file = this.files.find(f => f.priority === 'mainFile');
-    if (file) return file;
+    if (this.files) {
+      const file = this.files.find(f => f.priority === 'mainFile');
+      if (file) return file;
+    }
 
     return {
-      path: undefined
+      path: ''
     };
   }
 }

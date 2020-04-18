@@ -19,43 +19,48 @@ const Curse = {
 
   // main function to convert curse to omaf
   convertToOMAF(asset) {
-    const id = Global.createID(asset.name);
-    const obj = {
-      omafVersion: Global.OMAF_VERSION,
-      name: asset.name,
-      id,
-      blurb: asset.summary,
-      authors: asset.authors.map(author => ({ name: author.name })),
-      cachedID: `curse-cached-${id}`,
-      type: this.getTypeFromCurseID(asset.categorySection.gameCategoryId),
-      installed: false,
-      hosts: {
-        curse: {
-          id: asset.id,
-          slug: asset.slug,
-          downloadCount: asset.downloadCount,
-          latestFileID: asset.defaultFileId,
-          dateCreated: asset.dateCreated,
-          dateReleased: asset.dateReleased,
-          dateModified: asset.dateModified,
+    if (asset) {
+      const id = Global.createID(asset.name);
+      const obj = {
+        omafVersion: Global.OMAF_VERSION,
+        name: asset.name,
+        id,
+        blurb: asset.summary,
+        authors: asset.authors.map(author => ({ name: author.name })),
+        cachedID: `curse-cached-${id}`,
+        type: this.getTypeFromCurseID(asset.categorySection.gameCategoryId),
+        installed: false,
+        hosts: {
+          curse: {
+            id: asset.id,
+            slug: asset.slug,
+            downloadCount: asset.downloadCount,
+            latestFileID: asset.defaultFileId,
+            dateCreated: asset.dateCreated,
+            dateReleased: asset.dateReleased,
+            dateModified: asset.dateModified,
 
-          localValues: {
-            gameVerLatestFiles: asset.gameVersionLatestFiles
+            localValues: {
+              gameVerLatestFiles: asset.gameVersionLatestFiles
+            }
           }
         }
-      }
-    };
+      };
 
-    if (asset.attachments && asset.attachments.length) {
-      const attachment = asset.attachments.find(a => a.isDefault);
-      if (attachment) {
-        obj.icon = attachment.url;
-        obj.iconPath = attachment.url;
-        obj.iconURL = attachment.url;
+      if (asset.attachments && asset.attachments.length) {
+        const attachment = asset.attachments.find(a => a.isDefault);
+        if (attachment) {
+          obj.icon = attachment.url;
+          obj.iconPath = attachment.url;
+          obj.iconURL = attachment.url;
+        }
       }
+
+      return obj;
     }
 
-    return obj;
+    logger.error('Asset does not exist when converting to OMAF!');
+    return undefined;
   },
 
   getTypeFromCurseID(id) {
@@ -116,7 +121,7 @@ const Curse = {
   async getDescription(asset) {
     return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/description`, {
       addonID: asset.hosts.curse.id
-    });
+    }).replace(/&nbsp;/gi, '');
   },
 
   convertCurseVersion(ver) {

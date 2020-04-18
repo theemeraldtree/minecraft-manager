@@ -39,6 +39,16 @@ const Button = styled.button.attrs(props => ({
   img {
     width: 90%;
   }
+  .spinner {
+    width: 20px;
+    height: 20px;
+
+    div {
+      width: 15px;
+      height: 15px;
+      border-width: 3px;
+    }
+  }
   &:hover {
     ${props =>
       !props.disabled &&

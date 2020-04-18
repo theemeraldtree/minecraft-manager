@@ -7,6 +7,15 @@ import HeaderButton from '../../../component/headerButton/headerButton';
 import Button from '../../../component/button/button';
 import ForgeFramework from '../../../framework/forge/forgeFramework';
 import FabricFramework from '../../../framework/fabric/fabricFramework';
+import Spinner from '../../../component/spinner/spinner';
+
+const Loading = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
 
 const ModeChooser = styled.div`
   margin-top: 5px;
@@ -185,9 +194,9 @@ export default function FrameworkInstaller({ show, profile, framework, cancelCli
                   </>
                 )}
                 {allVersions.length === 0 && (
-                  <>
-                    <p>loading...</p>
-                  </>
+                  <Loading>
+                    <Spinner />
+                  </Loading>
                 )}
               </VersionsList>
               <ButtonHolder>

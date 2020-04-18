@@ -6,6 +6,7 @@ import { shell, clipboard } from 'electron';
 import Button from '../button/button';
 import Global from '../../util/global';
 import downloadsIcon from '../navbar/downloads/downloads.png';
+import Spinner from '../spinner/spinner';
 
 const BG = styled.div`
   margin-top: 4px;
@@ -235,7 +236,7 @@ const AssetCard = ({
 
           {progressState.progress === 'installing' && !installed && showInstall && (
             <Button color="green" disabled>
-              installing
+              <Spinner />
             </Button>
           )}
         </Buttons>

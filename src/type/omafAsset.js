@@ -92,7 +92,7 @@ export default class OAMFAsset {
     };
 
     // Cleanup regarding local values on hosts
-    if (returnObject.hosts.curse) {
+    if (returnObject.hosts?.curse) {
       returnObject.hosts.curse.localValues = undefined;
       returnObject.hosts.curse.versionCache = undefined;
       returnObject.hosts.curse.latestFileID = undefined;

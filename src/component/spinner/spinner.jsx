@@ -44,7 +44,7 @@ const Container = styled.div`
 `;
 
 const Spinner = () => (
-  <Container>
+  <Container className="spinner">
     <div />
     <div />
     <div />

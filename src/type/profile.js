@@ -152,7 +152,7 @@ export default class Profile extends OAMFAsset {
           // set a progress state (for this profile) for each
           this.progressState[asset.id] = {
             progress: 'installed',
-            version: asset.version.displayName
+            version: asset.version?.displayName
           };
 
           assetObj.installed = true;
