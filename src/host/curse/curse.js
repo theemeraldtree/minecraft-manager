@@ -119,9 +119,11 @@ const Curse = {
   },
 
   async getDescription(asset) {
-    return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/description`, {
-      addonID: asset.hosts.curse.id
-    }).replace(/&nbsp;/gi, '');
+    return (
+      await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/description`, {
+        addonID: asset.hosts.curse.id
+      })
+    ).replace(/&nbsp;/gi, '');
   },
 
   convertCurseVersion(ver) {

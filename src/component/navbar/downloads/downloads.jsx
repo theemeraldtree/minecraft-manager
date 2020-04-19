@@ -6,8 +6,8 @@ import DownloadItem from './downloadItem';
 import DownloadsManager from '../../../manager/downloadsManager';
 
 const Wrapper = styled.div`
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   display: flex;
   justify-content: center;
   position: absolute;

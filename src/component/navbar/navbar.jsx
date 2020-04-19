@@ -6,8 +6,8 @@ import Downloads from './downloads/downloads';
 import settingsImage from '../windowbar/img/settings.png';
 
 const BG = styled.div`
-  width: 100px;
-  min-width: 100px;
+  width: 80px;
+  min-width: 80px;
   height: 100%;
   background-color: #1c1c1c;
   flex: 0 1 auto;
@@ -20,8 +20,8 @@ const CLink = styled(NavLink)`
   text-align: center;
   color: white;
   text-decoration: none;
-  font-size: 15pt;
-  font-weight: 100;
+  font-size: 12pt;
+  font-weight: 400;
   &:hover {
     filter: brightness(0.75);
   }
@@ -30,7 +30,7 @@ const CLink = styled(NavLink)`
     filter: brightness(1);
     font-weight: 900;
   }
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   transition: font-weight 150ms;
 `;
 

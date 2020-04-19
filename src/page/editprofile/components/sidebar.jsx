@@ -7,31 +7,31 @@ const BG = styled.div`
   height: 100%;
   position: absolute;
   background-color: #2b2b2b;
-  width: 160px;
+  width: 120px;
 `;
 
 const Item = styled(NavLink)`
-  width: 100%;
+  width: calc(100% - 5px);
   display: block;
   height: 25px;
-  text-align: center;
   color: white;
   text-decoration: none;
-  font-size: 15pt;
-  font-weight: 100;
+  font-size: 12pt;
+  font-weight: 400;
   &:hover {
     filter: brightness(0.75);
   }
   &.active,
   &.active:hover {
     filter: brightness(1);
-    font-weight: 900;
+    background: #424242;
   }
   margin-bottom: 0;
   margin-top: 0;
-  padding-top: 5px;
-  padding-bottom: 10px;
-  transition: font-weight 150ms;
+  padding-top: 10px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  transition: background 150ms;
 `;
 
 const Sidebar = ({ id, isDefaultProfile }) => (

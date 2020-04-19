@@ -28,12 +28,11 @@ const { dialog } = require('electron').remote;
 const Wrapper = styled.div`
   height: 100%;
   overflow: hidden;
+  padding-right: 10px;
 `;
 
 const Container = styled.div`
-  background-color: #2b2b2b;
   overflow: hidden;
-  padding: 10px;
   display: flex;
   flex-flow: column;
   height: calc(100% - 20px);
@@ -42,8 +41,6 @@ const Container = styled.div`
 const List = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
-  padding: 10px;
-  padding-top: 0;
   &::-webkit-scrollbar-track {
     background: none;
   }
@@ -79,9 +76,7 @@ const AnimateButton = transition(Button)`
 `;
 
 const FilterHeader = styled.div`
-  margin: 10px;
-  margin-bottom: 0;
-
+  margin-top: 5px;
   & > div {
     width: 130px;
   }

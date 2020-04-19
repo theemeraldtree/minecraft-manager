@@ -2,27 +2,24 @@ import rimraf from 'rimraf';
 import path from 'path';
 import OMAFFileAsset from './omafFileAsset';
 
-function World(omaf) {
-  OMAFFileAsset.call(this, omaf);
+export default class World extends OMAFFileAsset {
+  constructor(json) {
+    super(json);
+    if (!this.datapacks) {
+      this.datapacks = [];
+    }
+  }
 
-  if (!this.datapacks) {
-    this.datapacks = [];
+  deleteDatapack(profile, assetT) {
+    let asset = assetT;
+    if (!(asset instanceof OMAFFileAsset)) {
+      asset = new OMAFFileAsset(asset);
+    }
+
+    rimraf.sync(path.join(profile.gameDir, this.getMainFile().path, asset.getMainFile().path));
+    this.datapacks.splice(
+      this.datapacks.find(dp => dp.id === asset.id),
+      1
+    );
   }
 }
-
-World.prototype = Object.create(OMAFFileAsset.prototype);
-
-World.prototype.deleteDatapack = function(profile, assetT) {
-  let asset = assetT;
-  if (!(asset instanceof OMAFFileAsset)) {
-    asset = new OMAFFileAsset(asset);
-  }
-
-  rimraf.sync(path.join(profile.gameDir, this.getMainFile().path, asset.getMainFile().path));
-  this.datapacks.splice(
-    this.datapacks.find(dp => dp.id === asset.id),
-    1
-  );
-};
-
-export default World;

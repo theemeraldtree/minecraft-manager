@@ -99,7 +99,16 @@ export default class Profile extends OAMFAsset {
   readSubAsset(subAsset) {
     const subAssetPath = path.join(this.subAssetsPath, subAsset);
     if (fs.existsSync(subAssetPath)) {
-      const json = FSU.readJSONSync(subAssetPath);
+      let json;
+      try {
+        json = FSU.readJSONSync(subAssetPath);
+      } catch (err) {
+        ToastManager.createToast(
+          'Error',
+          `Unable to read OMAF subAsset File "${subAsset}" in profile "${this.name}"! This is very bad!`
+        );
+        return;
+      }
 
       let index;
       const { assetType } = json;

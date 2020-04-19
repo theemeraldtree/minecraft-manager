@@ -17,7 +17,7 @@ const BG = styled.div`
   text-align: left;
   border: 0;
   padding: 0;
-  background-color: #404040;
+  background-color: #313131;
   user-select: none;
   position: relative;
   overflow: hidden;
@@ -28,7 +28,7 @@ const BG = styled.div`
     css`
       cursor: pointer;
       &:hover {
-        background-color: #5b5b5b;
+        background-color: #414141;
         transform: scale(1.02);
       }
     `}

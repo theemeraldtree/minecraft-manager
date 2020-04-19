@@ -6,7 +6,7 @@ import transition from 'styled-transition-group';
 import NavContext from '../../navContext';
 
 const BG = styled.div`
-  min-height: 60px;
+  min-height: 50px;
   background-color: #2b2b2b;
   display: flex;
   align-items: center;
@@ -17,9 +17,10 @@ const Title = styled.p`
   color: white;
   margin: 0;
   margin-left: 10px;
-  font-size: 32pt;
+  font-size: 27pt;
   font-weight: 900;
   transition: 150ms;
+  color: #e0e0e0;
 `;
 
 const BackButton = transition.button`
@@ -29,8 +30,7 @@ const BackButton = transition.button`
   font-weight: 900;
   text-decoration: none;
   font-size: 17pt;
-  margin-left: 10px;
-  margin-right: 12px;
+  margin-left: 8px;
   cursor: pointer;
   
   &:hover {
@@ -48,12 +48,12 @@ const BackButton = transition.button`
   }
   
   &:enter-active {
-      margin-left: 10px;
+      margin-left: 8px;
       transition: 150ms;
   }
   
   &:exit {
-      margin-left: 10px;
+      margin-left: 8px;
   }
 
   &:exit-active {
