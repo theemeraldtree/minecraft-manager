@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../button/button';
 import AlertBackground from './alertbackground';
+import useKeyPress from '../../util/useKeyPress';
 
 const InputContainer = styled.div`
   position: absolute;
@@ -16,6 +17,13 @@ const InputContainer = styled.div`
 `;
 
 export default function AlertObject({ children, buttons }) {
+  const escapePress = useKeyPress('Escape');
+
+  useEffect(() => {
+    if (escapePress) {
+      buttons.find(button => button.isCancel).onClick();
+    }
+  }, [escapePress]);
   return (
     <AlertBackground>
       <div dangerouslySetInnerHTML={{ __html: children }} />

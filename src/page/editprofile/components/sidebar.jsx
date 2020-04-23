@@ -2,6 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
+import { ContextMenuTrigger, ContextMenu, MenuItem } from 'react-contextmenu';
+import { remote } from 'electron';
+import path from 'path';
+import Global from '../../../util/global';
+import ProfilesManager from '../../../manager/profilesManager';
 
 const BG = styled.div`
   height: 100%;
@@ -44,20 +49,61 @@ const Sidebar = ({ id, isDefaultProfile }) => (
         <Item to={`/edit/versions/${id}`} activeClassName="active">
           versions
         </Item>
-        <Item to={`/edit/mods/${id}`} activeClassName="active">
-          mods
-        </Item>
+        <ContextMenuTrigger holdToDisplay={-1} id="editsidebarmods">
+          <Item to={`/edit/mods/${id}`} activeClassName="active">
+            mods
+          </Item>
+        </ContextMenuTrigger>
       </>
     )}
-    <Item to={`/edit/worlds/${id}`} activeClassName="active">
-      worlds
-    </Item>
-    <Item to={`/edit/resourcepacks/${id}`} activeClassName="active">
-      resource packs
-    </Item>
+    <ContextMenuTrigger holdToDisplay={-1} id="editsidebarworlds">
+      <Item to={`/edit/worlds/${id}`} activeClassName="active">
+        worlds
+      </Item>
+    </ContextMenuTrigger>
+    <ContextMenuTrigger holdToDisplay={-1} id="editsidebarresourcepacks">
+      <Item to={`/edit/resourcepacks/${id}`} activeClassName="active">
+        resource packs
+      </Item>
+    </ContextMenuTrigger>
     <Item to={`/edit/advanced/${id}`} activeClassName="active">
       advanced
     </Item>
+
+    <ContextMenu id="editsidebarmods">
+      <MenuItem
+        onClick={() => {
+          remote.shell.openExternal(path.join(Global.PROFILES_PATH, `/${id}/files/mods`));
+        }}
+      >
+        Open Mods Folder
+      </MenuItem>
+      <MenuItem onClick={() => ProfilesManager.getProfileFromID(id).refreshSubAsset('mods')}>Refresh Mods</MenuItem>
+    </ContextMenu>
+
+    <ContextMenu id="editsidebarworlds">
+      <MenuItem
+        onClick={() => {
+          remote.shell.openExternal(path.join(Global.PROFILES_PATH, `/${id}/files/saves`));
+        }}
+      >
+        Open Worlds Folder
+      </MenuItem>
+      <MenuItem onClick={() => ProfilesManager.getProfileFromID(id).refreshSubAsset('worlds')}>Refresh Worlds</MenuItem>
+    </ContextMenu>
+
+    <ContextMenu id="editsidebarresourcepacks">
+      <MenuItem
+        onClick={() => {
+          remote.shell.openExternal(path.join(Global.PROFILES_PATH, `/${id}/files/resourcepacks`));
+        }}
+      >
+        Open Resource Packs Folder
+      </MenuItem>
+      <MenuItem onClick={() => ProfilesManager.getProfileFromID(id).refreshSubAsset('resourcepacks')}>
+        Refresh Resource Packs
+      </MenuItem>
+    </ContextMenu>
   </BG>
 );
 

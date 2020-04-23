@@ -183,6 +183,29 @@ export default class Profile extends OAMFAsset {
     }
   }
 
+  /**
+   * Forces a refresh of a sub asset
+   * @param {string} subAsset - The sub asset to refresh
+   */
+  refreshSubAsset(subAsset) {
+    if (subAsset === 'mods') {
+      this.mods = [];
+      this.readSubAsset('mods.json');
+    } else if (subAsset === 'worlds') {
+      this.worlds = [];
+      this.readSubAsset('worlds.json');
+    } else if (subAsset === 'resourcepacks') {
+      this.resourcepacks = [];
+      this.readSubAsset('resourcepacks.json');
+    }
+
+    Global.scanProfile(this);
+
+    setTimeout(() => {
+      ProfilesManager.updateProfile(this);
+    }, 2000);
+  }
+
   // TODO: Write JSDoc info for these functions
 
   hasFramework() {
@@ -509,21 +532,31 @@ export default class Profile extends OAMFAsset {
           this.mods.splice(this.mods.indexOf(asset), 1);
           this.progressState[asset.id] = undefined;
           fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), e => {
-            if (e) {
-              this.logger.error(`Unable to delete subasset ${asset.id}: ${e.toString()}`);
-              this.mods.push(asset);
-              this.progressState[asset.id] = {
-                progress: 'installed',
-                version: asset.version.displayName
-              };
-              reject(e);
+            if (e.code !== 'ENOENT') {
+              if (e) {
+                this.logger.error(`Unable to delete subasset ${asset.id}: ${e.toString()}`);
+                this.mods.push(asset);
+                this.progressState[asset.id] = {
+                  progress: 'installed',
+                  version: asset.version.displayName
+                };
+                reject(e);
+              } else {
+                if (asset.icon) {
+                  if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
+                    fs.unlinkSync(path.join(this.profilePath, asset.icon));
+                  }
+                }
+
+                if (doSave) this.save();
+                resolve();
+              }
             } else {
               if (asset.icon) {
                 if (fs.existsSync(path.join(this.profilePath, asset.icon))) {
                   fs.unlinkSync(path.join(this.profilePath, asset.icon));
                 }
               }
-
               if (doSave) this.save();
               resolve();
             }

@@ -12,6 +12,7 @@ import rimraf from 'rimraf';
 import LauncherManager from './launcherManager';
 import Global from '../util/global';
 import SettingsManager from './settingsManager';
+import crypto from 'crypto';
 const { exec } = require('child_process');
 const admzip = require('adm-zip');
 /**
@@ -22,6 +23,7 @@ const admzip = require('adm-zip');
 const logger = logInit('DirectLauncherManager');
 
 const DirectLauncherManager = {
+  concurrentDownloads: [],
   downloadDefaultProfile(version) {
     return new Promise(async resolve => {
       if (!fs.existsSync(path.join(VersionsManager.getVersionsPath(), `/${version}`))) {
@@ -298,6 +300,11 @@ const DirectLauncherManager = {
         logger.info(`Verifying downloaded libraries...`);
         await this.verifyDownloadedLibraries(profile, versionJSON);
         logger.info(`Downloaded libraries verification complete`);
+
+        logger.info(`Verifying downloaded assets...`);
+        await this.verifyDownloadedAssets(profile, versionJSON);
+        logger.info(`Downloaded assets verification complete`);
+
         logger.info(`Extracting natives...`);
         await this.extractNatives(profile, versionJSON);
         logger.info(`Finished extracting natives`);
@@ -456,6 +463,115 @@ const DirectLauncherManager = {
         }
       }
     }
+  },
+
+  async downloadAssetsList(profileName, assetsList, callback, onUpdate, concurrent) {
+    if (concurrent !== 0 && concurrent !== undefined) {
+      for (let i = 0; i < concurrent - 1; i++) {
+        setTimeout(() => {
+          this.downloadAssetsList(profileName, assetsList, callback, onUpdate);
+        }, 1000);
+      }
+    }
+
+    if (assetsList.length === 0) {
+      callback();
+    } else {
+      const item = { ...assetsList[0] };
+      if (this.concurrentDownloads.includes(item.name)) {
+        const list2 = assetsList.slice();
+        list2.shift();
+        this.downloadAssetsList(profileName, list2, callback, onUpdate);
+      } else {
+        this.concurrentDownloads.push(item.name);
+        FSU.createDirIfMissing(path.join(Global.getMCPath(), `/assets/objects/${item.hash.substring(0, 2)}`));
+        await DownloadsManager.startFileDownload(
+          `${item.name}\n_A_${profileName}`,
+          `https://resources.download.minecraft.net/${item.hash.substring(0, 2)}/${item.hash}`,
+          path.join(Global.getMCPath(), `/assets/objects/${item.hash.substring(0, 2)}/${item.hash}`)
+        );
+
+        onUpdate();
+        assetsList.shift();
+        this.downloadAssetsList(profileName, assetsList, callback, onUpdate);
+      }
+    }
+  },
+
+  async verifyDownloadedAssets(profile, versionJSON) {
+    return new Promise(async resolve => {
+      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/assets'));
+      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/assets/indexes'));
+      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/assets/objects'));
+
+      if (versionJSON.assetIndex) {
+        const assetIndexPath = path.join(Global.getMCPath(), `/assets/indexes/${versionJSON.assetIndex.id}.json`);
+
+        const downloadAssetIndex = async () => {
+          return DownloadsManager.startFileDownload(
+            `Asset Index ${versionJSON.assetIndex.id}\n_A_${profile.name}`,
+            versionJSON.assetIndex.url,
+            assetIndexPath
+          );
+        };
+
+        if (!fs.existsSync(assetIndexPath)) {
+          await downloadAssetIndex();
+        } else {
+          const sum = crypto.createHash('sha1');
+          sum.update(fs.readFileSync(assetIndexPath));
+          const hash = sum.digest('hex');
+
+          if (hash === versionJSON.assetIndex.sha1) {
+            logger.info(`Current asset index for ${versionJSON.assetIndex.id} is up-to-date. Hashes match.`);
+          } else {
+            logger.info(
+              `Current asset index for ${versionJSON.assetIndex.id} is not up-to-date. Downloading up-to-date version`
+            );
+            fs.unlinkSync(assetIndexPath);
+            await downloadAssetIndex();
+          }
+        }
+
+        if (fs.existsSync(assetIndexPath)) {
+          const indexJSON = await FSU.readJSON(assetIndexPath);
+          const assetsToDownload = [];
+          for (let object of Object.keys(indexJSON.objects)) {
+            const hash = indexJSON.objects[object].hash;
+            const hashedObjectPath = path.join(Global.getMCPath(), `/assets/objects/${hash.substring(0, 2)}/${hash}`);
+            if (!fs.existsSync(hashedObjectPath)) {
+              assetsToDownload.push({
+                name: object,
+                hash
+              });
+            }
+          }
+
+          DownloadsManager.createProgressiveDownload(`Assets\n_A_${profile.name}`).then(download => {
+            const concurrent = assetsToDownload.length >= 10 ? 10 : 0;
+            let numberDownloaded = 0;
+            this.downloadAssetsList(
+              profile.name,
+              assetsToDownload.slice(),
+              async () => {
+                if (numberDownloaded === assetsToDownload.length) {
+                  DownloadsManager.removeDownload(download.name);
+                  resolve();
+                }
+              },
+              () => {
+                numberDownloaded++;
+                DownloadsManager.setDownloadProgress(
+                  download.name,
+                  Math.ceil((numberDownloaded / assetsToDownload.length) * 100)
+                );
+              },
+              concurrent
+            );
+          });
+        }
+      }
+    });
   }
 };
 

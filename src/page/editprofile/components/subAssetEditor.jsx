@@ -84,7 +84,7 @@ const FilterHeader = styled.div`
 
 export default function SubAssetEditor({ id, assetType, dpWorld }) {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
-  const [profile] = useState(ProfilesManager.getProfileFromID(id));
+  const [profile, setProfile] = useState(ProfilesManager.getProfileFromID(id));
   const [progressState, setProgressState] = useState(profile.progressState);
   const [searchTerm, setSearchTerm] = useState('');
   const [liveSearchTerm, setLiveSearchTerm] = useState('');
@@ -381,6 +381,17 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
     }
   }, [escPress]);
 
+  const reloadListener = () => {
+    setProfile(ProfilesManager.getProfileFromID(id));
+    forceUpdate();
+  };
+
+  useEffect(() => {
+    ProfilesManager.registerReloadListener(reloadListener);
+    return () => {
+      ProfilesManager.unregisterReloadListener(reloadListener);
+    };
+  }, []);
   return (
     <>
       <Wrapper>

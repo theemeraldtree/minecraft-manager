@@ -7,6 +7,7 @@ import Button from '../button/button';
 import Global from '../../util/global';
 import downloadsIcon from '../navbar/downloads/downloads.png';
 import Spinner from '../spinner/spinner';
+import ToastManager from '../../manager/toastManager';
 
 const BG = styled.div`
   margin-top: 4px;
@@ -284,11 +285,13 @@ const AssetCard = ({
           <>
             <SubMenu hoverDelay={0} title="CurseForge">
               <MenuItem
-                onClick={() =>
+                onClick={() => {
                   clipboard.writeText(
                     `${asset.name} on CurseForge:\n${asset.blurb}\nhttps://minecraft.curseforge.com/projects/${asset.hosts.curse.id}\n\nTry it with Minecraft Manager, the easiest way to manage Minecraft Mods and Modpacks (is.gd/mcmtet)`
-                  )
-                }
+                  );
+
+                  ToastManager.noticeToast('Copied!');
+                }}
               >
                 Copy with Info
               </MenuItem>
@@ -299,7 +302,11 @@ const AssetCard = ({
               </MenuItem>
 
               <MenuItem
-                onClick={() => clipboard.writeText(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)}
+                onClick={() => {
+                  clipboard.writeText(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`);
+
+                  ToastManager.noticeToast('Copied!');
+                }}
               >
                 Copy Link
               </MenuItem>

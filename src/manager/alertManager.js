@@ -38,6 +38,7 @@ const AlertManager = {
       buttons: [
         {
           text: cancel,
+          isCancel: true,
           onClick: () => AlertManager.dismissAlert(id),
           color: 'red'
         },
