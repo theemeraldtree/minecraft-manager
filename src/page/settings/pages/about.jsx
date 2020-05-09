@@ -28,7 +28,7 @@ const AboutTop = styled.div`
     font-weight: thin;
     font-size: 13pt;
   }
-  background-color: #505050;
+  background-color: #353535;
 `;
 
 const AboutBottom = styled.div`
@@ -235,7 +235,7 @@ export default function About() {
             }
             color="green"
           >
-            view full license information
+            view full license info
           </Button>
         </div>
         <div>

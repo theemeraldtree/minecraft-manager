@@ -22,6 +22,7 @@ import MoveToOverlay from './moveToOverlay';
 import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import ErrorManager from '../../../manager/errorManager';
 import useKeyPress from '../../../util/useKeyPress';
+import AlertManager from '../../../manager/alertManager';
 
 const { dialog } = require('electron').remote;
 
@@ -303,15 +304,25 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
 
   const deleteClick = assetid => {
     if (assetType !== 'datapack') {
-      const asset = profile.getSubAssetFromID(assetType, assetid);
-      profile
-        .deleteSubAsset(assetType, asset)
-        .then(() => {
-          updateProgressStates();
-        })
-        .catch(e => {
-          ToastManager.createToast('Unable to delete', ErrorManager.makeReadable(e, 'subasset'));
-        });
+      const del = () => {
+        const asset = profile.getSubAssetFromID(assetType, assetid);
+        profile
+          .deleteSubAsset(assetType, asset)
+          .then(() => {
+            // hacky fix
+            setTimeout(() => {
+              updateProgressStates();
+            }, 100);
+          })
+          .catch(e => {
+            ToastManager.createToast('Unable to delete', ErrorManager.makeReadable(e, 'subasset'));
+          });
+      };
+      if (assetType === 'world') {
+        AlertManager.alert('are you sure?', '', del, 'delete', 'cancel');
+      } else {
+        del();
+      }
     } else {
       const asset = dpWorld.datapacks.find(dp => dp.id === assetid);
       dpWorld.deleteDatapack(profile, asset);
@@ -458,6 +469,22 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
                   })
                   .map(asset => {
                     if (displayState === 'assetsList') {
+                      if (!asset.name) {
+                        return (
+                          <AssetCard
+                            progressState={progressState}
+                            key="undefinedasset"
+                            compact
+                            asset={{
+                              id: asset.id,
+                              name: 'Undefined Asset',
+                              version: { displayName: 'Something has gone wrong - please delete' }
+                            }}
+                            showDelete
+                            deleteClick={deleteClick}
+                          />
+                        );
+                      }
                       if (asset.name.toLowerCase().includes(liveSearchTerm.toLowerCase())) {
                         return (
                           <AssetCard

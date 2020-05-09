@@ -532,7 +532,7 @@ export default class Profile extends OAMFAsset {
           this.mods.splice(this.mods.indexOf(asset), 1);
           this.progressState[asset.id] = undefined;
           fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), e => {
-            if (e.code !== 'ENOENT') {
+            if (e && e.code !== 'ENOENT') {
               if (e) {
                 this.logger.error(`Unable to delete subasset ${asset.id}: ${e.toString()}`);
                 this.mods.push(asset);

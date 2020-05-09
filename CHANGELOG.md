@@ -4,12 +4,14 @@ Changelogs for development versions are located in their corresponding branch.
 
 ## 2.4.1
 
-#### Currently WIP
+#### Released 2020-05-09
 
 ### Features
 
+- New sidebar design in Edit Pages and Settings
 - Improved UI consistency
 - Better usage via keyboard
+- Improved Error Handling
 
 ## 2.4.0
 

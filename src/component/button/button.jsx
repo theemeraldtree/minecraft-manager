@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 function getColor(name) {
   switch (name) {
@@ -33,8 +33,8 @@ const Button = styled.button.attrs(props => ({
   border: 2px solid transparent;
   ${props =>
     props.disabled &&
-    `
-        filter: brightness(0.65);
+    css`
+      filter: brightness(0.65);
     `}
   img {
     width: 90%;
@@ -52,14 +52,14 @@ const Button = styled.button.attrs(props => ({
   &:hover {
     ${props =>
       !props.disabled &&
-      `
-            filter: brightness(0.75);
-        `}
+      css`
+        filter: brightness(0.75);
+      `}
     ${props =>
       props.disabled &&
-      `
-            cursor: not-allowed;
-        `}
+      css`
+        cursor: not-allowed;
+      `}
   }
   &:focus-visible {
     border-color: yellow;

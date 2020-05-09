@@ -15,30 +15,34 @@ const Sidebar = styled.div`
 `;
 
 const Item = styled.p`
-  margin-top: 10px;
-  width: 100%;
+  width: calc(100% - 5px);
   display: block;
   height: 25px;
-  text-align: center;
   color: white;
   text-decoration: none;
-  font-size: 15pt;
-  font-weight: 100;
+  font-size: 12pt;
+  font-weight: 400;
   cursor: pointer;
   &:hover {
     filter: brightness(0.75);
   }
+
   ${props =>
     props.active &&
     `
-        font-weight: bolder;
-        &:hover {
-            filter: brightness(1.0);
-        }
-    `}
+      filter: brightness(1);
+      background: #424242;
+      &:hover {
+        filter: brightness(1);
+      }
+  `}
 
-  margin-bottom: 15px;
-  transition: font-weight 150ms;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding-top: 10px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  transition: background 150ms;
 `;
 
 const Container = styled.div`
