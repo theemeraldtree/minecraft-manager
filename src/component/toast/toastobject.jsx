@@ -25,9 +25,7 @@ const slideOutAnim = keyframes`
 `;
 
 const BG = styled.div`
-  width: fit-content;
-  min-width: 200px;
-  max-width: 350px;
+  width: 350px;
   height: fit-content;
   min-height: 50px;
   background-color: #2b2b2b;
@@ -103,7 +101,7 @@ ToastObject.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   body: PropTypes.string.isRequired,
-  error: PropTypes.bool,
+  error: PropTypes.string,
   dismiss: PropTypes.func.isRequired,
   slideOut: PropTypes.bool,
   disableAnimation: PropTypes.bool

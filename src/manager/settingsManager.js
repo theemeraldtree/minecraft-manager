@@ -136,7 +136,7 @@ const SettingsManager = {
       defaultsSyncOptionsTXT: false,
       defaultsSyncOptionsOF: false,
       defaultsSyncServers: false,
-      mcAccount: Object.keys(LauncherManager.getMCAccounts())[0]
+      mcAccount: ''
     };
 
     logger.info('Saving new settings...');

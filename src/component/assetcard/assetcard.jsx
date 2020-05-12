@@ -200,7 +200,7 @@ const AssetCard = ({
           )}
           <Title compact={compact}>{asset.name}</Title>
           <Version buttonShown={showInstall || showDelete}>
-            {!showBlurb && asset.version && asset.version.displayName}
+            {!showBlurb && asset.version && Global.cleanVersionName(asset.version.displayName, asset)}
             {showBlurb && asset.blurb}
           </Version>
         </Details>

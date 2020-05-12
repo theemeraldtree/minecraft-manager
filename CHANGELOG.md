@@ -2,6 +2,25 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.4.2
+
+#### Released 2020-05-11
+
+### Changed
+
+- The application is now installed per user instead of per system
+
+### Fixed
+
+- Crash loading mods list
+- Update throwing error
+- Fixed bugs in Welcome page
+- Missing mods from Curse cancelling install
+
+### Removed
+
+- Removed .mcjprofile file association
+
 ## 2.4.1
 
 #### Released 2020-05-09

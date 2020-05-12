@@ -9,6 +9,7 @@ import DownloadsManager from '../../manager/downloadsManager';
 import OMAFFileAsset from '../../type/omafFileAsset';
 import World from '../../type/world';
 import logInit from '../../util/logger';
+import HTTPRequest from '../httprequest';
 
 const logger = logInit('CurseFramework');
 const ADMZip = require('adm-zip');
@@ -196,13 +197,17 @@ const Curse = {
   },
 
   async getFullAsset(asset, type) {
-    const info = await this.getInfo(asset);
+    if (asset && asset.hosts && asset.hosts.curse) {
+      const info = await this.getInfo(asset);
 
-    if (type === 'mod') {
-      return new Mod(this.convertToOMAF(info));
+      if (type === 'mod') {
+        return new Mod(this.convertToOMAF(info));
+      }
+
+      return this.convertToOMAF(info);
     }
 
-    return this.convertToOMAF(info);
+    return undefined;
   },
 
   convertSortString(string) {
@@ -399,26 +404,37 @@ const Curse = {
 
         const manifest = JSON.parse(fs.readFileSync(path.join(extractPath, 'manifest.json')));
 
-        const list = manifest.files.map(file => {
-          // i'm not sure why required is an option in the manifest...
-          // afaik the twitch app only downloads mods marked as required
-          // there also was a bug with a modpack caused by not checking for required
-          if (file.required) {
-            const mod = new Mod({
-              type: 'mod',
-              hosts: {
-                curse: {
-                  id: file.projectID,
-                  fileID: file.fileID
-                }
-              },
-              cachedID: `curse-mod-install-${file.projectID}`
-            });
+        let list = [];
+        try {
+          const projectIDs = manifest.files.map(file => file.required && file.projectID);
+          const allInfo = await HTTPRequest.post(this.URL_BASE, projectIDs);
+          list = allInfo.data.map(asset => {
+            const mod = this.convertToOMAF(asset);
+            mod.hosts.curse.fileID = manifest.files.find(mf => mf.projectID === asset.id).fileID;
+            mod.cachedID = `curse-mod-install-${asset.id}`;
             return mod;
-          }
+          });
+        } catch (e) {
+          logger.error(`Unable to obtain all mod info for ${mp.id} at once.`);
+          list = manifest.files.map(file => {
+            if (file.required) {
+              const mod = new Mod({
+                type: 'mod',
+                hosts: {
+                  curse: {
+                    id: file.projectID,
+                    fileID: file.fileID
+                  }
+                },
+                cachedID: `curse-mod-install-${file.projectID}`
+              });
+              return mod;
+            }
 
-          return undefined;
-        });
+            return undefined;
+          });
+        }
+
         resolve(list);
       });
     });

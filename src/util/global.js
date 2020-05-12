@@ -36,8 +36,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.4.1',
-  MCM_RELEASE_DATE: '5/9/2020',
+  MCM_VERSION: '2.4.2',
+  MCM_RELEASE_DATE: '5/11/2020',
 
   OMAF_VERSION: '1.0.0',
 
@@ -588,15 +588,23 @@ const Global = {
   },
   // it really annoys me that authors leave stuff like the file extension in the version name
   // all this does is hide it from the user; no actual names are being changed
-  cleanVersionName: name => {
-    let currentName = name;
-    if (
-      currentName.substring(currentName.length - 4) === '.zip' ||
-      currentName.substring(currentName.length - 4) === '.jar'
-    ) {
-      currentName = name.substring(0, currentName.length - 4);
+  cleanVersionName: (name, asset) => {
+    if (name) {
+      let n = name.replace(/(\.jar|\.zip)$/gim, ''); // Extension removal
+
+      if (asset && asset.name) {
+        let assetName = asset.name.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+        n = n.replace(new RegExp(assetName.replace(/\s/gim, '([_-\\s]+)?'), 'gim'), asset.name); // Fix asset name
+        assetName = assetName.replace(/['.]/gim, '');
+        n = n.replace(new RegExp(assetName.replace(/\s/gim, '([_-\\s]+)?'), 'gim'), asset.name); // Fix asset name
+      }
+
+      n = n.replace(/(?<=[\S])-(?=\S)/gim, ' - '); // Dash spacing
+      return n;
     }
-    return currentName;
+
+    return name;
   }
 };
 

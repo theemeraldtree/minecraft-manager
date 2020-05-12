@@ -142,7 +142,7 @@ const LauncherManager = {
   },
   getMCAccounts() {
     logger.info('Getting Minecraft accounts...');
-    if (fs.existsSync(Global.PROFILES_PATH)) {
+    if (fs.existsSync(this.getLauncherProfiles())) {
       return FSU.readJSONSync(this.getLauncherProfiles()).authenticationDatabase;
     }
     return undefined;

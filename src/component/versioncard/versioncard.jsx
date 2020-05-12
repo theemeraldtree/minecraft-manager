@@ -144,7 +144,8 @@ export default class VersionCard extends PureComponent {
       progressState,
       disableMcVer,
       installClick,
-      allowVersionReinstallation
+      allowVersionReinstallation,
+      asset
     } = this.props;
 
     let progress = '';
@@ -178,7 +179,7 @@ export default class VersionCard extends PureComponent {
     return (
       <BG extraInfo={showMoreInfo} hideFramework={hideFramework}>
         <Details>
-          <Title>{Global.cleanVersionName(version.displayName)}</Title>
+          <Title>{Global.cleanVersionName(version.displayName, asset)}</Title>
           {version.hosts.curse && !hideFramework && (
             <Modloader>Modloader: {safeModloader(version.hosts.curse.localValues.inferredModloader)}</Modloader>
           )}

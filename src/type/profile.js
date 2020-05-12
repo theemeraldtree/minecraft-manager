@@ -717,22 +717,29 @@ export default class Profile extends OAMFAsset {
       syncOptionsOF: currentSettings.defaultsSyncOptionsOF,
       syncServers: currentSettings.defaultsSyncServers
     };
-    if (currentSettings.defaultsSyncOptionsTXT) {
-      fs.linkSync(path.join(Global.getMCPath(), 'options.txt'), path.join(this.gameDir, 'options.txt'));
-    } else {
-      fs.copyFileSync(path.join(Global.getMCPath(), 'options.txt'), path.join(this.gameDir, 'options.txt'));
+
+    if (fs.existsSync(path.join(Global.getMCPath(), 'options.txt'))) {
+      if (currentSettings.defaultsSyncOptionsTXT) {
+        fs.linkSync(path.join(Global.getMCPath(), 'options.txt'), path.join(this.gameDir, 'options.txt'));
+      } else {
+        fs.copyFileSync(path.join(Global.getMCPath(), 'options.txt'), path.join(this.gameDir, 'options.txt'));
+      }
     }
 
-    if (currentSettings.defaultsSyncOptionsOF) {
-      fs.linkSync(path.join(Global.getMCPath(), 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
-    } else if (fs.existsSync(path.join(Global.getMCPath(), 'optionsof.txt'))) {
-      fs.copyFileSync(path.join(Global.getMCPath(), 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
+    if (fs.existsSync(path.join(Global.getMCPath(), 'optionsof.txt'))) {
+      if (currentSettings.defaultsSyncOptionsOF) {
+        fs.linkSync(path.join(Global.getMCPath(), 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
+      } else if (fs.existsSync(path.join(Global.getMCPath(), 'optionsof.txt'))) {
+        fs.copyFileSync(path.join(Global.getMCPath(), 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
+      }
     }
 
-    if (currentSettings.defaultsSyncServers) {
-      fs.linkSync(path.join(Global.getMCPath(), 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
-    } else {
-      fs.copyFileSync(path.join(Global.getMCPath(), 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
+    if (fs.existsSync(path.join(Global.getMCPath(), 'servers.dat'))) {
+      if (currentSettings.defaultsSyncServers) {
+        fs.linkSync(path.join(Global.getMCPath(), 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
+      } else {
+        fs.copyFileSync(path.join(Global.getMCPath(), 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
+      }
     }
   }
 }

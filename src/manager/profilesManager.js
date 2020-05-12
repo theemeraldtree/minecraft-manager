@@ -357,7 +357,8 @@ const ProfilesManager = {
     });
   },
 
-  deleteProfile(profile) {
+  deleteProfile(profileT) {
+    const profile = profileT;
     logger.info(`Starting deletion of profile ${profile.id}`);
 
     this.previouslyRemovedProfiles.push(profile);
@@ -365,6 +366,9 @@ const ProfilesManager = {
       logger.info(`Removing progressState for ${profile.id}`);
       delete this.progressState[profile.id];
     }
+
+    profile.state = 'Deleting...';
+    this.updateProfile(profile);
 
     return new Promise(resolve => {
       logger.info(`Deleting launcher profile for ${profile.id}`);

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
@@ -15,6 +16,7 @@ import logo from '../../img/logo-sm.png';
 import NavContext from '../../navContext';
 import tipShare from './img/tip-share.png';
 import tipRightClick from './img/tip-right-click.png';
+import LauncherManager from '../../manager/launcherManager';
 
 const { dialog } = require('electron').remote;
 
@@ -143,6 +145,8 @@ function WelcomePage({ history }) {
     SettingsManager.setHomeDirectory(mcHome);
     SettingsManager.setMCExe(mcExe);
 
+    SettingsManager.currentSettings.mcAccount = Object.keys(LauncherManager.getMCAccounts())[0];
+    SettingsManager.save();
     const mcl = path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager');
     if (!fs.existsSync(mcl)) {
       fs.mkdirSync(mcl);

@@ -1,6 +1,6 @@
 {
   "name": "minecraft-manager",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "license": "GPL-3.0",
   "main": "main.js",
   "author": "theemeraldtree",
@@ -13,17 +13,10 @@
     "extraResources": [
       "resources/*"
     ],
-    "fileAssociations": [
-      {
-        "ext": "mcjprofile",
-        "name": "Minecraft Java Profile (OMAF)",
-        "description": "Minecraft Java Profile for OMAF"
-      }
-    ],
     "publish": {
       "provider": "github",
-      "repo": "minecraft-manager",
-      "owner": "theemeraldtree"
+      "repo": "mcm-update-test",
+      "owner": "stairman06"
     },
     "win": {
       "target": "nsis",
@@ -39,8 +32,9 @@
     },
     "nsis": {
       "license": "LICENSE",
-      "perMachine": "true",
-      "oneClick": "false"
+      "oneClick": "true",
+      "allowElevation": "false",
+      "packElevateHelper": "false"
     },
     "dmg": {
       "title": "Install Minecraft Manager"

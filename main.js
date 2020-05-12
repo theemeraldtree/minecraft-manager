@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell, ipcMain, Notification } = require('electron');
+const { app, BrowserWindow, shell, ipcMain, Notification, dialog } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const url = require('url');
 const path = require('path');
@@ -6,6 +6,7 @@ const fs = require('fs');
 const axios = require('axios');
 const os = require('os');
 const winston = require('winston');
+const { execFile } = require('child_process');
 require('winston-daily-rotate-file');
 
 const logformat = winston.format.printf(
@@ -155,6 +156,30 @@ function createWindow() {
     titleBarStyle: 'hidden'
   });
 
+  if (os.platform() === 'win32') {
+    if (fs.existsSync(path.join('C:\\Program Files\\Minecraft Manager\\Uninstall Minecraft Manager.exe'))) {
+      // 2.4.2 changed the program from being a per-machine install to a per-user install
+      // Unfortunately electron-updater doesn't cleanup the old version,
+      // so we have to check and remove it manually
+      const ret = dialog.showMessageBox({
+        type: 'info',
+        title: 'Heads Up!',
+        message:
+          'Minecraft Manager version 2.4.2 requires the uninstaller of the previous version to be ran on first launch.\n\nYou may have to agree to some User Account Control dialogs.\n\nIf you get an error, report it at https://theemeraldtree.net/mcm/issues',
+        buttons: ['View More Info and Continue', 'Continue'],
+        noLink: true,
+        defaultId: 1,
+        cancelId: 1
+      });
+
+      if (ret === 0) {
+        shell.openExternal('https://github.com/theemeraldtree/minecraft-manager/wiki/2.4.2-Uninstaller-Information');
+      }
+
+      execFile('C:\\Program Files\\Minecraft Manager\\Uninstall Minecraft Manager.exe', ['/S']);
+    }
+  }
+
   mainWindow.ELECTRON_DISABLE_SECURITY_WARNINGS = true;
 
   if (dev) {
@@ -202,8 +227,6 @@ function createWindow() {
   mainWindow.webContents.on('new-window', (event, navURL) => {
     navigation(event, navURL);
   });
-
-  autoUpdater.checkForUpdatesAndNotify();
 }
 
 app.on('window-all-closed', () => {
@@ -213,51 +236,60 @@ app.on('window-all-closed', () => {
   }
 });
 
+let currentUpdateState = 'checking-for-update';
+
 function checkForUpdates() {
-  if (dev) {
-    mainLogger.info('[Updater] Cannot update while in dev mode');
-    mainWindow.webContents.send('in-dev');
-  } else {
-    mainLogger.info('[Updater] Checking for updates...');
-    autoUpdater.checkForUpdates();
-    autoUpdater.on('checking-for-update', () => {
-      mainWindow.webContents.send('checking-for-update');
-    });
+  // if (dev) {
+  //   mainLogger.info('[Updater] Cannot update while in dev mode');
+  //   mainWindow.webContents.send('in-dev');
+  // } else {
+  currentUpdateState = 'checking-for-update';
+  mainLogger.info('[Updater] Checking for updates...');
+  autoUpdater.checkForUpdates();
+  autoUpdater.on('checking-for-update', () => {
+    mainWindow.webContents.send('checking-for-update');
+  });
 
-    autoUpdater.on('update-available', () => {
-      mainLogger.info('[Updater] Found an update. Sending IPC...');
-      mainWindow.webContents.send('update-available');
-    });
+  autoUpdater.on('update-available', () => {
+    currentUpdateState = 'update-available';
+    mainLogger.info('[Updater] Found an update. Sending IPC...');
+    mainWindow.webContents.send('update-available');
+  });
 
-    autoUpdater.on('update-downloaded', () => {
-      mainLogger.info('[Updater] Successfully downloaded update. Sending Notification and IPC...');
-      const notif = new Notification({
-        title: 'Minecraft Manager',
-        body:
-          'An update is available for Minecraft Manager. It has been downloaded and will be installed next time you start the app.'
-      });
-      notif.show();
-      mainWindow.webContents.send('update-downloaded');
+  autoUpdater.on('update-downloaded', () => {
+    currentUpdateState = 'update-downloaded';
+    mainLogger.info('[Updater] Successfully downloaded update. Sending Notification and IPC...');
+    const notif = new Notification({
+      title: 'Minecraft Manager',
+      body:
+        'An update is available for Minecraft Manager. It has been downloaded and will be installed next time you start the app.'
     });
+    notif.show();
+    mainWindow.webContents.send('update-downloaded');
+  });
 
-    autoUpdater.on('update-not-available', () => {
-      mainLogger.info('[Updater] No updates available');
-      mainWindow.webContents.send('update-not-available');
-    });
+  autoUpdater.on('update-not-available', () => {
+    currentUpdateState = 'update-not-available';
+    mainLogger.info('[Updater] No updates available');
+    mainWindow.webContents.send('update-not-available');
+  });
 
-    autoUpdater.on('error', error => {
-      mainLogger.error(`[Updater] Error checking for updates:\n${error.toString()}`);
-      mainWindow.webContents.send('error', error);
-    });
-  }
+  autoUpdater.on('error', error => {
+    currentUpdateState = 'error';
+    mainLogger.error(`[Updater] Error checking for updates:\n${error.toString()}`);
+    mainWindow.webContents.send('error', error);
+  });
+  // }
 }
 
 ipcMain.on('check-for-updates', () => {
-  checkForUpdates();
+  if (currentUpdateState !== 'error' && currentUpdateState !== 'update-not-available') {
+    mainWindow.webContents.send(currentUpdateState);
+  } else {
+    checkForUpdates();
+  }
 });
 
-if (!dev) {
-  checkForUpdates();
-}
+checkForUpdates();
 
 app.on('ready', createWindow);

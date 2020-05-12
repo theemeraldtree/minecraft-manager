@@ -178,12 +178,19 @@ const Hosts = {
         list2.shift();
         this.downloadModList(host, profile, list2, callback, onUpdate);
       } else {
-        this.concurrentDownloads.push(item.cachedID);
-        const mod = await this.installAssetVersionToProfile(host, profile, item, 'unknown', false);
-        this.cache.assets[item.cachedID] = mod;
-        onUpdate();
-        list.shift();
-        this.downloadModList(host, profile, list, callback, onUpdate);
+        try {
+          this.concurrentDownloads.push(item.cachedID);
+          const mod = await this.installAssetVersionToProfile(host, profile, item, 'unknown', false);
+          this.cache.assets[item.cachedID] = mod;
+          onUpdate();
+          list.shift();
+          this.downloadModList(host, profile, list, callback, onUpdate);
+        } catch (e) {
+          ToastManager.createToast('Skipped', 'An asset was unable to install.');
+          onUpdate();
+          list.shift();
+          this.downloadModList(host, profile, list, callback, onUpdate);
+        }
       }
     }
   },
@@ -281,8 +288,13 @@ const Hosts = {
         if (!mod.name || mod.icon.substring(0, 4) !== 'http') {
           if (host === 'curse') {
             const newm = await Curse.getFullAsset(mod, type);
-            newm.hosts.curse.fileID = mod.hosts.curse.fileID;
-            mod = newm;
+            if (newm) {
+              newm.hosts.curse.fileID = mod.hosts.curse.fileID;
+              mod = newm;
+            } else {
+              reject();
+              return;
+            }
           }
         }
 
