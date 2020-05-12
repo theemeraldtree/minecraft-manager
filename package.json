@@ -15,8 +15,8 @@
     ],
     "publish": {
       "provider": "github",
-      "repo": "mcm-update-test",
-      "owner": "stairman06"
+      "repo": "minecraft-manager",
+      "owner": "theemeraldtree"
     },
     "win": {
       "target": "nsis",
