@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
-import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 import Page from '../page';
 import About from './pages/about';
 import General from './pages/general';
 import Defaults from './pages/defaults';
 import Help from './pages/help';
 import NavContext from '../../navContext';
+import FluentHover from '../../util/fluentHover';
 
 const Sidebar = styled.div`
   height: 100%;
@@ -14,7 +16,7 @@ const Sidebar = styled.div`
   width: 120px;
 `;
 
-const Item = styled.p`
+const ItemBase = styled.p`
   width: calc(100% - 5px);
   display: block;
   height: 25px;
@@ -23,15 +25,11 @@ const Item = styled.p`
   font-size: 12pt;
   font-weight: 400;
   cursor: pointer;
-  &:hover {
-    filter: brightness(0.75);
-  }
-
   ${props =>
     props.active &&
-    `
+    css`
       filter: brightness(1);
-      background: #424242;
+      background: #424242 !important;
       &:hover {
         filter: brightness(1);
       }
@@ -42,7 +40,7 @@ const Item = styled.p`
   padding-top: 10px;
   padding-bottom: 4px;
   padding-left: 5px;
-  transition: background 150ms;
+  transition: 150ms;
 `;
 
 const Container = styled.div`
@@ -60,6 +58,27 @@ const Wrapper = styled.div`
   overflow: hidden;
   height: 100%;
 `;
+
+const Item = ({ onClick, active, children }) => {
+  const ref = React.createRef();
+  return (
+    <ItemBase
+      ref={ref}
+      onClick={onClick}
+      active={active}
+      onMouseMove={e => FluentHover.mouseMove(e, ref, '#363636')}
+      onMouseLeave={() => FluentHover.mouseLeave(ref, '#2b2b2b')}
+    >
+      {children}
+    </ItemBase>
+  );
+};
+
+Item.propTypes = {
+  onClick: PropTypes.func,
+  active: PropTypes.bool,
+  children: PropTypes.any
+};
 
 export default function SettingsPage() {
   const { header } = useContext(NavContext);

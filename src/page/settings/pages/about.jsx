@@ -134,7 +134,7 @@ export default function About() {
             </a>
             <h1>About Minecraft Manager</h1>
             <h3>Version {Global.MCM_VERSION}</h3>
-            <h3>released {Global.MCM_RELEASE_DATE}</h3>
+            <h3>Released {Global.MCM_RELEASE_DATE}</h3>
 
             <Updates>
               {os.platform() !== 'darwin' && (

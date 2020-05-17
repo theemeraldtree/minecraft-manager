@@ -48,7 +48,7 @@ const VersionsList = styled.div`
   }
 `;
 
-const FrameworkVersion = styled.button`
+const FrameworkVersion = styled(Button)`
   width: 100%;
   border: 0;
   color: white;
@@ -59,6 +59,8 @@ const FrameworkVersion = styled.button`
   padding-left: 120px;
   text-align: left;
   cursor: pointer;
+  padding-top: 0;
+  padding-bottom: 0;
 
   p {
     margin: 0;
@@ -66,10 +68,12 @@ const FrameworkVersion = styled.button`
     left: 10px;
     top: 6px;
     font-weight: 900;
+    font-size: 10pt;
   }
 
   &:hover {
-    filter: brightness(0.75);
+    transform: scale(1.0);
+    filter: brightness(1.4);
   }
 `;
 
@@ -175,6 +179,8 @@ export default function FrameworkInstaller({ show, profile, framework, cancelCli
                 {!noVersions &&
                   allVersions.map(version => (
                     <FrameworkVersion
+                      color="#121212"
+                      dimHoverEffect
                       key={version.name}
                       onClick={() => {
                         installClick(version.name);

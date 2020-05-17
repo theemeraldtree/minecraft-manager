@@ -1,4 +1,7 @@
+/* eslint-disable */
+import React from 'react';
 import styled, { css } from 'styled-components';
+import FluentHover from '../../util/fluentHover';
 
 function getColor(name) {
   switch (name) {
@@ -13,16 +16,16 @@ function getColor(name) {
     case 'red':
       return '#8a1111';
     default:
-      return 'none';
+      return name;
   }
 }
 
-const Button = styled.button.attrs(props => ({
+const Base = styled.button.attrs(props => ({
   style: {
-    backgroundColor: getColor(props.color)
+    background: getColor(props.color)
   }
 }))`
-  padding: 9.5px;
+  padding: 11.5px;
   color: white;
   width: fit-content;
   display: inline-block;
@@ -30,7 +33,7 @@ const Button = styled.button.attrs(props => ({
   outline: none;
   border: 0;
   font-size: 12pt;
-  border: 2px solid transparent;
+  transition: 150ms;
   ${props =>
     props.disabled &&
     css`
@@ -51,19 +54,34 @@ const Button = styled.button.attrs(props => ({
   }
   &:hover {
     ${props =>
-      !props.disabled &&
-      css`
-        filter: brightness(0.75);
+    !props.disabled &&
+    css`
+        transform: scale(1.05);
       `}
     ${props =>
-      props.disabled &&
-      css`
+    props.disabled &&
+    css`
         cursor: not-allowed;
       `}
   }
+  &:active {
+    transform: scale(0.95);
+  }
   &:focus-visible {
-    border-color: yellow;
+    outline: 2px solid yellow;
   }
 `;
+
+const Button = ({ children, color, className, onClick, disabled, dimHoverEffect = false }) => {
+  const ref = React.createRef();
+  const baseColor = getColor(color);
+
+  return (
+    <Base ref={ref} disabled={disabled} color={color} className={className} onMouseMove={e => FluentHover.mouseMove(e, ref, baseColor, dimHoverEffect)} onMouseLeave={() => FluentHover.mouseLeave(ref, baseColor)} onClick={onClick}>
+      {children}
+    </Base>
+  )
+}
+
 
 export default Button;

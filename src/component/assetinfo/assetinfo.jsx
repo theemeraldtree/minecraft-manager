@@ -243,9 +243,7 @@ export default class AssetInfo extends Component {
     this.props.versionInstall(version, this.state.activeAsset);
   };
 
-  displayStateSwitch = e => {
-    const newState = e.currentTarget.dataset.state;
-
+  displayStateSwitch = newState => {
     this.setState({
       displayState: newState,
       cantConnect: false
@@ -288,7 +286,7 @@ export default class AssetInfo extends Component {
       <>
         <AssetCard
           progressState={progressState}
-          installed={displayState[activeAsset.id] === 'installed'}
+          installed={progressState[activeAsset.id] === 'installed'}
           disableHover
           showInstall={!localAsset}
           installClick={installClick}
@@ -298,21 +296,19 @@ export default class AssetInfo extends Component {
         <HeaderButtons>
           <HeaderButton
             active={displayState === 'description'}
-            onClick={this.displayStateSwitch}
-            data-state="description"
+            onClick={() => this.displayStateSwitch('description')}
           >
             Description
           </HeaderButton>
           {activeAsset.hosts.curse && (
-            <HeaderButton active={displayState === 'versions'} onClick={this.displayStateSwitch} data-state="versions">
+            <HeaderButton active={displayState === 'versions'} onClick={() => this.displayStateSwitch('versions')}>
               Versions
             </HeaderButton>
           )}
           {activeAsset.hosts.curse && type === 'mod' && (
             <HeaderButton
               active={displayState === 'dependencies'}
-              onClick={this.displayStateSwitch}
-              data-state="dependencies"
+              onClick={() => this.displayStateSwitch('dependencies')}
             >
               Dependencies
             </HeaderButton>
@@ -320,8 +316,7 @@ export default class AssetInfo extends Component {
           {activeAsset.installed && type === 'world' && (
             <HeaderButton
               active={displayState === 'datapacks'}
-              onClick={this.displayStateSwitch}
-              data-state="datapacks"
+              onClick={() => this.displayStateSwitch('datapacks')}
             >
               Datapacks
             </HeaderButton>

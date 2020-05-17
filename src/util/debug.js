@@ -7,28 +7,33 @@ import LauncherManager from '../manager/launcherManager';
 import ProfilesManager from '../manager/profilesManager';
 
 const Debug = {
-  systemSpecs: () => `
+	systemSpecs: () => `
 OS: ${os.release()}
 Platform: ${os.platform()}
 Architecture: ${os.arch()}
 CPUs: ${os
-    .cpus()
-    .map(
-      (cpu, index) => `
+			.cpus()
+			.map(
+				(cpu, index) => `
 	CPU${index}: ${cpu.model}`
-    )
-    .join('')}
+			)
+			.join('')}
 
 Memory:
 	Free: ${os.freemem()}
 	Total: ${os.totalmem()}`,
-  dataDump: () => {
-    const allDumpedMCProfiles = LauncherManager.dumpAllProfiles();
-    return `
+	dataDump: () => {
+		const allDumpedMCProfiles = LauncherManager.dumpAllProfiles();
+		return `
 =======
 Minecraft Manager Data Dump
 ${new Date().toISOString()}
 file an issue at https://theemeraldtree.net/mcm/issues
+
+This dump may contain your PC username "${os.userInfo().username}"
+If you are not comfortable sharing this information,
+please use a text editor and replace it with "USERNAME"
+
 =======
 
 System Specifications, as known to Minecraft Manager
@@ -50,8 +55,8 @@ PROFILES: ${Global.PROFILES_PATH}
 Minecraft Manager Profiles
 ---
 Loaded Profiles: ${ProfilesManager.loadedProfiles
-      .map(
-        profile => `
+				.map(
+					profile => `
 	Name: ${profile.name}
 	ID: ${profile.id}
 	omafVersion: ${profile.omafVersion}
@@ -79,8 +84,8 @@ Loaded Profiles: ${ProfilesManager.loadedProfiles
 	mcm: ${JSON.stringify(profile.mcm)}
 	---
 `
-      )
-      .join('')}
+				)
+				.join('')}
 
 Minecraft Client Information
 ---
@@ -103,23 +108,23 @@ Minecraft Client Profiles
 ---
 Profiles Path: ${LauncherManager.getLauncherProfiles()}
 All Profiles: ${Object.keys(allDumpedMCProfiles)
-      .map(key => {
-        const profile = allDumpedMCProfiles[key];
-        return `
+				.map(key => {
+					const profile = allDumpedMCProfiles[key];
+					return `
 	ID: ${key}
 	Name: ${profile.name}
 	gameDir: ${profile.gameDir},
 	lastVersionId: ${profile.lastVersionId}
 	type: ${profile.type}
 	---`;
-      })
-      .join('')}
+				})
+				.join('')}
 Extra Profiles: ${Global.checkExtraMinecraftProfiles()}
 
 =======
 End Minecraft Manager Data Dump
 =======`;
-  }
+	}
 };
 
 export default Debug;

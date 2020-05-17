@@ -8,6 +8,7 @@ import Global from '../../util/global';
 import edit from './img/edit.png';
 import launch from './img/launch.png';
 import Button from '../button/button';
+import FluentHover from '../../util/fluentHover';
 
 const BG = styled.div`
   width: 120px;
@@ -128,99 +129,105 @@ const StateOverlay = styled.div`
   flex-flow: column;
 `;
 
-const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate, showLaunching, hideLaunching }) => (
-  <Wrapper>
-    <ContextMenuTrigger holdToDisplay={-1} id={`profilecard${profile.id}`}>
-      {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && (
-        <StateOverlay>
-          <b>ERROR</b> <br />
-          Unfinished Curse Profile Install
-        </StateOverlay>
-      )}
-      {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
-      <BG
-        onClick={() => {
-          history.push(`/profile/${profile.id}`);
-        }}
-      >
-        <Image src={`file:///${profile.iconPath}#${Global.cacheUpdateTime}`} />
-        <Title>{profile.name}</Title>
-        <Buttons className="buttons">
-          <LaunchButton
-            color="green"
-            onClick={async e => {
-              e.stopPropagation();
-              showLaunching();
-              await profile.launch();
-              hideLaunching();
-            }}
-          >
-            <img alt="Launch" src={launch} />
-          </LaunchButton>
-          <EditButton
-            color="yellow"
-            onClick={e => {
-              e.stopPropagation();
-              history.push(`/edit/general/${profile.id}`);
-            }}
-          >
-            <img alt="Launch" src={edit} />
-          </EditButton>
-        </Buttons>
-      </BG>
-    </ContextMenuTrigger>
-    <ContextMenu holdToDisplay={-1} id={`profilecard${profile.id}`}>
-      {!profile.error && profile.state !== 'installing' && (
-        <>
-          <MenuItem onClick={() => profile.launch()}>Launch</MenuItem>
-          <SubMenu title="Edit" hoverDelay={0} onClick={() => history.push(`/edit/general/${profile.id}`)}>
-            <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>General</MenuItem>
-            {!profile.isDefaultProfile && (
-              <>
-                <MenuItem onClick={() => history.push(`/edit/versions/${profile.id}`)}>Versions</MenuItem>
-                <MenuItem onClick={() => history.push(`/edit/mods/${profile.id}`)}>Mods</MenuItem>
-              </>
-            )}
-            <MenuItem onClick={() => history.push(`/edit/worlds/${profile.id}`)}>Worlds</MenuItem>
-            <MenuItem onClick={() => history.push(`/edit/resourcepacks/${profile.id}`)}>Resource Packs</MenuItem>
-            <MenuItem onClick={() => history.push(`/edit/advanced/${profile.id}`)}>Advanced</MenuItem>
-          </SubMenu>
-
-          {!profile.isDefaultProfile && (
-            <>
-              <MenuItem onClick={() => showUpdate(profile)}>Update</MenuItem>
-              <MenuItem onClick={() => showShare(profile)}>Share</MenuItem>
-            </>
-          )}
-        </>
-      )}
-      {profile.state !== 'installing' && !profile.isDefaultProfile && (
-        <MenuItem
+const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate, showLaunching, hideLaunching }) => {
+  const ref = React.createRef();
+  return (
+    <Wrapper>
+      <ContextMenuTrigger holdToDisplay={-1} id={`profilecard${profile.id}`}>
+        {profile.hosts.curse && !profile.hosts.curse.fullyInstalled && !profile.state && (
+          <StateOverlay>
+            <b>ERROR</b> <br />
+            Unfinished Curse Profile Install
+          </StateOverlay>
+        )}
+        {profile.state && <StateOverlay>{profile.state}</StateOverlay>}
+        <BG
+          ref={ref}
+          onMouseMove={e => FluentHover.mouseMove(e, ref, '#5b5b5b', true)}
+          onMouseLeave={() => FluentHover.mouseLeave(ref, '#404040')}
           onClick={() => {
-            showDeletion(profile);
+            history.push(`/profile/${profile.id}`);
           }}
         >
-          Delete
-        </MenuItem>
-      )}
-      {!profile.error && profile.state !== 'installing' && (
-        <>
-          <MenuItem divider />
-          <MenuItem onClick={() => profile.openGameDir()}>Open Profile Folder</MenuItem>
-        </>
-      )}
-      {!profile.error && profile.state !== 'installing' && profile.hosts.curse && (
-        <>
+          <Image src={`file:///${profile.iconPath}#${Global.cacheUpdateTime}`} />
+          <Title>{profile.name}</Title>
+          <Buttons className="buttons">
+            <LaunchButton
+              color="green"
+              onClick={async e => {
+                e.stopPropagation();
+                showLaunching();
+                await profile.launch();
+                hideLaunching();
+              }}
+            >
+              <img alt="Launch" src={launch} />
+            </LaunchButton>
+            <EditButton
+              color="yellow"
+              onClick={e => {
+                e.stopPropagation();
+                history.push(`/edit/general/${profile.id}`);
+              }}
+            >
+              <img alt="Launch" src={edit} />
+            </EditButton>
+          </Buttons>
+        </BG>
+      </ContextMenuTrigger>
+      <ContextMenu holdToDisplay={-1} id={`profilecard${profile.id}`}>
+        {!profile.error && profile.state !== 'installing' && (
+          <>
+            <MenuItem onClick={() => profile.launch()}>Launch</MenuItem>
+            <SubMenu title="Edit" hoverDelay={0} onClick={() => history.push(`/edit/general/${profile.id}`)}>
+              <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>General</MenuItem>
+              {!profile.isDefaultProfile && (
+                <>
+                  <MenuItem onClick={() => history.push(`/edit/versions/${profile.id}`)}>Versions</MenuItem>
+                  <MenuItem onClick={() => history.push(`/edit/mods/${profile.id}`)}>Mods</MenuItem>
+                </>
+              )}
+              <MenuItem onClick={() => history.push(`/edit/worlds/${profile.id}`)}>Worlds</MenuItem>
+              <MenuItem onClick={() => history.push(`/edit/resourcepacks/${profile.id}`)}>Resource Packs</MenuItem>
+              <MenuItem onClick={() => history.push(`/edit/advanced/${profile.id}`)}>Advanced</MenuItem>
+            </SubMenu>
+
+            {!profile.isDefaultProfile && (
+              <>
+                <MenuItem onClick={() => showUpdate(profile)}>Update</MenuItem>
+                <MenuItem onClick={() => showShare(profile)}>Share</MenuItem>
+              </>
+            )}
+          </>
+        )}
+        {profile.state !== 'installing' && !profile.isDefaultProfile && (
           <MenuItem
-            onClick={() => shell.openExternal(`https://curseforge.com/minecraft/modpacks/${profile.hosts.curse.slug}`)}
+            onClick={() => {
+              showDeletion(profile);
+            }}
           >
-            View on CurseForge
+            Delete
           </MenuItem>
-        </>
-      )}
-    </ContextMenu>
-  </Wrapper>
-);
+        )}
+        {!profile.error && profile.state !== 'installing' && (
+          <>
+            <MenuItem divider />
+            <MenuItem onClick={() => profile.openGameDir()}>Open Profile Folder</MenuItem>
+          </>
+        )}
+        {!profile.error && profile.state !== 'installing' && profile.hosts.curse && (
+          <>
+            <MenuItem
+              onClick={() => shell.openExternal(`https://curseforge.com/minecraft/modpacks/${profile.hosts.curse.slug}`)}
+            >
+              View on CurseForge
+            </MenuItem>
+          </>
+        )}
+      </ContextMenu>
+    </Wrapper>
+  );
+};
 
 ProfileCard.propTypes = {
   profile: PropTypes.object.isRequired,

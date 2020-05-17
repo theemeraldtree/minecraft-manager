@@ -16,7 +16,7 @@ const BG = styled.div`
 const CLink = styled(NavLink)`
   width: 100%;
   display: block;
-  height: 30px;
+  height: min-content;
   text-align: center;
   color: white;
   text-decoration: none;
@@ -30,7 +30,8 @@ const CLink = styled(NavLink)`
     filter: brightness(1);
     font-weight: 900;
   }
-  margin-bottom: 10px;
+  outline-offset: -2px;
+  margin-bottom: 20px;
   transition: font-weight 150ms;
 `;
 

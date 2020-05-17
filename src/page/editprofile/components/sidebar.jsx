@@ -7,6 +7,7 @@ import { remote } from 'electron';
 import path from 'path';
 import Global from '../../../util/global';
 import ProfilesManager from '../../../manager/profilesManager';
+import FluentHover from '../../../util/fluentHover';
 
 const BG = styled.div`
   height: 100%;
@@ -15,7 +16,7 @@ const BG = styled.div`
   width: 120px;
 `;
 
-const Item = styled(NavLink)`
+const ItemBase = styled(NavLink)`
   width: calc(100% - 5px);
   display: block;
   height: 25px;
@@ -23,13 +24,10 @@ const Item = styled(NavLink)`
   text-decoration: none;
   font-size: 12pt;
   font-weight: 400;
-  &:hover {
-    filter: brightness(0.75);
-  }
   &.active,
   &.active:hover {
     filter: brightness(1);
-    background: #424242;
+    background: #424242 !important;
   }
   margin-bottom: 0;
   margin-top: 0;
@@ -37,36 +35,57 @@ const Item = styled(NavLink)`
   padding-bottom: 4px;
   padding-left: 5px;
   transition: background 150ms;
+  outline-offset: -2px;
 `;
+
+const Item = ({ to, children }) => {
+  const ref = React.createRef();
+  return (
+    <ItemBase
+      activeClassName="active"
+      to={to}
+      ref={ref}
+      onMouseMove={e => FluentHover.mouseMove(e, ref, '#363636')}
+      onMouseLeave={() => FluentHover.mouseLeave(ref, '#2b2b2b')}
+    >
+      {children}
+    </ItemBase>
+  );
+};
+
+Item.propTypes = {
+  to: PropTypes.string,
+  children: PropTypes.any
+};
 
 const Sidebar = ({ id, isDefaultProfile }) => (
   <BG>
-    <Item to={`/edit/general/${id}`} activeClassName="active">
+    <Item to={`/edit/general/${id}`}>
       general
     </Item>
     {!isDefaultProfile && (
       <>
-        <Item to={`/edit/versions/${id}`} activeClassName="active">
+        <Item to={`/edit/versions/${id}`}>
           versions
         </Item>
         <ContextMenuTrigger holdToDisplay={-1} id="editsidebarmods">
-          <Item to={`/edit/mods/${id}`} activeClassName="active">
+          <Item to={`/edit/mods/${id}`}>
             mods
           </Item>
         </ContextMenuTrigger>
       </>
     )}
     <ContextMenuTrigger holdToDisplay={-1} id="editsidebarworlds">
-      <Item to={`/edit/worlds/${id}`} activeClassName="active">
+      <Item to={`/edit/worlds/${id}`}>
         worlds
       </Item>
     </ContextMenuTrigger>
     <ContextMenuTrigger holdToDisplay={-1} id="editsidebarresourcepacks">
-      <Item to={`/edit/resourcepacks/${id}`} activeClassName="active">
+      <Item to={`/edit/resourcepacks/${id}`}>
         resource packs
       </Item>
     </ContextMenuTrigger>
-    <Item to={`/edit/advanced/${id}`} activeClassName="active">
+    <Item to={`/edit/advanced/${id}`}>
       advanced
     </Item>
 

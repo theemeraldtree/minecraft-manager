@@ -51,6 +51,7 @@ const ButtonContainer = styled.div`
 
 const HBWrapper = styled.div`
   margin-top: 5px;
+  margin-bottom: 5px;
   min-height: 46px;
 `;
 

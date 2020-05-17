@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import transition from 'styled-transition-group';
 import arrow from './img/arrow.png';
+import FluentHover from '../../util/fluentHover';
 
 const CDropdown = styled.div`
   background-color: #404040;
@@ -20,6 +21,7 @@ const CDropdown = styled.div`
   }
   font-size: 12pt;
   outline: none;
+  outline-offset: -2px;
   border: 0;
   ${props =>
     props.active &&
@@ -252,7 +254,7 @@ export default class CustomDropdown extends Component {
         if (!this.props.items.find(item => item === currentValue) && !this.props.dontAutoSelectFirst) {
           currentValue = this.props.items[0];
 
-          this.props.onChange(currentValue, () => {});
+          this.props.onChange(currentValue, () => { });
         }
       }
     }
@@ -320,6 +322,8 @@ export default class CustomDropdown extends Component {
         disabled={this.props.disabled}
         active={dropdownOpen}
         onClick={this.openDropdown}
+        onMouseMove={e => FluentHover.mouseMove(e, this.wrapperRef, '#5b5b5b', true)}
+        onMouseLeave={() => FluentHover.mouseLeave(this.wrapperRef, '#404040')}
       >
         <Label>{currentName}</Label>
         <Arrow flip={dropdownOpen} src={arrow} />
