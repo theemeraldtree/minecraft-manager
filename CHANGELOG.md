@@ -2,6 +2,19 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.4.3
+
+#### Released 2020-05-18
+
+### Features
+
+- New, experimental privacy-respecting analytics
+- New hover effect on buttons and cards
+
+### Changed
+
+- Small UI improvements
+
 ## 2.4.2
 
 #### Released 2020-05-11

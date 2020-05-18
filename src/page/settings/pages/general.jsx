@@ -185,6 +185,10 @@ export default function General() {
           <Detail>check for news on startup</Detail>
         </InputContainer>
         <InputContainer>
+          <Checkbox checked={SettingsManager.currentSettings.analyticsEnabled} lighter onClick={() => toggleSetting('analyticsEnabled')} />
+          <Detail>enable anonymous, privacy-respecting analytics</Detail>
+        </InputContainer>
+        <InputContainer>
           <Checkbox checked={SettingsManager.currentSettings.closeOnLaunch} lighter onClick={closeOnLaunchClick} />
           <Detail>close minecraft manager on profile launch</Detail>
         </InputContainer>

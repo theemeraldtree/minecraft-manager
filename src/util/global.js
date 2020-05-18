@@ -12,6 +12,7 @@ import OMAFFileAsset from '../type/omafFileAsset';
 import FileScanner from './fileScanner';
 import World from '../type/world';
 import logInit from './logger';
+import Analytics from './analytics';
 
 const semver = require('semver');
 const { remote } = require('electron');
@@ -36,8 +37,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.4.3-work',
-  MCM_RELEASE_DATE: 'WIP',
+  MCM_VERSION: '2.4.3',
+  MCM_RELEASE_DATE: '5/18/2020',
 
   OMAF_VERSION: '1.0.0',
 
@@ -95,6 +96,7 @@ const Global = {
   checkChangelog() {
     const version = SettingsManager.currentSettings.lastVersion;
     if (!version || (semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1)) {
+      Analytics.send('update');
       ToastManager.createToast(
         `Welcome to ${this.MCM_VERSION}`,
         `<a href="https://github.com/theemeraldtree/minecraft-manager/blob/v${this.MCM_VERSION}/CHANGELOG.md">View the changelog here</a>`

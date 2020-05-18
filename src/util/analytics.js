@@ -1,0 +1,24 @@
+import HTTPRequest from '../host/httprequest';
+import SettingsManager from '../manager/settingsManager';
+import logInit from './logger';
+
+// Privacy-respecting Analytics
+// https://github.com/theemeraldtree/analytics
+
+const logger = logInit('Analytics');
+
+const Analytics = {
+  send: (type) => {
+    try {
+      if (SettingsManager.currentSettings.analyticsEnabled) {
+        logger.info(`Sending ${type} analytic`);
+        HTTPRequest.get(`https://github.com/theemeraldtree/analytics/releases/download/minecraftmanager/${type}`);
+      }
+    } catch (e) {
+      logger.error(`Unable to send ${type} analytic`);
+      logger.error(e);
+    }
+  }
+};
+
+export default Analytics;

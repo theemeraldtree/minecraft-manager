@@ -21,6 +21,7 @@ import FSU from './util/fsu';
 import dropdownArrow from './component/customdropdown/img/arrow.png';
 import theemeraldtreeLogo from './page/settings/img/theemeraldtree-logo.png';
 import checkmark from './component/checkbox/checkmark.png';
+import Analytics from './util/analytics';
 
 const logger = logInit('index');
 
@@ -112,6 +113,8 @@ async function load() {
       Global.scanProfiles();
 
       ProfilesManager.updateReloadListeners();
+
+      Analytics.send('launch');
     }
   } catch (e) {
     logger.error('Something went wrong[1]');

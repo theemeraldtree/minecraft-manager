@@ -17,6 +17,10 @@ import NavContext from '../../navContext';
 import tipShare from './img/tip-share.png';
 import tipRightClick from './img/tip-right-click.png';
 import LauncherManager from '../../manager/launcherManager';
+import InputContainer from '../editprofile/components/inputcontainer';
+import Checkbox from '../../component/checkbox/checkbox';
+import Detail from '../../component/detail/detail';
+import Analytics from '../../util/analytics';
 
 const { dialog } = require('electron').remote;
 
@@ -118,6 +122,7 @@ function WelcomePage({ history }) {
   const [mcExe, setMCExe] = useState(Global.getDefaultMCExePath());
   const [step, setStep] = useState(0);
   const [preparing, setPreparing] = useState(false);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
 
   useEffect(() => {
     nav.header.setTitle('welcome');
@@ -146,7 +151,12 @@ function WelcomePage({ history }) {
     SettingsManager.setMCExe(mcExe);
 
     SettingsManager.currentSettings.mcAccount = Object.keys(LauncherManager.getMCAccounts())[0];
+    SettingsManager.currentSettings.analyticsEnabled = analyticsEnabled;
+    SettingsManager.currentSettings.lastVersion = Global.MCM_VERSION;
     SettingsManager.save();
+
+    if (analyticsEnabled) Analytics.send('first-install');
+
     const mcl = path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager');
     if (!fs.existsSync(mcl)) {
       fs.mkdirSync(mcl);
@@ -187,6 +197,10 @@ function WelcomePage({ history }) {
       setMCExe(p[0]);
     }
   };
+
+  const analyticsClick = () => {
+    setAnalyticsEnabled(!analyticsEnabled);
+  }
 
   return (
     <>
@@ -285,6 +299,27 @@ function WelcomePage({ history }) {
             {step === 4 && (
               <>
                 <Spacing />
+                <Title>Analytics</Title>
+
+                <p>
+                  Minecraft Manager contains anonymous, privacy-respecting analytics. <br />
+                  Would you like these to be enabled?
+                </p>
+
+                <InputContainer>
+                  <Checkbox lighter checked={analyticsEnabled} onClick={analyticsClick} />
+                  <Detail>Enable Analytics</Detail>
+                </InputContainer>
+
+                <GB onClick={nextStep} color="green">
+                  continue
+                </GB>
+              </>
+            )}
+
+            {step === 5 && (
+              <>
+                <Spacing />
                 <Title>You're all set!</Title>
 
                 <h3>You're done setting up Minecraft Manager.</h3>
@@ -300,7 +335,7 @@ function WelcomePage({ history }) {
               </>
             )}
 
-            {step === 5 && (
+            {step === 6 && (
               <>
                 <Spacing />
                 <Title>tips and tricks</Title>
@@ -318,7 +353,7 @@ function WelcomePage({ history }) {
               </>
             )}
 
-            {step === 6 && (
+            {step === 7 && (
               <>
                 <Spacing />
                 <Title>tips and tricks</Title>
