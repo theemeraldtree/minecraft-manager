@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { ContextMenu, ContextMenuTrigger, MenuItem, SubMenu } from 'react-contextmenu';
 import { shell, clipboard } from 'electron';
-import Button from '../button/button';
+import { Button, Spinner } from '@theemeraldtree/emeraldui';
 import Global from '../../util/global';
 import downloadsIcon from '../navbar/downloads/downloads.png';
-import Spinner from '../spinner/spinner';
 import ToastManager from '../../manager/toastManager';
 import FluentHover from '../../util/fluentHover';
 
@@ -302,7 +301,9 @@ const AssetCard = ({
                   Copy with Info
                 </MenuItem>
                 <MenuItem
-                  onClick={() => shell.openExternal(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)}
+                  onClick={() =>
+                    shell.openExternal(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)
+                  }
                 >
                   View
                 </MenuItem>

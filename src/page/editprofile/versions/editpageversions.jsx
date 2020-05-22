@@ -2,11 +2,9 @@ import React, { useState, useEffect, useContext, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
+import { Button, Dropdown, Detail } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../../manager/profilesManager';
-import Detail from '../../../component/detail/detail';
 import OptionBreak from '../components/optionbreak';
-import Button from '../../../component/button/button';
-import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import Overlay from '../../../component/overlay/overlay';
 import Hosts from '../../../host/Hosts';
 import AlertManager from '../../../manager/alertManager';
@@ -317,7 +315,7 @@ export default function EditPageVersions({ id }) {
           <>
             <Detail>profile version</Detail>
             {hostVersionValues && (
-              <CustomDropdown
+              <Dropdown
                 value={curseVerValue}
                 onChange={curseVersionChange}
                 items={hostVersionValues}

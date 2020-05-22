@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Button from '../button/button';
-import Detail from '../detail/detail';
+import { Button, Detail } from '@theemeraldtree/emeraldui';
 import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
 import Hosts from '../../host/Hosts';
 import Global from '../../util/global';

@@ -1,12 +1,10 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
+import { Button, TextInput, Detail } from '@theemeraldtree/emeraldui';
 import styled from 'styled-components';
 import Page from '../page';
 import SearchBox from '../../component/searchbox/searchbox';
-import Button from '../../component/button/button';
 import ProfileGrid from './components/profilegrid';
-import Detail from '../../component/detail/detail';
-import TextInput from '../../component/textinput/textinput';
 import ProfilesManager from '../../manager/profilesManager';
 import Overlay from '../../component/overlay/overlay';
 import Global from '../../util/global';

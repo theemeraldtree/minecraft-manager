@@ -1,18 +1,23 @@
-/* eslint-disable */
+/* eslint-disable no-return-await */
+/* eslint-disable new-cap */
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable no-template-curly-in-string */
 import path from 'path';
 import fs from 'fs';
 import os from 'os';
+import mkdirp from 'mkdirp';
+import rimraf from 'rimraf';
+import crypto from 'crypto';
 import FSU from '../util/fsu';
 import VersionsManager from './versionsManager';
 import LibrariesManager from './librariesManager';
 import logInit from '../util/logger';
-import mkdirp from 'mkdirp';
 import DownloadsManager from './downloadsManager';
-import rimraf from 'rimraf';
 import LauncherManager from './launcherManager';
 import Global from '../util/global';
 import SettingsManager from './settingsManager';
-import crypto from 'crypto';
+import HTTPRequest from '../host/httprequest';
+
 const { exec } = require('child_process');
 const admzip = require('adm-zip');
 /**
@@ -72,7 +77,7 @@ const DirectLauncherManager = {
           finalLibraries = [...plain.libraries, ...inherited.libraries];
         }
 
-        final = Object.assign({ ...inherited }, plain);
+        final = { ...inherited, ...plain };
         final.libraries = finalLibraries;
 
         if (plain.arguments && plain.arguments.game) {
@@ -90,28 +95,26 @@ const DirectLauncherManager = {
       }
 
       return final;
-    } else {
+    }
       if (profile.id === '0-default-profile-latest') {
         const latestVersion = Global.MC_VERSIONS[0];
         await this.downloadDefaultProfile(latestVersion);
         return await FSU.readJSON(
           path.join(VersionsManager.getVersionsPath(), `/${latestVersion}/${latestVersion}.json`)
         );
-      } else if (profile.id === '0-default-profile-snapshot') {
+      } if (profile.id === '0-default-profile-snapshot') {
         const latestSnapshot = Global.ALL_VERSIONS[0];
         await this.downloadDefaultProfile(latestSnapshot);
         return await FSU.readJSON(
           path.join(VersionsManager.getVersionsPath(), `/${latestSnapshot}/${latestSnapshot}.json`)
         );
-      } else {
+      }
         return await FSU.readJSON(
           path.join(
             VersionsManager.getVersionsPath(),
             `/${profile.version.minecraft.version}/${profile.version.minecraft.version}.json`
           )
         );
-      }
-    }
   },
 
   generateClasspath(profile, versionJSON) {
@@ -238,11 +241,10 @@ const DirectLauncherManager = {
           `/${versionJSON.jar}/${versionJSON.jar}.jar`
         )}"`;
         finishedJavaArgs += ` -cp ${classpath}`;
-        finishedJavaArgs += ` -Xmx8G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M`;
+        finishedJavaArgs += ' -Xmx8G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
         finishedJavaArgs += ` ${versionJSON.mainClass}`;
         finishedJavaArgs += ` ${mcArgs}`;
-      } else {
-        if (versionJSON.arguments.jvm) {
+      } else if (versionJSON.arguments.jvm) {
           versionJSON.arguments.jvm.forEach(arg => {
             if (typeof arg === 'string') {
               finishedJavaArgs += `${arg} `;
@@ -269,7 +271,6 @@ const DirectLauncherManager = {
           finishedJavaArgs += `${versionJSON.mainClass} `;
           finishedJavaArgs += mcArgs;
         }
-      }
 
       finishedJavaArgs = finishedJavaArgs.replace('${launcher_name}', 'minecraft-launcher');
       finishedJavaArgs = finishedJavaArgs.replace('${launcher_version}', 'X');
@@ -297,18 +298,18 @@ const DirectLauncherManager = {
         logger.info(`Launching ${profile.id} directly`);
         const versionJSON = await this.getVersionJSON(profile);
 
-        logger.info(`Verifying downloaded libraries...`);
+        logger.info('Verifying downloaded libraries...');
         await this.verifyDownloadedLibraries(profile, versionJSON);
-        logger.info(`Downloaded libraries verification complete`);
+        logger.info('Downloaded libraries verification complete');
 
-        logger.info(`Verifying downloaded assets...`);
+        logger.info('Verifying downloaded assets...');
         await this.verifyDownloadedAssets(profile, versionJSON);
-        logger.info(`Downloaded assets verification complete`);
+        logger.info('Downloaded assets verification complete');
 
-        logger.info(`Extracting natives...`);
+        logger.info('Extracting natives...');
         await this.extractNatives(profile, versionJSON);
-        logger.info(`Finished extracting natives`);
-        logger.info(`Generating and running command`);
+        logger.info('Finished extracting natives');
+        logger.info('Generating and running command');
         await this.runCommand(profile, versionJSON);
 
         setTimeout(() => {
@@ -343,9 +344,9 @@ const DirectLauncherManager = {
   getOSName() {
     if (os.platform() === 'win32') {
       return 'windows';
-    } else if (os.platform() === 'darwin') {
+    } if (os.platform() === 'darwin') {
       return 'osx';
-    } else if (os.platform() === 'linux') {
+    } if (os.platform() === 'linux') {
       return 'linux';
     }
 
@@ -369,7 +370,7 @@ const DirectLauncherManager = {
 
     mkdirp.sync(nativesPath);
 
-    for (let library of versionJSON.libraries) {
+    for (const library of versionJSON.libraries) {
       if (library.natives && this.allowLibrary(library)) {
         const nativeClassifier = library.natives[this.getOSName()];
 
@@ -378,12 +379,12 @@ const DirectLauncherManager = {
         );
         const zipEntries = zip.getEntries();
 
-        let allowedEntries = [];
+        const allowedEntries = [];
         zipEntries.forEach(entry => {
           if (library.extract && library.extract.exclude) {
             let doAllow = true;
             let stop = false;
-            for (let exclude of library.extract.exclude) {
+            for (const exclude of library.extract.exclude) {
               if (stop) break;
               if (exclude.substring(exclude.length - 1) === '/') {
                 if (entry.entryName.substring(0, exclude.length) === exclude) {
@@ -412,7 +413,7 @@ const DirectLauncherManager = {
   },
 
   async verifyDownloadedLibraries(profile, versionJSON) {
-    for (let library of versionJSON.libraries) {
+    for (const library of versionJSON.libraries) {
       if (this.allowLibrary(library)) {
         const mvnPath = this.calculateMavenPath(library.name);
         if (!library.natives) {
@@ -423,6 +424,7 @@ const DirectLauncherManager = {
               // manually parse the downloads
               mkdirp.sync(path.dirname(libPath));
 
+              // eslint-disable-next-line no-await-in-loop
               await DownloadsManager.startFileDownload(
                 `Library "${library.name}"\n_A_${profile.name}`,
                 `${library.url}${mvnPath}`,
@@ -431,6 +433,7 @@ const DirectLauncherManager = {
             } else if (library.downloads) {
               mkdirp.sync(path.dirname(libPath));
 
+              // eslint-disable-next-line no-await-in-loop
               await DownloadsManager.startFileDownload(
                 `Library "${library.name}"\n_A_${profile.name}`,
                 library.downloads.artifact.url,
@@ -453,6 +456,7 @@ const DirectLauncherManager = {
 
               mkdirp.sync(path.dirname(libPath));
 
+              // eslint-disable-next-line no-await-in-loop
               await DownloadsManager.startFileDownload(
                 `Native library "${library.name}"\n_A_${profile.name}`,
                 library.downloads.classifiers[nativeClassifier].url,
@@ -507,13 +511,11 @@ const DirectLauncherManager = {
       if (versionJSON.assetIndex) {
         const assetIndexPath = path.join(Global.getMCPath(), `/assets/indexes/${versionJSON.assetIndex.id}.json`);
 
-        const downloadAssetIndex = async () => {
-          return DownloadsManager.startFileDownload(
+        const downloadAssetIndex = async () => DownloadsManager.startFileDownload(
             `Asset Index ${versionJSON.assetIndex.id}\n_A_${profile.name}`,
             versionJSON.assetIndex.url,
             assetIndexPath
           );
-        };
 
         if (!fs.existsSync(assetIndexPath)) {
           await downloadAssetIndex();
@@ -536,7 +538,7 @@ const DirectLauncherManager = {
         if (fs.existsSync(assetIndexPath)) {
           const indexJSON = await FSU.readJSON(assetIndexPath);
           const assetsToDownload = [];
-          for (let object of Object.keys(indexJSON.objects)) {
+          for (const object of Object.keys(indexJSON.objects)) {
             const hash = indexJSON.objects[object].hash;
             const hashedObjectPath = path.join(Global.getMCPath(), `/assets/objects/${hash.substring(0, 2)}/${hash}`);
             if (!fs.existsSync(hashedObjectPath)) {

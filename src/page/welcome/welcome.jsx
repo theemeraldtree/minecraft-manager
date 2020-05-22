@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
@@ -6,9 +5,7 @@ import styled from 'styled-components';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import TextInput from '../../component/textinput/textinput';
-import Button from '../../component/button/button';
-import InputHolder from '../../component/inputholder/inputholder';
+import { Button, TextInput, Detail, Checkbox, InputHolder } from '@theemeraldtree/emeraldui';
 import Global from '../../util/global';
 import SettingsManager from '../../manager/settingsManager';
 import LibrariesManager from '../../manager/librariesManager';
@@ -17,9 +14,6 @@ import NavContext from '../../navContext';
 import tipShare from './img/tip-share.png';
 import tipRightClick from './img/tip-right-click.png';
 import LauncherManager from '../../manager/launcherManager';
-import InputContainer from '../editprofile/components/inputcontainer';
-import Checkbox from '../../component/checkbox/checkbox';
-import Detail from '../../component/detail/detail';
 import Analytics from '../../util/analytics';
 
 const { dialog } = require('electron').remote;
@@ -200,7 +194,7 @@ function WelcomePage({ history }) {
 
   const analyticsClick = () => {
     setAnalyticsEnabled(!analyticsEnabled);
-  }
+  };
 
   return (
     <>
@@ -306,10 +300,10 @@ function WelcomePage({ history }) {
                   Would you like these to be enabled?
                 </p>
 
-                <InputContainer>
+                <InputHolder>
                   <Checkbox lighter checked={analyticsEnabled} onClick={analyticsClick} />
                   <Detail>Enable Analytics</Detail>
-                </InputContainer>
+                </InputHolder>
 
                 <GB onClick={nextStep} color="green">
                   continue

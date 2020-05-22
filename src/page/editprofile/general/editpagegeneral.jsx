@@ -2,15 +2,10 @@ import React, { useState, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import styled from 'styled-components';
+import { Button, TextInput, TextBox, Detail, Spinner, InputHolder, withTheme } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../../manager/profilesManager';
-import Button from '../../../component/button/button';
-import TextInput from '../../../component/textinput/textinput';
-import TextBox from '../../../component/textbox/textbox';
-import Detail from '../../../component/detail/detail';
-import InputContainer from '../components/inputcontainer';
 import Global from '../../../util/global';
 import Overlay from '../../../component/overlay/overlay';
-import Spinner from '../../../component/spinner/spinner';
 import ToastManager from '../../../manager/toastManager';
 import ErrorManager from '../../../manager/errorManager';
 
@@ -66,9 +61,11 @@ const IconWrapper = styled.button`
 `;
 
 const ResetIconButton = styled(Button)`
-  width: 150px;
-  padding: 11.5px 0;
-  text-align: center;
+  && {
+    width: 150px;
+    padding: 11.5px 0;
+    text-align: center;
+  }
 `;
 
 const Icon = styled.img`
@@ -106,7 +103,7 @@ const AboutRight = styled.div`
   }
 `;
 
-const EditPageGeneral = ({ id, history }) => {
+const EditPageGeneral = ({ id, history, theme }) => {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const [profile] = useState(ProfilesManager.getProfileFromID(id));
   const [nameValue, setNameValue] = useState(profile.name);
@@ -203,7 +200,7 @@ const EditPageGeneral = ({ id, history }) => {
               <AboutRight>
                 <div>
                   <Detail>profile name</Detail>
-                  <InputContainer>
+                  <InputHolder>
                     <TextInput
                       disabled={profile.isDefaultProfile}
                       value={nameValue}
@@ -213,7 +210,7 @@ const EditPageGeneral = ({ id, history }) => {
                     <Button onClick={confirmNameChange} disabled={nameDisabled} color="green">
                       change
                     </Button>
-                  </InputContainer>
+                  </InputHolder>
                 </div>
                 <div>
                   <DescContainer>
@@ -236,6 +233,7 @@ const EditPageGeneral = ({ id, history }) => {
                 onChange={descChange}
                 disabled={profile.isDefaultProfile}
                 placeholder="Enter a long description"
+                theme={theme}
               />
             </DescContainer>
           </>
@@ -249,7 +247,8 @@ EditPageGeneral.propTypes = {
   id: PropTypes.string.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func
-  }).isRequired
+  }).isRequired,
+  theme: PropTypes.object
 };
 
-export default withRouter(EditPageGeneral);
+export default withTheme(withRouter(EditPageGeneral));

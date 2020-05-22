@@ -1,7 +1,5 @@
 import React, { useReducer } from 'react';
-import InputContainer from '../../editprofile/components/inputcontainer';
-import Checkbox from '../../../component/checkbox/checkbox';
-import Detail from '../../../component/detail/detail';
+import { InputHolder, Checkbox, Detail } from '@theemeraldtree/emeraldui';
 import SettingsManager from '../../../manager/settingsManager';
 import Section from '../components/section';
 
@@ -21,30 +19,30 @@ export default function Defaults() {
       </p>
       <Section>
         <h3>Sync Options</h3>
-        <InputContainer>
+        <InputHolder>
           <Checkbox
             checked={SettingsManager.currentSettings.defaultsSyncOptionsTXT}
             lighter
             onClick={() => toggleItem('defaultsSyncOptionsTXT')}
           />
           <Detail>Sync in-game Minecraft Options</Detail>
-        </InputContainer>
-        <InputContainer>
+        </InputHolder>
+        <InputHolder>
           <Checkbox
             checked={SettingsManager.currentSettings.defaultsSyncOptionsOF}
             lighter
             onClick={() => toggleItem('defaultsSyncOptionsOF')}
           />
           <Detail>Sync in-game OptiFine Options</Detail>
-        </InputContainer>
-        <InputContainer>
+        </InputHolder>
+        <InputHolder>
           <Checkbox
             checked={SettingsManager.currentSettings.defaultsSyncServers}
             lighter
             onClick={() => toggleItem('defaultsSyncServers')}
           />
           <Detail>Sync in-game server list</Detail>
-        </InputContainer>
+        </InputHolder>
       </Section>
     </>
   );

@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Spinner, Detail } from '@theemeraldtree/emeraldui';
 import AssetCard from '../assetcard/assetcard';
 import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
 import VersionCard from '../versioncard/versioncard';
-import Detail from '../detail/detail';
 import Global from '../../util/global';
 import Hosts from '../../host/Hosts';
 import ToastManager from '../../manager/toastManager';
 import SubAssetEditor from '../../page/editprofile/components/subAssetEditor';
 import MCVersionSelector from '../mcVersionSelector/mcVersionSelector';
 import HeaderButton from '../headerButton/headerButton';
-import Spinner from '../spinner/spinner';
 
 const LoadingText = styled.div`
   font-size: 23pt;

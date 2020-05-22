@@ -2,11 +2,8 @@ import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { css } from 'styled-transition-group';
-import CustomDropdown from '../customdropdown/customdropdown';
+import { Dropdown, TextInput, InputHolder, Checkbox } from '@theemeraldtree/emeraldui';
 import Global from '../../util/global';
-import TextInput from '../textinput/textinput';
-import InputContainer from '../../page/editprofile/components/inputcontainer';
-import Checkbox from '../checkbox/checkbox';
 
 const Container = styled.div`
   padding-bottom: 5px;
@@ -171,7 +168,7 @@ export default function MCVersionSelector({ showAll, disabled, onChange, value, 
   };
 
   return (
-    <CustomDropdown
+    <Dropdown
       items={items}
       disabled={disabled}
       onChange={onChange}
@@ -190,26 +187,26 @@ export default function MCVersionSelector({ showAll, disabled, onChange, value, 
         <Options onClick={e => e.stopPropagation()}>
           <p>show...</p>
           <div>
-            <InputContainer>
+            <InputHolder>
               <Checkbox disabled checked />
               <p>Releases</p>
-            </InputContainer>
-            <InputContainer>
+            </InputHolder>
+            <InputHolder>
               <Checkbox onClick={() => toggleOption('preReleases')} checked={visibilityOptions.preReleases} />
               <p>Pre-Releases</p>
-            </InputContainer>
-            <InputContainer>
+            </InputHolder>
+            <InputHolder>
               <Checkbox onClick={() => toggleOption('snapshots')} checked={visibilityOptions.snapshots} />
               <p>Snapshots</p>
-            </InputContainer>
-            <InputContainer>
+            </InputHolder>
+            <InputHolder>
               <Checkbox onClick={() => toggleOption('old')} checked={visibilityOptions.old} />
               <p>Old Versions</p>
-            </InputContainer>
+            </InputHolder>
           </div>
         </Options>
       </Container>
-    </CustomDropdown>
+    </Dropdown>
   );
 }
 

@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Button } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../manager/profilesManager';
 import Global from '../../util/global';
-import Button from '../button/button';
 
 const Container = styled.div`
   max-height: 45vh;
@@ -12,7 +12,7 @@ const Container = styled.div`
   align-items: center;
   flex-flow: column;
   padding-bottom: 10px;
-  
+
   &::-webkit-scrollbar-track {
     background: none;
   }

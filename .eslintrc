@@ -1,6 +1,8 @@
 {
   "parser": "babel-eslint",
-  "extends": ["airbnb"],
+  "extends": [
+    "airbnb"
+  ],
   "env": {
     "browser": true,
     "node": true
@@ -35,6 +37,11 @@
     "function-paren-newline": "off",
     "no-console": "off",
     "linebreak-style": "off",
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true
+      }
+    ]
   }
 }

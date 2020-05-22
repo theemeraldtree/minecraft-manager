@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Button } from '@theemeraldtree/emeraldui';
 import Overlay from '../overlay/overlay';
-import Button from '../button/button';
 import Hosts from '../../host/Hosts';
 import AlertBackground from '../alert/alertbackground';
 

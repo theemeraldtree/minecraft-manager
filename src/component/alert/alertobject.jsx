@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Button from '../button/button';
+import { Button } from '@theemeraldtree/emeraldui';
 import AlertBackground from './alertbackground';
 import useKeyPress from '../../util/useKeyPress';
 

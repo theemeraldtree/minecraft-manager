@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import path from 'path';
-import Button from '../button/button';
+import { Button } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../manager/profilesManager';
 import Overlay from '../overlay/overlay';
 import AlertBackground from '../alert/alertbackground';

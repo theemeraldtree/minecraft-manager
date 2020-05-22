@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+import { FluentHover } from '@theemeraldtree/emeraldui';
 import Page from '../page';
 import About from './pages/about';
 import General from './pages/general';
 import Defaults from './pages/defaults';
 import Help from './pages/help';
 import NavContext from '../../navContext';
-import FluentHover from '../../util/fluentHover';
 
 const Sidebar = styled.div`
   height: 100%;

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import TextInput from '../textinput/textinput';
+import { TextInput, withTheme } from '@theemeraldtree/emeraldui';
 
 const SearchBox = styled(TextInput)`
   height: 40px;
@@ -9,4 +9,4 @@ const SearchBox = styled(TextInput)`
   padding-left: 10px;
 `;
 
-export default SearchBox;
+export default withTheme(SearchBox);

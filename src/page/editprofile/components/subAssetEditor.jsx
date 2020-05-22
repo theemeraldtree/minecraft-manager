@@ -4,11 +4,9 @@ import styled from 'styled-components';
 import transition from 'styled-transition-group';
 import path from 'path';
 import fs from 'fs';
+import { Button, TextInput, InputHolder, Dropdown, withTheme } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../../manager/profilesManager';
-import TextInput from '../../../component/textinput/textinput';
-import Button from '../../../component/button/button';
 import DiscoverList from '../../../component/discoverlist/discoverlist';
-import InputContainer from './inputcontainer';
 import AssetCard from '../../../component/assetcard/assetcard';
 import Mod from '../../../type/mod';
 import Global from '../../../util/global';
@@ -19,7 +17,6 @@ import OMAFFileAsset from '../../../type/omafFileAsset';
 import World from '../../../type/world';
 import CopyToOverlay from './copyToOverlay';
 import MoveToOverlay from './moveToOverlay';
-import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import ErrorManager from '../../../manager/errorManager';
 import useKeyPress from '../../../util/useKeyPress';
 import AlertManager from '../../../manager/alertManager';
@@ -52,7 +49,7 @@ const Search = styled(TextInput)`
   flex-shrink: 9999;
 `;
 
-const SearchContainer = styled(InputContainer)`
+const SearchContainer = styled(InputHolder)`
   margin-top: 10px;
   flex-shrink: 0;
   background-color: #404040;
@@ -83,7 +80,7 @@ const FilterHeader = styled.div`
   }
 `;
 
-export default function SubAssetEditor({ id, assetType, dpWorld }) {
+function SubAssetEditor({ id, assetType, dpWorld, theme }) {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const [profile, setProfile] = useState(ProfilesManager.getProfileFromID(id));
   const [progressState, setProgressState] = useState(profile.progressState);
@@ -429,11 +426,12 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
               ←
             </AnimateButton>
             {displayState !== 'assetsList' && displayState !== 'modInfo' && (
-              <Search onChange={searchChange} onKeyPress={searchChange} placeholder="search curseforge" />
+              <Search theme={theme} onChange={searchChange} onKeyPress={searchChange} placeholder="search curseforge" />
             )}
 
             {displayState === 'assetsList' && (
               <Search
+                theme={theme}
                 value={liveSearchTerm}
                 onChange={searchChange}
                 onKeyPress={searchChange}
@@ -454,7 +452,7 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
           {displayState === 'assetsList' && (
             <>
               <FilterHeader>
-                <CustomDropdown items={sortOptions} value={sortValue} onChange={sortValueChange} />
+                <Dropdown items={sortOptions} value={sortValue} onChange={sortValueChange} />
               </FilterHeader>
               <List>
                 {selobj[po]
@@ -559,5 +557,8 @@ export default function SubAssetEditor({ id, assetType, dpWorld }) {
 SubAssetEditor.propTypes = {
   id: PropTypes.string.isRequired,
   assetType: PropTypes.string.isRequired,
-  dpWorld: PropTypes.object
+  dpWorld: PropTypes.object,
+  theme: PropTypes.object
 };
+
+export default withTheme(SubAssetEditor);

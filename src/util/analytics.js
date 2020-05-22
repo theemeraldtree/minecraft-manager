@@ -1,6 +1,7 @@
 import HTTPRequest from '../host/httprequest';
 import SettingsManager from '../manager/settingsManager';
 import logInit from './logger';
+import Global from './global';
 
 // Privacy-respecting Analytics
 // https://github.com/theemeraldtree/analytics
@@ -8,9 +9,9 @@ import logInit from './logger';
 const logger = logInit('Analytics');
 
 const Analytics = {
-  send: (type) => {
+  send: type => {
     try {
-      if (SettingsManager.currentSettings.analyticsEnabled) {
+      if (SettingsManager.currentSettings.analyticsEnabled && Global.MCM_VERSION.indexOf('beta') === -1) {
         logger.info(`Sending ${type} analytic`);
         HTTPRequest.get(`https://github.com/theemeraldtree/analytics/releases/download/minecraftmanager/${type}`);
       }

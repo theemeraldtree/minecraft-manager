@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import { Spinner } from '@theemeraldtree/emeraldui';
 import Overlay from '../overlay/overlay';
 import AlertBackground from '../alert/alertbackground';
-import Spinner from '../spinner/spinner';
 
 const BG = styled(AlertBackground)`
   display: flex;

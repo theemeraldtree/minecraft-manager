@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { HashRouter as Router, Route, Redirect } from 'react-router-dom';
 import fs from 'fs';
 import os from 'os';
+import { DarkTheme, EmeraldUIThemeProvider } from '@theemeraldtree/emeraldui';
 import HomePage from './page/home/homePage';
 import SettingsPage from './page/settings/settingsPage';
 import ViewProfilePage from './page/viewprofile/viewprofile';
@@ -91,21 +92,29 @@ function App() {
             <Content>
               {fs.existsSync(Global.PROFILES_PATH) && <Navbar />}
               <ContentSide>
-                <Header />
 
-                <Route exact path="/" component={HomePage} />
-                <Route path="/discover" component={DiscoverPage} />
-                <Route path="/settings" component={SettingsPage} />
-                <Route path="/welcome" component={WelcomePage} />
-                <Route path="/profile/:id" component={ViewProfilePage} />
-                <Route path="/edit/:page/:id" component={EditPage} />
+                <EmeraldUIThemeProvider theme={DarkTheme}>
+
+                  <Header />
+
+                  <Route exact path="/" component={HomePage} />
+                  <Route path="/discover" component={DiscoverPage} />
+                  <Route path="/settings" component={SettingsPage} />
+                  <Route path="/welcome" component={WelcomePage} />
+                  <Route path="/profile/:id" component={ViewProfilePage} />
+                  <Route path="/edit/:page/:id" component={EditPage} />
+
+                </EmeraldUIThemeProvider>
+
               </ContentSide>
             </Content>
           </Container>
 
           {!fs.existsSync(Global.PROFILES_PATH) && <Redirect to="/welcome" />}
         </ErrorBoundary>
+
       </Router>
+
     </NavContext.Provider>
   );
 }

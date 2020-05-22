@@ -46,6 +46,7 @@
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-react": "^7.0.0",
     "@hot-loader/react-dom": "^16.13.0",
+    "@theemeraldtree/emeraldui": "../emeraldui/theemeraldtree-emeraldui-v0.1.1.tgz",
     "adm-zip": "^0.4.13",
     "archiver": "^3.0.0",
     "axios": "^0.19.2",

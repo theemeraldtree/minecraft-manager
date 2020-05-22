@@ -4,10 +4,10 @@ import styled from 'styled-components';
 import { withRouter } from 'react-router-dom';
 import { ContextMenu, MenuItem, ContextMenuTrigger, SubMenu } from 'react-contextmenu';
 import { shell } from 'electron';
+import { Button } from '@theemeraldtree/emeraldui';
 import Global from '../../util/global';
 import edit from './img/edit.png';
 import launch from './img/launch.png';
-import Button from '../button/button';
 import FluentHover from '../../util/fluentHover';
 
 const BG = styled.div`
@@ -80,30 +80,35 @@ const Buttons = styled.div`
 `;
 
 const LaunchButton = styled(Button)`
-  img {
-    width: 20px;
+  && {
+    img {
+      width: 20px;
+    }
+    width: 80px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
   }
-  width: 80px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 2px;
 `;
 
 const EditButton = styled(Button)`
+  && {
+    img {
+      width: 20px;
+    }
+    
   padding: 3px;
   padding-left: 0;
   padding-right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  img {
-    width: 20px;
-  }
   margin-left: 3px;
   width: 30px;
   text-align: center;
+  }
 `;
 
 const Wrapper = styled.div`
@@ -218,7 +223,9 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate, sh
         {!profile.error && profile.state !== 'installing' && profile.hosts.curse && (
           <>
             <MenuItem
-              onClick={() => shell.openExternal(`https://curseforge.com/minecraft/modpacks/${profile.hosts.curse.slug}`)}
+              onClick={() =>
+                shell.openExternal(`https://curseforge.com/minecraft/modpacks/${profile.hosts.curse.slug}`)
+              }
             >
               View on CurseForge
             </MenuItem>

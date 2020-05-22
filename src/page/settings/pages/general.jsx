@@ -1,15 +1,10 @@
 import React, { useState, useReducer } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import TextInput from '../../../component/textinput/textinput';
-import Button from '../../../component/button/button';
-import Detail from '../../../component/detail/detail';
-import InputHolder from '../../../component/inputholder/inputholder';
+import { Button, TextInput, Detail, Checkbox, InputHolder, Dropdown, withTheme } from '@theemeraldtree/emeraldui';
 import SettingsManager from '../../../manager/settingsManager';
 import Global from '../../../util/global';
-import Checkbox from '../../../component/checkbox/checkbox';
 import ProfilesManager from '../../../manager/profilesManager';
-import InputContainer from '../../editprofile/components/inputcontainer';
-import CustomDropdown from '../../../component/customdropdown/customdropdown';
 import LauncherManager from '../../../manager/launcherManager';
 
 const { dialog } = require('electron').remote;
@@ -24,8 +19,10 @@ const WarningMSG = styled.p`
 `;
 
 const PathInput = styled(TextInput)`
-  width: 590px;
-  font-size: 13pt;
+  && {
+    width: 590px;
+    font-size: 13pt;
+  }
 `;
 
 const LaunchContainer = styled.div`
@@ -45,7 +42,7 @@ function getMCAccounts() {
   return final;
 }
 
-export default function General() {
+function General({ theme }) {
   const [mcHome, setMCHome] = useState(SettingsManager.MC_HOME);
   const [mcExe, setMCExe] = useState(SettingsManager.currentSettings.mcExe);
   const [dedicatedRam, setDedicatedRam] = useState(SettingsManager.currentSettings.dedicatedRam);
@@ -144,25 +141,25 @@ export default function General() {
   return (
     <>
       <Settings>
-        <InputHolder>
+        <InputHolder vertical>
           <Detail>minecraft home directory</Detail>
           <div>
-            <PathInput disabled value={mcHome} />
+            <PathInput theme={theme} disabled value={mcHome} />
             <Button onClick={chooseHomeDirectory} color="green">
               choose
             </Button>
           </div>
         </InputHolder>
-        <InputHolder>
+        <InputHolder vertical>
           <Detail>minecraft executable</Detail>
           <div>
-            <PathInput disabled value={mcExe} />
+            <PathInput theme={theme} disabled value={mcExe} />
             <Button onClick={chooseMCExe} color="green">
               choose
             </Button>
           </div>
         </InputHolder>
-        <InputHolder>
+        <InputHolder vertical>
           <Detail>dedicated ram (gb)</Detail>
           <div>
             <TextInput onChange={ramAmountChange} value={dedicatedRam} />
@@ -172,29 +169,29 @@ export default function General() {
           </div>
           <WarningMSG>{warningMessage}</WarningMSG>
         </InputHolder>
-        <InputContainer>
+        <InputHolder>
           <Checkbox
             checked={SettingsManager.currentSettings.allowSnapshotProfile}
             lighter
             onClick={allowSnapshotProfileClick}
           />
           <Detail>show latest snapshot profile</Detail>
-        </InputContainer>
-        <InputContainer>
+        </InputHolder>
+        <InputHolder>
           <Checkbox checked={SettingsManager.currentSettings.checkToastNews} lighter onClick={checkToastNewsClick} />
           <Detail>check for news on startup</Detail>
-        </InputContainer>
-        <InputContainer>
+        </InputHolder>
+        <InputHolder>
           <Checkbox checked={SettingsManager.currentSettings.analyticsEnabled} lighter onClick={() => toggleSetting('analyticsEnabled')} />
           <Detail>enable anonymous, privacy-respecting analytics</Detail>
-        </InputContainer>
-        <InputContainer>
+        </InputHolder>
+        <InputHolder>
           <Checkbox checked={SettingsManager.currentSettings.closeOnLaunch} lighter onClick={closeOnLaunchClick} />
           <Detail>close minecraft manager on profile launch</Detail>
-        </InputContainer>
+        </InputHolder>
         <LaunchContainer>
           <Detail>Minecraft account to use for Launching</Detail>
-          <CustomDropdown
+          <Dropdown
             items={minecraftAccounts}
             value={SettingsManager.currentSettings.mcAccount}
             onChange={changeMCAccount}
@@ -205,3 +202,9 @@ export default function General() {
     </>
   );
 }
+
+General.propTypes = {
+  theme: PropTypes.object
+};
+
+export default withTheme(General);

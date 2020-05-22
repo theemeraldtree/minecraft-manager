@@ -4,12 +4,9 @@ import styled from 'styled-components';
 import path from 'path';
 import { shell } from 'electron';
 import fs from 'fs';
+import { Button, Detail, Checkbox, InputHolder } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../../manager/profilesManager';
-import Button from '../../../component/button/button';
-import Detail from '../../../component/detail/detail';
-import Checkbox from '../../../component/checkbox/checkbox';
 import SettingsManager from '../../../manager/settingsManager';
-import InputContainer from '../components/inputcontainer';
 import Global from '../../../util/global';
 import LauncherManager from '../../../manager/launcherManager';
 import FSU from '../../../util/fsu';
@@ -184,20 +181,20 @@ export default function EditPageAdvanced({ id }) {
 
           {profile.id !== '0-default-profile-latest' && runSnapshotInSeperateFolder && (
             <>
-              <InputContainer>
+              <InputHolder>
                 <Checkbox lighter checked={syncOptionsTXT} onClick={syncOptionsTXTClick} />
                 Sync in-game Minecraft Options with this profile
-              </InputContainer>
+              </InputHolder>
 
-              <InputContainer>
+              <InputHolder>
                 <Checkbox lighter checked={syncOptionsOF} onClick={syncOptionsOFClick} />
                 Sync in-game OptiFine Options with this profile
-              </InputContainer>
+              </InputHolder>
 
-              <InputContainer>
+              <InputHolder>
                 <Checkbox lighter checked={syncServers} onClick={syncServersClick} />
                 Sync in-game Server List with this profile
-              </InputContainer>
+              </InputHolder>
               <br />
             </>
           )}
@@ -225,10 +222,10 @@ export default function EditPageAdvanced({ id }) {
           <Detail>version timestamp: {profile.version.timestamp}</Detail>
           <Detail>OMAF version: {profile.omafVersion}</Detail>
           {profile.id === '0-default-profile-snapshot' && (
-            <InputContainer>
+            <InputHolder>
               <Checkbox lighter checked={runSnapshotInSeperateFolder} onClick={snapshotSeperateFolderClick} />
               Run in a seperate game directory from Latest release
-            </InputContainer>
+            </InputHolder>
           )}
         </Panel>
         <Panel>

@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { Dropdown, Spinner } from '@theemeraldtree/emeraldui';
 import AssetCard from '../assetcard/assetcard';
 import AssetInfo from '../assetinfo/assetinfo';
 import Hosts from '../../host/Hosts';
-import CustomDropdown from '../customdropdown/customdropdown';
 import MCVersionSelector from '../mcVersionSelector/mcVersionSelector';
-import Spinner from '../spinner/spinner';
 
 const LoadingText = styled.div`
   font-size: 23pt;
@@ -54,14 +53,18 @@ const Header = styled.div`
   }
 `;
 
-const SortDropdown = styled(CustomDropdown)`
-  width: 130px;
-  margin-right: 5px;
-  margin-bottom: 5px;
+const SortDropdown = styled(Dropdown)`
+  && {
+    width: 130px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
 `;
 
 const MCVerSel = styled(MCVersionSelector)`
-  width: 168px;
+  && {
+    width: 168px; 
+  }
 `;
 
 export default class DiscoverList extends Component {

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Redirect, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
+import { Button } from '@theemeraldtree/emeraldui';
 import Page from '../page';
 import ProfilesManager from '../../manager/profilesManager';
-import Button from '../../component/button/button';
 import SanitizedHTML from '../../component/sanitizedhtml/sanitizedhtml';
 import Confirmation from '../../component/confirmation/confirmation';
 import ShareOverlay from '../../component/shareoverlay/shareoverlay';
@@ -55,8 +55,10 @@ const MiddlePanel = styled.div`
 `;
 
 const CustomButton = styled(Button)`
-  width: 170px;
-  text-align: center;
+  && {
+    width: 170px;
+    text-align: center;
+  }
 `;
 
 const ButtonGroup = styled.div`
