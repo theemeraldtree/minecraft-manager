@@ -102,6 +102,9 @@ export default class DiscoverList extends Component {
       return true;
     } if (nextState.assets !== this.state.assets) {
       return true;
+    } if (nextProps.forceUpdate !== this.props.forceUpdate) {
+      // Very hacky fix
+      return true;
     }
     return false;
   }
@@ -412,7 +415,9 @@ DiscoverList.propTypes = {
 
   searchTerm: PropTypes.string,
 
-  state: PropTypes.string
+  state: PropTypes.string,
+
+  forceUpdate: PropTypes.number
 };
 
 DiscoverList.defaultProps = {

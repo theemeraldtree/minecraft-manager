@@ -74,7 +74,8 @@ export default class ShareOverlay extends Component {
     super(props);
     this.state = {
       displayState: 'main',
-      exportProgress: 'Waiting...'
+      exportProgress: 'Waiting...',
+      exportItems: []
     };
   }
 
@@ -96,7 +97,7 @@ export default class ShareOverlay extends Component {
   exportClick = () => {
     const { profile } = this.props;
     const { exportFolders } = this.state;
-    const p = dialog.showSaveDialog({
+    const p = dialog.showSaveDialogSync({
       title: 'Where do you want to export to?',
       buttonLabel: 'Export here',
       defaultPath: `${profile.name}.mcjprofile`,
@@ -107,23 +108,29 @@ export default class ShareOverlay extends Component {
         }
       ]
     });
-    if (p) {
-      profile
-        .export(p, exportFolders, progress => {
-          this.setState({
-            exportProgress: progress
-          });
-        })
-        .then(() => {
-          this.props.cancelClick();
-        })
-        .catch(() => {
-          this.props.cancelClick();
+
+    profile
+      .export(p, exportFolders, progress => {
+        this.setState({
+          exportProgress: progress
         });
-      this.setState({
-        displayState: 'progress'
+      })
+      .then(() => {
+        this.props.cancelClick();
+        this.setState({
+          displayState: 'main'
+        });
+      })
+      .catch(() => {
+        this.props.cancelClick();
+        this.setState({
+          displayState: 'main'
+        });
       });
-    }
+
+    this.setState({
+      displayState: 'progress'
+    });
   };
 
   useProfile() {
@@ -173,7 +180,7 @@ export default class ShareOverlay extends Component {
                 Minecraft Manager or other OMAF-supporting apps
               </Subtext>
               <Breaker />
-              {this.state.exportItems && (
+              {this.state.exportItems.length !== 0 && (
                 <>
                   <Title>choose your folders</Title>
                   <Subtext>

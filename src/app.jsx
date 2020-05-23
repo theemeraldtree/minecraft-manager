@@ -80,19 +80,19 @@ function App() {
       }}
     >
       {localStorage.setItem('showDownloads', false)}
-      <div>
-        <Alert />
-        <Toast />
-      </div>
-      <Router>
-        <ErrorBoundary>
-          <Container>
-            {os.platform() !== 'linux' && <WindowBar />}
-            <Content>
-              {fs.existsSync(Global.PROFILES_PATH) && <Navbar />}
-              <ContentSide>
+      <EmeraldUIThemeProvider theme={DarkTheme}>
+        <div>
+          <Alert />
+          <Toast />
+        </div>
+        <Router>
+          <ErrorBoundary>
+            <Container>
+              {os.platform() !== 'linux' && <WindowBar />}
+              <Content>
+                {fs.existsSync(Global.PROFILES_PATH) && <Navbar />}
+                <ContentSide>
 
-                <EmeraldUIThemeProvider theme={DarkTheme}>
 
                   <Header />
 
@@ -103,16 +103,16 @@ function App() {
                   <Route path="/profile/:id" component={ViewProfilePage} />
                   <Route path="/edit/:page/:id" component={EditPage} />
 
-                </EmeraldUIThemeProvider>
 
-              </ContentSide>
-            </Content>
-          </Container>
+                </ContentSide>
+              </Content>
+            </Container>
 
-          {!fs.existsSync(Global.PROFILES_PATH) && <Redirect to="/welcome" />}
-        </ErrorBoundary>
+            {!fs.existsSync(Global.PROFILES_PATH) && <Redirect to="/welcome" />}
+          </ErrorBoundary>
 
-      </Router>
+        </Router>
+      </EmeraldUIThemeProvider>
 
     </NavContext.Provider>
   );

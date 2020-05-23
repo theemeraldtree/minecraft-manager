@@ -6,6 +6,7 @@ import { Dropdown, TextInput, InputHolder, Checkbox } from '@theemeraldtree/emer
 import Global from '../../util/global';
 
 const Container = styled.div`
+  padding-top: 5px;
   padding-bottom: 5px;
   width: 100%;
   height: 100%;
@@ -13,7 +14,7 @@ const Container = styled.div`
   height: 27px;
   max-height: max-content;
   flex-shrink: 0;
-  background: #404040;
+  background: #5b5b5b;
   transition: 150ms;
 
   & > div:nth-child(1) {

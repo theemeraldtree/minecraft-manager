@@ -4,7 +4,7 @@ Changelogs for development versions are located in their corresponding branch.
 
 ## 2.4.4
 
-#### Currently WIP
+#### Released 2020-05-23
 
 ### Features
 

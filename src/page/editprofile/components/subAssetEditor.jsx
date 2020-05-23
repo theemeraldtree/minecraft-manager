@@ -81,7 +81,7 @@ const FilterHeader = styled.div`
 `;
 
 function SubAssetEditor({ id, assetType, dpWorld, theme }) {
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const [forceUpdateNumber, forceUpdate] = useReducer(x => x + 1, 0);
   const [profile, setProfile] = useState(ProfilesManager.getProfileFromID(id));
   const [progressState, setProgressState] = useState(profile.progressState);
   const [searchTerm, setSearchTerm] = useState('');
@@ -546,6 +546,7 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
               state={listState}
               stateChange={setListState}
               forceFramework={profile.getPrimaryFramework()}
+              forceUpdate={forceUpdateNumber}
             />
           )}
         </Container>

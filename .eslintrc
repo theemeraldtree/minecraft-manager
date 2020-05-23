@@ -37,6 +37,7 @@
     "function-paren-newline": "off",
     "no-console": "off",
     "linebreak-style": "off",
+    "no-debugger": "off",
     "import/no-extraneous-dependencies": [
       "error",
       {

@@ -1,9 +1,10 @@
 import React, { PureComponent } from 'react';
+import { withTheme } from '@theemeraldtree/emeraldui';
 import AlertManager from '../../manager/alertManager';
 import Overlay from '../overlay/overlay';
 import AlertObject from './alertobject';
 
-export default class Alert extends PureComponent {
+export default withTheme(class Alert extends PureComponent {
   constructor() {
     super();
     this.state = {
@@ -41,4 +42,4 @@ export default class Alert extends PureComponent {
       </Overlay>
     );
   }
-}
+});

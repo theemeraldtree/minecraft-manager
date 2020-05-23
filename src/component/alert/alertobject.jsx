@@ -16,7 +16,7 @@ const InputContainer = styled.div`
   align-items: center;
 `;
 
-export default function AlertObject({ children, buttons }) {
+function AlertObject({ children, buttons, theme }) {
   const escapePress = useKeyPress('Escape');
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function AlertObject({ children, buttons }) {
 
       <InputContainer>
         {buttons.map(button => (
-          <Button key={button.text} onClick={button.onClick} color={button.color}>
+          <Button theme={theme} key={button.text} onClick={button.onClick} color={button.color}>
             {button.text}
           </Button>
         ))}
@@ -41,5 +41,8 @@ export default function AlertObject({ children, buttons }) {
 
 AlertObject.propTypes = {
   children: PropTypes.node.isRequired,
-  buttons: PropTypes.array
+  buttons: PropTypes.array,
+  theme: PropTypes.object
 };
+
+export default AlertObject;

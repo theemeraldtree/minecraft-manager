@@ -6,7 +6,7 @@ import NavContext from '../../navContext';
 import SearchBox from '../../component/searchbox/searchbox';
 
 export default function DiscoverPage() {
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const [forceUpdateNumber, forceUpdate] = useReducer(x => x + 1, 0);
 
   const { header } = useContext(NavContext);
 
@@ -99,6 +99,7 @@ export default function DiscoverPage() {
         type="profile"
         installClick={installClick}
         searchTerm={searchTerm}
+        forceUpdate={forceUpdateNumber}
       />
     </>
   );

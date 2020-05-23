@@ -19,29 +19,31 @@ const Container = styled.div`
 `;
 
 const ProfBG = styled(Button)`
-  border: 0;
-  display: flex;
-  align-items: center;
-  height: 50px;
-  background: #121212;
-  padding: 5px;
-  margin-bottom: 3px;
-  color: white;
-  width: calc(100% - 30px);
-  cursor: pointer;
-  p {
-    font-weight: 900;
-    margin: 0;
-    margin-left: 10px;
-    font-size: 12pt;
-  }
+  && {
+    border: 0;
+    display: flex;
+    align-items: center;
+    height: 50px;
+    background: #121212;
+    padding: 5px;
+    margin-bottom: 3px;
+    color: white;
+    width: calc(100% - 30px);
+    cursor: pointer;
+    p {
+      font-weight: 900;
+      margin: 0;
+      margin-left: 10px;
+      font-size: 12pt;
+    }
 
-  &:hover {
-    transform: scale(1.03);
-  }
+    &:hover {
+      transform: scale(1.03);
+    }
 
-  &:focus-visible {
-    outline: 2px solid yellow;
+    &:focus-visible {
+      outline: 2px solid yellow;
+    }
   }
 `;
 
