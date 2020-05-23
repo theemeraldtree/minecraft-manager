@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import { Button, TextInput, Detail } from '@theemeraldtree/emeraldui';
 import styled from 'styled-components';
-import Page from '../page';
 import SearchBox from '../../component/searchbox/searchbox';
 import ProfileGrid from './components/profilegrid';
 import ProfilesManager from '../../manager/profilesManager';
@@ -54,6 +53,9 @@ export default withRouter(({ history }) => {
     header.setShowBackButton(false);
     header.setTitle('profiles');
     header.setShowChildren(true);
+  }, []);
+
+  useEffect(() => {
     header.setChildren(
       <>
         <SearchBox
@@ -70,7 +72,7 @@ export default withRouter(({ history }) => {
         </Button>
       </>
     );
-  }, []);
+  }, [searchTerm]);
 
   const createNameChange = e => {
     const input = e.target.value;
@@ -90,7 +92,7 @@ export default withRouter(({ history }) => {
   };
 
   return (
-    <Page>
+    <>
       <ProfileGrid searchTerm={searchTerm} />
       <ImportOverlay in={showImport} cancelClick={() => setShowImport(false)} />
       <Overlay in={showCreate}>
@@ -112,6 +114,6 @@ export default withRouter(({ history }) => {
           </CreateControls>
         </CreateBG>
       </Overlay>
-    </Page>
+    </>
   );
 });

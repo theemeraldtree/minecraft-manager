@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useReducer } from 'react';
-import Page from '../page';
 import DiscoverList from '../../component/discoverlist/discoverlist';
 import ProfilesManager from '../../manager/profilesManager';
 import Hosts from '../../host/Hosts';
@@ -89,7 +88,7 @@ export default function DiscoverPage() {
   }, [searchValue]);
 
   return (
-    <Page>
+    <>
       <DiscoverList
         host="curse"
         mcVerFilter="All"
@@ -101,6 +100,6 @@ export default function DiscoverPage() {
         installClick={installClick}
         searchTerm={searchTerm}
       />
-    </Page>
+    </>
   );
 }

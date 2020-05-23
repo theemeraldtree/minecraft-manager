@@ -93,8 +93,17 @@ export default class DiscoverList extends Component {
     this.browseAssets();
   }
 
-  shouldComponentUpdate() {
-    return true;
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.searchTerm !== this.props.searchTerm) {
+      return true;
+    } if (nextProps.progressState !== this.props.progressState) {
+      return true;
+    } if (nextProps.state !== this.props.state) {
+      return true;
+    } if (nextState.assets !== this.state.assets) {
+      return true;
+    }
+    return false;
   }
 
   componentDidUpdate(prevProps) {

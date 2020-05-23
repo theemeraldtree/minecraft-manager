@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { FluentHover } from '@theemeraldtree/emeraldui';
-import Page from '../page';
 import About from './pages/about';
 import General from './pages/general';
 import Defaults from './pages/defaults';
@@ -94,7 +93,7 @@ export default function SettingsPage() {
   }, []);
 
   return (
-    <Page>
+    <>
       <Wrapper>
         <Sidebar>
           <Item onClick={() => setSettingsPage('about')} active={settingsPage === 'about'}>
@@ -117,6 +116,6 @@ export default function SettingsPage() {
           {settingsPage === 'help' && <Help />}
         </Container>
       </Wrapper>
-    </Page>
+    </>
   );
 }

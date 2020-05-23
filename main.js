@@ -151,9 +151,10 @@ function createWindow() {
     backgroundColor: '#222',
     webPreferences: {
       webSecurity: false,
-      experimentalFeatures: true
+      experimentalFeatures: true,
+      nodeIntegration: true
     },
-    titleBarStyle: 'hidden'
+    titleBarStyle: 'hidden',
   });
 
   if (os.platform() === 'win32') {
@@ -186,7 +187,7 @@ function createWindow() {
     // install the react devtools
     // make sure you create a .reactDevtools.json file that looks similar to the following
     // {
-    //    "extPath": "PATH TO EXTENSION GOES HERE"
+    //    "extPath": "C:\\Users\\username\\AppData\\Local\\Google\\Chrome\\User Data\\\Default\\Extensions\\extensionidgoeshere\\versionnumber"
     // }
 
     if (fs.existsSync('.reactDevtools.json')) {

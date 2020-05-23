@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Redirect, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button } from '@theemeraldtree/emeraldui';
-import Page from '../page';
 import ProfilesManager from '../../manager/profilesManager';
 import SanitizedHTML from '../../component/sanitizedhtml/sanitizedhtml';
 import Confirmation from '../../component/confirmation/confirmation';
@@ -104,7 +103,7 @@ function ViewProfilePage({ match, history }) {
 
   if (profile) {
     return (
-      <Page>
+      <>
         {showDelete && (
           <Confirmation
             questionText="are you sure?"
@@ -155,7 +154,7 @@ function ViewProfilePage({ match, history }) {
         </MiddlePanel>
         <ShareOverlay show={showShareOverlay} cancelClick={() => setShowShareOverlay(false)} profile={profile} />}
         <UpdateOverlay show={showUpdateOverlay} cancelClick={() => setShowUpdateOverlay(false)} profile={profile} />
-      </Page>
+      </>
     );
   }
   return <Redirect to="/" />;

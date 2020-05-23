@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
 import os from 'os';
+import fs from 'fs';
+import path from 'path';
 import { Button } from '@theemeraldtree/emeraldui';
 import logo from '../../../img/logo-sm.png';
 import Section from '../components/section';
@@ -9,7 +11,6 @@ import NeedHelp from '../components/needhelp';
 import Global from '../../../util/global';
 import theemeraldtreelogo from '../img/theemeraldtree-logo.png';
 import AlertManager from '../../../manager/alertManager';
-import licenseDisclaimer from '../../../assets/licenseDisclaimer.txt';
 
 const AboutTop = styled.div`
   display: flex;
@@ -230,7 +231,7 @@ export default function About() {
             onClick={() =>
               AlertManager.messageBox(
                 'full license information',
-                `<textarea class="wrap">${licenseDisclaimer}</textarea>`
+                `<textarea class="wrap">${fs.readFileSync(path.join(Global.getResourcesPath(), 'licenseDisclaimer.txt'))}</textarea>`
               )
             }
             color="green"
