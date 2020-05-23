@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import 'react-hot-loader/patch';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import fs from 'fs';

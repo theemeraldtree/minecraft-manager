@@ -2,7 +2,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { spawn } = require('child_process');
 const process = require('process');
 const path = require('path');
-const webpack = require('webpack');
 
 module.exports = (env, argv) => {
   const isDev = argv.mode === 'development';
@@ -11,18 +10,14 @@ module.exports = (env, argv) => {
     context: `${__dirname}/src`,
     entry: './index.js',
     resolve: {
-      extensions: ['.js', '.jsx'],
-      alias: {
-        'react-dom': '@hot-loader/react-dom'
-      }
+      extensions: ['.js', '.jsx']
     },
     plugins: isDev ? [
       new HtmlWebpackPlugin({
         template: './index.html'
-      }),
-      new webpack.HotModuleReplacementPlugin()
+      })
     ] : [new HtmlWebpackPlugin({ template: './index.html' })],
-    devtool: isDev ? 'inline-source-map' : 'none',
+    devtool: isDev ? 'cheap-module-eval-source-map' : 'none',
     target: 'electron-main',
     module: {
       rules: [
@@ -60,7 +55,6 @@ module.exports = (env, argv) => {
     },
     devServer: {
       contentBase: './',
-      hot: true,
       before() {
         spawn('electron', ['.'], {
           shell: true,

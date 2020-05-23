@@ -47,20 +47,16 @@
     }
   },
   "dependencies": {
-    "electron-updater": "^4.0.6",
     "axios": "^0.19.2",
+    "electron-updater": "^4.0.6",
     "winston": "^3.2.1",
     "winston-daily-rotate-file": "^4.4.2"
   },
   "devDependencies": {
-    "electron": "8.3.0",
-    "electron-builder": "^22.6.1",
-    "webpack-cli": "^3.3.11",
     "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/preset-env": "^7.9.6",
     "@babel/preset-react": "^7.9.4",
-    "@hot-loader/react-dom": "^16.13.0",
     "@theemeraldtree/emeraldui": "^0.1.1",
     "adm-zip": "^0.4.13",
     "archiver": "^3.0.0",
@@ -70,6 +66,8 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-airbnb": "^4.4.0",
     "css-loader": "^3.0.0",
+    "electron": "8.3.0",
+    "electron-builder": "^22.6.1",
     "eslint": "^7.0.0",
     "eslint-config-airbnb": "^18.0.1",
     "eslint-config-prettier": "^6.10.0",
@@ -92,7 +90,6 @@
     "react": "^16.10.0",
     "react-contextmenu": "^2.11.0",
     "react-dom": "^16.10.0",
-    "react-hot-loader": "^4.12.20",
     "react-router-dom": "^5.1.2",
     "react-transition-group": "^4.4.1",
     "rimraf": "^2.6.3",
@@ -102,8 +99,9 @@
     "styled-components": "^5.1.0",
     "styled-transition-group": "^2.0.1",
     "stylis": "^3.5.4",
-    "webpack": "^4.43.0",
-    "webpack-dev-server": "^3.11.0"
+    "webpack": "4.29.0",
+    "webpack-cli": "3.2.1",
+    "webpack-dev-server": "3.1.14"
   },
   "scripts": {
     "dev": "webpack-dev-server --mode development --inline --port 9483",

@@ -33,7 +33,7 @@ const Container = styled.div`
   overflow: hidden;
   display: flex;
   flex-flow: column;
-  height: calc(100% - 20px);
+  height: calc(100vh - 80px);
 `;
 
 const List = styled.div`
