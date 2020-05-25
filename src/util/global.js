@@ -37,8 +37,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.4.4',
-  MCM_RELEASE_DATE: '5/23/2020',
+  MCM_VERSION: '2.4.5',
+  MCM_RELEASE_DATE: '5/24/2020',
 
   OMAF_VERSION: '1.0.0',
 

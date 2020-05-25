@@ -2,6 +2,14 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.4.5
+
+#### Released 2020-05-24
+
+### Fixes
+
+- Profiles displayed on the profiles screen had an extra "a" at the end
+
 ## 2.4.4
 
 #### Released 2020-05-23

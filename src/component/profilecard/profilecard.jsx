@@ -155,7 +155,7 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate, sh
           }}
         >
           <Image src={`file:///${profile.iconPath}#${Global.cacheUpdateTime}`} />
-          <Title>{profile.name}a</Title>
+          <Title>{profile.name}</Title>
           <Buttons className="buttons">
             <LaunchButton
               color="green"
