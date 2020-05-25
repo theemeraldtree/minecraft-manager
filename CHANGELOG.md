@@ -2,6 +2,14 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.4.6
+
+#### Released 2020-05-25
+
+### Fixes
+
+- Critical problem in the Welcome page
+
 ## 2.4.5
 
 #### Released 2020-05-24

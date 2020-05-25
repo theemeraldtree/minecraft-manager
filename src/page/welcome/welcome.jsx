@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { Button, TextInput, Detail, Checkbox, InputHolder } from '@theemeraldtree/emeraldui';
+import { Button, TextInput, Detail, Checkbox, InputHolder, withTheme } from '@theemeraldtree/emeraldui';
 import Global from '../../util/global';
 import SettingsManager from '../../manager/settingsManager';
 import LibrariesManager from '../../manager/librariesManager';
@@ -75,8 +75,10 @@ const Logo = styled.div`
 `;
 
 const TI = styled(TextInput)`
-  max-width: 680px;
-  width: 100%;
+  &&&& {
+    max-width: 680px;
+    width: 100%;
+  }
 `;
 
 const GB = styled(Button)`
@@ -84,9 +86,15 @@ const GB = styled(Button)`
 `;
 
 const IH = styled(InputHolder)`
-  margin-top: 1px;
-  max-width: 650px;
-  width: 100%;
+  && {
+    margin-top: 1px;
+    max-width: 650px;
+    width: 100%;
+
+    div {
+      width: 100%;
+    }
+  }
 `;
 
 const Spacing = styled.div`
@@ -109,7 +117,7 @@ const LeftSubText = styled(Subtext)`
   background-color: #404040;
 `;
 
-function WelcomePage({ history }) {
+function WelcomePage({ history, theme }) {
   const nav = useContext(NavContext);
 
   const [mcHome, setMCHome] = useState(Global.getDefaultMinecraftPath());
@@ -251,7 +259,7 @@ function WelcomePage({ history }) {
 
                 <IH>
                   <div>
-                    <TI disabled value={mcHome} />
+                    <TI theme={theme} disabled value={mcHome} />
                     <Button onClick={chooseHomeDirectory} color="green">
                       change
                     </Button>
@@ -274,7 +282,7 @@ function WelcomePage({ history }) {
 
                 <IH>
                   <div>
-                    <TI disabled value={mcExe} />
+                    <TI theme={theme} disabled value={mcExe} />
                     <Button onClick={chooseMCExe} color="green">
                       change
                     </Button>
@@ -380,7 +388,8 @@ function WelcomePage({ history }) {
 }
 
 WelcomePage.propTypes = {
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
+  theme: PropTypes.object
 };
 
-export default withRouter(WelcomePage);
+export default withTheme(withRouter(WelcomePage));
