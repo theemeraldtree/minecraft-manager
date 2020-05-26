@@ -2,6 +2,14 @@
 
 Changelogs for development versions are located in their corresponding branch.
 
+## 2.4.7
+
+#### Released 2020-05-25
+
+### Fixes
+
+- Linux now starts up correctly
+
 ## 2.4.6
 
 #### Released 2020-05-25
