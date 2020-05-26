@@ -48,7 +48,7 @@ const Settings = styled(Link)`
   background-position: center;
   position: absolute;
   bottom: 100px;
-  left: 40px;
+  left: 30px;
 `;
 
 const Navbar = () => (

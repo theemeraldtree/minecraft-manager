@@ -157,6 +157,8 @@ function createWindow() {
     titleBarStyle: 'hidden',
   });
 
+  mainWindow.removeMenu();
+
   if (os.platform() === 'win32') {
     if (fs.existsSync(path.join('C:\\Program Files\\Minecraft Manager\\Uninstall Minecraft Manager.exe'))) {
       // 2.4.2 changed the program from being a per-machine install to a per-user install

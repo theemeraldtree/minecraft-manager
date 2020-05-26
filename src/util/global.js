@@ -37,7 +37,7 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.4.6',
+  MCM_VERSION: '2.4.7',
   MCM_RELEASE_DATE: '5/25/2020',
 
   OMAF_VERSION: '1.0.0',
@@ -244,13 +244,13 @@ const Global = {
     ) {
       dev = true;
     }
-    if (dev) {
+    if (dev && os.platform() !== 'linux') {
       return path.join('resources');
+    } if (dev && os.platform() === 'linux') {
+      return path.join(__dirname, '../../../../../../resources');
     }
-    if (os.platform() === 'win32' || os.platform() === 'darwin') {
-      return path.join(remote.app.getAppPath(), '../resources');
-    }
-    return null;
+
+    return path.join(remote.app.getAppPath(), '../resources');
   },
   getTypeString: obj => {
     if (obj instanceof Mod) {
