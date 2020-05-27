@@ -2,10 +2,13 @@ import React, { useState, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Button, TextInput, Detail, Checkbox, InputHolder, Dropdown, withTheme } from '@theemeraldtree/emeraldui';
+import path from 'path';
 import SettingsManager from '../../../manager/settingsManager';
 import Global from '../../../util/global';
 import ProfilesManager from '../../../manager/profilesManager';
 import LauncherManager from '../../../manager/launcherManager';
+import InstallWizard from '../../../component/installWizard/installWizard';
+import JavaHandler from '../../../minecraft/javaHandler';
 
 const { dialog } = require('electron').remote;
 const os = require('os');
@@ -51,6 +54,8 @@ function General({ theme }) {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const [minecraftAccounts] = useState(getMCAccounts());
   const [javaPath, setJavaPath] = useState(SettingsManager.currentSettings.java.path);
+  const [javaVersions, setJavaVersions] = useState([]);
+  const [showJavaInstaller, setShowJavaInstaller] = useState(false);
 
   const chooseHomeDirectory = () => {
     const p = dialog.showOpenDialog({
@@ -147,6 +152,19 @@ function General({ theme }) {
     forceUpdate();
   };
 
+  const getJavaVersions = async () => {
+    setJavaVersions(await JavaHandler.getJavaVersionsForInstaller());
+  };
+
+  const installJavaClick = async (ver) => {
+    await JavaHandler.installVersion(ver, path.join(Global.MCM_PATH, '/shared/binaries/java/'));
+    console.log(ver);
+  };
+
+  const installJavaCancelClick = () => {
+    setShowJavaInstaller(false);
+  };
+
   return (
     <>
       <Settings>
@@ -216,6 +234,9 @@ function General({ theme }) {
             </Button>
           </div>
         </InputHolder>
+
+        <Button onClick={() => setShowJavaInstaller(true)}>install java</Button>
+        <InstallWizard cancelClick={installJavaCancelClick} installClick={installJavaClick} name="Java" show={showJavaInstaller} versions={javaVersions} getVersions={getJavaVersions} />
       </Settings>
     </>
   );
