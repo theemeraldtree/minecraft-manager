@@ -38,6 +38,7 @@
     "no-console": "off",
     "linebreak-style": "off",
     "no-debugger": "off",
+    "no-underscore-dangle": "off",
     "import/no-extraneous-dependencies": [
       "error",
       {

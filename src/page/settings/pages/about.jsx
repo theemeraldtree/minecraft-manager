@@ -261,6 +261,9 @@ export default function About() {
         <h2>Other things to check out...</h2>
         <ul>
           <li>
+            <a href="https://www.reddit.com/r/MinecraftManager">r/MinecraftManager</a>
+          </li>
+          <li>
             <a href="https://stopmodreposts.org">stopmodreposts.org</a>
           </li>
           <li>

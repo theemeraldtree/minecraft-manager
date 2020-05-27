@@ -1,3 +1,4 @@
+/* eslint-disable */
 import fs from 'fs';
 import path from 'path';
 import rimraf from 'rimraf';
@@ -20,6 +21,7 @@ import Hosts from '../host/Hosts';
 import SettingsManager from '../manager/settingsManager';
 import logInit from '../util/logger';
 import DirectLauncherManager from '../manager/directLauncherManager';
+import MCVersionHandler from '../minecraft/mcVersionHandler';
 
 export default class Profile extends OAMFAsset {
   /**
@@ -52,6 +54,7 @@ export default class Profile extends OAMFAsset {
     if (!this.mcm) this.mcm = {};
 
     this.subAssetsPath = path.join(this.profilePath, '/_omaf/subAssets');
+    this.mcmPath = path.join(this.profilePath, '/_mcm/');
 
     this.safename = Global.createSafeName(this.name);
     this.versionname = `${this.safename} [Minecraft Manager]`;
@@ -325,32 +328,33 @@ export default class Profile extends OAMFAsset {
   }
 
   launch() {
-    if (!LauncherManager.profileExists(this)) {
-      LauncherManager.createProfile(this);
-    }
+    MCVersionHandler.updateProfile(this);
+    // if (!LauncherManager.profileExists(this)) {
+    //   LauncherManager.createProfile(this);
+    // }
 
-    this.addIconToLauncher();
-    LauncherManager.updateVersion(this);
-    LauncherManager.setMostRecentProfile(this);
+    // this.addIconToLauncher();
+    // LauncherManager.updateVersion(this);
+    // LauncherManager.setMostRecentProfile(this);
 
-    return new Promise(resolve => {
-      DirectLauncherManager.launch(this)
-        .then(() => {
-          if (SettingsManager.currentSettings.closeOnLaunch) {
-            remote.getCurrentWindow().close();
-          }
-          resolve();
-        })
-        .catch(e => {
-          this.logger.info(`Unable to launch Minecraft directly. Opening Launcher instead. Error: ${e.toString()}`);
-          LauncherManager.openLauncher();
-          if (SettingsManager.currentSettings.closeOnLaunch) {
-            remote.getCurrentWindow().close();
-            resolve();
-          }
-          resolve();
-        });
-    });
+    // return new Promise(resolve => {
+    //   DirectLauncherManager.launch(this)
+    //     .then(() => {
+    //       if (SettingsManager.currentSettings.closeOnLaunch) {
+    //         remote.getCurrentWindow().close();
+    //       }
+    //       resolve();
+    //     })
+    //     .catch(e => {
+    //       this.logger.info(`Unable to launch Minecraft directly. Opening Launcher instead. Error: ${e.toString()}`);
+    //       LauncherManager.openLauncher();
+    //       if (SettingsManager.currentSettings.closeOnLaunch) {
+    //         remote.getCurrentWindow().close();
+    //         resolve();
+    //       }
+    //       resolve();
+    //     });
+    // });
   }
 
   removeAllMods() {

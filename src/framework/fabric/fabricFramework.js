@@ -78,7 +78,30 @@ const FabricFramework = {
         .catch(err => {
           reject(err);
         });
-    })
+    }),
+  getVersionJSON: async (profile) => {
+    if (profile.frameworks?.fabric?.version) {
+      const rawVersion = (await HTTPRequest.get(`https://meta.fabricmc.net/v2/versions/loader/${profile.version.minecraft.version}/${profile.frameworks.fabric.version}`)).data;
+      const { launcherMeta } = rawVersion;
+
+      const combinedLibs = [...launcherMeta.libraries.client, ...launcherMeta.libraries.common];
+      combinedLibs.push({
+        name: `minecraftmanager.profiles:mcm-${profile.id}:fabric-loader`
+      });
+
+      combinedLibs.push({
+        name: `minecraftmanager.profiles:mcm-${profile.id}:fabric-intermediary`
+      });
+
+      return {
+        _priority: 1,
+        mainClass: launcherMeta.mainClass.client,
+        '+libraries': combinedLibs
+      };
+    }
+
+    return undefined;
+  }
 };
 
 export default FabricFramework;

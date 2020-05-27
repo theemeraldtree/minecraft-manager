@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import os from 'os';
 import ActionButtons from './action-buttons';
 import logo from '../../img/logo-sm.png';
@@ -19,7 +19,7 @@ const Wrapper = styled.div`
     width: 20px;
   }
   ${os.platform() === 'darwin' &&
-    `
+    css`
         height: 23px;
         flex: 0 1 23px;
         display: flex;
@@ -39,7 +39,7 @@ const Title = styled.p`
   -webkit-app-region: drag;
   cursor: default;
   ${os.platform() === 'darwin' &&
-    `
+    css`
         text-align: center;
         top: 0;
         position: initial;
