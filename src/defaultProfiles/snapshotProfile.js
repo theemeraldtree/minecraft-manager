@@ -19,7 +19,7 @@ const SnapshotProfile = new Profile({
     displayName: 'Snapshot',
     timestamp: 0,
     minecraft: {
-      version: 'latest-snapshot'
+      version: Global.MC_VERSIONS[0]
     }
   }
 });
@@ -56,8 +56,7 @@ function loadSnapshotProfile() {
   if (!SettingsManager.currentSettings.runSnapshotInSeperateFolder) {
     SnapshotProfile.worlds = LatestProfile.worlds;
     SnapshotProfile.resourcespacks = LatestProfile.resourcepacks;
-  } else {
-    SnapshotProfile.gameDir = Global.getMCPath();
+    SnapshotProfile.gameDir = LatestProfile.gameDir;
   }
 }
 

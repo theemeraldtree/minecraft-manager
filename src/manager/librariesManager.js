@@ -11,7 +11,7 @@ const logger = logInit('LibrariesManager');
 
 const LibrariesManager = {
   getLibrariesPath() {
-    return path.join(Global.getMCPath(), '/libraries/');
+    return path.join(Global.MCM_PATH, '/shared/libraries/');
   },
   getMCMLibraries() {
     return path.join(this.getLibrariesPath(), '/minecraftmanager/profiles/');

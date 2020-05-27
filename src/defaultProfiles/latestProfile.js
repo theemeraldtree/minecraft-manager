@@ -3,6 +3,7 @@ import fs from 'fs';
 import mkdirp from 'mkdirp';
 import Profile from '../type/profile';
 import Global from '../util/global';
+import SettingsManager from '../manager/settingsManager';
 
 const LatestProfile = new Profile({
   type: 'profile',
@@ -17,7 +18,7 @@ const LatestProfile = new Profile({
     displayName: 'Latest',
     timestamp: 0,
     minecraft: {
-      version: 'latest-release'
+      version: Global.MC_VERSIONS[0]
     }
   }
 });
@@ -28,7 +29,9 @@ function loadLatestProfile() {
   LatestProfile.iconPath = path.join(Global.getResourcesPath(), 'icon-latest.png');
   LatestProfile.addIconToLauncher = () => {};
 
-  LatestProfile.gameDir = Global.getMCPath();
+  if (SettingsManager.currentSettings.runLatestInIntegration) {
+    LatestProfile.gameDir = Global.getMCPath();
+  }
 
   if (!fs.existsSync(LatestProfile.profilePath)) {
     fs.mkdirSync(LatestProfile.profilePath);

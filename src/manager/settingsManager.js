@@ -65,6 +65,11 @@ const SettingsManager = {
           this.currentSettings.defaultsSyncServers = false;
         }
 
+        if (this.currentSettings.runLatestInIntegrated === undefined) {
+          logger.info('Setting "runLatestInIntegrated" was missing. Adding it...');
+          this.currentSettings.runLatestInIntegrated = false;
+        }
+
         if (this.currentSettings.mcAccount === undefined) {
           logger.info('Setting "mcAccount" was missing. Adding it...');
           this.currentSettings.mcAccount = Object.keys(LauncherManager.getMCAccounts())[0];

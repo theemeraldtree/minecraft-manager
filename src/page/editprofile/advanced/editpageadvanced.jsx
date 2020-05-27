@@ -53,6 +53,8 @@ export default function EditPageAdvanced({ id }) {
     SettingsManager.currentSettings.runSnapshotInSeperateFolder
   );
 
+  const [runLatestInIntegrated, setRunLatestInIntegrated] = useState(SettingsManager.currentSettings.runLatestInIntegrated);
+
   const [syncOptionsTXT, setSyncOptionsTXT] = useState(profile.mcm.syncOptionsTXT);
   const [syncOptionsOF, setSyncOptionsOF] = useState(profile.mcm.syncOptionsOF);
   const [syncServers, setSyncServers] = useState(profile.mcm.syncServers);
@@ -157,6 +159,27 @@ export default function EditPageAdvanced({ id }) {
     setShowCopyOverlay(false);
   };
 
+  const runLatestInIntegratedClick = () => {
+    const inverted = !runLatestInIntegrated;
+    setRunLatestInIntegrated(inverted);
+    SettingsManager.currentSettings.runLatestInIntegrated = inverted;
+    SettingsManager.save();
+
+    if (!inverted) {
+      profile.gameDir = path.join(profile.profilePath, 'files');
+      profile.worlds = [];
+      profile.resourcepacks = [];
+      profile.save();
+      Global.scanProfile(profile);
+    } else {
+      profile.gameDir = Global.getMCPath();
+      profile.worlds = [];
+      profile.resourcepacks = [];
+      profile.save();
+      Global.scanProfile(profile);
+    }
+  };
+
   return (
     <>
       <Overlay in={showCopyOverlay}>
@@ -225,6 +248,12 @@ export default function EditPageAdvanced({ id }) {
             <InputHolder>
               <Checkbox lighter checked={runSnapshotInSeperateFolder} onClick={snapshotSeperateFolderClick} />
               Run in a seperate game directory from Latest release
+            </InputHolder>
+          )}
+          {profile.id === '0-default-profile-latest' && (
+            <InputHolder>
+              <Checkbox lighter checked={runLatestInIntegrated} onClick={runLatestInIntegratedClick} />
+              Run in the Minecraft Home Directory
             </InputHolder>
           )}
         </Panel>

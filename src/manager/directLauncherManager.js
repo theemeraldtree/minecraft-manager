@@ -31,12 +31,12 @@ const DirectLauncherManager = {
   concurrentDownloads: [],
   downloadMinecraftJAR(profile) {
     return new Promise(async resolve => {
-      if (!fs.existsSync(path.join(profile.mcmPath, '/game.jar'))) {
+      if (!fs.existsSync(path.join(Global.MCM_PATH, `/shared/jars/${profile.version.minecraft.version}.jar`))) {
         const data = await FSU.readJSON(path.join(profile.mcmPath, '/version/default.json'));
         await DownloadsManager.startFileDownload(
           `Minecraft ${profile.version.minecraft.version} Client JAR`,
           data.downloads.client.url,
-          path.join(profile.mcmPath, '/game.jar')
+          path.join(Global.MCM_PATH, `/shared/jars/${profile.version.minecraft.version}.jar`)
         );
       }
 
@@ -83,19 +83,19 @@ const DirectLauncherManager = {
 
       return final;
     }
-      if (profile.id === '0-default-profile-latest') {
-        const latestVersion = Global.MC_VERSIONS[0];
-        await this.downloadMinecraftJAR(latestVersion);
-        return await FSU.readJSON(
-          path.join(VersionsManager.getVersionsPath(), `/${latestVersion}/${latestVersion}.json`)
-        );
-      } if (profile.id === '0-default-profile-snapshot') {
-        const latestSnapshot = Global.ALL_VERSIONS[0];
-        await this.downloadMinecraftJAR(latestSnapshot);
-        return await FSU.readJSON(
-          path.join(VersionsManager.getVersionsPath(), `/${latestSnapshot}/${latestSnapshot}.json`)
-        );
-      }
+      // if (profile.id === '0-default-profile-latest') {
+      //   const latestVersion = Global.MC_VERSIONS[0];
+      //   await this.downloadMinecraftJAR(latestVersion);
+      //   return await FSU.readJSON(
+      //     path.join(VersionsManager.getVersionsPath(), `/${latestVersion}/${latestVersion}.json`)
+      //   );
+      // } if (profile.id === '0-default-profile-snapshot') {
+      //   const latestSnapshot = Global.ALL_VERSIONS[0];
+      //   await this.downloadMinecraftJAR(latestSnapshot);
+      //   return await FSU.readJSON(
+      //     path.join(VersionsManager.getVersionsPath(), `/${latestSnapshot}/${latestSnapshot}.json`)
+      //   );
+      // }
         return await FSU.readJSON(
           path.join(
             VersionsManager.getVersionsPath(),
@@ -108,11 +108,11 @@ const DirectLauncherManager = {
     let cpString = '';
     versionJSON.libraries.forEach(library => {
       if (this.allowLibrary(library) && !library.natives) {
-        cpString += `${path.join(LibrariesManager.getLibrariesPath(), this.calculateMavenPath(library.name))};`;
+        cpString += `"${path.join(LibrariesManager.getLibrariesPath(), this.calculateMavenPath(library.name))}";`;
       }
     });
 
-    cpString += `"${path.join(profile.mcmPath, '/game.jar')}"`;
+    cpString += `"${path.join(Global.MCM_PATH, `/shared/jars/${profile.version.minecraft.version}.jar`)}"`;
 
     return cpString;
   },
