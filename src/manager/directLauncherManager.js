@@ -16,7 +16,7 @@ import DownloadsManager from './downloadsManager';
 import LauncherManager from './launcherManager';
 import Global from '../util/global';
 import SettingsManager from './settingsManager';
-import HTTPRequest from '../host/httprequest';
+import JavaHandler from '../minecraft/javaHandler';
 
 const { exec } = require('child_process');
 const admzip = require('adm-zip');
@@ -29,27 +29,14 @@ const logger = logInit('DirectLauncherManager');
 
 const DirectLauncherManager = {
   concurrentDownloads: [],
-  downloadDefaultProfile(version) {
+  downloadMinecraftJAR(profile) {
     return new Promise(async resolve => {
-      if (!fs.existsSync(path.join(VersionsManager.getVersionsPath(), `/${version}`))) {
-        mkdirp.sync(path.join(VersionsManager.getVersionsPath(), `/${version}`));
-      }
-
-      if (!fs.existsSync(path.join(VersionsManager.getVersionsPath(), `/${version}/${version}.json`))) {
-        const vers = await HTTPRequest.get('https://launchermeta.mojang.com/mc/game/version_manifest.json');
+      if (!fs.existsSync(path.join(profile.mcmPath, '/game.jar'))) {
+        const data = await FSU.readJSON(path.join(profile.mcmPath, '/version/default.json'));
         await DownloadsManager.startFileDownload(
-          `Minecraft ${version} Version Info`,
-          vers.versions.find(a => a.id === version).url,
-          path.join(VersionsManager.getVersionsPath(), `/${version}/${version}.json`)
-        );
-      }
-
-      if (!fs.existsSync(path.join(VersionsManager.getVersionsPath(), `/${version}/${version}.jar`))) {
-        const data = await FSU.readJSON(path.join(VersionsManager.getVersionsPath(), `/${version}/${version}.json`));
-        await DownloadsManager.startFileDownload(
-          `Minecraft ${version} Client JAR`,
+          `Minecraft ${profile.version.minecraft.version} Client JAR`,
           data.downloads.client.url,
-          path.join(VersionsManager.getVersionsPath(), `${version}/${version}.jar`)
+          path.join(profile.mcmPath, '/game.jar')
         );
       }
 
@@ -98,13 +85,13 @@ const DirectLauncherManager = {
     }
       if (profile.id === '0-default-profile-latest') {
         const latestVersion = Global.MC_VERSIONS[0];
-        await this.downloadDefaultProfile(latestVersion);
+        await this.downloadMinecraftJAR(latestVersion);
         return await FSU.readJSON(
           path.join(VersionsManager.getVersionsPath(), `/${latestVersion}/${latestVersion}.json`)
         );
       } if (profile.id === '0-default-profile-snapshot') {
         const latestSnapshot = Global.ALL_VERSIONS[0];
-        await this.downloadDefaultProfile(latestSnapshot);
+        await this.downloadMinecraftJAR(latestSnapshot);
         return await FSU.readJSON(
           path.join(VersionsManager.getVersionsPath(), `/${latestSnapshot}/${latestSnapshot}.json`)
         );
@@ -125,11 +112,7 @@ const DirectLauncherManager = {
       }
     });
 
-    if (versionJSON.jar) {
-      cpString += `${path.join(VersionsManager.getVersionsPath(), `/${versionJSON.jar}/${versionJSON.jar}.jar`)}`;
-    } else {
-      cpString += `${path.join(VersionsManager.getVersionsPath(), `/${versionJSON.id}/${versionJSON.id}.jar`)}`;
-    }
+    cpString += `"${path.join(profile.mcmPath, '/game.jar')}"`;
 
     return cpString;
   },
@@ -280,7 +263,7 @@ const DirectLauncherManager = {
       );
       finishedJavaArgs = finishedJavaArgs.replace('${classpath}', this.generateClasspath(profile, versionJSON));
 
-      exec(`"${Global.getJavaPath()}" ${finishedJavaArgs}`, {
+      exec(`"${JavaHandler.getJavaPath()}" ${finishedJavaArgs}`, {
         cwd: profile.gameDir
       });
 
@@ -297,6 +280,9 @@ const DirectLauncherManager = {
       try {
         logger.info(`Launching ${profile.id} directly`);
         const versionJSON = await this.getVersionJSON(profile);
+
+        logger.info(`Downloading Minecraft JAR for ${profile.id}`);
+        await this.downloadMinecraftJAR(profile);
 
         logger.info('Verifying downloaded libraries...');
         await this.verifyDownloadedLibraries(profile, versionJSON);

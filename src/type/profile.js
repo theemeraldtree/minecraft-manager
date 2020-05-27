@@ -329,6 +329,7 @@ export default class Profile extends OAMFAsset {
 
   launch() {
     MCVersionHandler.updateProfile(this);
+    DirectLauncherManager.launch(this);
     // if (!LauncherManager.profileExists(this)) {
     //   LauncherManager.createProfile(this);
     // }

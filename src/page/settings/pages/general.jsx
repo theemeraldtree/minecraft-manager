@@ -50,6 +50,7 @@ function General({ theme }) {
   const [warningMessage, setWarningMessage] = useState('');
   const [, forceUpdate] = useReducer(x => x + 1, 0);
   const [minecraftAccounts] = useState(getMCAccounts());
+  const [javaPath, setJavaPath] = useState(SettingsManager.currentSettings.java.path);
 
   const chooseHomeDirectory = () => {
     const p = dialog.showOpenDialog({
@@ -104,6 +105,14 @@ function General({ theme }) {
         setWarningMessage('');
       }
     }
+  };
+
+  const javaPathChange = e => {
+    setJavaPath(e.target.value);
+  };
+
+  const changeJavaPath = () => {
+    SettingsManager.currentSettings.java.path = javaPath;
   };
 
   const changeRAM = () => {
@@ -198,6 +207,15 @@ function General({ theme }) {
           />
           <Detail>Add an account via the standard Minecraft Launcher</Detail>
         </LaunchContainer>
+        <InputHolder>
+          <Detail>java path</Detail>
+          <div>
+            <TextInput onChange={javaPathChange} value={javaPath} />
+            <Button onClick={changeJavaPath} color="green">
+              change
+            </Button>
+          </div>
+        </InputHolder>
       </Settings>
     </>
   );

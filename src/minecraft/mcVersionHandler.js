@@ -100,6 +100,7 @@ class MCVersionHandler {
     });
 
     final.id = profile.versionname;
+    final.type = undefined;
     final._priority = undefined;
 
     return final;
