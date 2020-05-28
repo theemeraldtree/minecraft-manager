@@ -2,6 +2,7 @@ import os from 'os';
 import AdmZip from 'adm-zip';
 import path from 'path';
 import fs from 'fs';
+import rimraf from 'rimraf';
 import SettingsManager from '../manager/settingsManager';
 import HTTPRequest from '../host/httprequest';
 import Global from '../util/global';
@@ -19,6 +20,10 @@ const JavaHandler = {
     if (profile && profile.mcm.java?.override) {
 
     } else {
+      if(SettingsManager.currentSettings.java.manual) {
+        return SettingsManager.currentSettings.java.manualPath;
+      }
+
       return SettingsManager.currentSettings.java.path;
     }
   },
@@ -56,7 +61,6 @@ const JavaHandler = {
 
   installVersion(version, to) {
     return new Promise(async resolve => {
-      console.log(version);
       const arch = os.arch();
       let osName = 'windows';
       if(os.platform() === 'darwin') osName = 'mac';
@@ -78,11 +82,11 @@ const JavaHandler = {
       zip.extractEntryTo(zip.getEntries()[0].entryName, tempExtract, true, true);
 
       fs.readdir(tempExtract, (e, files) => {
-        if(fs.existsSync(to)) fs.rmdirSync(to);
-        fs.rename(path.join(tempExtract, files), to, () => {
+        if(fs.existsSync(to)) rimraf.sync(to);
+        fs.rename(path.join(tempExtract, files[0]), to, () => {
           fs.unlinkSync(tempPath);
   
-          resolve();
+          resolve(files[0]);
         });
       })
     });

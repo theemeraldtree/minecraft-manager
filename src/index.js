@@ -23,6 +23,7 @@ import Analytics from './util/analytics';
 const logger = logInit('index');
 
 const { remote, ipcRenderer } = require('electron');
+const { dialog } = require('electron').remote;
 
 localStorage.setItem('importDone', 'false');
 
@@ -130,4 +131,13 @@ if (module.hot) {
   module.hot.accept();
 }
 
-load();
+async function init() {
+try {
+  await load();
+} catch (e) {
+  logger.error(`Unable to intiailize: ${e.stack}`);
+  dialog.showErrorBox('Error initializing app', `${e.stack}\n\n---\nMinecraft Manager ${Global.MCM_VERSION}\nfile a bug at https://theemeraldtree.net/mcm/issues`);
+}
+}
+
+init();

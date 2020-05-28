@@ -158,7 +158,6 @@ function General({ theme }) {
 
   const installJavaClick = async (ver) => {
     await JavaHandler.installVersion(ver, path.join(Global.MCM_PATH, '/shared/binaries/java/'));
-    console.log(ver);
   };
 
   const installJavaCancelClick = () => {
