@@ -12,6 +12,7 @@ import AlertManager from '../../../manager/alertManager';
 import PathInput from '../components/pathInput';
 import EmptyOffset from '../components/emptyOffset';
 import Global from '../../../util/global';
+import MCLauncherIntegrationHandler from '../../../minecraft/mcLauncherIntegrationHandler';
 
 const { dialog } = require('electron').remote;
 
@@ -33,6 +34,7 @@ function Launcher({ theme }) {
     } else if ((!integrationEnabled && mcHome && mcExe) || integrationEnabled) {
       SettingsManager.currentSettings.launcherIntegration = !integrationEnabled;
       SettingsManager.save();
+      MCLauncherIntegrationHandler.integrate();
     }
     setIntegrationEnabled(!integrationEnabled);
   };

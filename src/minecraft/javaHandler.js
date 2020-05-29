@@ -86,7 +86,11 @@ const JavaHandler = {
         fs.rename(path.join(tempExtract, files[0]), to, () => {
           fs.unlinkSync(tempPath);
   
-          resolve(files[0]);
+          if(version === 'latest') {
+            resolve(files[0]);
+          }else{
+            resolve(version);
+          }
         });
       })
     });

@@ -28,9 +28,9 @@ const Dot = styled.div`
   border-radius: 8px;
 `
 
-export default function RadioButton({ active, onClick }) {
+export default function RadioButton({ active, onClick, className }) {
   return (
-    <BG active={active} onClick={onClick}>
+    <BG className={className} active={active} onClick={onClick}>
       {active && <Dot />}
     </BG>
   )

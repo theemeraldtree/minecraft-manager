@@ -13,10 +13,10 @@ import VersionsManager from './versionsManager';
 import LibrariesManager from './librariesManager';
 import logInit from '../util/logger';
 import DownloadsManager from './downloadsManager';
-import LauncherManager from './launcherManager';
 import Global from '../util/global';
 import SettingsManager from './settingsManager';
 import JavaHandler from '../minecraft/javaHandler';
+import MCAccountsHandler from '../minecraft/mcAccountsHandler';
 
 const { exec } = require('child_process');
 const admzip = require('adm-zip');
@@ -155,7 +155,6 @@ const DirectLauncherManager = {
   runCommand(profile, versionJSON) {
     return new Promise(async resolve => {
       const classpath = this.generateClasspath(profile, versionJSON);
-      const launcherProfiles = await FSU.readJSON(LauncherManager.getLauncherProfiles());
 
       let mcArgs = '';
       if (versionJSON.minecraftArguments) {
@@ -186,33 +185,46 @@ const DirectLauncherManager = {
 
       mcArgs = mcArgs.replace(
         '${auth_player_name}',
-        Object.values(launcherProfiles.authenticationDatabase[SettingsManager.currentSettings.mcAccount].profiles)[0]
-          .displayName
-      );
+        MCAccountsHandler.getNameFromUUID(SettingsManager.currentSettings.activeAccount));
       mcArgs = mcArgs.replace('${version_name}', `"${profile.versionname}"`);
       mcArgs = mcArgs.replace('${game_directory}', `"${profile.gameDir}"`);
       mcArgs = mcArgs.replace('${assets_root}', `"${path.join(Global.getMCPath(), '/assets')}"`);
       mcArgs = mcArgs.replace('${assets_index_name}', versionJSON.assets);
       mcArgs = mcArgs.replace(
         '${auth_uuid}',
-        Object.keys(launcherProfiles.authenticationDatabase[SettingsManager.currentSettings.mcAccount].profiles)[0]
+        SettingsManager.currentSettings.activeAccount
       );
       mcArgs = mcArgs.replace(
         '${auth_access_token}',
-        launcherProfiles.authenticationDatabase[SettingsManager.currentSettings.mcAccount].accessToken
+        MCAccountsHandler.getAccessTokenFromUUID(SettingsManager.currentSettings.activeAccount)
       );
       mcArgs = mcArgs.replace('${user_type}', 'mojang');
       mcArgs = mcArgs.replace('${user_properties}', '{}');
 
       if (profile.getPrimaryFramework() === 'none') {
-        mcArgs = mcArgs.replace('${version_type}', 'vanilla');
+        if (versionJSON.type) {
+          mcArgs = mcArgs.replace('${version_type}', versionJSON.type);
+        } else {
+          mcArgs = mcArgs.replace('${version_type}', 'release');
+        }
       } else if (profile.getPrimaryFramework() === 'fabric') {
-        mcArgs = mcArgs.replace('${version_type}', 'Fabric');
+        mcArgs = mcArgs.replace('${version_type}', 'fabric');
       } else if (profile.getPrimaryFramework() === 'forge') {
-        mcArgs = mcArgs.replace('${version_type}', 'Forge');
+        mcArgs = mcArgs.replace('${version_type}', 'forge');
       }
 
-      let finishedJavaArgs = '';
+
+      let remainingArgs = '';
+      if (SettingsManager.currentSettings.java.customArgsActive) {
+        remainingArgs += ` ${SettingsManager.currentSettings.java.customJavaArgs}`;
+      }
+      if (profile.mcm.java?.customJavaArgsActive) {
+        remainingArgs += ` ${profile.mcm.java.customJavaArgs}`;
+      }
+
+      const endJavaArgs = `-Xmx${SettingsManager.currentSettings.dedicatedRam}G ${remainingArgs}`;
+
+      let finishedJavaArgs = `${endJavaArgs}`;
 
       if (!versionJSON.arguments) {
         // no arguments, we have to figure them out ourselves
@@ -224,7 +236,7 @@ const DirectLauncherManager = {
           `/${versionJSON.jar}/${versionJSON.jar}.jar`
         )}"`;
         finishedJavaArgs += ` -cp ${classpath}`;
-        finishedJavaArgs += ' -Xmx8G -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
+        finishedJavaArgs += ' -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
         finishedJavaArgs += ` ${versionJSON.mainClass}`;
         finishedJavaArgs += ` ${mcArgs}`;
       } else if (versionJSON.arguments.jvm) {

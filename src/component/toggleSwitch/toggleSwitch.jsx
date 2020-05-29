@@ -12,6 +12,7 @@ const BG = styled.div`
   align-items: center;
   cursor: pointer;
   transition: 150ms;
+  margin-right: 11px !important;
   ${props => props.active && css`
     background: #16AD77;
   `}
