@@ -87,6 +87,11 @@ const SettingsManager = {
           this.currentSettings.launcherIntegration = true;
         }
 
+        if (this.currentSettings.accounts === undefined) {
+          logger.info('Setting "accounts" was missing. Adding it...');
+          this.currentSettings.accounts = [];
+        }
+
         if (this.currentSettings.analyticsEnabled === undefined && fs.existsSync(Global.PROFILES_PATH)) {
           logger.info('Showing analytics message');
           this.currentSettings.analyticsEnabled = true;
