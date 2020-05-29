@@ -4,6 +4,7 @@ import mkdirp from 'mkdirp';
 import Profile from '../type/profile';
 import Global from '../util/global';
 import SettingsManager from '../manager/settingsManager';
+import FSU from '../util/fsu';
 
 const LatestProfile = new Profile({
   type: 'profile',
@@ -47,6 +48,11 @@ function loadLatestProfile() {
 
   if (!fs.existsSync(path.join(LatestProfile.profilePath, '/_mcm/icons/worlds'))) {
     mkdirp.sync(path.join(LatestProfile.profilePath, '/_mcm/icons/worlds'));
+  }
+
+  if (fs.existsSync(path.join(LatestProfile.profilePath, '/profile.json'))) {
+    const json = FSU.readJSONSync(path.join(LatestProfile.profilePath, '/profile.json'));
+    LatestProfile.mcm = json.mcm;
   }
 
   LatestProfile.version.minecraft.version = Global.MC_VERSIONS[0];

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -19,32 +20,6 @@ import logInit from '../../../util/logger';
 
 const logger = logInit('EditPageAdvanced');
 
-const Panel = styled.div`
-  background-color: #2b2b2b;
-  width: 400px;
-  padding: 10px;
-  margin-bottom: 5px;
-
-  & > div {
-    margin-top: 5px;
-  }
-
-  h3 {
-    margin: 0;
-  }
-
-  button {
-    margin-top: 5px;
-    display: block;
-  }
-
-  &:not(:nth-child(2)) {
-    button {
-      width: 285px;
-      text-align: left;
-    }
-  }
-`;
 
 export default function EditPageAdvanced({ id }) {
   const profile = ProfilesManager.getProfileFromID(id);
@@ -55,12 +30,6 @@ export default function EditPageAdvanced({ id }) {
 
   const [runLatestInIntegrated, setRunLatestInIntegrated] = useState(SettingsManager.currentSettings.runLatestInIntegrated);
 
-  const [syncOptionsTXT, setSyncOptionsTXT] = useState(profile.mcm.syncOptionsTXT);
-  const [syncOptionsOF, setSyncOptionsOF] = useState(profile.mcm.syncOptionsOF);
-  const [syncServers, setSyncServers] = useState(profile.mcm.syncServers);
-  const [currentCopyObject, setCurrentCopyObject] = useState('');
-  const [copyObjectReadable, setCopyObjectReadable] = useState('');
-  const [showCopyOverlay, setShowCopyOverlay] = useState(false);
 
   const snapshotSeperateFolderClick = () => {
     const inverted = !SettingsManager.currentSettings.runSnapshotInSeperateFolder;
@@ -84,80 +53,6 @@ export default function EditPageAdvanced({ id }) {
     LauncherManager.updateGameDir(profile);
   };
 
-  const symlinkFile = (doLink, fileName) => {
-    FSU.deleteFileIfExists(path.join(profile.gameDir, fileName));
-    if (doLink) {
-      FSU.createFileIfMissing(path.join(Global.getMCPath(), fileName));
-      fs.linkSync(path.join(Global.getMCPath(), fileName), path.join(profile.gameDir, fileName));
-    }
-  };
-
-  const syncOptionsTXTClick = () => {
-    const inverted = !syncOptionsTXT;
-
-    logger.info(`{${profile.id}} Setting options.txt sync to ${inverted}`);
-    symlinkFile(inverted, 'options.txt');
-    profile.mcm.syncOptionsTXT = inverted;
-    profile.save();
-
-    setSyncOptionsTXT(inverted);
-  };
-
-  const syncOptionsOFClick = () => {
-    const inverted = !syncOptionsOF;
-
-    logger.info(`{${profile.id}} Setting optionsof.txt sync to ${inverted}`);
-
-    symlinkFile(inverted, 'optionsof.txt');
-    profile.mcm.syncOptionsOF = inverted;
-    profile.save();
-
-    setSyncOptionsOF(!syncOptionsOF);
-  };
-
-  const syncServersClick = () => {
-    const inverted = !syncServers;
-
-    logger.info(`{${profile.id}} Setting servers.dat sync to ${inverted}`);
-
-    symlinkFile(inverted, 'servers.dat');
-    profile.mcm.syncServers = inverted;
-    profile.save();
-
-    setSyncServers(!syncServers);
-  };
-
-  const copyOptionsTXT = () => {
-    setCurrentCopyObject('options.txt');
-    setCopyObjectReadable('in-game Minecraft Options');
-    setShowCopyOverlay(true);
-  };
-
-  const copyOptionsOF = () => {
-    setCurrentCopyObject('optionsof.txt');
-    setCopyObjectReadable('in-game OptiFine Options');
-    setShowCopyOverlay(true);
-  };
-
-  const copyServers = () => {
-    setCurrentCopyObject('servers.dat');
-    setCopyObjectReadable('in-game servers list');
-    setShowCopyOverlay(true);
-  };
-
-  const onCopySelect = prof => {
-    const destGameDir = prof.gameDir;
-    const destObject = path.join(destGameDir, currentCopyObject);
-
-    logger.info(`{${profile.id}} Copying ${currentCopyObject} to ${prof.id}`);
-
-    FSU.deleteFileIfExists(destObject);
-    fs.copyFileSync(path.join(profile.gameDir, currentCopyObject), destObject);
-
-    ToastManager.noticeToast('Copied!');
-
-    setShowCopyOverlay(false);
-  };
 
   const runLatestInIntegratedClick = () => {
     const inverted = !runLatestInIntegrated;

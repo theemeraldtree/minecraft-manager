@@ -6,7 +6,7 @@ import Sidebar from './components/sidebar';
 import EditPageVersions from './versions/editpageversions';
 import NavContext from '../../navContext';
 import EditPageMods from './mods/editpagemods';
-import EditPageAdvanced from './advanced/editpageadvanced';
+import EditPageAdvanced from './advanced/editpageadvancednew';
 import EditPageResourcePacks from './resourcepacks/editpageresourcepacks';
 import ProfilesManager from '../../manager/profilesManager';
 import EditPageWorlds from './worlds/editpageworlds';
@@ -16,6 +16,7 @@ const BG = styled.div`
   flex: 1 1 auto;
   display: flex;
   height: 100%;
+  overflow: hidden;
 `;
 const CC = styled.div`
   margin-left: 130px;

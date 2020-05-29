@@ -8,6 +8,7 @@ import HTTPRequest from '../host/httprequest';
 import Global from '../util/global';
 import DownloadsManager from '../manager/downloadsManager';
 import ToastManager from '../manager/toastManager';
+import ErrorManager from '../manager/errorManager';
 
 /* eslint-disable */
 const JavaHandler = {
@@ -18,8 +19,12 @@ const JavaHandler = {
    * @param {object} [profile] - The profile to use
    */
   getJavaPath(profile) {
-    if (profile && profile.mcm.java?.override) {
-
+    if (profile && profile.mcm.java.overridePath) {
+      if(profile.mcm.java.manual) {
+        return profile.mcm.java.manualPath;
+      }
+      
+      return profile.mcm.java.path;
     } else {
       if(SettingsManager.currentSettings.java.manual) {
         return SettingsManager.currentSettings.java.manualPath;
@@ -86,7 +91,8 @@ const JavaHandler = {
         zip.extractEntryTo(zip.getEntries()[0].entryName, tempExtract, true, true);
   
         fs.readdir(tempExtract, (e, files) => {
-          if(fs.existsSync(to)) rimraf.sync(to);
+          try {
+            if(fs.existsSync(to)) rimraf.sync(to);
           fs.rename(path.join(tempExtract, files[0]), to, () => {
             fs.unlinkSync(tempPath);
     
@@ -96,6 +102,10 @@ const JavaHandler = {
               resolve(version);
             }
           });
+        }catch(e) {
+          ToastManager.createToast('Unable to install Java', ErrorManager.makeReadable(e, 'java'))
+          resolve('error');
+        }
         })
       })
       .catch(() => {

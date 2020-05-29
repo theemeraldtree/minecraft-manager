@@ -216,14 +216,16 @@ const DirectLauncherManager = {
 
 
       let remainingArgs = '';
-      if (SettingsManager.currentSettings.java.customArgsActive) {
-        remainingArgs += ` ${SettingsManager.currentSettings.java.customJavaArgs}`;
+      if (SettingsManager.currentSettings.java.customArgsActive && !profile.mcm.java.overrideArgs) {
+        remainingArgs += `${SettingsManager.currentSettings.java.customJavaArgs}`;
       }
-      if (profile.mcm.java?.customJavaArgsActive) {
-        remainingArgs += ` ${profile.mcm.java.customJavaArgs}`;
+      if (profile.mcm.java.overrideArgs) {
+        remainingArgs += `${profile.mcm.java.customArgs}`;
       }
 
-      const endJavaArgs = `-Xmx${SettingsManager.currentSettings.dedicatedRam}G ${remainingArgs}`;
+      const ramAmount = profile.mcm.java.overrideRam ? profile.mcm.java.dedicatedRam : SettingsManager.currentSettings.dedicatedRam;
+
+      const endJavaArgs = `-Xmx${ramAmount}G ${remainingArgs} `;
 
       let finishedJavaArgs = `${endJavaArgs}`;
 
@@ -276,7 +278,7 @@ const DirectLauncherManager = {
       );
       finishedJavaArgs = finishedJavaArgs.replace('${classpath}', this.generateClasspath(profile, versionJSON));
 
-      exec(`"${JavaHandler.getJavaPath()}" ${finishedJavaArgs}`, {
+      exec(`"${JavaHandler.getJavaPath(profile)}" ${finishedJavaArgs}`, {
         cwd: profile.gameDir
       });
 

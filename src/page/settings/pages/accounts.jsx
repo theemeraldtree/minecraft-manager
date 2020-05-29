@@ -47,6 +47,7 @@ const Account = styled.div`
 const Header = styled.div`
   margin: 10px;
   margin-left: 0;
+  padding: 10px;
   button {
     margin-right: 5px;
   }

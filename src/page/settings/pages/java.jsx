@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Detail, InputHolder, Button, TextInput, withTheme, TextBox, Spinner } from '@theemeraldtree/emeraldui';
+import { Detail, InputHolder, Button, withTheme, TextBox, Spinner } from '@theemeraldtree/emeraldui';
 import os from 'os';
 import path from 'path';
 import SettingsManager from '../../../manager/settingsManager';
@@ -18,6 +18,7 @@ import SettingsRadioButton from '../components/settingsRadioButton';
 import Overlay from '../../../component/overlay/overlay';
 import AlertBackground from '../../../component/alert/alertbackground';
 import useDebounced from '../../../util/useDebounced';
+import PathInput from '../components/pathInput';
 
 const { dialog } = require('electron').remote;
 
@@ -31,12 +32,6 @@ const VersionPanel = styled.div`
     filter: brightness(0.65);
     cursor: not-allowed;
   `}
-`;
-
-const PathInput = styled(TextInput)`
-  cursor: default;
-  font-size: 12pt;
-  width: calc(100% - 100px);
 `;
 
 const RAMError = styled.p`
@@ -82,26 +77,36 @@ const CenterSpinner = styled.div`
   }
 `;
 
-function Java({ theme }) {
-  const [disableStandardJava, setDisableStandardJava] = useState(SettingsManager.currentSettings.java.manual);
+function Java({ theme, profileScope }) {
+  const [disableStandardJava, setDisableStandardJava] = useState(!profileScope ? SettingsManager.currentSettings.java.manual : profileScope.mcm.java.manual);
   const [showJavaDialog, setShowJavaDialog] = useState(false);
   const [javaVersions, setJavaVersions] = useState([]);
-  const [javaPath, setJavaPath] = useState(SettingsManager.currentSettings.java.manualPath);
-  const [ramValue, setRamValue] = useState(SettingsManager.currentSettings.dedicatedRam);
+  const [javaPath, setJavaPath] = useState(!profileScope ? SettingsManager.currentSettings.java.manualPath : profileScope.mcm.java.manualPath);
+  const [ramValue, setRamValue] = useState(!profileScope ? SettingsManager.currentSettings.dedicatedRam : profileScope.mcm.java.dedicatedRam);
   const [ramError, setRamError] = useState('');
-  const [javaArgsActive, setJavaArgsActive] = useState(SettingsManager.currentSettings.java.customArgsActive);
-  const [javaArgs, setJavaArgs] = useState(SettingsManager.currentSettings.java.customJavaArgs);
+  const [javaArgsActive, setJavaArgsActive] = useState(!profileScope ? SettingsManager.currentSettings.java.customArgsActive : profileScope.mcm.java.overrideArgs);
+  const [javaArgs, setJavaArgs] = useState(!profileScope ? SettingsManager.currentSettings.java.customJavaArgs : profileScope.mcm.java.customArgs);
   const [javaInstalling, setJavaInstalling] = useState(false);
-  const [javaReleaseName, setJavaReleaseName] = useState(SettingsManager.currentSettings.java.releaseName);
+  const [javaReleaseName, setJavaReleaseName] = useState(!profileScope ? SettingsManager.currentSettings.java.releaseName : profileScope.mcm.java.releaseName);
+  const [overrideProfileJava, setOverrideProfileJava] = useState(profileScope ? profileScope.mcm.java.overridePath : false);
+  const [overrideProfileRam, setOverrideProfileRam] = useState(profileScope ? profileScope.mcm.java.overrideRam : false);
 
-  const javaArgsDebounced = useDebounced(() => {
-    SettingsManager.currentSettings.java.customJavaArgs = javaArgs;
-    SettingsManager.save();
-  }, 1000);
+  const javaArgsDebounced = useDebounced((args) => {
+    if (!profileScope) {
+      SettingsManager.currentSettings.java.customJavaArgs = args;
+      SettingsManager.save();
+    } else {
+      profileScope.setOverride('java-custom-args', args);
+    }
+  }, 200);
 
-  const ramDebounced = useDebounced(() => {
-    SettingsManager.setDedicatedRam(ramValue);
-  }, 1000);
+  const ramDebounced = useDebounced((ram) => {
+    if (!profileScope) {
+      SettingsManager.setDedicatedRam(ram);
+    } else {
+      profileScope.setOverride('custom-ram', ram);
+    }
+  }, 200);
 
   const osMemory = Math.ceil(os.totalmem() / 1073741824);
 
@@ -111,15 +116,22 @@ function Java({ theme }) {
 
   const installJavaClick = async ver => {
     setJavaInstalling(true);
-    const version = await JavaHandler.installVersion(ver, path.join(Global.MCM_PATH, '/shared/binaries/java/'));
+
+    let installPath;
+    if (!profileScope) installPath = path.join(Global.MCM_PATH, '/shared/binaries/java');
+    if (profileScope) installPath = path.join(profileScope.mcmPath, '/binaries/java/');
+    const version = await JavaHandler.installVersion(ver, installPath);
     setJavaInstalling(false);
     if (version !== 'error') {
-      SettingsManager.currentSettings.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/bin/java.exe');
-      SettingsManager.currentSettings.java.releaseName = version;
-
+      if (!profileScope) {
+        SettingsManager.currentSettings.java.path = path.join(installPath, '/bin/java.exe');
+        SettingsManager.currentSettings.java.releaseName = version;
+        SettingsManager.save();
+      } else {
+        profileScope.setOverride('java-install-path', path.join(installPath, '/bin/java.exe'));
+        profileScope.setOverride('java-releasename', version);
+      }
       setJavaReleaseName(version);
-
-      SettingsManager.save();
     }
   };
 
@@ -145,18 +157,29 @@ function Java({ theme }) {
 
     if (p && p[0]) {
       setJavaPath(p[0]);
-      SettingsManager.currentSettings.java.manualPath = p[0];
-      SettingsManager.currentSettings.java.manual = true;
 
-      SettingsManager.save();
+      if (!profileScope) {
+        SettingsManager.currentSettings.java.manualPath = p[0];
+        SettingsManager.currentSettings.java.manual = true;
+
+        SettingsManager.save();
+      } else {
+        profileScope.setOverride('java-manual-path', p[0]);
+        profileScope.setOverride('java-manual', true);
+      }
     }
   };
 
   const switchBetween = (val) => {
     setDisableStandardJava(val);
-    SettingsManager.currentSettings.java.manual = val;
 
-    SettingsManager.save();
+    if (!profileScope) {
+      SettingsManager.currentSettings.java.manual = val;
+
+      SettingsManager.save();
+    } else {
+      profileScope.setOverride('java-manual', val);
+    }
   };
 
   const ramChange = (value) => {
@@ -169,21 +192,36 @@ function Java({ theme }) {
     } else if (intAmount === 0) {
       setRamError('Please enter a value');
     } else {
-      ramDebounced();
+      ramDebounced(value);
       setRamError('');
     }
   };
 
   const javaArgsToggle = () => {
-    SettingsManager.currentSettings.java.customArgsActive = !javaArgsActive;
-    SettingsManager.save();
+    if (!profileScope) {
+      SettingsManager.currentSettings.java.customArgsActive = !javaArgsActive;
+      SettingsManager.save();
+    } else {
+      profileScope.setOverride('java-args', !javaArgsActive);
+    }
     setJavaArgsActive(!javaArgsActive);
   };
 
 
   const javaArgsChange = e => {
     setJavaArgs(e.target.value);
-    javaArgsDebounced();
+    javaArgsDebounced(e.target.value);
+  };
+
+  const overrideProfileJavaClick = () => {
+    profileScope.setOverride('java-path', !overrideProfileJava);
+    setOverrideProfileJava(!overrideProfileJava);
+  };
+
+  const overrideProfileRamClick = () => {
+    profileScope.setOverride('ram', !overrideProfileRam);
+    profileScope.save();
+    setOverrideProfileRam(!overrideProfileRam);
   };
 
   return (
@@ -206,7 +244,18 @@ function Java({ theme }) {
           </CenterSpinner>
         </AlertBackground>
       </Overlay>
-      <Slider label="Dedicated RAM (GB)" min={1} max={osMemory - 1} step={1} value={ramValue} onChange={ramChange} />
+      {profileScope && (
+        <>
+          <InputHolder>
+            <ToggleSwitch onClick={overrideProfileRamClick} value={overrideProfileRam} />
+            <Detail>Override Global Dedicated RAM Settings</Detail>
+          </InputHolder>
+          <Gap />
+        </>
+      )}
+      <DisabledBox active={!profileScope || (profileScope && overrideProfileRam)}>
+        <Slider label="Dedicated RAM (GB)" min={1} max={osMemory - 1} step={1} value={ramValue} onChange={ramChange} />
+      </DisabledBox>
       {ramError && <RAMError>{ramError}</RAMError>}
       <SettingSeperator />
       <InputHolder>
@@ -221,39 +270,52 @@ function Java({ theme }) {
 
       <SettingSeperator />
 
+      {profileScope && (
+        <>
+          <InputHolder>
+            <ToggleSwitch onClick={overrideProfileJavaClick} value={overrideProfileJava} />
+            <Detail>Override Global Java Settings</Detail>
+          </InputHolder>
+          <Gap />
+        </>
+      )}
+
+
       <InputHolder>
-        <SettingsRadioButton active={!disableStandardJava} onClick={() => switchBetween(false)} />
-        <FadedDetail active={!disableStandardJava}>Let Minecraft Manager handle Java Installation</FadedDetail>
+        <SettingsRadioButton disabled={profileScope && !overrideProfileJava} active={!disableStandardJava} onClick={() => switchBetween(false)} />
+        <FadedDetail active={!(disableStandardJava || (profileScope && !overrideProfileJava))}>Let Minecraft Manager handle Java Installation</FadedDetail>
       </InputHolder>
       <EmptyOffset>
-        <VersionPanel disabled={disableStandardJava}>
+        <VersionPanel disabled={disableStandardJava || (profileScope && !overrideProfileJava)}>
           <p>Currently using JRE version <b>{javaReleaseName}</b></p>
-          <Button disabled={disableStandardJava} onClick={changeJavaVersion} color="green">change version</Button>
+          <Button disabled={disableStandardJava || (profileScope && !overrideProfileJava)} onClick={changeJavaVersion} color="green">change version</Button>
         </VersionPanel>
       </EmptyOffset>
 
       <Gap />
 
       <InputHolder>
-        <SettingsRadioButton active={disableStandardJava} onClick={() => switchBetween(true)} />
-        <FadedDetail active={disableStandardJava}>Manually set Java path</FadedDetail>
+        <SettingsRadioButton disabled={profileScope && !overrideProfileJava} active={disableStandardJava} onClick={() => switchBetween(true)} />
+        <FadedDetail active={(disableStandardJava && !profileScope) || (profileScope && overrideProfileJava && disableStandardJava)}>Manually set Java path</FadedDetail>
       </InputHolder>
       <EmptyOffset>
-        <DisabledBox active={disableStandardJava}>
+        <DisabledBox active={(disableStandardJava && !profileScope) || (profileScope && overrideProfileJava && disableStandardJava)}>
           <InputHolder vertical>
             <PathInput theme={theme} readOnly value={javaPath} />
-            <Button onClick={chooseJavaPath} disabled={!disableStandardJava} color="green">
+            <Button onClick={chooseJavaPath} color="green">
               browse
             </Button>
           </InputHolder>
         </DisabledBox>
       </EmptyOffset>
+
     </>
   );
 }
 
 Java.propTypes = {
-  theme: PropTypes.object
+  theme: PropTypes.object,
+  profileScope: PropTypes.object
 };
 
 export default withTheme(Java);

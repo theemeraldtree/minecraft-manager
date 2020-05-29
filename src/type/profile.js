@@ -51,7 +51,13 @@ export default class Profile extends OAMFAsset {
 
     if (!this.gameDir) this.gameDir = path.join(this.profilePath, '/files');
 
-    if (!this.mcm) this.mcm = {};
+    if (!this.mcm) {
+        this.mcm = {
+        java: {
+
+        }
+    };
+  }
 
     this.subAssetsPath = path.join(this.profilePath, '/_omaf/subAssets');
     this.mcmPath = path.join(this.profilePath, '/_mcm/');
@@ -172,6 +178,55 @@ export default class Profile extends OAMFAsset {
           return assetObj;
         });
     }
+  }
+
+  /**
+   * Overrides a Global setting for this profile
+   * @param {string} setting - The setting to override
+   * @param {boolean} value - The value to set it to
+   */
+  setOverride(setting, value) {
+    switch(setting) {
+      case 'java-path':
+        this.mcm.java.overridePath = value;
+        this.save();
+        return;
+      case 'ram':
+        this.mcm.java.overrideRam = value;
+        this.save();
+        return;
+      case 'custom-ram':
+        this.mcm.java.dedicatedRam = value;
+        this.save();
+        return;
+      case 'java-args':
+        this.mcm.java.overrideArgs = value;
+        this.save();
+        return;
+      case 'java-custom-args':
+        this.mcm.java.customArgs = value;
+        this.save();
+        return;
+      case 'java-install-path':
+        this.mcm.java.path = value;
+        this.save();
+        return;
+      case 'java-releasename':
+        this.mcm.java.releaseName = value;
+        this.save();
+        return;
+      case 'java-manual':
+        this.mcm.java.manual = value;
+        this.save();
+        return;
+      case 'java-manual-path':
+        this.mcm.java.manualPath = value;
+        this.save();
+        return;
+      default:
+        return;
+    }
+
   }
 
   /**
@@ -348,6 +403,7 @@ export default class Profile extends OAMFAsset {
         .catch(e => {
           if(SettingsManager.currentSettings.launcherIntegration) {
             this.logger.info(`Unable to launch Minecraft directly. Opening Launcher instead. Error: ${e.toString()}`);
+            this.logger.info(e.stack);
             LauncherManager.openLauncher();
             if (SettingsManager.currentSettings.closeOnLaunch) {
               remote.getCurrentWindow().close();

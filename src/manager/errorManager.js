@@ -14,6 +14,9 @@ const ErrorManager = {
           }
           return 'That file may be open in another application. Close it, and try again.';
         case 'EPERM':
+          if (context === 'java') {
+            return 'Minecraft may currently be running. Close it, and try again';
+          }
           return `You are missing permissions to modify some files. Try running Minecraft Manager as the administrator. ${error.toString()}`;
         default:
           return error.toString();

@@ -112,6 +112,6 @@ Slider.propTypes = {
   max: PropTypes.number,
   step: PropTypes.number,
   onChange: PropTypes.func,
-  value: PropTypes.number,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   label: PropTypes.string
 };

@@ -19,6 +19,7 @@ import logInit from './util/logger';
 import FSU from './util/fsu';
 import theemeraldtreeLogo from './page/settings/img/theemeraldtree-logo.png';
 import Analytics from './util/analytics';
+import MCLauncherIntegrationHandler from './minecraft/mcLauncherIntegrationHandler';
 
 const logger = logInit('index');
 
@@ -122,6 +123,11 @@ async function load() {
 
   logger.info('Caching images...');
   Global.cacheImage(theemeraldtreeLogo);
+
+  if (SettingsManager.currentSettings.launcherIntegration) {
+    logger.info('Reintregating...');
+    MCLauncherIntegrationHandler.integrate();
+  }
 
   // eslint-disable-next-line react/jsx-filename-extension
   ReactDOM.render(<App />, document.getElementById('app'));
