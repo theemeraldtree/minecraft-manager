@@ -329,33 +329,38 @@ export default class Profile extends OAMFAsset {
 
   launch() {
     MCVersionHandler.updateProfile(this);
-    DirectLauncherManager.launch(this);
-    // if (!LauncherManager.profileExists(this)) {
-    //   LauncherManager.createProfile(this);
-    // }
+    if (SettingsManager.currentSettings.launcherIntegration && !LauncherManager.profileExists(this)) {
+      LauncherManager.createProfile(this);
+    }
 
-    // this.addIconToLauncher();
-    // LauncherManager.updateVersion(this);
-    // LauncherManager.setMostRecentProfile(this);
+    this.addIconToLauncher();
+    LauncherManager.updateVersion(this);
+    LauncherManager.setMostRecentProfile(this);
 
-    // return new Promise(resolve => {
-    //   DirectLauncherManager.launch(this)
-    //     .then(() => {
-    //       if (SettingsManager.currentSettings.closeOnLaunch) {
-    //         remote.getCurrentWindow().close();
-    //       }
-    //       resolve();
-    //     })
-    //     .catch(e => {
-    //       this.logger.info(`Unable to launch Minecraft directly. Opening Launcher instead. Error: ${e.toString()}`);
-    //       LauncherManager.openLauncher();
-    //       if (SettingsManager.currentSettings.closeOnLaunch) {
-    //         remote.getCurrentWindow().close();
-    //         resolve();
-    //       }
-    //       resolve();
-    //     });
-    // });
+    return new Promise(resolve => {
+      DirectLauncherManager.launch(this)
+        .then(() => {
+          if (SettingsManager.currentSettings.closeOnLaunch) {
+            remote.getCurrentWindow().close();
+          }
+          resolve();
+        })
+        .catch(e => {
+          if(SettingsManager.currentSettings.launcherIntegration) {
+            this.logger.info(`Unable to launch Minecraft directly. Opening Launcher instead. Error: ${e.toString()}`);
+            LauncherManager.openLauncher();
+            if (SettingsManager.currentSettings.closeOnLaunch) {
+              remote.getCurrentWindow().close();
+              resolve();
+            }
+            resolve();
+          }else{
+            this.logger(`Unable to launch Minecraft directly. Not launcher integrated. Error: ${e.toString()}`);
+            ToastManager.createToast('Unable to launch', `${e.toString()}`);
+            resolve();
+          }
+        });
+    });
   }
 
   removeAllMods() {

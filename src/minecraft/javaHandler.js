@@ -7,6 +7,7 @@ import SettingsManager from '../manager/settingsManager';
 import HTTPRequest from '../host/httprequest';
 import Global from '../util/global';
 import DownloadsManager from '../manager/downloadsManager';
+import ToastManager from '../manager/toastManager';
 
 /* eslint-disable */
 const JavaHandler = {
@@ -74,25 +75,33 @@ const JavaHandler = {
       }
   
       const tempPath = path.join(Global.MCM_TEMP, `/java-install-${new Date().getTime()}.zip`);
-      await DownloadsManager.startFileDownload(`Java ${version}`, url, tempPath);
-      
-      const tempExtract = path.join(Global.MCM_TEMP, `/java-extract-${new Date().getTime()}`);
 
-      const zip = new AdmZip(tempPath);
-      zip.extractEntryTo(zip.getEntries()[0].entryName, tempExtract, true, true);
+        
+      DownloadsManager.startFileDownload(`Java ${version}`, url, tempPath, {
+        disableErrorToast: true
+      }).then(() => {
+        const tempExtract = path.join(Global.MCM_TEMP, `/java-extract-${new Date().getTime()}`);
 
-      fs.readdir(tempExtract, (e, files) => {
-        if(fs.existsSync(to)) rimraf.sync(to);
-        fs.rename(path.join(tempExtract, files[0]), to, () => {
-          fs.unlinkSync(tempPath);
+        const zip = new AdmZip(tempPath);
+        zip.extractEntryTo(zip.getEntries()[0].entryName, tempExtract, true, true);
   
-          if(version === 'latest') {
-            resolve(files[0]);
-          }else{
-            resolve(version);
-          }
-        });
+        fs.readdir(tempExtract, (e, files) => {
+          if(fs.existsSync(to)) rimraf.sync(to);
+          fs.rename(path.join(tempExtract, files[0]), to, () => {
+            fs.unlinkSync(tempPath);
+    
+            if(version === 'latest') {
+              resolve(files[0]);
+            }else{
+              resolve(version);
+            }
+          });
+        })
       })
+      .catch(() => {
+        ToastManager.createToast('Unable to download Java', `Check your internet connection, and try again`);
+        resolve('error');
+      });
     });
   }
 }

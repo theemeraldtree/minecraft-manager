@@ -17,6 +17,7 @@ import QuestionButton from '../../../component/questionButton/questionButton';
 import SettingsRadioButton from '../components/settingsRadioButton';
 import Overlay from '../../../component/overlay/overlay';
 import AlertBackground from '../../../component/alert/alertbackground';
+import useDebounced from '../../../util/useDebounced';
 
 const { dialog } = require('electron').remote;
 
@@ -93,6 +94,15 @@ function Java({ theme }) {
   const [javaInstalling, setJavaInstalling] = useState(false);
   const [javaReleaseName, setJavaReleaseName] = useState(SettingsManager.currentSettings.java.releaseName);
 
+  const javaArgsDebounced = useDebounced(() => {
+    SettingsManager.currentSettings.java.customJavaArgs = javaArgs;
+    SettingsManager.save();
+  }, 1000);
+
+  const ramDebounced = useDebounced(() => {
+    SettingsManager.setDedicatedRam(ramValue);
+  }, 1000);
+
   const osMemory = Math.ceil(os.totalmem() / 1073741824);
 
   const changeJavaVersion = () => {
@@ -103,16 +113,23 @@ function Java({ theme }) {
     setJavaInstalling(true);
     const version = await JavaHandler.installVersion(ver, path.join(Global.MCM_PATH, '/shared/binaries/java/'));
     setJavaInstalling(false);
-    SettingsManager.currentSettings.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/bin/java.exe');
-    SettingsManager.currentSettings.java.releaseName = version;
+    if (version !== 'error') {
+      SettingsManager.currentSettings.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/bin/java.exe');
+      SettingsManager.currentSettings.java.releaseName = version;
 
-    setJavaReleaseName(version);
+      setJavaReleaseName(version);
 
-    SettingsManager.save();
+      SettingsManager.save();
+    }
   };
 
   const getJavaVersions = async () => {
-    setJavaVersions(await JavaHandler.getJavaVersionsForInstaller());
+    setJavaVersions([]);
+    try {
+      setJavaVersions(await JavaHandler.getJavaVersionsForInstaller());
+    } catch (e) {
+      setJavaVersions(['network-error']);
+    }
   };
 
   const chooseJavaPath = () => {
@@ -126,7 +143,7 @@ function Java({ theme }) {
       ]
     });
 
-    if (p[0]) {
+    if (p && p[0]) {
       setJavaPath(p[0]);
       SettingsManager.currentSettings.java.manualPath = p[0];
       SettingsManager.currentSettings.java.manual = true;
@@ -152,7 +169,7 @@ function Java({ theme }) {
     } else if (intAmount === 0) {
       setRamError('Please enter a value');
     } else {
-      SettingsManager.setDedicatedRam(value);
+      ramDebounced();
       setRamError('');
     }
   };
@@ -163,10 +180,10 @@ function Java({ theme }) {
     setJavaArgsActive(!javaArgsActive);
   };
 
+
   const javaArgsChange = e => {
     setJavaArgs(e.target.value);
-    SettingsManager.currentSettings.java.customJavaArgs = e.target.value;
-    SettingsManager.save();
+    javaArgsDebounced();
   };
 
   return (
@@ -189,7 +206,7 @@ function Java({ theme }) {
           </CenterSpinner>
         </AlertBackground>
       </Overlay>
-      <Slider label="Dedicated RAM (GB)" min={1} max={osMemory} step={1} value={ramValue} onChange={ramChange} />
+      <Slider label="Dedicated RAM (GB)" min={1} max={osMemory - 1} step={1} value={ramValue} onChange={ramChange} />
       {ramError && <RAMError>{ramError}</RAMError>}
       <SettingSeperator />
       <InputHolder>
@@ -210,7 +227,7 @@ function Java({ theme }) {
       </InputHolder>
       <EmptyOffset>
         <VersionPanel disabled={disableStandardJava}>
-          <p>Currently using AdoptOpenJDK JRE version <b>{javaReleaseName}</b></p>
+          <p>Currently using JRE version <b>{javaReleaseName}</b></p>
           <Button disabled={disableStandardJava} onClick={changeJavaVersion} color="green">change version</Button>
         </VersionPanel>
       </EmptyOffset>

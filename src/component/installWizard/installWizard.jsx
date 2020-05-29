@@ -12,6 +12,15 @@ const Loading = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-flow: column;
+
+  p:nth-child(2) {
+    margin: 0;
+  }
+
+  h2 {
+    margin-bottom: 5px;
+  }
 `;
 
 const ModeChooser = styled.div`
@@ -76,6 +85,14 @@ const FrameworkVersion = styled(Button)`
   }
 `;
 
+const TryAgain = styled.p`
+  margin: 0;
+  color: lightblue;
+  font-size: 14pt;
+  cursor: pointer;
+`;
+
+
 export default function InstallWizard({ show, name, cancelClick, installClick, versions, getVersions }) {
   const [displayState, setDisplayState] = useState('simple');
   const [allVersions, setAllVersions] = useState([]);
@@ -94,6 +111,10 @@ export default function InstallWizard({ show, name, cancelClick, installClick, v
   const simpleInstallClick = () => {
     installClick('latest');
     cancelClick();
+  };
+
+  const tryAgain = () => {
+    getVersions();
   };
 
   return (
@@ -128,7 +149,7 @@ export default function InstallWizard({ show, name, cancelClick, installClick, v
               <p>Choose the version of {name} you want to install</p>
               <VersionsList>
                 {
-                  allVersions.map(version => (
+                  allVersions.length >= 1 && allVersions[0] !== 'network-error' && allVersions.map(version => (
                     <FrameworkVersion
                       color="#121212"
                       dimHoverEffect
@@ -142,6 +163,13 @@ export default function InstallWizard({ show, name, cancelClick, installClick, v
                       {version.name}
                     </FrameworkVersion>
                   ))}
+                {allVersions.length === 1 && allVersions[0] === 'network-error' && (
+                <Loading>
+                  <h2>Network Error</h2>
+                  <p>Check your internet connection</p>
+                  <TryAgain onClick={tryAgain}>try again</TryAgain>
+                </Loading>
+                )}
                 {allVersions.length === 0 && (
                   <Loading>
                     <Spinner />

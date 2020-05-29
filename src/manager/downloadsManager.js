@@ -12,26 +12,26 @@ const logger = logInit('DownloadsManager');
 const DownloadsManager = {
   activeDownloads: [],
   downloadUpdateFunc: null,
-  startFileDownload(downloadName, file, downloadPath) {
+  startFileDownload(downloadName, file, downloadPath, opts) {
     return new Promise((resolve, reject) => {
       if (file) {
-        const download = new Download(downloadName, file, downloadPath);
+        const download = new Download(downloadName, file, downloadPath, opts);
         this.activeDownloads.push(download);
         if (this.onDownload) {
           this.downloadUpdate();
         }
         HTTPRequest.download(file, downloadPath, progress => {
           this.handleDownloadProgress(download, progress);
-        })
+        }, opts)
           .then(() => {
             this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
             this.downloadUpdate();
             resolve();
           })
-          .catch(() => {
+          .catch((e) => {
             this.activeDownloads.splice(this.activeDownloads.indexOf(download), 1);
             this.downloadUpdate();
-            reject();
+            reject(e);
           });
       } else {
         logger.error('Missing file download path');

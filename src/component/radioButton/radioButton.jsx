@@ -14,7 +14,7 @@ const BG = styled.button`
   cursor: pointer;
   transition: filter 150ms; 
   ${props => props.active && css`
-    background: #16AD77;
+    background: rgb(19, 140, 10);
   `}
   &:hover {
     filter: brightness(1.5);

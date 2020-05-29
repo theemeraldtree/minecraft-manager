@@ -145,6 +145,9 @@ const MCAccountsHandler = {
   },
   getNameFromUUID(uuid) {
     return SettingsManager.currentSettings.accounts.find(acc => acc.uuid === uuid).name;
+  },
+  getAccountFromUUID(uuid) {
+    return SettingsManager.currentSettings.accounts.find(acc => acc.uuid === uid);
   }
 };
 

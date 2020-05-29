@@ -17,6 +17,7 @@ import Global from '../util/global';
 import SettingsManager from './settingsManager';
 import JavaHandler from '../minecraft/javaHandler';
 import MCAccountsHandler from '../minecraft/mcAccountsHandler';
+import AlertManager from './alertManager';
 
 const { exec } = require('child_process');
 const admzip = require('adm-zip');
@@ -290,6 +291,12 @@ const DirectLauncherManager = {
   launch(profile) {
     return new Promise(async (resolve, reject) => {
       try {
+        if (!MCAccountsHandler.getAccountFromUUID(SettingsManager.currentSettings.activeAccount)) {
+          logger.info('No active account. Unable to launch.');
+          AlertManager.messageBox('no account', 'You don\'t have an account setup. Go to Settings > Accounts to add one.');
+          resolve();
+          return;
+        }
         logger.info(`Launching ${profile.id} directly`);
         const versionJSON = await this.getVersionJSON(profile);
 
