@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Detail } from '@theemeraldtree/emeraldui';
 
 const Container = styled.div`
@@ -22,6 +22,9 @@ const TB = styled.input.attrs({
   padding-left: 5px;
   padding-right: 5px;
   font-size: 15pt;
+  ${props => props.disabled && css`
+    cursor: default;
+  `}
   &:focus {
     outline: none;
   }
@@ -52,12 +55,18 @@ const Input = styled.input.attrs(props => ({
     cursor: pointer;
     -webkit-appearance: none;
     margin-top: -6px;
+    ${props => props.disabled && css`
+      cursor: default;
+    `}
   }
   &::-webkit-slider-runnable-track {
     width: 100%;
     height: 3px;
     cursor: pointer;
     background: #454547;
+    ${props => props.disabled && css`
+      cursor: default;
+    `}
   }
 `;
 
@@ -83,7 +92,7 @@ const Title = styled(Detail)`
   top: 0;
 `;
 
-export default function Slider({ onChange, label, value, min, max, step }) {
+export default function Slider({ onChange, disabled, label, value, min, max, step }) {
   const changeHandler = e => {
     onChange(e.target.value);
   };
@@ -99,8 +108,8 @@ export default function Slider({ onChange, label, value, min, max, step }) {
   return (
     <Container>
       <Title>{label}</Title>
-      <TB onChange={changeInputHandler} value={value} min={min} max={max} />
-      <Input value={value} onChange={changeHandler} min={min} max={max} step={step} />
+      <TB onChange={changeInputHandler} disabled={disabled} value={value} min={min} max={max} />
+      <Input disabled={disabled} value={value} onChange={changeHandler} min={min} max={max} step={step} />
       <LabelBeginning>{min}</LabelBeginning>
       <LabelEnd>{max}</LabelEnd>
     </Container>
@@ -113,5 +122,6 @@ Slider.propTypes = {
   step: PropTypes.number,
   onChange: PropTypes.func,
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-  label: PropTypes.string
+  label: PropTypes.string,
+  disabled: PropTypes.bool
 };

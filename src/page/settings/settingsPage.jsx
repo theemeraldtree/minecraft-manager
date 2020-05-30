@@ -102,20 +102,20 @@ export default function SettingsPage() {
           <Item onClick={() => setSettingsPage('about')} active={settingsPage === 'about'}>
             about
           </Item>
-          <Item onClick={() => setSettingsPage('general')} active={settingsPage === 'general'}>
-            general
-          </Item>
           <Item onClick={() => setSettingsPage('accounts')} active={settingsPage === 'accounts'}>
             accounts
+          </Item>
+          <Item onClick={() => setSettingsPage('general')} active={settingsPage === 'general'}>
+            general
           </Item>
           <Item onClick={() => setSettingsPage('java')} active={settingsPage === 'java'}>
             java
           </Item>
-          <Item onClick={() => setSettingsPage('defaults')} active={settingsPage === 'defaults'}>
-            defaults
-          </Item>
           <Item onClick={() => setSettingsPage('launcher')} active={settingsPage === 'launcher'}>
             integration
+          </Item>
+          <Item onClick={() => setSettingsPage('defaults')} active={settingsPage === 'defaults'}>
+            defaults
           </Item>
           <Item onClick={() => setSettingsPage('help')} active={settingsPage === 'help'}>
             help

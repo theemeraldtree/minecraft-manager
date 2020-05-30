@@ -11,6 +11,9 @@ import ToastManager from '../../../../manager/toastManager';
 import logInit from '../../../../util/logger';
 import Global from '../../../../util/global';
 import FSU from '../../../../util/fsu';
+import SettingsManager from '../../../../manager/settingsManager';
+import LauncherManager from '../../../../manager/launcherManager';
+import LatestProfile from '../../../../defaultProfiles/latestProfile';
 
 const Panel = styled.div`
   background-color: #2b2b2b;
@@ -29,13 +32,8 @@ const Panel = styled.div`
   button {
     margin-top: 5px;
     display: block;
-  }
-
-  &:not(:nth-child(2)) {
-    button {
-      width: 285px;
-      text-align: left;
-    }
+    width: 285px;
+    text-align: left;
   }
 `;
 
@@ -49,6 +47,13 @@ export default function Sync(params) {
   const [currentCopyObject, setCurrentCopyObject] = useState('');
   const [copyObjectReadable, setCopyObjectReadable] = useState('');
   const [showCopyOverlay, setShowCopyOverlay] = useState(false);
+
+  const [runLatestInIntegrated, setRunLatestInIntegrated] = useState(SettingsManager.currentSettings.runLatestInIntegrated);
+
+  const [runSnapshotInSeperateFolder, setRunSnapshotInSeperateFolder] = useState(
+    SettingsManager.currentSettings.runSnapshotInSeperateFolder
+  );
+
 
   const symlinkFile = (doLink, fileName) => {
     FSU.deleteFileIfExists(path.join(profile.gameDir, fileName));
@@ -125,6 +130,53 @@ export default function Sync(params) {
     setShowCopyOverlay(false);
   };
 
+  const runLatestInIntegratedClick = () => {
+    const inverted = !runLatestInIntegrated;
+    setRunLatestInIntegrated(inverted);
+    SettingsManager.currentSettings.runLatestInIntegrated = inverted;
+    SettingsManager.save();
+
+    if (!inverted) {
+      profile.gameDir = path.join(profile.profilePath, 'files');
+      profile.worlds = [];
+      profile.resourcepacks = [];
+      profile.save();
+      Global.scanProfile(profile);
+    } else {
+      profile.gameDir = Global.getMCPath();
+      profile.worlds = [];
+      profile.resourcepacks = [];
+      profile.save();
+      Global.scanProfile(profile);
+    }
+  };
+
+  const snapshotSeperateFolderClick = () => {
+    const inverted = !SettingsManager.currentSettings.runSnapshotInSeperateFolder;
+
+    logger.info(`Setting runSnapshotInSeperateFolder to ${inverted}`);
+    if (inverted) {
+      profile.gameDir = path.join(profile.profilePath, 'files');
+      profile.worlds = [];
+      profile.resourcepacks = [];
+      profile.save();
+      Global.scanProfile(profile);
+    } else {
+      profile.gameDir = Global.getMCPath();
+      profile.worlds = LatestProfile.worlds;
+      profile.resourcepacks = LatestProfile.resourcepacks;
+    }
+    setRunSnapshotInSeperateFolder(inverted);
+    profile.save();
+    SettingsManager.currentSettings.runSnapshotInSeperateFolder = inverted;
+    SettingsManager.save();
+
+    if (SettingsManager.currentSettings.launcherIntegration) {
+      LauncherManager.updateGameDir(profile);
+    }
+  };
+
+
   return (
     <>
       <Overlay in={showCopyOverlay}>
@@ -166,17 +218,38 @@ export default function Sync(params) {
         </>
         )}
 
+        {fs.existsSync(path.join(profile.gameDir, 'options.txt')) && (
+
         <Button color="green" onClick={copyOptionsTXT}>
           copy in-game minecraft options to...
         </Button>
 
+        )}
+        {fs.existsSync(path.join(profile.gameDir, 'optionsof.txt')) && (
         <Button color="green" onClick={copyOptionsOF}>
           copy in-game optifine options to...
         </Button>
+        )}
 
+        {fs.existsSync(path.join(profile.gameDir, 'servers.dat')) && (
         <Button color="green" onClick={copyServers}>
           copy in-game servers list to...
         </Button>
+        )}
+
+        {profile.id === '0-default-profile-latest' && (
+        <InputHolder>
+          <Checkbox lighter checked={runLatestInIntegrated} onClick={runLatestInIntegratedClick} />
+          Run in the Minecraft Home Directory
+        </InputHolder>
+          )}
+
+        {profile.id === '0-default-profile-snapshot' && (
+        <InputHolder>
+          <Checkbox lighter checked={runSnapshotInSeperateFolder} onClick={snapshotSeperateFolderClick} />
+          Run in a seperate game directory from Latest release
+        </InputHolder>
+          )}
       </Panel>
     </>
   );

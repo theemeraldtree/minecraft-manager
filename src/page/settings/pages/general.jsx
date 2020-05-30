@@ -1,131 +1,14 @@
-import React, { useState, useReducer } from 'react';
-import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import { Button, TextInput, Detail, Checkbox, InputHolder, Dropdown, withTheme } from '@theemeraldtree/emeraldui';
-import path from 'path';
+import React, { useReducer } from 'react';
+import { Detail, InputHolder } from '@theemeraldtree/emeraldui';
 import SettingsManager from '../../../manager/settingsManager';
-import Global from '../../../util/global';
+import ToggleSwitch from '../../../component/toggleSwitch/toggleSwitch';
+import SettingSeperator from '../../../component/settingSeparator/settingSeparator';
+import Gap from '../components/gap';
 import ProfilesManager from '../../../manager/profilesManager';
-import LauncherManager from '../../../manager/launcherManager';
-import InstallWizard from '../../../component/installWizard/installWizard';
-import JavaHandler from '../../../minecraft/javaHandler';
+import Description from '../components/description';
 
-const { dialog } = require('electron').remote;
-const os = require('os');
-
-const Settings = styled.div`
-  margin: 10px;
-`;
-
-const WarningMSG = styled.p`
-  color: red;
-`;
-
-const PathInput = styled(TextInput)`
-  && {
-    width: 590px;
-    font-size: 13pt;
-  }
-`;
-
-const LaunchContainer = styled.div`
-  margin-top: 30px;
-`;
-
-function getMCAccounts() {
-  const final = [];
-  const accounts = LauncherManager.getMCAccounts();
-  Object.keys(accounts).forEach(acc => {
-    final.push({
-      id: acc,
-      name: Object.values(accounts[acc].profiles)[0].displayName
-    });
-  });
-
-  return final;
-}
-
-function General({ theme }) {
-  const [mcHome, setMCHome] = useState(SettingsManager.MC_HOME);
-  const [mcExe, setMCExe] = useState(SettingsManager.currentSettings.mcExe);
-  const [dedicatedRam, setDedicatedRam] = useState(SettingsManager.currentSettings.dedicatedRam);
-  const [ramChangeDisabled, setRamChangeDisabled] = useState(true);
-  const [warningMessage, setWarningMessage] = useState('');
+function General() {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
-  const [minecraftAccounts] = useState(getMCAccounts());
-  const [javaPath, setJavaPath] = useState(SettingsManager.currentSettings.java.path);
-  const [javaVersions, setJavaVersions] = useState([]);
-  const [showJavaInstaller, setShowJavaInstaller] = useState(false);
-
-  const chooseHomeDirectory = () => {
-    const p = dialog.showOpenDialog({
-      title: 'Choose your Minecraft Home Directory',
-      defaultPath: Global.getDefaultMinecraftPath(),
-      buttonLabel: 'Select Directory',
-      properties: ['openDirectory', 'showHiddenFiles']
-    });
-
-    if (p[0]) {
-      SettingsManager.setHomeDirectory(p[0]);
-      setMCHome(p[0]);
-    }
-  };
-
-  const chooseMCExe = () => {
-    let properties;
-    if (os.platform() === 'win32') {
-      properties = ['openFile', 'showHiddenFiles'];
-    } else if (os.platform() === 'darwin') {
-      properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory'];
-    }
-    const p = dialog.showOpenDialog({
-      title: 'Choose your Minecraft Executable',
-      defaultPath: Global.getDefaultMCExePath(),
-      buttonLabel: 'Select File',
-      properties
-    });
-
-    if (p[0]) {
-      SettingsManager.setMCExe(p[0]);
-      setMCExe(p[0]);
-    }
-  };
-
-  const ramAmountChange = e => {
-    const newAmount = e.target.value;
-    const oldAmount = SettingsManager.currentSettings.dedicatedRam.toString();
-
-    if (/^[0-9\b]+$/.test(newAmount) || newAmount === '') {
-      setRamChangeDisabled(true);
-      setDedicatedRam(newAmount);
-      const intAmount = parseInt(newAmount);
-      if (intAmount >= Math.ceil(os.totalmem() / 1073741824)) {
-        setWarningMessage('That is equal to or higher than your available RAM! Please set it lower!');
-      } else if (newAmount === '') {
-        setWarningMessage('Please enter a value');
-      } else if (intAmount === 0) {
-        setWarningMessage('You need to provide SOME amount of RAM!');
-      } else {
-        setRamChangeDisabled(newAmount === oldAmount);
-        setWarningMessage('');
-      }
-    }
-  };
-
-  const javaPathChange = e => {
-    setJavaPath(e.target.value);
-  };
-
-  const changeJavaPath = () => {
-    SettingsManager.currentSettings.java.path = javaPath;
-  };
-
-  const changeRAM = () => {
-    if (!ramChangeDisabled) {
-      SettingsManager.setDedicatedRam(dedicatedRam);
-      setRamChangeDisabled(true);
-    }
-  };
 
   const toggleSetting = setting => {
     SettingsManager.currentSettings[setting] = !SettingsManager.currentSettings[setting];
@@ -133,116 +16,76 @@ function General({ theme }) {
     forceUpdate();
   };
 
-  const allowSnapshotProfileClick = () => {
-    toggleSetting('allowSnapshotProfile');
-    ProfilesManager.getProfiles();
-  };
-
-  const checkToastNewsClick = () => {
-    toggleSetting('checkToastNews');
-  };
-
-  const closeOnLaunchClick = () => {
-    toggleSetting('closeOnLaunch');
-  };
-
-  const changeMCAccount = acc => {
-    SettingsManager.currentSettings.mcAccount = acc;
-    SettingsManager.save();
-    forceUpdate();
-  };
-
-  const getJavaVersions = async () => {
-    setJavaVersions(await JavaHandler.getJavaVersionsForInstaller());
-  };
-
-  const installJavaClick = async (ver) => {
-    await JavaHandler.installVersion(ver, path.join(Global.MCM_PATH, '/shared/binaries/java/'));
-  };
-
-  const installJavaCancelClick = () => {
-    setShowJavaInstaller(false);
-  };
-
   return (
     <>
-      <Settings>
-        <InputHolder vertical>
-          <Detail>minecraft home directory</Detail>
-          <div>
-            <PathInput theme={theme} disabled value={mcHome} />
-            <Button onClick={chooseHomeDirectory} color="green">
-              choose
-            </Button>
-          </div>
-        </InputHolder>
-        <InputHolder vertical>
-          <Detail>minecraft executable</Detail>
-          <div>
-            <PathInput theme={theme} disabled value={mcExe} />
-            <Button onClick={chooseMCExe} color="green">
-              choose
-            </Button>
-          </div>
-        </InputHolder>
-        <InputHolder vertical>
-          <Detail>dedicated ram (gb)</Detail>
-          <div>
-            <TextInput onChange={ramAmountChange} value={dedicatedRam} />
-            <Button disabled={ramChangeDisabled} onClick={changeRAM} color="green">
-              change
-            </Button>
-          </div>
-          <WarningMSG>{warningMessage}</WarningMSG>
-        </InputHolder>
-        <InputHolder>
-          <Checkbox
-            checked={SettingsManager.currentSettings.allowSnapshotProfile}
-            lighter
-            onClick={allowSnapshotProfileClick}
-          />
-          <Detail>show latest snapshot profile</Detail>
-        </InputHolder>
-        <InputHolder>
-          <Checkbox checked={SettingsManager.currentSettings.checkToastNews} lighter onClick={checkToastNewsClick} />
-          <Detail>check for news on startup</Detail>
-        </InputHolder>
-        <InputHolder>
-          <Checkbox checked={SettingsManager.currentSettings.analyticsEnabled} lighter onClick={() => toggleSetting('analyticsEnabled')} />
-          <Detail>enable anonymous, privacy-respecting analytics</Detail>
-        </InputHolder>
-        <InputHolder>
-          <Checkbox checked={SettingsManager.currentSettings.closeOnLaunch} lighter onClick={closeOnLaunchClick} />
-          <Detail>close minecraft manager on profile launch</Detail>
-        </InputHolder>
-        <LaunchContainer>
-          <Detail>Minecraft account to use for Launching</Detail>
-          <Dropdown
-            items={minecraftAccounts}
-            value={SettingsManager.currentSettings.mcAccount}
-            onChange={changeMCAccount}
-          />
-          <Detail>Add an account via the standard Minecraft Launcher</Detail>
-        </LaunchContainer>
-        <InputHolder>
-          <Detail>java path</Detail>
-          <div>
-            <TextInput onChange={javaPathChange} value={javaPath} />
-            <Button onClick={changeJavaPath} color="green">
-              change
-            </Button>
-          </div>
-        </InputHolder>
+      <Gap />
 
-        <Button onClick={() => setShowJavaInstaller(true)}>install java</Button>
-        <InstallWizard cancelClick={installJavaCancelClick} installClick={installJavaClick} name="Java" show={showJavaInstaller} versions={javaVersions} getVersions={getJavaVersions} />
-      </Settings>
+      <InputHolder vertical>
+        <div>
+
+          <ToggleSwitch
+            value={SettingsManager.currentSettings.allowSnapshotProfile}
+            onClick={() => {
+            toggleSetting('allowSnapshotProfile');
+            ProfilesManager.getProfiles();
+          }}
+          />
+          <Detail>Show Latest Snapshot Profile</Detail>
+        </div>
+        <Description>
+          Enabled the Latest Snapshot Profile, which runs the latest Minecraft Snapshot. Snapshots may be unstable and buggy.
+        </Description>
+      </InputHolder>
+
+      <SettingSeperator />
+
+      <InputHolder vertical>
+        <div>
+
+          <ToggleSwitch
+            value={SettingsManager.currentSettings.checkToastNews}
+            onClick={() => toggleSetting('checkToastNews')}
+          />
+          <Detail>Check for News Snippets on startup</Detail>
+        </div>
+        <Description>
+          News snippets may include Minecraft Manager news or fun announcements.
+        </Description>
+      </InputHolder>
+
+      <SettingSeperator />
+
+      <InputHolder vertical>
+        <div>
+          <ToggleSwitch
+            value={SettingsManager.currentSettings.analyticsEnabled}
+            onClick={() => toggleSetting('analyticsEnabled')}
+          />
+          <Detail>Enable Analytics</Detail>
+        </div>
+        <Description>
+          Minecraft Manager contains fully-anonymous, privacy respecting analytics.
+          No system information, or data of any kind is sent to Minecraft Manager or theemeraldtree.
+        </Description>
+      </InputHolder>
+
+      <SettingSeperator />
+
+      <InputHolder vertical>
+        <div>
+
+          <ToggleSwitch
+            value={SettingsManager.currentSettings.closeOnLaunch}
+            onClick={() => toggleSetting('closeOnLaunch')}
+          />
+          <Detail>Close Minecraft Manager on profile launch</Detail>
+        </div>
+        <Description>
+          The Minecraft Manager window will be closed when you launch a Profile.
+        </Description>
+      </InputHolder>
     </>
   );
 }
 
-General.propTypes = {
-  theme: PropTypes.object
-};
-
-export default withTheme(General);
+export default General;

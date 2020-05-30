@@ -5,6 +5,7 @@ import HeaderButton from '../../../component/headerButton/headerButton';
 import ProfileSettingsJava from './pages/java';
 import ProfilesManager from '../../../manager/profilesManager';
 import Sync from './pages/sync';
+import Other from './pages/other';
 
 const Header = styled.div`
   margin-top: 10px;
@@ -48,6 +49,7 @@ export default function EditPageAdvanced({ id }) {
       <Content>
         {currentPage === 'java' && <ProfileSettingsJava profile={profile} />}
         {currentPage === 'sync' && <Sync profile={profile} />}
+        {currentPage === 'other' && <Other profile={profile} />}
       </Content>
     </Container>
   );

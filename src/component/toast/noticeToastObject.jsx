@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled, { keyframes, css } from 'styled-components';
 import ToastManager from '../../manager/toastManager';
@@ -54,12 +54,17 @@ const Text = styled.p`
 
 export default function NoticeToastObject({ id, text }) {
   const [slideOut, setSlideOut] = useState(false);
-  setTimeout(() => {
-    setSlideOut(true);
+
+
+  useEffect(() => {
     setTimeout(() => {
-      ToastManager.dismissToast(id);
-    }, 300);
-  }, 1000);
+      setSlideOut(true);
+      setTimeout(() => {
+        ToastManager.dismissToast(id);
+      }, 300);
+    }, 1000);
+  }, []);
+
 
   return (
     <BG slideOut={slideOut}>
@@ -69,6 +74,6 @@ export default function NoticeToastObject({ id, text }) {
 }
 
 NoticeToastObject.propTypes = {
-  id: PropTypes.string.isRequired,
+  id: PropTypes.string,
   text: PropTypes.string.isRequired
 };

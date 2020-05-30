@@ -254,7 +254,7 @@ function Java({ theme, profileScope }) {
         </>
       )}
       <DisabledBox active={!profileScope || (profileScope && overrideProfileRam)}>
-        <Slider label="Dedicated RAM (GB)" min={1} max={osMemory - 1} step={1} value={ramValue} onChange={ramChange} />
+        <Slider disabled={profileScope && !overrideProfileRam} label="Dedicated RAM (GB)" min={1} max={osMemory - 1} step={1} value={ramValue} onChange={ramChange} />
       </DisabledBox>
       {ramError && <RAMError>{ramError}</RAMError>}
       <SettingSeperator />
