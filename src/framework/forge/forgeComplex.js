@@ -10,6 +10,7 @@ import VersionsManager from '../../manager/versionsManager';
 import HTTPRequest from '../../host/httprequest';
 import LibrariesManager from '../../manager/librariesManager';
 import logInit from '../../util/logger';
+import SettingsManager from '../../manager/settingsManager';
 
 const logger = logInit('ForgeComplex');
 
@@ -217,13 +218,13 @@ const ForgeComplex = {
       });
 
       const commandArguments = `-cp "${jar};${classpath.join(';')}" "${getMainClass(jar)}" ${args.join(' ')}`;
-      logger.info(`Java path is: ${Global.getJavaPath()}`);
+      logger.info(`Java path is: ${SettingsManager.currentSettings.java.path}`);
       logger.info(`Running: java ${commandArguments}`);
 
       DownloadsManager.createProgressiveDownload(`Running ${path.basename(jar)}\n_A_${profile.name}`).then(download => {
         DownloadsManager.setDownloadProgress(download.name, 100);
         exec(
-          `"${Global.getJavaPath()}" ${commandArguments}`,
+          `"${SettingsManager.currentSettings.java.path}" ${commandArguments}`,
           {
             cwd: TEMP_PATH,
             maxBuffer: 2048 * 500

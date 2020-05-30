@@ -75,13 +75,6 @@ const SettingsManager = {
           this.currentSettings.mcAccount = Object.keys(LauncherManager.getMCAccounts())[0];
         }
 
-        if (this.currentSettings.java === undefined) {
-          logger.info('Setting "java" was missing. Adding it...');
-          this.currentSettings.java = {
-            path: Global.getJavaPath()
-          };
-        }
-
         if (this.currentSettings.launcherIntegration === undefined) {
           logger.info('Setting "launcherIntegration" was missing. Adding it...');
           this.currentSettings.launcherIntegration = true;

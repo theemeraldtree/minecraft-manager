@@ -1,10 +1,9 @@
+import fs from 'fs';
+import axios from 'axios';
+import adapter from 'axios/lib/adapters/http';
 import ToastManager from '../manager/toastManager';
-import logInit from '../util/logger';
 
 const { ipcRenderer } = require('electron');
-const axios = require('axios');
-
-const logger = logInit('HTTPRequest');
 
 const HTTPRequest = {
   fileDownloads: {},
@@ -28,6 +27,31 @@ const HTTPRequest = {
     });
   },
 
+  downloadInline(url, dest) {
+    return new Promise(async (resolve, reject) => {
+      const { data } = await axios.get(url, {
+        responseType: 'stream',
+        headers: {
+          'X-Client': 'MinecraftManager'
+        },
+        adapter
+      });
+
+      const ws = fs.createWriteStream(dest);
+
+      data.pipe(ws);
+
+      data.on('error', e => {
+        reject(e);
+      });
+
+      data.on('end', () => {
+        ws.end();
+        resolve();
+      });
+    });
+  },
+
   /**
    * Download progress occurs
    * @param {object} download - The Download Object
@@ -44,7 +68,6 @@ const HTTPRequest = {
    */
   fileDownloadFinish(download) {
     if (this.fileDownloads[download.id]) {
-      logger.info(`Finished downloading: ${download.id}`);
       this.fileDownloads[download.id].onFinish();
     }
   },

@@ -59,7 +59,7 @@ class MCVersionHandler {
       await fs.writeFile(path.join(profile.mcmPath, `/version/${name}`), JSON.stringify(data));
     };
 
-    if (profile.frameworks?.fabric) await addPatch('fabric.json', await FabricFramework.getVersionJSON(profile));
+    if (profile.frameworks.fabric) await addPatch('fabric.json', await FabricFramework.getVersionJSON(profile));
   }
 
   saveCompiledVersionJSON = async (profile) => {

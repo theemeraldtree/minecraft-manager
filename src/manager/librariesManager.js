@@ -21,7 +21,7 @@ const LibrariesManager = {
     this.checkExist();
     const p = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
     if (!fs.existsSync(p)) {
-      fs.mkdirSync(p);
+      mkdirp.sync(p);
     }
 
     return p;
@@ -37,10 +37,10 @@ const LibrariesManager = {
   checkExist() {
     const mcmpath = path.join(this.getLibrariesPath(), '/minecraftmanager');
     if (!fs.existsSync(mcmpath)) {
-      fs.mkdirSync(mcmpath);
+      mkdirp.sync(mcmpath);
     }
     if (!fs.existsSync(this.getMCMLibraries())) {
-      fs.mkdirSync(this.getMCMLibraries());
+      mkdirp.sync(this.getMCMLibraries());
     }
   },
   renameLibrary(profile, newID) {

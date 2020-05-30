@@ -129,56 +129,7 @@ export default function EditPageAdvanced({ id }) {
             copy in-game servers list to...
           </Button>
         </Panel>
-        <Panel>
-          <h3>Advanced Info</h3>
-          <Button color="red" onClick={() => profile.openGameDir()}>
-            open profile folder
-          </Button>
-
-          <Detail>internal id: {profile.id}</Detail>
-          <Detail>version-safe name: {profile.safename}</Detail>
-          <Detail>version timestamp: {profile.version.timestamp}</Detail>
-          <Detail>OMAF version: {profile.omafVersion}</Detail>
-          {profile.id === '0-default-profile-snapshot' && (
-            <InputHolder>
-              <Checkbox lighter checked={runSnapshotInSeperateFolder} onClick={snapshotSeperateFolderClick} />
-              Run in a seperate game directory from Latest release
-            </InputHolder>
-          )}
-          {profile.id === '0-default-profile-latest' && (
-            <InputHolder>
-              <Checkbox lighter checked={runLatestInIntegrated} onClick={runLatestInIntegratedClick} />
-              Run in the Minecraft Home Directory
-            </InputHolder>
-          )}
-        </Panel>
-        <Panel>
-          <h3>Technical Functions</h3>
-          <Button color="red" onClick={() => shell.openExternal(path.join(profile.profilePath, '/profile.json'))}>
-            open profile.json
-          </Button>
-          <Button
-            color="red"
-            onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/mods.json'))}
-          >
-            open subAssets/mods.json
-          </Button>
-          <Button
-            color="red"
-            onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/resourcepacks.json'))}
-          >
-            open subAssets/resourcepacks.json
-          </Button>
-          <Button
-            color="red"
-            onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/worlds.json'))}
-          >
-            open subAssets/worlds.json
-          </Button>
-          <Button color="red" onClick={() => shell.openExternal(profile.profilePath)}>
-            open OMAF data folder
-          </Button>
-        </Panel>
+        
       </div>
     </>
   );

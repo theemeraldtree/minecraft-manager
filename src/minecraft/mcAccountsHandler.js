@@ -21,32 +21,36 @@ const MCAccountsHandler = {
   getAccounts() {
     return SettingsManager.currentSettings.accounts;
   },
-  async addAccountLauncher(email, token, uuid) {
-    const skinReq = (await HTTPRequest.get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`)).data;
+  addAccountLauncher(email, token, uuid) {
+    return new Promise(async resolve => {
+      const skinReq = (await HTTPRequest.get(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`)).data;
         
-    const finish = headTexture => {
-      SettingsManager.currentSettings.accounts.push({
-        email,
-        name: skinReq.name,
-        uuid,
-        headTexture,
-        accessToken: token
-      });
+      const finish = headTexture => {
+        SettingsManager.currentSettings.accounts.push({
+          email,
+          name: skinReq.name,
+          uuid,
+          headTexture,
+          accessToken: token
+        });
+  
+        SettingsManager.save();
 
-      SettingsManager.save();
-    }
-
-    if(skinReq.properties) {
-      const skinURL = JSON.parse(atob(skinReq.properties[0].value)).textures.SKIN.url;
-
-      const img = await jimp.read(skinURL);
-
-      img.crop(8, 8, 8, 8).getBase64(jimp.MIME_PNG, (err, res) => {
-          finish(res);
-      });
-    }else{
-      finish('');
-    }
+        resolve();
+      }
+  
+      if(skinReq.properties) {
+        const skinURL = JSON.parse(atob(skinReq.properties[0].value)).textures.SKIN.url;
+  
+        const img = await jimp.read(skinURL);
+  
+        img.crop(8, 8, 8, 8).getBase64(jimp.MIME_PNG, (err, res) => {
+            finish(res);
+        });
+      }else{
+        finish('');
+      }
+    })
   },
   registerAccount(email, password) {
     return new Promise(async resolve => {

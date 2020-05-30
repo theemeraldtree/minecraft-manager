@@ -18,6 +18,7 @@ import SettingsManager from './settingsManager';
 import JavaHandler from '../minecraft/javaHandler';
 import MCAccountsHandler from '../minecraft/mcAccountsHandler';
 import AlertManager from './alertManager';
+import Downloader from '../util/downloader';
 
 const { exec } = require('child_process');
 const admzip = require('adm-zip');
@@ -189,7 +190,7 @@ const DirectLauncherManager = {
         MCAccountsHandler.getNameFromUUID(SettingsManager.currentSettings.activeAccount));
       mcArgs = mcArgs.replace('${version_name}', `"${profile.versionname}"`);
       mcArgs = mcArgs.replace('${game_directory}', `"${profile.gameDir}"`);
-      mcArgs = mcArgs.replace('${assets_root}', `"${path.join(Global.getMCPath(), '/assets')}"`);
+      mcArgs = mcArgs.replace('${assets_root}', `"${path.join(Global.MCM_PATH, '/shared/assets')}"`);
       mcArgs = mcArgs.replace('${assets_index_name}', versionJSON.assets);
       mcArgs = mcArgs.replace(
         '${auth_uuid}',
@@ -495,11 +496,11 @@ const DirectLauncherManager = {
         this.downloadAssetsList(profileName, list2, callback, onUpdate);
       } else {
         this.concurrentDownloads.push(item.name);
-        FSU.createDirIfMissing(path.join(Global.getMCPath(), `/assets/objects/${item.hash.substring(0, 2)}`));
+        FSU.createDirIfMissing(path.join(Global.MCM_PATH, `/shared/assets/objects/${item.hash.substring(0, 2)}`));
         await DownloadsManager.startFileDownload(
           `${item.name}\n_A_${profileName}`,
           `https://resources.download.minecraft.net/${item.hash.substring(0, 2)}/${item.hash}`,
-          path.join(Global.getMCPath(), `/assets/objects/${item.hash.substring(0, 2)}/${item.hash}`)
+          path.join(Global.MCM_PATH, `/shared/assets/objects/${item.hash.substring(0, 2)}/${item.hash}`)
         );
 
         onUpdate();
@@ -511,12 +512,13 @@ const DirectLauncherManager = {
 
   async verifyDownloadedAssets(profile, versionJSON) {
     return new Promise(async resolve => {
-      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/assets'));
-      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/assets/indexes'));
-      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/assets/objects'));
+      const assetsPath = path.join(Global.MCM_PATH, '/shared/assets/');
+      FSU.createDirIfMissing(assetsPath);
+      FSU.createDirIfMissing(path.join(assetsPath, '/indexes'));
+      FSU.createDirIfMissing(path.join(assetsPath, '/objects'));
 
       if (versionJSON.assetIndex) {
-        const assetIndexPath = path.join(Global.getMCPath(), `/assets/indexes/${versionJSON.assetIndex.id}.json`);
+        const assetIndexPath = path.join(assetsPath, `/indexes/${versionJSON.assetIndex.id}.json`);
 
         const downloadAssetIndex = async () => DownloadsManager.startFileDownload(
             `Asset Index ${versionJSON.assetIndex.id}\n_A_${profile.name}`,
@@ -544,40 +546,22 @@ const DirectLauncherManager = {
 
         if (fs.existsSync(assetIndexPath)) {
           const indexJSON = await FSU.readJSON(assetIndexPath);
-          const assetsToDownload = [];
-          for (const object of Object.keys(indexJSON.objects)) {
+          const toDownload = Object.keys(indexJSON.objects).map(object => {
             const hash = indexJSON.objects[object].hash;
-            const hashedObjectPath = path.join(Global.getMCPath(), `/assets/objects/${hash.substring(0, 2)}/${hash}`);
+            const hashedObjectPath = path.join(assetsPath, `/objects/${hash.substring(0, 2)}/${hash}`);
             if (!fs.existsSync(hashedObjectPath)) {
-              assetsToDownload.push({
-                name: object,
-                hash
-              });
+              FSU.createDirIfMissing(path.join(Global.MCM_PATH, `/shared/assets/objects/${hash.substring(0, 2)}`));
+              return {
+                url: `https://resources.download.minecraft.net/${hash.substring(0, 2)}/${hash}`,
+                dest: path.join(Global.MCM_PATH, `/shared/assets/objects/${hash.substring(0, 2)}/${hash}`)
+              };
             }
-          }
 
-          DownloadsManager.createProgressiveDownload(`Assets\n_A_${profile.name}`).then(download => {
-            const concurrent = assetsToDownload.length >= 10 ? 10 : 0;
-            let numberDownloaded = 0;
-            this.downloadAssetsList(
-              profile.name,
-              assetsToDownload.slice(),
-              async () => {
-                if (numberDownloaded === assetsToDownload.length) {
-                  DownloadsManager.removeDownload(download.name);
-                  resolve();
-                }
-              },
-              () => {
-                numberDownloaded++;
-                DownloadsManager.setDownloadProgress(
-                  download.name,
-                  Math.ceil((numberDownloaded / assetsToDownload.length) * 100)
-                );
-              },
-              concurrent
-            );
+            return undefined;
           });
+
+          await Downloader.downloadConcurrently(toDownload);
+          resolve();
         }
       }
     });

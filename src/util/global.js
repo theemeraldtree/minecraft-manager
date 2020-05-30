@@ -1,3 +1,4 @@
+import mkdirp from 'mkdirp';
 import SettingsManager from '../manager/settingsManager';
 import ProfilesManager from '../manager/profilesManager';
 import Mod from '../type/mod';
@@ -13,6 +14,9 @@ import FileScanner from './fileScanner';
 import World from '../type/world';
 import logInit from './logger';
 import Analytics from './analytics';
+import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
+import JavaHandler from '../minecraft/javaHandler';
+import mcVersionHandler from '../minecraft/mcVersionHandler';
 
 const semver = require('semver');
 const { remote } = require('electron');
@@ -32,6 +36,7 @@ const Global = {
   MC_VERSIONS: [],
   ALL_VERSIONS: [],
   VERSIONS_RAW: [],
+  migratorListeners: [],
   cacheUpdateTime: new Date().getTime(),
   cached: {
     versions: {}
@@ -451,9 +456,27 @@ const Global = {
     });
   },
 
+  addMigratorListener(listener) {
+    this.migratorListeners.push(listener);
+  },
+
+  removeMigratorListener(listener) {
+    this.migratorListeners.splice(this.migratorListeners.indexOf(listener), 1);
+  },
+
+  updateMigratorStep(step) {
+    this.migratorListeners.forEach(listener => listener({ active: true, step }));
+  },
+
+  setMigratorEnabled(val) {
+    this.migratorListeners.forEach(listener => listener({ active: val }));
+  },
+
   /* eslint-disable */
-  checkMigration() {
+  async checkMigration() {
     let showMigrationmessage = false;
+    let majorMigrationToPerform = '';
+
     for (const profile of ProfilesManager.loadedProfiles) {
       // From beta 4.1 and earlier there was no info about the OMAF format version
       if (!profile.omafVersion) {
@@ -562,6 +585,138 @@ const Global = {
         }
         profile.save();
       }
+
+      if(!profile.mcm.version) {
+        profile.mcm.version = 1;
+        
+        majorMigrationToPerform = '2.5';
+
+        mkdirp.sync(path.join(profile.mcmPath, '/binaries'));
+        mkdirp.sync(path.join(profile.mcmPath, '/version'));
+
+        profile.mcm.java = {
+          overrideRam: false,
+          dedicatedRam: SettingsManager.currentSettings.dedicatedRam,
+          overrideArgs: false,
+          overridePath: false,
+          releaseName: '',
+          manual: false,
+          manualPath: '',
+          customArgs: ''
+        };
+      }
+    }
+
+    if(majorMigrationToPerform === '2.5') {
+
+      const migrateLog = (text) => {
+        logger.info(`[Migration] ${text}`);
+      }
+      this.setMigratorEnabled(true);
+      this.updateMigratorStep('Making necessary folders...');
+
+      migrateLog('Creating all required directories');
+
+      mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries'));
+      mkdirp.sync(path.join(Global.MCM_PATH, '/shared/binaries'));
+      mkdirp.sync(path.join(Global.MCM_PATH, '/shared/assets'));
+      mkdirp.sync(path.join(Global.MCM_PATH, '/shared/jars'));
+
+      this.updateMigratorStep('Migrating accounts...');
+
+      migrateLog('Calling integrateAccounts');
+      await MCLauncherIntegrationHandler.integrateAccounts();
+
+      this.updateMigratorStep('Setting active account...');
+
+      migrateLog('Assigning activeAccount to UUID of account 0');
+
+      SettingsManager.currentSettings.activeAccount = SettingsManager.currentSettings.accounts[0].uuid;
+      SettingsManager.currentSettings.launcherIntegration = true;
+      if(!SettingsManager.currentSettings.java) {
+
+        this.updateMigratorStep('Assigning Java settings...');
+
+        migrateLog('Setting minimum global Java settings');
+        SettingsManager.currentSettings.java = {
+          path: path.join(Global.MCM_PATH, '/shared/binaries/java/bin/javaw.exe'),
+          manual: false,
+          customJavaArgs: '',
+          customArgsActive: false,
+          manualPath: '',
+          releaseName: 'currently installing...'
+        }
+
+        this.updateMigratorStep('Installing Java...');
+
+        migrateLog('Installing java version "latest" to shared java binary path');
+        const version = await JavaHandler.installVersion('latest', path.join(Global.MCM_PATH, '/shared/binaries/java'));
+
+        if(version !== 'error') {
+
+          this.updateMigratorStep('Assigning Java name...');
+
+          migrateLog('Assigning latest Global java release name');
+          SettingsManager.currentSettings.java.releaseName = version;
+          SettingsManager.save();
+
+          ProfilesManager.loadedProfiles.forEach(prof => {
+
+            this.updateMigratorStep(`Setting Java settings for ${prof.name}`);
+
+            migrateLog(`Assigning java release name to ${prof}`)
+            prof.mcm.java.releaseName = version;
+            prof.mcm.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/bin/javaw.exe')
+            prof.save();
+
+            this.updateMigratorStep(`Downloading Version JSON for ${prof.name}`);
+            
+            migrateLog(`Downloading version json for ${prof.id}`);
+            mcVersionHandler.updateProfile(prof);
+
+            if(!fs.existsSync(path.join(prof.profilePath, '/files'))) {
+              mkdirp.sync(path.join(prof.profilePath, '/files'));
+            }
+          });
+        }
+
+        if(SettingsManager.currentSettings.launcherIntegration) {
+          migrateLog('Calling integrateJava');
+          this.updateMigratorStep('Integrating Java...');
+
+          MCLauncherIntegrationHandler.integrateJava();
+        }
+      }
+
+      this.updateMigratorStep('Saving...');
+
+      SettingsManager.currentSettings.runLatestInIntegrated = true;
+      SettingsManager.save();
+
+      this.updateMigratorStep('Copying assets... (this may take a while)');
+
+      // timeout to allow visuals to update
+      setTimeout(() => {
+        migrateLog('Copying assets directory to shared');
+        //Global.copyDirSync(path.join(Global.getMCPath(), '/assets/'), path.join(Global.MCM_PATH, '/shared/assets/'));
+      
+        this.updateMigratorStep('Copying libraries...');
+  
+        // timeout to allow visuals to update
+        setTimeout(() => {
+
+          if(fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
+            migrateLog('Copying libraries/minecraftmanager to shared');
+            //Global.copyDirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'), path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
+          }else{
+            mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
+          }
+    
+          migrateLog('Finished migration');
+          this.setMigratorEnabled(false);
+        }, 2000);
+      }, 2000);
+
     }
 
     if (showMigrationmessage) {
