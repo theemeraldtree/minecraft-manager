@@ -5,6 +5,7 @@ import Profile from '../type/profile';
 import Global from '../util/global';
 import SettingsManager from '../manager/settingsManager';
 import LatestProfile from './latestProfile';
+import FSU from '../util/fsu';
 
 const SnapshotProfile = new Profile({
   type: 'profile',
@@ -21,6 +22,12 @@ const SnapshotProfile = new Profile({
     minecraft: {
       version: Global.MC_VERSIONS[0]
     }
+  },
+  mcm: {
+    java: {
+
+    },
+    version: 1
   }
 });
 
@@ -48,6 +55,12 @@ function loadSnapshotProfile() {
 
   if (!fs.existsSync(SnapshotProfile.gameDir)) {
     mkdirp.sync(SnapshotProfile.gameDir);
+  }
+
+
+  if (fs.existsSync(path.join(LatestProfile.profilePath, '/profile.json'))) {
+    const json = FSU.readJSONSync(path.join(LatestProfile.profilePath, '/profile.json'));
+    LatestProfile.mcm = json.mcm;
   }
 
   SnapshotProfile.version.minecraft.version = Global.ALL_VERSIONS[0];

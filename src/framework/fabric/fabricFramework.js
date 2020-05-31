@@ -1,5 +1,5 @@
 import path from 'path';
-import fs from 'fs';
+import mkdirp from 'mkdirp';
 import VersionsManager from '../../manager/versionsManager';
 import HTTPRequest from '../../host/httprequest';
 import DownloadsManager from '../../manager/downloadsManager';
@@ -7,6 +7,8 @@ import LibrariesManager from '../../manager/librariesManager';
 import ToastManager from '../../manager/toastManager';
 import LauncherManager from '../../manager/launcherManager';
 import logInit from '../../util/logger';
+import mcVersionHandler from '../../minecraft/mcVersionHandler';
+import FSU from '../../util/fsu';
 
 const logger = logInit('FabricFramework');
 
@@ -14,22 +16,17 @@ const FabricFramework = {
   setupFabric: profile =>
     new Promise(async resolve => {
       logger.info(`Beginning install of Fabric ${profile.frameworks.fabric.version} to ${profile.id}`);
-      const versionMeta = (
-        await HTTPRequest.get(
-          `https://meta.fabricmc.net/v2/versions/loader/${profile.version.minecraft.version}/${profile.frameworks.fabric.version}`
-        )
-      ).data;
-      VersionsManager.createVersion(profile, 'fabric', versionMeta);
+      profile.setFrameworkIsInstalling('fabric');
+
+      mcVersionHandler.updateProfile(profile);
 
       const libraryPath = path.join(LibrariesManager.getMCMLibraries(), `/mcm-${profile.id}`);
 
-      if (!fs.existsSync(libraryPath)) {
-        fs.mkdirSync(libraryPath);
-      }
+      FSU.createDirIfMissing(libraryPath);
 
       logger.info(`Creating Fabric Library paths for ${profile.id}`);
-      fs.mkdirSync(path.join(libraryPath, '/fabric-intermediary'));
-      fs.mkdirSync(path.join(libraryPath, '/fabric-loader'));
+      mkdirp.sync(path.join(libraryPath, '/fabric-intermediary'));
+      mkdirp.sync(path.join(libraryPath, '/fabric-loader'));
 
       logger.info(`Starting download of Fabric Intermediary for ${profile.id}`);
       DownloadsManager.startFileDownload(
@@ -44,6 +41,8 @@ const FabricFramework = {
         `https://maven.fabricmc.net/net/fabricmc/fabric-loader/${profile.frameworks.fabric.version}/fabric-loader-${profile.frameworks.fabric.version}.jar`,
         path.join(libraryPath, `fabric-loader/mcm-${profile.id}-fabric-loader.jar`)
       );
+
+      profile.unsetFrameworkIsInstalling('fabric');
 
       resolve();
     }),

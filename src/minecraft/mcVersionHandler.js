@@ -4,6 +4,7 @@ import FSU from '../util/fsu';
 import HTTPRequest from '../host/httprequest';
 import FabricFramework from '../framework/fabric/fabricFramework';
 import Global from '../util/global';
+import ForgeFramework from '../framework/forge/forgeFramework';
 
 /**
  * Handles creation of Minecraft Version JSON Files and patches
@@ -37,18 +38,20 @@ class MCVersionHandler {
    * Updates or creates a profile's JSON patches and compiles them
    * @param {object} profile - The profile to update
    */
-  updateProfile = async (profile) => {
-    const versionPath = path.join(profile.mcmPath, '/version/');
-    FSU.createDirIfMissing(versionPath);
+  updateProfile = (profile, redownload = true) => new Promise(async resolve => {
+      const versionPath = path.join(profile.mcmPath, '/version/');
+      FSU.createDirIfMissing(versionPath);
 
-    await fs.writeFile(path.join(versionPath, '/default.json'), JSON.stringify(await this.getDefaultJSON(profile.minecraftVersion)));
+      await fs.writeFile(path.join(versionPath, '/default.json'), JSON.stringify(await this.getDefaultJSON(profile.minecraftVersion)));
 
-    await this.getFrameworkPatches(profile);
+      if (redownload) await this.getFrameworkPatches(profile);
 
-    await this.saveCompiledVersionJSON(profile);
+      await this.saveCompiledVersionJSON(profile);
 
-    await this.createLauncherIntegration(profile);
-  }
+      await this.createLauncherIntegration(profile);
+
+      resolve();
+    })
 
   /**
    * Downloads and correctly formats the required patches from Frameworks
@@ -60,6 +63,7 @@ class MCVersionHandler {
     };
 
     if (profile.frameworks.fabric) await addPatch('fabric.json', await FabricFramework.getVersionJSON(profile));
+    if (profile.frameworks.forge) await addPatch('forge.json', await ForgeFramework.getVersionJSON(profile));
   }
 
   saveCompiledVersionJSON = async (profile) => {
@@ -72,11 +76,37 @@ class MCVersionHandler {
     const versionPath = path.join(profile.mcmPath, '/version/');
     const defaultJSON = await FSU.readJSON(path.join(versionPath, 'default.json'));
 
-    let patches = await Promise.all((await fs.readdir(versionPath)).filter(pn => pn !== 'default.json').map(async patchName => JSON.parse(await fs.readFile(path.join(versionPath, patchName)))));
+    let patches = await Promise.all((await fs.readdir(versionPath)).map(async patchName => JSON.parse(await fs.readFile(path.join(versionPath, patchName)))));
 
     patches = patches.sort((a, b) => a._priority - b._priority);
 
-    const final = { ...defaultJSON };
+    let final = { ...defaultJSON };
+
+    const compileObject = (first, second) => {
+      const out = { ...first };
+
+      Object.keys(second).forEach(rawKey => {
+        if (rawKey[0] === '+') {
+          const key = rawKey.substring(1);
+          if (out[key]) {
+            out[key] = [...second[rawKey], ...out[key]];
+          } else {
+            out[key] = second[key];
+          }
+        } else if (typeof (second[rawKey]) === 'object') {
+          let newFirst = out[rawKey];
+          if (!newFirst) newFirst = {};
+
+          out[rawKey] = compileObject(newFirst, second[rawKey]);
+        } else if (rawKey !== '_priority') {
+          if ((out[rawKey] && second._priority >= first._priority) || !out[rawKey]) {
+            out[rawKey] = second[rawKey];
+          }
+        }
+      });
+
+      return out;
+    };
 
     patches.forEach((patch, index) => {
       let previousPatch;
@@ -88,15 +118,7 @@ class MCVersionHandler {
         };
       }
 
-      Object.keys(patch).forEach(rawKey => {
-        if (rawKey[0] === '+') {
-          const key = rawKey.substring(1);
-          if (final[key] && Array.isArray(final[key])) final[key] = [...final[key], ...patch[rawKey]];
-        } else if (rawKey !== '_priority') {
-          const key = rawKey;
-          if ((final[key] && patch._priority >= previousPatch._priority) || (!final[key])) final[key] = patch[key];
-        }
-      });
+      final = compileObject(previousPatch, patch);
     });
 
     final.id = profile.versionname;

@@ -1,5 +1,5 @@
-import fs from 'fs';
 import path from 'path';
+import AdmZip from 'adm-zip';
 import VersionsManager from '../../manager/versionsManager';
 import LibrariesManager from '../../manager/librariesManager';
 import DownloadsManager from '../../manager/downloadsManager';
@@ -7,6 +7,9 @@ import ForgeComplex from './forgeComplex';
 import LauncherManager from '../../manager/launcherManager';
 import HTTPRequest from '../../host/httprequest';
 import logInit from '../../util/logger';
+import Global from '../../util/global';
+import mcVersionHandler from '../../minecraft/mcVersionHandler';
+import FSU from '../../util/fsu';
 
 const logger = logInit('ForgeFramework');
 
@@ -21,14 +24,16 @@ const ForgeFramework = {
         ForgeComplex.setupForge(profile, resolve);
       } else {
         profile.setFrameworkIsInstalling('forge');
-        VersionsManager.createVersion(profile, 'forge');
 
-        const libraryPath = LibrariesManager.createLibraryPath(profile);
+        mcVersionHandler.updateProfile(profile);
+
+        const libraryPath = path.join(LibrariesManager.getMCMLibraries(), `/mcm-${profile.id}`);
+
+        FSU.createDirIfMissing(libraryPath);
 
         const forgePath = path.join(libraryPath, 'forge');
-        if (!fs.existsSync(forgePath)) {
-          fs.mkdirSync(forgePath);
-        }
+
+        FSU.createDirIfMissing(forgePath);
 
         const mcversion = profile.version.minecraft.version;
         let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-universal.jar`;
@@ -77,6 +82,34 @@ const ForgeFramework = {
         'https://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.json'
       );
       resolve(metadata.data[minecraftVersion]);
+    }),
+  getVersionJSON: (profile) => new Promise(async resolve => {
+      const installerPath = path.join(Global.MCM_TEMP, `/forge-installer-${new Date().getTime()}`);
+      await DownloadsManager.startFileDownload(
+        'Minecraft Forge Installer',
+        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`,
+        installerPath
+      );
+
+      const zip = new AdmZip(installerPath);
+      const json = JSON.parse(zip.readFile('version.json'));
+
+      json.libraries[0] = {
+        name: `minecraftmanager.profiles:mcm-${profile.id}:forge`
+      };
+
+      json['+libraries'] = json.libraries;
+
+      json._comment_ = undefined;
+      json.libraries = undefined;
+      json._priority = 1;
+      json.inheritsFrom = undefined;
+      json.id = undefined;
+      json.time = undefined;
+      json.arguments = {
+        '+game': json.arguments.game
+      };
+      resolve(json);
     })
 };
 

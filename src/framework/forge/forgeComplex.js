@@ -6,11 +6,11 @@ import mkdirp from 'mkdirp';
 import rimraf from 'rimraf';
 import DownloadsManager from '../../manager/downloadsManager';
 import Global from '../../util/global';
-import VersionsManager from '../../manager/versionsManager';
 import HTTPRequest from '../../host/httprequest';
 import LibrariesManager from '../../manager/librariesManager';
 import logInit from '../../util/logger';
 import SettingsManager from '../../manager/settingsManager';
+import mcVersionHandler from '../../minecraft/mcVersionHandler';
 
 const logger = logInit('ForgeComplex');
 
@@ -186,7 +186,7 @@ const ForgeComplex = {
       });
     }
   },
-  executeNextProcessor(profile) {
+  async executeNextProcessor(profile) {
     const getMainClass = jar => {
       const z = AdmZip(jar);
       const meta = z.readAsText('META-INF/MANIFEST.MF');
@@ -244,9 +244,7 @@ const ForgeComplex = {
       logger.info('Finished processors');
 
       logger.info('Creating version...');
-      VersionsManager.createVersion(profile, 'forgeComplex', {
-        version: JSON.parse(fs.readFileSync(path.join(TEMP_PATH, '/jar/version.json')))
-      });
+      await mcVersionHandler.updateProfile(profile);
 
       logger.info('Creating library...');
       const libraryPath = LibrariesManager.createLibraryPath(profile);

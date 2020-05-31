@@ -54,7 +54,17 @@ export default class Profile extends OAMFAsset {
     if (!this.mcm) {
         this.mcm = {
         java: {
-
+          version: 1,
+          syncOptionsTXT: false,
+          syncOptionsOF: false,
+          syncServers: false,
+          java: {
+            releaseName: SettingsManager.currentSettings.java.releaseName,
+            path: SettingsManager.currentSettings.java.path,
+            manual: false,
+            manualPath: '',
+            dedicatedRam: SettingsManager.currentSettings.dedicatedRam
+          }
         }
     };
   }
@@ -382,15 +392,14 @@ export default class Profile extends OAMFAsset {
     this.setIcon(path.join(Global.getResourcesPath(), '/logo-sm.png'));
   }
 
-  launch() {
-    MCVersionHandler.updateProfile(this);
+  async launch() {
+    await MCVersionHandler.updateProfile(this, false);
     if (SettingsManager.currentSettings.launcherIntegration && !LauncherManager.profileExists(this)) {
       LauncherManager.createProfile(this);
+      this.addIconToLauncher();
+      LauncherManager.updateVersion(this);
+      LauncherManager.setMostRecentProfile(this);
     }
-
-    this.addIconToLauncher();
-    LauncherManager.updateVersion(this);
-    LauncherManager.setMostRecentProfile(this);
 
     return new Promise(resolve => {
       DirectLauncherManager.launch(this)

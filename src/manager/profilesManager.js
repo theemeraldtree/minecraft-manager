@@ -307,6 +307,8 @@ const ProfilesManager = {
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/files'));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm'));
+      fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/binaries'));
+      fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/version'));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/icons'));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/icons/mods'));
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id, '/_mcm/icons/resourcepacks'));
@@ -330,6 +332,9 @@ const ProfilesManager = {
           minecraft: {
             version: mcversion
           }
+        },
+        mcm: {
+          version: 1
         }
       });
 

@@ -604,6 +604,8 @@ const Global = {
           manualPath: '',
           customArgs: ''
         };
+
+        profile.save();
       }
     }
 
@@ -667,6 +669,7 @@ const Global = {
             migrateLog(`Assigning java release name to ${prof}`)
             prof.mcm.java.releaseName = version;
             prof.mcm.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/bin/javaw.exe')
+            prof.mcm.version = 1;
             prof.save();
 
             this.updateMigratorStep(`Downloading Version JSON for ${prof.name}`);
@@ -698,7 +701,7 @@ const Global = {
       // timeout to allow visuals to update
       setTimeout(() => {
         migrateLog('Copying assets directory to shared');
-        //Global.copyDirSync(path.join(Global.getMCPath(), '/assets/'), path.join(Global.MCM_PATH, '/shared/assets/'));
+        Global.copyDirSync(path.join(Global.getMCPath(), '/assets/'), path.join(Global.MCM_PATH, '/shared/assets/'));
       
         this.updateMigratorStep('Copying libraries...');
   
@@ -707,7 +710,7 @@ const Global = {
 
           if(fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
             migrateLog('Copying libraries/minecraftmanager to shared');
-            //Global.copyDirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'), path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
+            Global.copyDirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'), path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
           }else{
             mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
           }

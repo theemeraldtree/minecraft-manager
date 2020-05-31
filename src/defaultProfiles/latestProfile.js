@@ -21,6 +21,12 @@ const LatestProfile = new Profile({
     minecraft: {
       version: Global.MC_VERSIONS[0]
     }
+  },
+  mcm: {
+    java: {
+
+    },
+    version: 1
   }
 });
 

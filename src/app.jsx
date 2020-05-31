@@ -72,8 +72,7 @@ function App() {
   const [headerBackLink, setHeaderBackLink] = useState('');
   const [headerShowBackButton, setHeaderShowBackButton] = useState(false);
   const [migrating, setMigrating] = useState({
-    active: true,
-    step: 'Installing Java'
+    active: false
   });
 
   useEffect(() => {
