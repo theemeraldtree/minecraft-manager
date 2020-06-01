@@ -120,7 +120,6 @@ async function load() {
   } catch (e) {
     logger.error('Something went wrong[1]');
     logger.error(e.toString());
-    console.log(e.stack);
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
   }
 

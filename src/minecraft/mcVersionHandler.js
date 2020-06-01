@@ -1,5 +1,5 @@
 import path from 'path';
-import { promises as fs } from 'fs';
+import fss, { promises as fs } from 'fs';
 import FSU from '../util/fsu';
 import HTTPRequest from '../host/httprequest';
 import FabricFramework from '../framework/fabric/fabricFramework';
@@ -10,42 +10,67 @@ import SettingsManager from '../manager/settingsManager';
 /**
  * Handles creation of Minecraft Version JSON Files and patches
  */
-class MCVersionHandler {
-  getVersionsPath = () => path.join(Global.getMCPath(), '/versions')
+const MCVersionHandler = {
+  getVersionsPath() {
+    return path.join(Global.getMCPath(), '/versions');
+  },
 
   /**
    * Downloads and sets VERSION_MANIFEST to the latest Version Manifest
    */
-  getVersionManifest = async () => new Promise(async resolve => {
-    this.VERSION_MANIFEST = (await HTTPRequest.get('https://launchermeta.mojang.com/mc/game/version_manifest.json')).data;
-    resolve();
-    })
+  async getVersionManifest() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        this.VERSION_MANIFEST = (await HTTPRequest.get('https://launchermeta.mojang.com/mc/game/version_manifest.json')).data;
+
+
+      resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  },
 
   /**
    * Gets the default Version JSON for the specified Minecraft Version
    * @param {string} mcVer - The Minecraft Version
    */
-  getDefaultJSON = async (mcVer) => {
-    if (!this.VERSION_MANIFEST) await this.getVersionManifest();
+  getDefaultJSON(mcVer) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        if (!this.VERSION_MANIFEST) await this.getVersionManifest();
 
-    console.log(mcVer);
-    console.log(this.VERSION_MANIFEST);
-    const manifestVer = this.VERSION_MANIFEST.versions.find(ver => ver.id === mcVer);
 
-    const final = (await HTTPRequest.get(manifestVer.url)).data;
-    final._priority = 0;
-    return final;
-  }
+        const manifestVer = this.VERSION_MANIFEST.versions.find(ver => ver.id === mcVer);
+
+        const final = (await HTTPRequest.get(manifestVer.url)).data;
+        final._priority = 0;
+        resolve(final);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  },
 
   /**
    * Updates or creates a profile's JSON patches and compiles them
    * @param {object} profile - The profile to update
    */
-  updateProfile = (profile, redownload = true) => new Promise(async resolve => {
+  async updateProfile(profile, redownload = true) {
+    return new Promise(async (resolve, reject) => {
       const versionPath = path.join(profile.mcmPath, '/version/');
       FSU.createDirIfMissing(versionPath);
 
-      await fs.writeFile(path.join(versionPath, '/default.json'), JSON.stringify(await this.getDefaultJSON(profile.minecraftVersion)));
+      if (true) {
+        try {
+          await fs.writeFile(path.join(versionPath, '/default.json'), JSON.stringify(await this.getDefaultJSON(profile.minecraftVersion)));
+        } catch (e) {
+          if (!fss.existsSync(path.join(versionPath, '/default.json'))) {
+            reject(new Error('no-version-json'));
+            return;
+          }
+        }
+      }
 
       if (redownload) await this.getFrameworkPatches(profile);
 
@@ -54,28 +79,29 @@ class MCVersionHandler {
       await this.createLauncherIntegration(profile);
 
       resolve();
-    })
+    });
+  },
 
   /**
    * Downloads and correctly formats the required patches from Frameworks
    * @param {object} profile - The profile to use
    */
-  getFrameworkPatches = async (profile) => {
+  async getFrameworkPatches(profile) {
     const addPatch = async (name, data) => {
       await fs.writeFile(path.join(profile.mcmPath, `/version/${name}`), JSON.stringify(data));
     };
 
     if (profile.frameworks.fabric) await addPatch('fabric.json', await FabricFramework.getVersionJSON(profile));
     if (profile.frameworks.forge) await addPatch('forge.json', await ForgeFramework.getVersionJSON(profile));
-  }
+  },
 
-  saveCompiledVersionJSON = async (profile) => {
+  async saveCompiledVersionJSON(profile) {
     const compiled = await this.compileVersionJSON(profile);
 
     await fs.writeFile(path.join(profile.mcmPath, '/version.json'), JSON.stringify(compiled));
-  }
+  },
 
-  compileVersionJSON = async (profile) => {
+  async compileVersionJSON(profile) {
     const versionPath = path.join(profile.mcmPath, '/version/');
     const defaultJSON = await FSU.readJSON(path.join(versionPath, 'default.json'));
 
@@ -89,7 +115,6 @@ class MCVersionHandler {
       const out = { ...first };
 
       Object.keys(second).forEach(rawKey => {
-        console.log(rawKey, typeof (second[rawKey]));
         if (rawKey[0] === '+') {
           const key = rawKey.substring(1);
           if (out[key]) {
@@ -104,7 +129,6 @@ class MCVersionHandler {
           out[rawKey] = compileObject(newFirst, second[rawKey]);
         } else if (rawKey !== '_priority') {
           if ((out[rawKey] && second._priority >= first._priority) || !out[rawKey]) {
-            console.log(rawKey, second[rawKey]);
             out[rawKey] = second[rawKey];
           }
         }
@@ -131,9 +155,9 @@ class MCVersionHandler {
     final._priority = undefined;
 
     return final;
-  }
+  },
 
-  createLauncherIntegration = async (profile) => {
+  async createLauncherIntegration(profile) {
     if (SettingsManager.currentSettings.launcherIntegration) {
       FSU.createDirIfMissing(path.join(this.getVersionsPath(), profile.versionname));
 
@@ -143,6 +167,6 @@ class MCVersionHandler {
       await fs.link(path.join(profile.mcmPath, '/version.json'), symlinkJSONPath);
     }
   }
-}
+};
 
-export default new MCVersionHandler();
+export default MCVersionHandler;

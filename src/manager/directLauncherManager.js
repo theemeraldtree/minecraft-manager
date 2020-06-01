@@ -228,7 +228,6 @@ const DirectLauncherManager = {
       );
       finishedJavaArgs = finishedJavaArgs.replace('${classpath}', this.generateClasspath(profile, versionJSON));
 
-      console.log(`"${JavaHandler.getJavaPath(profile)}" ${finishedJavaArgs}`);
 
       exec(`"${JavaHandler.getJavaPath(profile)}" ${finishedJavaArgs}`, {
         cwd: profile.gameDir
@@ -374,13 +373,7 @@ const DirectLauncherManager = {
   },
 
   async verifyDownloadedLibraries(profile, versionJSON) {
-    console.log(versionJSON);
-    console.log(typeof (versionJSON.libraries));
-    for (const lib of versionJSON.libraries) {
-      console.log(lib);
-    }
     for (const library of versionJSON.libraries) {
-      console.log('t');
       if (this.allowLibrary(library)) {
         const mvnPath = this.calculateMavenPath(library.name);
         if (!library.natives) {

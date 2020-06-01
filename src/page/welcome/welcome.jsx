@@ -253,7 +253,6 @@ function WelcomePage({ theme, history }) {
     });
 
     if (p && p[0]) {
-      console.log(p[0]);
       SettingsManager.setMCExe(p[0]);
       setMCExe(p[0]);
     }

@@ -16,7 +16,7 @@ import logInit from './logger';
 import Analytics from './analytics';
 import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
 import JavaHandler from '../minecraft/javaHandler';
-import mcVersionHandler from '../minecraft/mcVersionHandler';
+import MCVersionHandler from '../minecraft/mcVersionHandler';
 
 const semver = require('semver');
 const { remote } = require('electron');
@@ -95,7 +95,7 @@ const Global = {
         SettingsManager.setLastToastNewsID(news.id);
       }
     } catch (e) {
-      ToastManager.createToast('Error', `Error checking for MCM news: ${e.toString()}`);
+      logger.info(`Error checking for toastnews: ${e.toString()}`);
     }
   },
   checkChangelog() {
@@ -675,7 +675,7 @@ const Global = {
             this.updateMigratorStep(`Downloading Version JSON for ${prof.name}`);
             
             migrateLog(`Downloading version json for ${prof.id}`);
-            mcVersionHandler.updateProfile(prof);
+            MCVersionHandler.updateProfile(prof);
 
             if(!fs.existsSync(path.join(prof.profilePath, '/files'))) {
               mkdirp.sync(path.join(prof.profilePath, '/files'));

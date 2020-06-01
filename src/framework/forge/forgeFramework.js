@@ -8,7 +8,7 @@ import LauncherManager from '../../manager/launcherManager';
 import HTTPRequest from '../../host/httprequest';
 import logInit from '../../util/logger';
 import Global from '../../util/global';
-import mcVersionHandler from '../../minecraft/mcVersionHandler';
+import MCVersionHandler from '../../minecraft/mcVersionHandler';
 import FSU from '../../util/fsu';
 
 const logger = logInit('ForgeFramework');
@@ -25,7 +25,7 @@ const ForgeFramework = {
       } else {
         profile.setFrameworkIsInstalling('forge');
 
-        mcVersionHandler.updateProfile(profile);
+        MCVersionHandler.updateProfile(profile);
 
         const libraryPath = path.join(LibrariesManager.getMCMLibraries(), `/mcm-${profile.id}`);
 

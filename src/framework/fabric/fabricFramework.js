@@ -7,7 +7,7 @@ import LibrariesManager from '../../manager/librariesManager';
 import ToastManager from '../../manager/toastManager';
 import LauncherManager from '../../manager/launcherManager';
 import logInit from '../../util/logger';
-import mcVersionHandler from '../../minecraft/mcVersionHandler';
+import MCVersionHandler from '../../minecraft/mcVersionHandler';
 import FSU from '../../util/fsu';
 
 const logger = logInit('FabricFramework');
@@ -18,7 +18,7 @@ const FabricFramework = {
       logger.info(`Beginning install of Fabric ${profile.frameworks.fabric.version} to ${profile.id}`);
       profile.setFrameworkIsInstalling('fabric');
 
-      mcVersionHandler.updateProfile(profile);
+      MCVersionHandler.updateProfile(profile);
 
       const libraryPath = path.join(LibrariesManager.getMCMLibraries(), `/mcm-${profile.id}`);
 

@@ -390,16 +390,24 @@ export default class Profile extends OAMFAsset {
     this.setIcon(path.join(Global.getResourcesPath(), '/logo-sm.png'));
   }
 
-  async launch() {
-    await MCVersionHandler.updateProfile(this, false);
-    if (SettingsManager.currentSettings.launcherIntegration && !LauncherManager.profileExists(this)) {
-      LauncherManager.createProfile(this);
-      this.addIconToLauncher();
-      LauncherManager.updateVersion(this);
-      LauncherManager.setMostRecentProfile(this);
-    }
+  launch() {
+    return new Promise(async resolve => {
+      try {
+        await MCVersionHandler.updateProfile(this, false);
+      } catch (e) {
+        if (e.message === 'no-version-json') {
+          ToastManager.createToast('Unable to launch', 'Minecraft Manager is missing some essential Minecraft Version data. Check your internet connection, and try again.');
+        }
 
-    return new Promise(resolve => {
+        resolve();
+        return;
+      }
+      if (SettingsManager.currentSettings.launcherIntegration && !LauncherManager.profileExists(this)) {
+        LauncherManager.createProfile(this);
+        this.addIconToLauncher();
+        LauncherManager.updateVersion(this);
+        LauncherManager.setMostRecentProfile(this);
+      }
       DirectLauncherManager.launch(this)
         .then(() => {
           if (SettingsManager.currentSettings.closeOnLaunch) {
@@ -418,7 +426,6 @@ export default class Profile extends OAMFAsset {
             }
             resolve();
           } else {
-            console.log(e.stack);
             this.logger.info(`Unable to launch Minecraft directly. Not launcher integrated. Error: ${e.toString()}`);
             ToastManager.createToast('Unable to launch', `${e.toString()}`);
             resolve();

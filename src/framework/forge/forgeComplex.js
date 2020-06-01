@@ -10,7 +10,7 @@ import HTTPRequest from '../../host/httprequest';
 import LibrariesManager from '../../manager/librariesManager';
 import logInit from '../../util/logger';
 import SettingsManager from '../../manager/settingsManager';
-import mcVersionHandler from '../../minecraft/mcVersionHandler';
+import MCVersionHandler from '../../minecraft/mcVersionHandler';
 
 const logger = logInit('ForgeComplex');
 
@@ -244,7 +244,7 @@ const ForgeComplex = {
       logger.info('Finished processors');
 
       logger.info('Creating version...');
-      await mcVersionHandler.updateProfile(profile);
+      await MCVersionHandler.updateProfile(profile);
 
       logger.info('Creating library...');
       const libraryPath = LibrariesManager.createLibraryPath(profile);
