@@ -3,14 +3,18 @@ import AdmZip from 'adm-zip';
 import path from 'path';
 import fs from 'fs';
 import rimraf from 'rimraf';
+import tar from 'tar';
+import mkdirp from 'mkdirp';
 import SettingsManager from '../manager/settingsManager';
 import HTTPRequest from '../host/httprequest';
 import Global from '../util/global';
 import DownloadsManager from '../manager/downloadsManager';
 import ToastManager from '../manager/toastManager';
 import ErrorManager from '../manager/errorManager';
+import logInit from '../util/logger';
 
 const JavaHandler = {
+  logger: logInit('JavaHandler'),
   /**
    * Gets the Java Path for the requested profile
    * If no profile is given, the default global
@@ -70,6 +74,8 @@ const JavaHandler = {
       if (os.platform() === 'darwin') osName = 'mac';
       if (os.platform() === 'linux') osName = 'linux';
 
+      osName = 'linux';
+
       let url;
       if (version === 'latest') {
         url = `https://api.adoptopenjdk.net/v3/binary/latest/8/ga/${osName}/${arch}/jre/hotspot/normal/adoptopenjdk`;
@@ -77,7 +83,10 @@ const JavaHandler = {
         url = `https://api.adoptopenjdk.net/v3/binary/version/${version}/${osName}/${arch}/jre/hotspot/normal/adoptopenjdk`;
       }
 
-      const tempPath = path.join(Global.MCM_TEMP, `/java-install-${new Date().getTime()}.zip`);
+      let ext = 'zip';
+      if (osName === 'mac' || osName === 'linux') ext = 'tar.gz';
+
+      const tempPath = path.join(Global.MCM_TEMP, `/java-install-${new Date().getTime()}.${ext}`);
 
 
       DownloadsManager.startFileDownload(`Java ${version}`, url, tempPath, {
@@ -85,35 +94,59 @@ const JavaHandler = {
       }).then(() => {
         const tempExtract = path.join(Global.MCM_TEMP, `/java-extract-${new Date().getTime()}`);
 
-        const zip = new AdmZip(tempPath);
-        zip.extractEntryTo(zip.getEntries()[0].entryName, tempExtract, true, true);
+        if (ext === 'zip') {
+          const zip = new AdmZip(tempPath);
+          zip.extractEntryTo(zip.getEntries()[0].entryName, tempExtract, true, true);
+        } else if (ext === 'tar.gz') {
+          mkdirp.sync(tempExtract);
+          tar.extract({
+            gzip: true,
+            file: tempPath,
+            sync: true,
+            cwd: tempExtract
+          }, []);
+        }
 
         fs.readdir(tempExtract, (e, files) => {
           try {
             if (fs.existsSync(to)) rimraf.sync(to);
-          fs.rename(path.join(tempExtract, files[0]), to, () => {
-            fs.unlinkSync(tempPath);
+            const fileName = osName === 'mac' ? files[1] : files[0];
+            fs.rename(path.join(tempExtract, fileName), to, () => {
+              fs.unlinkSync(tempPath);
 
-            if (version === 'latest') {
-              resolve(files[0]);
-            } else {
-              resolve(version);
-            }
-          });
+              if (version === 'latest') {
+                resolve(files[0]);
+              } else {
+                resolve(version);
+              }
+            });
         } catch (error) {
+          this.logger.error(`Unable to install Java: ${error.toString()}`);
           ToastManager.createToast('Unable to install Java', ErrorManager.makeReadable(error, 'java'));
           resolve('error');
         }
         });
       })
-      .catch(() => {
+      .catch((e) => {
         if (fs.existsSync(Global.PROFILES_PATH)) {
+          this.logger.error(`Unable to download Java: ${e.toString()}`);
           ToastManager.createToast('Unable to download Java', 'Check your internet connection, and try again');
         }
         resolve('error');
       });
     });
-  }
+  },
+  getDefaultJavaPath() {
+    if (os.platform() === 'darwin') {
+      return '/Contents/Home/bin/java';
+    } if (os.platform() === 'win32') {
+      return '/bin/javaw.exe';
+    } if (os.platform() === 'linux') {
+      return '/bin/java';
+    }
+
+    return '/bin/javaw.exe';
+  },
 };
 
 export default JavaHandler;

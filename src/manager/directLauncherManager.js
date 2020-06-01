@@ -6,7 +6,6 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import mkdirp from 'mkdirp';
-import rimraf from 'rimraf';
 import crypto from 'crypto';
 import FSU from '../util/fsu';
 import VersionsManager from './versionsManager';
@@ -152,16 +151,10 @@ const DirectLauncherManager = {
       mcArgs = mcArgs.replace('${user_type}', 'mojang');
       mcArgs = mcArgs.replace('${user_properties}', '{}');
 
-      if (profile.getPrimaryFramework() === 'none') {
-        if (versionJSON.type) {
-          mcArgs = mcArgs.replace('${version_type}', versionJSON.type);
-        } else {
-          mcArgs = mcArgs.replace('${version_type}', 'release');
-        }
-      } else if (profile.getPrimaryFramework() === 'fabric') {
-        mcArgs = mcArgs.replace('${version_type}', 'fabric');
-      } else if (profile.getPrimaryFramework() === 'forge') {
-        mcArgs = mcArgs.replace('${version_type}', 'forge');
+      if (versionJSON.type) {
+        mcArgs = mcArgs.replace('${version_type}', versionJSON.type);
+      } else {
+        mcArgs = mcArgs.replace('${version_type}', 'release');
       }
 
 
@@ -177,7 +170,7 @@ const DirectLauncherManager = {
 
       const endJavaArgs = `-Xmx${ramAmount}G ${remainingArgs} `;
 
-      let finishedJavaArgs = `${endJavaArgs}`;
+      let finishedJavaArgs = '';
 
       if (!versionJSON.arguments) {
         // no arguments, we have to figure them out ourselves
@@ -219,6 +212,8 @@ const DirectLauncherManager = {
           finishedJavaArgs += `${versionJSON.mainClass} `;
           finishedJavaArgs += mcArgs;
         }
+
+        finishedJavaArgs += endJavaArgs;
 
       finishedJavaArgs = finishedJavaArgs.replace('${launcher_name}', 'minecraft-launcher');
       finishedJavaArgs = finishedJavaArgs.replace('${launcher_version}', 'X');
@@ -326,9 +321,8 @@ const DirectLauncherManager = {
 
   async extractNatives(profile, versionJSON) {
     const nativesPath = path.join(profile.profilePath, '/_mcm/natives');
-    if (fs.existsSync(nativesPath)) rimraf.sync(nativesPath);
 
-    mkdirp.sync(nativesPath);
+    FSU.createDirIfMissing(nativesPath);
 
     for (const library of versionJSON.libraries) {
       if (library.natives && this.allowLibrary(library)) {
@@ -366,7 +360,11 @@ const DirectLauncherManager = {
         });
 
         allowedEntries.forEach(entry => {
-          zip.extractEntryTo(entry, nativesPath, false, true);
+          try {
+            zip.extractEntryTo(entry, nativesPath, false, true);
+          } catch (e) {
+            logger.info(`Unable to extract native ${entry}; game may be running`);
+          }
         });
       }
     }
@@ -497,15 +495,26 @@ const DirectLauncherManager = {
         }
 
         if (fs.existsSync(assetIndexPath)) {
+          let downloadsFinished = 0;
+          let totalDownloads = 0;
+          const download = await DownloadsManager.createProgressiveDownload(`Minecraft Assets\n_A_${profile.name}`);
           const indexJSON = await FSU.readJSON(assetIndexPath);
+
+          const downloadFinished = () => {
+            downloadsFinished++;
+            DownloadsManager.setDownloadProgress(download.name, Math.ceil((downloadsFinished / totalDownloads) * 100));
+          };
+
           const toDownload = Object.keys(indexJSON.objects).map(object => {
             const hash = indexJSON.objects[object].hash;
             const hashedObjectPath = path.join(assetsPath, `/objects/${hash.substring(0, 2)}/${hash}`);
             if (!fs.existsSync(hashedObjectPath)) {
               FSU.createDirIfMissing(path.join(Global.MCM_PATH, `/shared/assets/objects/${hash.substring(0, 2)}`));
+              totalDownloads++;
               return {
                 url: `https://resources.download.minecraft.net/${hash.substring(0, 2)}/${hash}`,
-                dest: path.join(Global.MCM_PATH, `/shared/assets/objects/${hash.substring(0, 2)}/${hash}`)
+                dest: path.join(Global.MCM_PATH, `/shared/assets/objects/${hash.substring(0, 2)}/${hash}`),
+                onFinish: downloadFinished
               };
             }
 
@@ -513,6 +522,8 @@ const DirectLauncherManager = {
           });
 
           await Downloader.downloadConcurrently(toDownload);
+
+          DownloadsManager.removeDownload(download.name);
           resolve();
         }
       }

@@ -114,7 +114,9 @@ const SettingsManager = {
   },
   setDedicatedRam(amount) {
     logger.info(`Changing dedicatedRam to ${amount}`);
-    LauncherManager.setDedicatedRam(amount);
+    if (this.currentSettings.launcherIntegration) {
+      LauncherManager.setDedicatedRam(amount);
+    }
     this.currentSettings.dedicatedRam = amount;
     this.save();
   },

@@ -45,6 +45,7 @@ const Global = {
   MCM_VERSION: '2.4.7',
   MCM_RELEASE_DATE: '5/25/2020',
 
+  MCM_PROFILE_VERSION: 1,
   OMAF_VERSION: '1.0.0',
 
   /**
@@ -641,7 +642,7 @@ const Global = {
 
         migrateLog('Setting minimum global Java settings');
         SettingsManager.currentSettings.java = {
-          path: path.join(Global.MCM_PATH, '/shared/binaries/java/bin/javaw.exe'),
+          path: path.join(Global.MCM_PATH, '/shared/binaries/java/', JavaHandler.getDefaultJavaPath()),
           manual: false,
           customJavaArgs: '',
           customArgsActive: false,
@@ -668,7 +669,7 @@ const Global = {
 
             migrateLog(`Assigning java release name to ${prof}`)
             prof.mcm.java.releaseName = version;
-            prof.mcm.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/bin/javaw.exe')
+            prof.mcm.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/', JavaHandler.getDefaultJavaPath);
             prof.mcm.version = 1;
             prof.save();
 

@@ -61,7 +61,7 @@ const MCVersionHandler = {
       const versionPath = path.join(profile.mcmPath, '/version/');
       FSU.createDirIfMissing(versionPath);
 
-      if (true) {
+      if (!fss.existsSync(path.join(versionPath, '/default.json')) || redownload) {
         try {
           await fs.writeFile(path.join(versionPath, '/default.json'), JSON.stringify(await this.getDefaultJSON(profile.minecraftVersion)));
         } catch (e) {

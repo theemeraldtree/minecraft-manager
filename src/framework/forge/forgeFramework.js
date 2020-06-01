@@ -4,7 +4,6 @@ import VersionsManager from '../../manager/versionsManager';
 import LibrariesManager from '../../manager/librariesManager';
 import DownloadsManager from '../../manager/downloadsManager';
 import ForgeComplex from './forgeComplex';
-import LauncherManager from '../../manager/launcherManager';
 import HTTPRequest from '../../host/httprequest';
 import logInit from '../../util/logger';
 import Global from '../../util/global';
@@ -60,7 +59,6 @@ const ForgeFramework = {
       logger.info(`Starting removal of Forge from ${profile.id}`);
       LibrariesManager.deleteLibrary(profile).then(() => {
         VersionsManager.deleteVersion(profile).then(() => {
-          LauncherManager.setProfileData(profile, 'lastVersionId', profile.version.minecraft.version);
           profile.removeFramework('forge');
 
           logger.info(`Finished removing Forge from ${profile.id}`);
@@ -106,9 +104,12 @@ const ForgeFramework = {
       json.inheritsFrom = undefined;
       json.id = undefined;
       json.time = undefined;
-      json.arguments = {
-        '+game': json.arguments.game
-      };
+
+      if (json.arguments && json.arguments.game) {
+        json.arguments = {
+          '+game': json.arguments.game
+        };
+      }
       resolve(json);
     })
 };

@@ -5,6 +5,7 @@ import LibrariesManager from '../manager/librariesManager';
 import VersionsManager from '../manager/versionsManager';
 import LauncherManager from '../manager/launcherManager';
 import ProfilesManager from '../manager/profilesManager';
+import SettingsManager from '../manager/settingsManager';
 
 const Debug = {
 	systemSpecs: () => `
@@ -23,7 +24,11 @@ Memory:
 	Free: ${os.freemem()}
 	Total: ${os.totalmem()}`,
 	dataDump: () => {
-		const allDumpedMCProfiles = LauncherManager.dumpAllProfiles();
+		let allDumpedMCProfiles = [];
+		if (SettingsManager.currentSettings.launcherIntegration) {
+			allDumpedMCProfiles = LauncherManager.dumpAllProfiles();
+		}
+
 		return `
 =======
 Minecraft Manager Data Dump
@@ -104,6 +109,8 @@ Versions Path: ${VersionsManager.getVersionsPath()}
 All Versions: ${VersionsManager.dumpAllVersions().join(',')}
 Extra Versions: ${Global.checkExtraMinecraftVersions()}
 
+${SettingsManager.currentSettings.launcherIntegration && `
+LAUNCHER INTEGRATION: ENABLED
 Minecraft Client Profiles
 ---
 Profiles Path: ${LauncherManager.getLauncherProfiles()}
@@ -121,6 +128,14 @@ All Profiles: ${Object.keys(allDumpedMCProfiles)
 				.join('')}
 Extra Profiles: ${Global.checkExtraMinecraftProfiles()}
 
+`}
+
+${!SettingsManager.currentSettings.launcherIntegration && `
+LAUNCHER INTREGRATION: DISABLED
+`}
+
+All Minecraft Manager Settings:
+${JSON.stringify(SettingsManager.currentSettings.launcherIntegration)}
 =======
 End Minecraft Manager Data Dump
 =======`;

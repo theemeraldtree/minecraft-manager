@@ -156,7 +156,7 @@ function WelcomePage({ theme, history }) {
 
     if (version !== 'error') {
       SettingsManager.currentSettings.java = {
-        path: path.join(Global.MCM_PATH, '/shared/binaries/java/bin/javaw.exe'),
+        path: path.join(Global.MCM_PATH, '/shared/binaries/java/', JavaHandler.getDefaultJavaPath()),
         releaseName: version,
         manualPath: ''
       };

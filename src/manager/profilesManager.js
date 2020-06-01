@@ -334,7 +334,10 @@ const ProfilesManager = {
           }
         },
         mcm: {
-          version: 1
+          version: Global.MCM_PROFILE_VERSION,
+          java: {
+
+          }
         }
       });
 
@@ -344,9 +347,10 @@ const ProfilesManager = {
 
       profile.applyDefaults();
 
+      if (SettingsManager.currentSettings.launcherIntegration) {
       logger.info(`Creating launcher profile for ${profile.id}`);
-
       LauncherManager.createProfile(profile);
+      }
 
       logger.info(`Saving new profile ${profile.id}`);
 
@@ -376,9 +380,10 @@ const ProfilesManager = {
     this.updateProfile(profile);
 
     return new Promise(resolve => {
-      logger.info(`Deleting launcher profile for ${profile.id}`);
-
-      LauncherManager.deleteProfile(profile);
+      if (SettingsManager.currentSettings.launcherIntegration) {
+        logger.info(`Deleting launcher profile for ${profile.id}`);
+        LauncherManager.deleteProfile(profile);
+      }
 
       logger.info(`Removing profile folder for ${profile.id}`);
       rimraf(profile.profilePath, err => {

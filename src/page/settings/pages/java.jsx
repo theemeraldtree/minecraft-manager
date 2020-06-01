@@ -124,11 +124,11 @@ function Java({ theme, profileScope }) {
     setJavaInstalling(false);
     if (version !== 'error') {
       if (!profileScope) {
-        SettingsManager.currentSettings.java.path = path.join(installPath, '/bin/javaw.exe');
+        SettingsManager.currentSettings.java.path = path.join(installPath, JavaHandler.getDefaultJavaPath());
         SettingsManager.currentSettings.java.releaseName = version;
         SettingsManager.save();
       } else {
-        profileScope.setOverride('java-install-path', path.join(installPath, '/bin/javaw.exe'));
+        profileScope.setOverride('java-install-path', path.join(installPath, JavaHandler.getDefaultJavaPath()));
         profileScope.setOverride('java-releasename', version);
       }
       setJavaReleaseName(version);

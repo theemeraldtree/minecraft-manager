@@ -33,13 +33,13 @@ export default class Profile extends OAMFAsset {
     if (json.isDefaultProfile) this.isDefaultProfile = json.isDefaultProfile;
     if (json.mcmSyncOptionsTXT) this.mcmSyncOptionsTXT = json.mcmSyncOptionsTXT;
 
+    this.logger = logInit(`{${json.id}}`);
+
     this.error = false;
 
     this.initLocalValues();
     this.loadSubAssets();
     this.checkMissingDirectories();
-
-    this.logger = logInit(`{${json.id}}`);
   }
 
   /**
@@ -50,23 +50,7 @@ export default class Profile extends OAMFAsset {
 
     if (!this.gameDir) this.gameDir = path.join(this.profilePath, '/files');
 
-    if (!this.mcm) {
-        this.mcm = {
-        java: {
-          version: 1,
-          syncOptionsTXT: false,
-          syncOptionsOF: false,
-          syncServers: false,
-          java: {
-            releaseName: SettingsManager.currentSettings.java.releaseName,
-            path: SettingsManager.currentSettings.java.path,
-            manual: false,
-            manualPath: '',
-            dedicatedRam: SettingsManager.currentSettings.dedicatedRam
-          }
-        }
-    };
-  }
+    this.checkMissingMCMValues();
 
     this.subAssetsPath = path.join(this.profilePath, '/_omaf/subAssets');
     this.mcmPath = path.join(this.profilePath, '/_mcm/');
@@ -364,13 +348,15 @@ export default class Profile extends OAMFAsset {
   }
 
   addIconToLauncher() {
-    Jimp.read(this.iconPath).then(jmp =>
-      jmp.contain(128, 128).getBase64(Jimp.MIME_PNG, (err, res) => {
-        if (!err) {
-          LauncherManager.setProfileData(this, 'icon', res);
-        }
-      })
-    );
+    if (SettingsManager.currentSettings.launcherIntegration) {
+      Jimp.read(this.iconPath).then(jmp =>
+        jmp.contain(128, 128).getBase64(Jimp.MIME_PNG, (err, res) => {
+          if (!err) {
+            LauncherManager.setProfileData(this, 'icon', res);
+          }
+        })
+      );
+    }
   }
 
   setIcon(img) {
@@ -789,15 +775,34 @@ export default class Profile extends OAMFAsset {
     });
   }
 
+  checkMissingMCMValues() {
+    const { currentSettings } = SettingsManager;
+
+    if (!this.mcm) {
+      this.mcm = {
+        version: Global.MCM_PROFILE_VERSION,
+        syncOptionsTXT: currentSettings.defaultsSyncOptionsTXT,
+        syncOptionsOF: currentSettings.defaultsSyncOptionsOF,
+        syncServers: currentSettings.defaultsSyncServers
+      };
+    }
+
+    if (!this.mcm.java) {
+      this.mcm.java = {
+        releaseName: currentSettings.java.releaseName,
+        path: currentSettings.java.path,
+        manual: false,
+        manualPath: '',
+        dedicatedRam: currentSettings.dedicatedRam
+      };
+    }
+  }
+
   applyDefaults() {
     this.logger.info('Applying defaults...');
     const { currentSettings } = SettingsManager;
 
-    this.mcm = {
-      syncOptionsTXT: currentSettings.defaultsSyncOptionsTXT,
-      syncOptionsOF: currentSettings.defaultsSyncOptionsOF,
-      syncServers: currentSettings.defaultsSyncServers
-    };
+    this.checkMissingMCMValues();
 
     if (fs.existsSync(path.join(Global.getMCPath(), 'options.txt'))) {
       if (currentSettings.defaultsSyncOptionsTXT) {

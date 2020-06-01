@@ -32,6 +32,12 @@ const CLink = styled(NavLink)`
     filter: brightness(1);
     font-weight: 900;
   }
+  &:focus {
+    outline: none;
+  }
+  &:focus-visible {
+    outline: 2px solid yellow;  
+  }
   outline-offset: -2px;
   margin-bottom: 20px;
   transition: font-weight 150ms;
