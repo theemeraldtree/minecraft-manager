@@ -36,10 +36,10 @@ async function load() {
   logger.info('Done loading settings');
 
   try {
-    logger.info('Attempting to update MC versions...');
-    Global.updateMCVersions();
-
     if (fs.existsSync(Global.PROFILES_PATH)) {
+      logger.info('Attempting to update MC versions...');
+      Global.updateMCVersions();
+
       // Check for directories - we need to make sure everything exists
       logger.info('Checking for missing essential library directories...');
 
@@ -91,10 +91,12 @@ async function load() {
       logger.info('Checking for libraries...');
       LibrariesManager.checkExist();
 
-      logger.info('Checking for extra versions, profiles, and libraries...');
-      Global.checkMinecraftVersions();
-      Global.checkMinecraftProfiles();
-      Global.checkMinecraftLibraries();
+      if (SettingsManager.currentSettings.launcherIntegration) {
+        logger.info('Checking for extra versions, profiles, and libraries...');
+        Global.checkMinecraftVersions();
+        Global.checkMinecraftProfiles();
+        Global.checkMinecraftLibraries();
+      }
 
       if (SettingsManager.currentSettings.checkToastNews) {
         logger.info('Checking for Toast news...');
@@ -118,13 +120,14 @@ async function load() {
   } catch (e) {
     logger.error('Something went wrong[1]');
     logger.error(e.toString());
+    console.log(e.stack);
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
   }
 
   logger.info('Caching images...');
   Global.cacheImage(theemeraldtreeLogo);
 
-  if (SettingsManager.currentSettings.launcherIntegration) {
+  if (SettingsManager.currentSettings.launcherIntegration && fs.existsSync(Global.PROFILES_PATH)) {
     logger.info('Reintregating...');
     MCLauncherIntegrationHandler.integrate();
   }

@@ -1,70 +1,48 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router-dom';
-import styled from 'styled-components';
-import fs from 'fs';
 import os from 'os';
+import styled, { css } from 'styled-components';
 import path from 'path';
-import { Button, TextInput, Detail, Checkbox, InputHolder, withTheme } from '@theemeraldtree/emeraldui';
-import Global from '../../util/global';
-import SettingsManager from '../../manager/settingsManager';
-import LibrariesManager from '../../manager/librariesManager';
-import logo from '../../img/logo-sm.png';
+import transition from 'styled-transition-group';
+import { withRouter } from 'react-router-dom';
+import { Button, Spinner, InputHolder, Detail, withTheme } from '@theemeraldtree/emeraldui';
+import mkdirp from 'mkdirp';
 import NavContext from '../../navContext';
-import tipShare from './img/tip-share.png';
-import tipRightClick from './img/tip-right-click.png';
-import LauncherManager from '../../manager/launcherManager';
+import logo from '../../img/logo-sm.png';
+import JavaHandler from '../../minecraft/javaHandler';
+import Global from '../../util/global';
+import ToggleSwitch from '../../component/toggleSwitch/toggleSwitch';
+import PathInput from '../settings/components/pathInput';
+import QuestionButton from '../../component/questionButton/questionButton';
+import Gap from '../settings/components/gap';
+import SettingsManager from '../../manager/settingsManager';
 import Analytics from '../../util/analytics';
+import AlertManager from '../../manager/alertManager';
 
 const { dialog } = require('electron').remote;
 
-const Title = styled.p`
-  color: white;
-  font-size: 26pt;
-  font-weight: 200;
-  margin: 0;
-`;
-
-const WelcomeBox = styled.div`
-  background-color: #404040;
-  max-width: 600px;
-  padding: 10px;
-  text-align: center;
+const Center = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(6px);
+  z-index: 9;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-flow: column;
+  color: white;
 `;
 
-const Subtext = styled.p`
-  color: white;
-  margin: 0;
-`;
-
-const Content = styled.div`
-  padding: 5px;
-  display: flex;
-  align-items: center;
-  flex-flow: column;
-  color: white;
-
-  img {
-    width: 200px;
-  }
-
-  h3 {
-    font-size: 21pt;
-  }
-
-  p {
-    font-size: 15pt;
-    max-width: 500px;
-    text-align: center;
-  }
-
-  input {
-    font-size: 13pt;
-  }
+const Box = styled.div`
+  width: 550px;
+  height: 550px;
+  background: #292929;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
 `;
 
 const Logo = styled.div`
@@ -74,111 +52,189 @@ const Logo = styled.div`
   background-size: contain;
 `;
 
-const TI = styled(TextInput)`
-  &&&& {
-    max-width: 680px;
-    width: 100%;
+const Container = transition.div`
+  position: absolute;
+  width: 550px;
+  height: 550px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  &:enter {
+    margin-left: 1000px;
+    opacity: 0;
+  }
+  &:enter-active {
+    margin-left: 0;
+    opacity: 1;
+    transition: 500ms ease-in-out;
+  }
+  &:exit {
+    margin-left: 0;
+    opacity: 1;
+  }
+  &:exit-active {
+    margin-left: -1000px;
+    opacity: 0;
+    transition: 500ms ease-in-out;
   }
 `;
 
-const GB = styled(Button)`
-  margin-top: 20px;
+const Pagination = styled.div`
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 50px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
-const IH = styled(InputHolder)`
-  && {
-    margin-top: 1px;
-    max-width: 650px;
-    width: 100%;
+const PageDot = styled.div`
+  width: 10px;
+  height: 10px;
+  border-radius: 10px;
+  background: white;
+  margin-right: 5px;
+  transition: 500ms;
+  ${props => props.active && css`
+    background: #45C15A; 
+  `}
+`;
 
-    div {
-      width: 100%;
-    }
+const WelcomeContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-flow: column;
+  h1 {
+    margin-bottom: 0;
+    font-size: 18pt;
+  }
+  h2 {
+    font-weight: 400;
+    font-size: 14pt;
   }
 `;
 
-const Spacing = styled.div`
-  width: 100%;
-  height: 30px;
+const LIAdvanced = styled.div`
+  input {
+    width: calc(100vw - 400px) !important;
+  }
 `;
 
-const AutofillText = styled.p`
-  margin: 0;
-  font-size: 10pt !important;
-  color: white;
+const IssuesLink = styled.div`
+  position: absolute;
+  bottom: 10px;
 `;
 
-const LeftSubText = styled(Subtext)`
-  text-align: left !important;
-  font-size: 13pt !important;
-  margin-top: 20px !important;
-  margin-bottom: 5px !important;
-  padding: 10px;
-  background-color: #404040;
-`;
-
-function WelcomePage({ history, theme }) {
-  const nav = useContext(NavContext);
-
-  const [mcHome, setMCHome] = useState(Global.getDefaultMinecraftPath());
-  const [mcExe, setMCExe] = useState(Global.getDefaultMCExePath());
+function WelcomePage({ theme, history }) {
+  const { header } = useContext(NavContext);
   const [step, setStep] = useState(0);
-  const [preparing, setPreparing] = useState(false);
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
+  const [javaInstalled, setJavaInstalled] = useState(false);
+  const [javaError, setJavaError] = useState(false);
+  const [enableLauncherIntegration, setEnableLauncherIntegration] = useState(false);
+  const [mcHome, setMCHome] = useState('');
+  const [mcExe, setMCExe] = useState('');
+  const [enableAnalytics, setEnableAnalytics] = useState(true);
+  const [settingUp, setSettingUp] = useState(true);
+  const [setupError, setSetupError] = useState(false);
+  const [errorHappened, setErrorHappened] = useState(false);
 
-  useEffect(() => {
-    nav.header.setTitle('welcome');
-    nav.header.setShowChildren(false);
-  });
+  const nextStep = () => setStep(step + 1);
 
-  const nextStep = () => {
-    setStep(step + 1);
+  const installJava = async () => {
+    setJavaInstalled(false);
+    SettingsManager.createSettings();
+
+    mkdirp.sync(Global.MCM_TEMP);
+    mkdirp.sync(path.join(Global.MCM_PATH, '/shared/binaries/java'));
+
+    const version = await JavaHandler.installVersion('latest', path.join(Global.MCM_PATH, '/shared/binaries/java'));
+
+    if (version !== 'error') {
+      SettingsManager.currentSettings.java = {
+        path: path.join(Global.MCM_PATH, '/shared/binaries/java/bin/javaw.exe'),
+        releaseName: version,
+        manualPath: ''
+      };
+
+      setJavaInstalled(true);
+    } else {
+      setStep(1);
+      setJavaError(true);
+      setJavaInstalled(true);
+      setErrorHappened(true);
+    }
+    setJavaInstalled(true);
   };
 
-  const chooseHomeDirectory = () => {
-    const p = dialog.showOpenDialog({
+  const setup = async () => {
+    setSettingUp(true);
+    setSetupError(false);
+
+    mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
+    mkdirp.sync(path.join(Global.MCM_PATH, '/shared/jars'));
+    mkdirp.sync(path.join(Global.MCM_PATH, '/shared/assets'));
+
+    SettingsManager.currentSettings.launcherIntegration = enableLauncherIntegration;
+    SettingsManager.currentSettings.analyticsEnabled = enableAnalytics;
+    SettingsManager.currentSettings.lastVersion = Global.MCM_VERSION;
+
+    SettingsManager.save();
+
+    if (enableAnalytics) Analytics.send('first-install');
+
+    const versions = await Global.updateMCVersions(true);
+
+    setTimeout(() => {
+      if (versions === 'no-connection') {
+        setErrorHappened(true);
+        setSettingUp(false);
+        setSetupError(true);
+      } else {
+        setSettingUp(false);
+        mkdirp.sync(Global.PROFILES_PATH);
+      }
+    }, 1000);
+  };
+
+
+  useEffect(() => {
+    if (step === 1) {
+      installJava();
+    }
+
+    if (step === 4) {
+      setup();
+    }
+  }, [step]);
+
+  useEffect(() => {
+    header.setShowBackButton(false);
+    header.setTitle('profiles');
+    header.setShowChildren(true);
+    header.setChildren(
+      <>
+      </>
+    );
+  }, []);
+
+  const clickLauncherIntegration = () => setEnableLauncherIntegration(!enableLauncherIntegration);
+
+  const chooseMCHome = () => {
+    const p = dialog.showOpenDialogSync({
       title: 'Choose your Minecraft Home Directory',
       defaultPath: Global.getDefaultMinecraftPath(),
       buttonLabel: 'Select Directory',
       properties: ['openDirectory', 'showHiddenFiles']
     });
-    if (p[0]) {
+
+    if (p && p[0]) {
+      SettingsManager.setHomeDirectory(p[0]);
       setMCHome(p[0]);
-    }
-  };
-
-  const start = async () => {
-    setPreparing(true);
-    SettingsManager.setHomeDirectory(mcHome);
-    SettingsManager.setMCExe(mcExe);
-
-    SettingsManager.currentSettings.mcAccount = Object.keys(LauncherManager.getMCAccounts())[0];
-    SettingsManager.currentSettings.analyticsEnabled = analyticsEnabled;
-    SettingsManager.currentSettings.lastVersion = Global.MCM_VERSION;
-    SettingsManager.save();
-
-    if (analyticsEnabled) Analytics.send('first-install');
-
-    const mcl = path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager');
-    if (!fs.existsSync(mcl)) {
-      fs.mkdirSync(mcl);
-    }
-
-    if (!fs.existsSync(LibrariesManager.getMCMLibraries())) {
-      fs.mkdirSync(LibrariesManager.getMCMLibraries());
-    }
-
-    const result = await Global.updateMCVersions(true);
-
-    fs.mkdirSync(path.join(Global.MCM_TEMP));
-
-    if (result === 'no-connection') {
-      setPreparing(false);
-    } else {
-      if (!fs.existsSync(Global.PROFILES_PATH)) {
-        fs.mkdirSync(Global.PROFILES_PATH);
-      }
-      history.push('/');
     }
   };
 
@@ -189,207 +245,172 @@ function WelcomePage({ history, theme }) {
     } else if (os.platform() === 'darwin') {
       properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory'];
     }
-    const p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialogSync({
       title: 'Choose your Minecraft Executable',
       defaultPath: Global.getDefaultMCExePath(),
       buttonLabel: 'Select File',
       properties
     });
-    if (p[0]) {
+
+    if (p && p[0]) {
+      console.log(p[0]);
+      SettingsManager.setMCExe(p[0]);
       setMCExe(p[0]);
     }
   };
 
-  const analyticsClick = () => {
-    setAnalyticsEnabled(!analyticsEnabled);
+  const clickAnalytics = () => setEnableAnalytics(!enableAnalytics);
+
+  const finish = () => {
+    history.push('/');
+  };
+
+  const questionHomeDirectory = () => {
+    AlertManager.messageBox('minecraft home directory', `
+    Your Minecraft Home directory is where the regular Minecraft Launcher stores info about the game.
+    <br /><br />
+    It's sometimes referred to as the <b>.minecraft folder</b>.`);
+  };
+
+  const questionMCExe = () => {
+    AlertManager.messageBox('minecraft executable', `
+    The Minecraft Executable is the file that is run to launch regular Minecraft.
+    <br /><br />
+    On Windows, it's typically located at<br /><b>C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe</b>
+    `);
   };
 
   return (
     <>
-      <Content>
-        <Spacing />
-        {!preparing && (
-          <>
-            {step === 0 && (
-              <>
-                <WelcomeBox>
-                  <Logo />
-                  <Title>Welcome to Minecraft Manager</Title>
-                  <Subtext>The easiest way to manage your Minecraft Launcher</Subtext>
-                </WelcomeBox>
-                <GB onClick={nextStep} color="green">
-                  continue
-                </GB>
-              </>
-            )}
+      <Center>
+        <Box>
 
-            {step === 1 && (
-              <>
-                <WelcomeBox>
-                  <Title>A quick word about your Launcher</Title>
-                </WelcomeBox>
-                <LeftSubText>
-                  <b>
-                    Minecraft Manager is very different from any other 3rd-party Minecraft Launcher you might've used.
-                  </b>
-                  <br />
-                  <br />
-                  Minecraft Manager adds your Profiles and Modpacks directly to the vanilla Minecraft Launcher, unlike
-                  other launchers.
-                  <br />
-                  <br />
-                  This may seem strange, but it allows for everything you do that's Minecraft-related to be in one
-                  place.
-                </LeftSubText>
-                <LeftSubText>
-                  Before continuing with setup, it's recommended that you{' '}
-                  <b>backup anything in your .minecraft folder that you don't want to lose,</b> in case something goes
-                  wrong
-                </LeftSubText>
-                <GB onClick={nextStep} color="green">
-                  continue with setup
-                </GB>
-              </>
-            )}
+          <Container in={step === 0} timeout={500} unmountOnExit>
+            <WelcomeContainer>
+              <Logo />
+              <h1>Welcome to Minecraft Manager</h1>
+              <h2>The easiest way to manage and <br />install mods, modpacks, and more.</h2>
+              <Button onClick={nextStep} color="green">Get Started</Button>
+            </WelcomeContainer>
+          </Container>
 
-            {step === 2 && (
-              <>
-                <Spacing />
-                <Title>Is this where your .minecraft folder is?</Title>
+          <Container in={step === 1} timeout={500} unmountOnExit>
+            <WelcomeContainer>
+              <h1>Java Install</h1>
+              {!javaError && <h2>Java is automatically being downloaded and installed.<br />We'll let you know when it's done.</h2>}
+              {javaError && <h2>Something went wrong while installing Java.<br />Check your internet connection, and try again.</h2>}
+              {!javaInstalled && <Spinner />}
+              {(javaInstalled && !javaError) && <Button onClick={nextStep} color="green">Continue</Button>}
+              {(javaError && javaInstalled) && <Button onClick={installJava} color="green">Try Again</Button>}
+            </WelcomeContainer>
+          </Container>
 
-                <IH>
-                  <div>
-                    <TI theme={theme} disabled value={mcHome} />
-                    <Button onClick={chooseHomeDirectory} color="green">
-                      change
-                    </Button>
+          <Container in={step === 2} timeout={500} unmountOnExit>
+            <WelcomeContainer>
+              <h1>Launcher Integration</h1>
+              <h2>
+                Minecraft Manager allows you to synchronize accounts, data,<br />
+                and run profiles from within the regular Minecraft Launcher.
+                <br /><br />
+                This setting can be turned off at any time.
+                <br />Do you want to enable this feature?
+              </h2>
+              <InputHolder>
+                <ToggleSwitch onClick={clickLauncherIntegration} value={enableLauncherIntegration} />
+                <Detail>Enable Launcher Integration</Detail>
+              </InputHolder>
+              {enableLauncherIntegration && (
+              <LIAdvanced>
+                <Gap />
+                <InputHolder vertical>
+                  <Detail>Enter your Minecraft Home Directory<QuestionButton onClick={questionHomeDirectory} /></Detail>
+                  <div style={{ marginTop: '10px' }}>
+                    <PathInput readOnly theme={theme} value={mcHome} />
+                    <Button onClick={chooseMCHome} color="green">browse</Button>
                   </div>
-                </IH>
-                <AutofillText>
-                  Most people will not have changed this. However if you have, please update it accordingly.
-                </AutofillText>
-
-                <GB onClick={nextStep} color="green">
-                  continue
-                </GB>
-              </>
-            )}
-
-            {step === 3 && (
-              <>
-                <Spacing />
-                <Title>Is this where your Minecraft Executable is?</Title>
-
-                <IH>
-                  <div>
-                    <TI theme={theme} disabled value={mcExe} />
-                    <Button onClick={chooseMCExe} color="green">
-                      change
-                    </Button>
-                  </div>
-                </IH>
-                <AutofillText>
-                  Most people will not have changed this. However if you have, please update it accordingly.
-                </AutofillText>
-
-                <GB onClick={nextStep} color="green">
-                  continue
-                </GB>
-              </>
-            )}
-
-            {step === 4 && (
-              <>
-                <Spacing />
-                <Title>Analytics</Title>
-
-                <p>
-                  Minecraft Manager contains anonymous, privacy-respecting analytics. <br />
-                  Would you like these to be enabled?
-                </p>
-
-                <InputHolder>
-                  <Checkbox lighter checked={analyticsEnabled} onClick={analyticsClick} />
-                  <Detail>Enable Analytics</Detail>
                 </InputHolder>
 
-                <GB onClick={nextStep} color="green">
-                  continue
-                </GB>
-              </>
-            )}
+                <Gap />
 
-            {step === 5 && (
-              <>
-                <Spacing />
-                <Title>You're all set!</Title>
+                <InputHolder vertical>
+                  <Detail>Enter your Minecraft Executable Path<QuestionButton onClick={questionMCExe} /></Detail>
+                  <div style={{ marginTop: '10px' }}>
+                    <PathInput readOnly theme={theme} value={mcExe} />
+                    <Button onClick={chooseMCExe} color="green">browse</Button>
+                  </div>
+                </InputHolder>
 
-                <h3>You're done setting up Minecraft Manager.</h3>
-                <p>
-                  Check out these tips and tricks to see what you can do. <br />
-                  If you want more,{' '}
-                  <a href="https://theemeraldtree.net/mcm/wiki">check out the Minecraft Manager wiki.</a>
-                </p>
+              </LIAdvanced>
+)}
 
-                <GB onClick={nextStep} color="green">
-                  next
-                </GB>
-              </>
-            )}
+              <Gap />
 
-            {step === 6 && (
-              <>
-                <Spacing />
-                <Title>tips and tricks</Title>
+              {enableLauncherIntegration && (!mcHome || !mcExe) && (
+              <Button disabled color="green">
+                Please fill in the two settings above
+              </Button>
+)}
 
-                <img alt="Share your profile" src={tipShare} />
+              {((enableLauncherIntegration && mcHome && mcExe) || !enableLauncherIntegration) && (
+              <Button
+                color="green"
+                onClick={nextStep}
+              >
+                Continue
+              </Button>
+)}
+            </WelcomeContainer>
+          </Container>
 
-                <h3>
-                  <b>share your profile</b>
-                </h3>
-                <p>Share your custom-made profile with your friends through a tiny, typically less than 1 MB file</p>
+          <Container in={step === 3} timeout={500} unmountOnExit>
+            <WelcomeContainer>
+              <h1>Analytics</h1>
+              <h2>Minecraft Manager includes anonymous,<br />privacy-respecting analytics.<br /><br />Do you want these enabled?</h2>
+              <InputHolder>
+                <ToggleSwitch value={enableAnalytics} onClick={clickAnalytics} />
+                <Detail>Enable Analytics</Detail>
+              </InputHolder>
 
-                <GB onClick={nextStep} color="green">
-                  next tip
-                </GB>
-              </>
-            )}
+              <Gap />
 
-            {step === 7 && (
-              <>
-                <Spacing />
-                <Title>tips and tricks</Title>
+              <Button color="green" onClick={nextStep}>Continue</Button>
+            </WelcomeContainer>
+          </Container>
 
-                <img alt="Right click" src={tipRightClick} />
+          <Container in={step === 4} timeout={500} unmountOnExit>
+            <WelcomeContainer>
+              {!setupError && <h1>All Done!</h1>}
+              {setupError && <h1>Uh oh!</h1>}
+              {settingUp && <h2>Minecraft Manager is performing<br />some first time setup.</h2>}
+              {(!settingUp && !setupError) && <h2>You're all done with setup</h2>}
+              {settingUp && <Spinner />}
+              {(!settingUp && !setupError) && <Button onClick={finish} color="green">Finish</Button>}
+              {setupError && <h2>Something went wrong during setup.<br />Check your internet connection, and try again.</h2>}
+              {setupError && <Button onClick={setup} color="green">Try Again</Button>}
+            </WelcomeContainer>
+          </Container>
+        </Box>
 
-                <h3>
-                  <b>right click for more</b>
-                </h3>
-
-                <p>Right click various things to access hidden actions! Who knows what you'll discover!</p>
-
-                <GB onClick={start} color="green">
-                  finish setup
-                </GB>
-              </>
-            )}
-          </>
-        )}
-
-        {preparing && (
-          <>
-            <Title>performing first time setup</Title>
-            <Subtext>this should only take a minute...</Subtext>
-          </>
-        )}
-      </Content>
+        {errorHappened && (
+        <IssuesLink>
+          Setup still not working? <a href="https://theemeraldtree.net/mcm/issues">File a bug report</a>
+        </IssuesLink>
+)}
+        <Pagination>
+          <PageDot active={step >= 0} />
+          <PageDot active={step >= 1} />
+          <PageDot active={step >= 2} />
+          <PageDot active={step >= 3} />
+          <PageDot active={step >= 4} />
+        </Pagination>
+      </Center>
     </>
   );
 }
 
 WelcomePage.propTypes = {
-  history: PropTypes.object.isRequired,
-  theme: PropTypes.object
+  theme: PropTypes.object,
+  history: PropTypes.object
 };
 
-export default withTheme(withRouter(WelcomePage));
+export default withRouter(withTheme(WelcomePage));

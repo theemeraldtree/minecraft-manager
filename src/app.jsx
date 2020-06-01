@@ -128,7 +128,7 @@ function App() {
             <Container>
               {os.platform() !== 'linux' && <WindowBar />}
               <Content>
-                {fs.existsSync(Global.PROFILES_PATH) && <Navbar />}
+                <Navbar />
                 <ContentSide>
 
                   {migrating.active && (

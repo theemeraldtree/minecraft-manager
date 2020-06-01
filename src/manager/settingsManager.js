@@ -70,7 +70,7 @@ const SettingsManager = {
           this.currentSettings.runLatestInIntegrated = false;
         }
 
-        if (this.currentSettings.mcAccount === undefined) {
+        if (this.currentSettings.mcAccount === undefined && LauncherManager.getMCAccounts()) {
           logger.info('Setting "mcAccount" was missing. Adding it...');
           this.currentSettings.mcAccount = Object.keys(LauncherManager.getMCAccounts())[0];
         }
@@ -160,7 +160,6 @@ const SettingsManager = {
       defaultsSyncOptionsTXT: false,
       defaultsSyncOptionsOF: false,
       defaultsSyncServers: false,
-      mcAccount: ''
     };
 
     logger.info('Saving new settings...');

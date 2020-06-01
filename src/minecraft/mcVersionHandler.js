@@ -5,6 +5,7 @@ import HTTPRequest from '../host/httprequest';
 import FabricFramework from '../framework/fabric/fabricFramework';
 import Global from '../util/global';
 import ForgeFramework from '../framework/forge/forgeFramework';
+import SettingsManager from '../manager/settingsManager';
 
 /**
  * Handles creation of Minecraft Version JSON Files and patches
@@ -27,6 +28,8 @@ class MCVersionHandler {
   getDefaultJSON = async (mcVer) => {
     if (!this.VERSION_MANIFEST) await this.getVersionManifest();
 
+    console.log(mcVer);
+    console.log(this.VERSION_MANIFEST);
     const manifestVer = this.VERSION_MANIFEST.versions.find(ver => ver.id === mcVer);
 
     const final = (await HTTPRequest.get(manifestVer.url)).data;
@@ -86,6 +89,7 @@ class MCVersionHandler {
       const out = { ...first };
 
       Object.keys(second).forEach(rawKey => {
+        console.log(rawKey, typeof (second[rawKey]));
         if (rawKey[0] === '+') {
           const key = rawKey.substring(1);
           if (out[key]) {
@@ -93,13 +97,14 @@ class MCVersionHandler {
           } else {
             out[key] = second[key];
           }
-        } else if (typeof (second[rawKey]) === 'object') {
+        } else if (typeof (second[rawKey]) === 'object' && !Array.isArray(second[rawKey])) {
           let newFirst = out[rawKey];
           if (!newFirst) newFirst = {};
 
           out[rawKey] = compileObject(newFirst, second[rawKey]);
         } else if (rawKey !== '_priority') {
           if ((out[rawKey] && second._priority >= first._priority) || !out[rawKey]) {
+            console.log(rawKey, second[rawKey]);
             out[rawKey] = second[rawKey];
           }
         }
@@ -129,12 +134,14 @@ class MCVersionHandler {
   }
 
   createLauncherIntegration = async (profile) => {
-    FSU.createDirIfMissing(path.join(this.getVersionsPath(), profile.versionname));
+    if (SettingsManager.currentSettings.launcherIntegration) {
+      FSU.createDirIfMissing(path.join(this.getVersionsPath(), profile.versionname));
 
-    const symlinkJSONPath = path.join(this.getVersionsPath(), `/${profile.versionname}/${profile.versionname}.json`);
+      const symlinkJSONPath = path.join(this.getVersionsPath(), `/${profile.versionname}/${profile.versionname}.json`);
 
-    FSU.deleteFileIfExists(symlinkJSONPath);
-    await fs.link(path.join(profile.mcmPath, '/version.json'), symlinkJSONPath);
+      FSU.deleteFileIfExists(symlinkJSONPath);
+      await fs.link(path.join(profile.mcmPath, '/version.json'), symlinkJSONPath);
+    }
   }
 }
 

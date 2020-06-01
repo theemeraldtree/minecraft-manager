@@ -10,7 +10,6 @@ import DownloadsManager from '../manager/downloadsManager';
 import ToastManager from '../manager/toastManager';
 import ErrorManager from '../manager/errorManager';
 
-/* eslint-disable */
 const JavaHandler = {
   /**
    * Gets the Java Path for the requested profile
@@ -20,23 +19,22 @@ const JavaHandler = {
    */
   getJavaPath(profile) {
     if (profile && profile.mcm.java.overridePath) {
-      if(profile.mcm.java.manual) {
+      if (profile.mcm.java.manual) {
         return profile.mcm.java.manualPath;
       }
-      
+
       return profile.mcm.java.path;
-    } else {
-      if(SettingsManager.currentSettings.java.manual) {
+    }
+      if (SettingsManager.currentSettings.java.manual) {
         return SettingsManager.currentSettings.java.manualPath;
       }
 
       return SettingsManager.currentSettings.java.path;
-    }
   },
 
   async getJavaVersionsForInstaller() {
     const javaVersions = await this.getJavaVersions();
-    return javaVersions.map(( ver, index) => ({ status: index === 0 ? 'Latest': '', name: ver.release_name}))
+    return javaVersions.map((ver, index) => ({ status: index === 0 ? 'Latest' : '', name: ver.release_name }));
   },
 
   /**
@@ -45,8 +43,8 @@ const JavaHandler = {
   async getJavaVersions() {
     const architecture = os.arch();
     let osName = 'windows';
-    if(os.platform() === 'darwin') osName = 'mac';
-    if(os.platform() === 'linux') osName = 'linux';
+    if (os.platform() === 'darwin') osName = 'mac';
+    if (os.platform() === 'linux') osName = 'linux';
 
     const qs = {
       architecture,
@@ -59,9 +57,9 @@ const JavaHandler = {
       project: 'jdk',
       sort_order: 'DESC',
       vendor: 'adoptopenjdk'
-    }
+    };
 
-    const res = (await HTTPRequest.get(`https://api.adoptopenjdk.net/v3/assets/feature_releases/8/ga`, qs)).data;
+    const res = (await HTTPRequest.get('https://api.adoptopenjdk.net/v3/assets/feature_releases/8/ga', qs)).data;
     return res;
   },
 
@@ -69,19 +67,19 @@ const JavaHandler = {
     return new Promise(async resolve => {
       const arch = os.arch();
       let osName = 'windows';
-      if(os.platform() === 'darwin') osName = 'mac';
-      if(os.platform() === 'linux') osName = 'linux';
-  
+      if (os.platform() === 'darwin') osName = 'mac';
+      if (os.platform() === 'linux') osName = 'linux';
+
       let url;
-      if(version === 'latest') {
+      if (version === 'latest') {
         url = `https://api.adoptopenjdk.net/v3/binary/latest/8/ga/${osName}/${arch}/jre/hotspot/normal/adoptopenjdk`;
       } else {
         url = `https://api.adoptopenjdk.net/v3/binary/version/${version}/${osName}/${arch}/jre/hotspot/normal/adoptopenjdk`;
       }
-  
+
       const tempPath = path.join(Global.MCM_TEMP, `/java-install-${new Date().getTime()}.zip`);
 
-        
+
       DownloadsManager.startFileDownload(`Java ${version}`, url, tempPath, {
         disableErrorToast: true
       }).then(() => {
@@ -89,31 +87,33 @@ const JavaHandler = {
 
         const zip = new AdmZip(tempPath);
         zip.extractEntryTo(zip.getEntries()[0].entryName, tempExtract, true, true);
-  
+
         fs.readdir(tempExtract, (e, files) => {
           try {
-            if(fs.existsSync(to)) rimraf.sync(to);
+            if (fs.existsSync(to)) rimraf.sync(to);
           fs.rename(path.join(tempExtract, files[0]), to, () => {
             fs.unlinkSync(tempPath);
-    
-            if(version === 'latest') {
+
+            if (version === 'latest') {
               resolve(files[0]);
-            }else{
+            } else {
               resolve(version);
             }
           });
-        }catch(e) {
-          ToastManager.createToast('Unable to install Java', ErrorManager.makeReadable(e, 'java'))
+        } catch (error) {
+          ToastManager.createToast('Unable to install Java', ErrorManager.makeReadable(error, 'java'));
           resolve('error');
         }
-        })
+        });
       })
       .catch(() => {
-        ToastManager.createToast('Unable to download Java', `Check your internet connection, and try again`);
+        if (fs.existsSync(Global.PROFILES_PATH)) {
+          ToastManager.createToast('Unable to download Java', 'Check your internet connection, and try again');
+        }
         resolve('error');
       });
     });
   }
-}
+};
 
 export default JavaHandler;

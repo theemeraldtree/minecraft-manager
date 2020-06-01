@@ -59,7 +59,7 @@ function Launcher({ theme }) {
       properties: ['openDirectory', 'showHiddenFiles']
     });
 
-    if (p[0]) {
+    if (p && p[0]) {
       SettingsManager.setHomeDirectory(p[0]);
       setMCHome(p[0]);
 
@@ -74,14 +74,14 @@ function Launcher({ theme }) {
     } else if (os.platform() === 'darwin') {
       properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory'];
     }
-    const p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialogSync({
       title: 'Choose your Minecraft Executable',
       defaultPath: Global.getDefaultMCExePath(),
       buttonLabel: 'Select File',
       properties
     });
 
-    if (p[0]) {
+    if (p && p[0]) {
       SettingsManager.setMCExe(p[0]);
       setMCExe(p[0]);
 

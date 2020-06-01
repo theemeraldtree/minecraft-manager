@@ -1,9 +1,11 @@
 import React from 'react';
+import fs from 'fs';
 import styled from 'styled-components';
 import { NavLink, Link } from 'react-router-dom';
 import os from 'os';
 import Downloads from './downloads/downloads';
 import settingsImage from '../windowbar/img/settings.png';
+import Global from '../../util/global';
 
 const BG = styled.div`
   width: 80px;
@@ -51,19 +53,22 @@ const Settings = styled(Link)`
   left: 30px;
 `;
 
-const Navbar = () => (
-  <BG>
-    <Links>
-      <CLink exact to="/" activeClassName="active">
-        profiles
-      </CLink>
-      <CLink to="/discover" activeClassName="active">
-        discover
-      </CLink>
-    </Links>
-    {os.platform() === 'linux' && <Settings to="/settings" />}
-    <Downloads />
-  </BG>
-);
+const Navbar = () => {
+  const setup = fs.existsSync(Global.PROFILES_PATH);
+  return (
+    <BG>
+      <Links>
+        <CLink tabIndex={setup ? 1 : -1} exact to="/" activeClassName="active">
+          profiles
+        </CLink>
+        <CLink tabIndex={setup ? 1 : -1} to="/discover" activeClassName="active">
+          discover
+        </CLink>
+      </Links>
+      {os.platform() === 'linux' && <Settings to="/settings" />}
+      <Downloads />
+    </BG>
+  );
+};
 
 export default Navbar;

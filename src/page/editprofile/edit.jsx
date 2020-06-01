@@ -6,7 +6,7 @@ import Sidebar from './components/sidebar';
 import EditPageVersions from './versions/editpageversions';
 import NavContext from '../../navContext';
 import EditPageMods from './mods/editpagemods';
-import EditPageAdvanced from './advanced/editpageadvancednew';
+import EditPageAdvanced from './advanced/editpageadvanced';
 import EditPageResourcePacks from './resourcepacks/editpageresourcepacks';
 import ProfilesManager from '../../manager/profilesManager';
 import EditPageWorlds from './worlds/editpageworlds';

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
@@ -16,7 +15,7 @@ const BG = styled.div`
   ${props => props.active && css`
     background: rgb(19, 140, 10);
   `}
-`
+`;
 
 const Slider = styled.div`
   width: 20px;
@@ -28,10 +27,10 @@ const Slider = styled.div`
   ${props => props.active && css`
     margin-left: 25px;
   `}
-`
+`;
 
 const ToggleSwitch = ({ onClick, value }) => (
-  <BG active={value} onClick={onClick} className='checkbox'>
+  <BG active={value} onClick={onClick} className="checkbox">
     <Slider active={value} />
   </BG>
 );
@@ -39,9 +38,7 @@ const ToggleSwitch = ({ onClick, value }) => (
 ToggleSwitch.propTypes = {
   value: PropTypes.bool,
   onClick: PropTypes.func
-}
-
-
+};
 
 
 export default ToggleSwitch;

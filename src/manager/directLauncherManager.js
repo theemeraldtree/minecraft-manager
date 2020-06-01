@@ -47,63 +47,12 @@ const DirectLauncherManager = {
   },
   async getVersionJSON(profile) {
     logger.info(`Getting Version JSON for ${profile.id}`);
-    if (profile.getPrimaryFramework() !== 'none') {
-      const plain = await FSU.readJSON(
-        path.join(VersionsManager.getVersionsPath(), `/${profile.versionname}/${profile.versionname}.json`)
-      );
-
-      let inherited, final;
-
-      if (plain.inheritsFrom) {
-        inherited = await FSU.readJSON(
-          path.join(VersionsManager.getVersionsPath(), `/${plain.inheritsFrom}/${plain.inheritsFrom}.json`)
-        );
-      }
-
-      if (inherited) {
-        let finalLibraries = inherited.libraries;
-        if (plain.libraries) {
-          finalLibraries = [...plain.libraries, ...inherited.libraries];
-        }
-
-        final = { ...inherited, ...plain };
-        final.libraries = finalLibraries;
-
-        if (plain.arguments && plain.arguments.game) {
-          final.arguments.game = [...plain.arguments.game, ...inherited.arguments.game];
-        } else if (inherited.arguments && inherited.arguments.game) {
-          final.arguments.game = inherited.arguments.game;
-        }
-        if (plain.arguments && plain.arguments.jvm) {
-          final.arguments.jvm = [...plain.arguments.jvm, ...inherited.arguments.jvm];
-        } else if (inherited.arguments && inherited.arguments.jvm) {
-          final.arguments.jvm = inherited.arguments.jvm;
-        }
-      } else {
-        final = plain;
-      }
-
-      return final;
-    }
-      // if (profile.id === '0-default-profile-latest') {
-      //   const latestVersion = Global.MC_VERSIONS[0];
-      //   await this.downloadMinecraftJAR(latestVersion);
-      //   return await FSU.readJSON(
-      //     path.join(VersionsManager.getVersionsPath(), `/${latestVersion}/${latestVersion}.json`)
-      //   );
-      // } if (profile.id === '0-default-profile-snapshot') {
-      //   const latestSnapshot = Global.ALL_VERSIONS[0];
-      //   await this.downloadMinecraftJAR(latestSnapshot);
-      //   return await FSU.readJSON(
-      //     path.join(VersionsManager.getVersionsPath(), `/${latestSnapshot}/${latestSnapshot}.json`)
-      //   );
-      // }
-        return await FSU.readJSON(
-          path.join(
-            VersionsManager.getVersionsPath(),
-            `/${profile.version.minecraft.version}/${profile.version.minecraft.version}.json`
-          )
-        );
+    return await FSU.readJSON(
+      path.join(
+        profile.mcmPath,
+        '/version.json'
+      )
+    );
   },
 
   generateClasspath(profile, versionJSON) {
@@ -279,6 +228,8 @@ const DirectLauncherManager = {
       );
       finishedJavaArgs = finishedJavaArgs.replace('${classpath}', this.generateClasspath(profile, versionJSON));
 
+      console.log(`"${JavaHandler.getJavaPath(profile)}" ${finishedJavaArgs}`);
+
       exec(`"${JavaHandler.getJavaPath(profile)}" ${finishedJavaArgs}`, {
         cwd: profile.gameDir
       });
@@ -293,6 +244,8 @@ const DirectLauncherManager = {
    */
   launch(profile) {
     return new Promise(async (resolve, reject) => {
+      if (!fs.existsSync(path.join(profile.profilePath, 'files'))) mkdirp.sync(path.join(profile.profilePath, 'files'));
+
       try {
         if (!MCAccountsHandler.getAccountFromUUID(SettingsManager.currentSettings.activeAccount)) {
           logger.info('No active account. Unable to launch.');
@@ -421,7 +374,13 @@ const DirectLauncherManager = {
   },
 
   async verifyDownloadedLibraries(profile, versionJSON) {
+    console.log(versionJSON);
+    console.log(typeof (versionJSON.libraries));
+    for (const lib of versionJSON.libraries) {
+      console.log(lib);
+    }
     for (const library of versionJSON.libraries) {
+      console.log('t');
       if (this.allowLibrary(library)) {
         const mvnPath = this.calculateMavenPath(library.name);
         if (!library.natives) {

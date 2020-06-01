@@ -1,4 +1,3 @@
-/* eslint-disable */
 import fs from 'fs';
 import path from 'path';
 import rimraf from 'rimraf';
@@ -196,47 +195,46 @@ export default class Profile extends OAMFAsset {
    * @param {boolean} value - The value to set it to
    */
   setOverride(setting, value) {
-    switch(setting) {
+    switch (setting) {
       case 'java-path':
         this.mcm.java.overridePath = value;
         this.save();
-        return;
+        break;
       case 'ram':
         this.mcm.java.overrideRam = value;
         this.save();
-        return;
+        break;
       case 'custom-ram':
         this.mcm.java.dedicatedRam = value;
         this.save();
-        return;
+        break;
       case 'java-args':
         this.mcm.java.overrideArgs = value;
         this.save();
-        return;
+        break;
       case 'java-custom-args':
         this.mcm.java.customArgs = value;
         this.save();
-        return;
+        break;
       case 'java-install-path':
         this.mcm.java.path = value;
         this.save();
-        return;
+        break;
       case 'java-releasename':
         this.mcm.java.releaseName = value;
         this.save();
-        return;
+        break;
       case 'java-manual':
         this.mcm.java.manual = value;
         this.save();
-        return;
+        break;
       case 'java-manual-path':
         this.mcm.java.manualPath = value;
         this.save();
-        return;
+        break;
       default:
-        return;
+        break;
     }
-
   }
 
   /**
@@ -410,7 +408,7 @@ export default class Profile extends OAMFAsset {
           resolve();
         })
         .catch(e => {
-          if(SettingsManager.currentSettings.launcherIntegration) {
+          if (SettingsManager.currentSettings.launcherIntegration) {
             this.logger.info(`Unable to launch Minecraft directly. Opening Launcher instead. Error: ${e.toString()}`);
             this.logger.info(e.stack);
             LauncherManager.openLauncher();
@@ -419,8 +417,9 @@ export default class Profile extends OAMFAsset {
               resolve();
             }
             resolve();
-          }else{
-            this.logger(`Unable to launch Minecraft directly. Not launcher integrated. Error: ${e.toString()}`);
+          } else {
+            console.log(e.stack);
+            this.logger.info(`Unable to launch Minecraft directly. Not launcher integrated. Error: ${e.toString()}`);
             ToastManager.createToast('Unable to launch', `${e.toString()}`);
             resolve();
           }

@@ -1,5 +1,5 @@
-/* eslint-disable */
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 const BG = styled.button`
@@ -33,12 +33,19 @@ const Dot = styled.div`
   height: 8px;
   background: white;
   border-radius: 8px;
-`
+`;
 
 export default function RadioButton({ active, onClick, className, disabled }) {
   return (
     <BG disabled={disabled} className={className} active={active} onClick={!disabled ? onClick : undefined}>
       {active && <Dot />}
     </BG>
-  )
+  );
 }
+
+RadioButton.propTypes = {
+  active: PropTypes.bool,
+  onClick: PropTypes.func,
+  className: PropTypes.string,
+  disabled: PropTypes.bool
+};

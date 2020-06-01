@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { ipcRenderer } from 'electron';
+import fs from 'fs';
 import styled, { keyframes, css } from 'styled-components';
 import downloadsImg from './downloads.png';
 import DownloadItem from './downloadItem';
 import DownloadsManager from '../../../manager/downloadsManager';
+import Global from '../../../util/global';
 
 const Wrapper = styled.div`
   width: 80px;
@@ -14,6 +16,9 @@ const Wrapper = styled.div`
   bottom: 0;
   align-items: flex-end;
   z-index: 51;
+  ${props => !props.isSetup && css`
+    z-index: 1;
+  `}
 `;
 
 const DownloadsButton = styled.button`
@@ -127,9 +132,10 @@ export default class Downloads extends Component {
 
   render() {
     const { downloadsList } = this.state;
+    const setup = fs.existsSync(Global.PROFILES_PATH);
     return (
-      <Wrapper>
-        <DownloadsButton onClick={this.showDownloads} />
+      <Wrapper isSetup={setup}>
+        <DownloadsButton tabIndex={setup ? 1 : -1} onClick={this.showDownloads} />
         <AnimationBar active={downloadsList.length} />
         {this.state.showOverlay && (
           <DownloadsOverlay>

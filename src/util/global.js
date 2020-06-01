@@ -291,10 +291,10 @@ const Global = {
   },
   getDefaultMCExePath: () => {
     if (os.platform() === 'win32') {
-      // const def = path.join('C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe');
-      // if (fs.existsSync(def)) {
-      //   return def;
-      // }
+      const def = path.join('C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe');
+      if (fs.existsSync(def)) {
+        return def;
+      }
       return path.join('C:\\Program Files (x86)');
     }
     if (os.platform() === 'darwin') {
