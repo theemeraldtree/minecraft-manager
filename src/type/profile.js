@@ -432,7 +432,7 @@ export default class Profile extends OAMFAsset {
       this.removeAllMods();
     }
 
-    if (!this.hasFramework()) {
+    if (!this.hasFramework() && SettingsManager.currentSettings.launcherIntegration) {
       LauncherManager.setProfileData(this, 'lastVersionId', newVer);
     }
 
@@ -464,10 +464,7 @@ export default class Profile extends OAMFAsset {
 
         exportProgress('Cleaning up properties...');
         const obj = JSON.parse(fs.readFileSync(path.join(tempPath, '/profile.json')));
-        if (obj.hideFromClient) {
-          obj.hideFromClient = undefined;
-          delete obj.hideFromClient;
-        }
+        obj.mcm = undefined;
 
         fs.writeFileSync(path.join(tempPath, '/profile.json'), JSON.stringify(obj));
         rimraf.sync(path.join(tempPath, '/_mcm'));
@@ -708,7 +705,7 @@ export default class Profile extends OAMFAsset {
         this.logger.info(`Changing Curse host version to ${versionToChangeTo}`);
         onUpdate('Creating backup...');
         ProfilesManager.createBackup(this);
-        this.hideFromClient = true;
+        this.mcm.hideFromClient = true;
         await this.save();
         onUpdate('Moving old folder...');
         const oldpath = path.join(Global.PROFILES_PATH, `/${this.id}-update-${new Date().getTime()}`);
@@ -720,7 +717,7 @@ export default class Profile extends OAMFAsset {
           } else {
             onUpdate('Installing modpack...');
             const newprofile = await Hosts.installModpackVersion('curse', this, versionToChangeTo);
-            newprofile.hideFromClient = false;
+            newprofile.mcm.hideFromClient = false;
             newprofile.save();
             if (fs.existsSync(path.join(oldgamedir, '/saves'))) {
               Global.copyDirSync(path.join(oldgamedir, '/saves'), path.join(this.gameDir, '/saves'));
@@ -748,17 +745,22 @@ export default class Profile extends OAMFAsset {
       this.logger.info(`Renaming to ${newName}...`);
       const newID = Global.createID(newName);
       const safeName = Global.createSafeName(newName);
-      if (!LauncherManager.profileExists(this)) {
-        LauncherManager.createProfile(this);
+      if (SettingsManager.currentSettings.launcherIntegration) {
+        if (!LauncherManager.profileExists(this)) {
+          LauncherManager.createProfile(this);
+        }
+        LauncherManager.setProfileData(this, 'name', newName);
+        LauncherManager.renameProfile(this, newID);
       }
-      LauncherManager.setProfileData(this, 'name', newName);
-      LauncherManager.renameProfile(this, newID);
+
       if (this.hasFramework()) {
-        LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
-        if (this.frameworks.forge) {
-          VersionsManager.renameVersion(this, safeName, 'forge');
-        } else if (this.frameworks.fabric) {
-          VersionsManager.renameVersion(this, safeName, 'fabric');
+        if (SettingsManager.currentSettings.launcherIntegration) {
+          LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
+          if (this.frameworks.forge) {
+            VersionsManager.renameVersion(this, safeName, 'forge');
+          } else if (this.frameworks.fabric) {
+            VersionsManager.renameVersion(this, safeName, 'fabric');
+          }
         }
         LibrariesManager.renameLibrary(this, newID);
       }

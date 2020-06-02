@@ -109,7 +109,12 @@ export default function EditPageVersions({ id }) {
         setProfile({
           name: 'hang on...',
           hosts: {},
-          frameworks: {}
+          frameworks: {},
+          version: {
+            minecraft: {
+              version: 'hang on'
+            }
+          }
         });
         setProfile(newprofile);
         setUpdateOverlay(false);

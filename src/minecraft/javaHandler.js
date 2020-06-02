@@ -74,8 +74,6 @@ const JavaHandler = {
       if (os.platform() === 'darwin') osName = 'mac';
       if (os.platform() === 'linux') osName = 'linux';
 
-      osName = 'linux';
-
       let url;
       if (version === 'latest') {
         url = `https://api.adoptopenjdk.net/v3/binary/latest/8/ga/${osName}/${arch}/jre/hotspot/normal/adoptopenjdk`;

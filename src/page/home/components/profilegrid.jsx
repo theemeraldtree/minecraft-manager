@@ -107,7 +107,7 @@ export default class ProfileGrid extends Component {
         {profiles.length >= 1 &&
           profiles.map(profile => {
             if (profile) {
-              if (!profile.hideFromClient && profile.name.toLowerCase().includes(searchTerm)) {
+              if (!profile.mcm.hideFromClient && profile.name.toLowerCase().includes(searchTerm)) {
                 return (
                   <ProfileCard
                     showUpdate={this.showUpdate}

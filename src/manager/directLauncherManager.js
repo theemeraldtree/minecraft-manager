@@ -18,6 +18,7 @@ import JavaHandler from '../minecraft/javaHandler';
 import MCAccountsHandler from '../minecraft/mcAccountsHandler';
 import AlertManager from './alertManager';
 import Downloader from '../util/downloader';
+import ToastManager from './toastManager';
 
 const { exec } = require('child_process');
 const admzip = require('adm-zip');
@@ -136,7 +137,7 @@ const DirectLauncherManager = {
       mcArgs = mcArgs.replace(
         '${auth_player_name}',
         MCAccountsHandler.getNameFromUUID(SettingsManager.currentSettings.activeAccount));
-      mcArgs = mcArgs.replace('${version_name}', `"${profile.versionname}"`);
+      mcArgs = mcArgs.replace('${version_name}', `"${profile.name}"`);
       mcArgs = mcArgs.replace('${game_directory}', `"${profile.gameDir}"`);
       mcArgs = mcArgs.replace('${assets_root}', `"${path.join(Global.MCM_PATH, '/shared/assets')}"`);
       mcArgs = mcArgs.replace('${assets_index_name}', versionJSON.assets);
@@ -183,6 +184,7 @@ const DirectLauncherManager = {
         )}"`;
         finishedJavaArgs += ` -cp ${classpath}`;
         finishedJavaArgs += ' -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
+        finishedJavaArgs += ` ${endJavaArgs}`;
         finishedJavaArgs += ` ${versionJSON.mainClass}`;
         finishedJavaArgs += ` ${mcArgs}`;
       } else if (versionJSON.arguments.jvm) {
@@ -209,11 +211,11 @@ const DirectLauncherManager = {
             }
           });
 
+          finishedJavaArgs += endJavaArgs;
           finishedJavaArgs += `${versionJSON.mainClass} `;
           finishedJavaArgs += mcArgs;
         }
 
-        finishedJavaArgs += endJavaArgs;
 
       finishedJavaArgs = finishedJavaArgs.replace('${launcher_name}', 'minecraft-launcher');
       finishedJavaArgs = finishedJavaArgs.replace('${launcher_version}', 'X');
@@ -226,6 +228,10 @@ const DirectLauncherManager = {
 
       exec(`"${JavaHandler.getJavaPath(profile)}" ${finishedJavaArgs}`, {
         cwd: profile.gameDir
+      }, (err, stdout, stderr) => {
+        if (stderr) {
+          ToastManager.createToast('Error launching', stderr.toString());
+        }
       });
 
       resolve();

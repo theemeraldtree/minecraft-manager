@@ -451,7 +451,7 @@ const Hosts = {
         profile.iconURL = modpack.iconURL;
         profile.iconPath = modpack.iconPath;
         profile.blurb = modpack.blurb;
-        profile.description = modpack.description;
+        profile.description = modpack.description ? modpack.description : 'No description available.';
 
         profile.version = verObj;
         profile.save();

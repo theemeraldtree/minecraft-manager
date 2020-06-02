@@ -73,7 +73,7 @@ export default class ImportOverlay extends Component {
   }
 
   chooseFile = () => {
-    const p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialogSync({
       title: 'Choose a file to import',
       buttonLabel: 'Import',
       filters: [
@@ -91,7 +91,7 @@ export default class ImportOverlay extends Component {
   };
 
   chooseFileMMC = () => {
-    const p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialogSync({
       title: 'Choose a file to import',
       buttonLabel: 'Import',
       filters: [
@@ -148,9 +148,23 @@ export default class ImportOverlay extends Component {
     });
   };
 
+  clickCancel = () => {
+    setTimeout(() => {
+      this.setState({
+        error: '',
+        showError: false,
+        updateState: false,
+        displayState: 'omaf'
+      });
+    }, 150);
+
+    this.props.cancelClick();
+  }
+
   render() {
     const { updateState, showError, error, displayState } = this.state;
-    const { cancelClick, file } = this.props;
+    const { file } = this.props;
+
     return (
       <Overlay in={this.props.in}>
         <BG>
@@ -172,7 +186,7 @@ export default class ImportOverlay extends Component {
                 Choose the <b>.mcjprofile</b> file that you would like to import
               </Subtext>
               <ButtonContainer>
-                <BTN onClick={cancelClick} color="red">
+                <BTN onClick={this.clickCancel} color="red">
                   cancel
                 </BTN>
                 <BTN onClick={this.chooseFile} color="green">
@@ -188,7 +202,7 @@ export default class ImportOverlay extends Component {
                 Choose the MultiMC <b>.zip</b> file that you would like to import
               </Subtext>
               <ButtonContainer>
-                <BTN onClick={cancelClick} color="red">
+                <BTN onClick={this.clickCancel} color="red">
                   cancel
                 </BTN>
                 <BTN onClick={this.chooseFileMMC} color="green">
@@ -205,7 +219,7 @@ export default class ImportOverlay extends Component {
                 Do you want to import the file <b>{path.basename(file)}</b>?
               </Subtext>
               <ButtonContainer>
-                <BTN onClick={cancelClick} color="red">
+                <BTN onClick={this.clickCancel} color="red">
                   cancel
                 </BTN>
                 <BTN onClick={this.importFile} color="green">
@@ -220,7 +234,7 @@ export default class ImportOverlay extends Component {
               <Title>error</Title>
               <Subtext>{error}</Subtext>
               <ButtonContainer>
-                <BTN onClick={cancelClick} color="red">
+                <BTN onClick={this.clickCancel} color="green">
                   close
                 </BTN>
               </ButtonContainer>

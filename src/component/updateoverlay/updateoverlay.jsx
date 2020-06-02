@@ -5,6 +5,7 @@ import { Button } from '@theemeraldtree/emeraldui';
 import Overlay from '../overlay/overlay';
 import Hosts from '../../host/Hosts';
 import AlertBackground from '../alert/alertbackground';
+import Global from '../../util/global';
 
 const BG = styled(AlertBackground)`
   width: 100%;
@@ -52,7 +53,7 @@ export default class UpdateOverlay extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.profile !== this.props.profile && this.props.profile !== undefined) {
+    if ((prevProps.profile !== this.props.profile && this.props.profile !== undefined) || (this.props.show !== prevProps.show)) {
       this.useProfile();
     }
   }
@@ -142,14 +143,14 @@ export default class UpdateOverlay extends Component {
               {displayState !== 'done' && <Title>update your profile</Title>}
               {!noUpdates && !updateAvailable && !noConnection && <Subtext>Checking for updates...</Subtext>}
               {noUpdates && !noConnection && <Subtext>You have the latest version. No update is available</Subtext>}
-              {noConnection && <Subtext>Unable to connect.</Subtext>}
+              {noConnection && <Subtext>Unable to check for updates. Check your internet connection, and try again.</Subtext>}
               {updateAvailable && (
                 <Subtext>
                   A new version is available.
                   <br />
-                  You have: {profile.version.displayName}
+                  You have: {Global.cleanVersionName(profile.version.displayName)}
                   <br />
-                  Latest version: {updateVersion.displayName}
+                  Latest version: {Global.cleanVersionName(updateVersion.displayName)}
                   <br />
                   Would you like to update?
                 </Subtext>

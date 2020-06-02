@@ -13,6 +13,7 @@ import LatestProfile from '../defaultProfiles/latestProfile';
 import SnapshotProfile from '../defaultProfiles/snapshotProfile';
 import SettingsManager from './settingsManager';
 import logInit from '../util/logger';
+import MCVersionHandler from '../minecraft/mcVersionHandler';
 
 const logger = logInit('ProfilesManager');
 
@@ -147,6 +148,9 @@ const ProfilesManager = {
           logger.info(`(ProfileImport) Removing extraction path from ${profile.id}...`);
           rimraf.sync(extractPath);
 
+          logger.info(`(ProfileImport) Creating version JSON for ${profile.id}`);
+          MCVersionHandler.updateProfile(profile, true);
+
           logger.info(`(ProfileImport) Import Complete for ${profile.id}`);
           stateChange('Done');
 
@@ -188,11 +192,14 @@ const ProfilesManager = {
               () => {
                 if (numberDownloaded === curseModsToDownload.length) {
                   DownloadsManager.removeDownload(download.name);
-                  stateChange('Creating launcher profile...');
 
-                  logger.info(`(ProfileImport) Creating Launcher profile for ${profile.id}`);
+                  if (SettingsManager.currentSettings.launcherIntegration) {
+                    stateChange('Creating launcher profile...');
+                    logger.info(`(ProfileImport) Creating Launcher profile for ${profile.id}`);
 
-                  LauncherManager.createProfile(profile);
+                    LauncherManager.createProfile(profile);
+                  }
+
                   if (profile.frameworks.forge) {
                     logger.info(`(ProfileImport) Installing Forge for ${profile.id}`);
                     stateChange('Installing Forge...');
@@ -331,12 +338,6 @@ const ProfilesManager = {
           timestamp: new Date().getTime(),
           minecraft: {
             version: mcversion
-          }
-        },
-        mcm: {
-          version: Global.MCM_PROFILE_VERSION,
-          java: {
-
           }
         }
       });

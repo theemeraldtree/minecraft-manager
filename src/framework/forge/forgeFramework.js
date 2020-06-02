@@ -90,8 +90,9 @@ const ForgeFramework = {
       );
 
       const zip = new AdmZip(installerPath);
-      const json = JSON.parse(zip.readFile('version.json'));
+      let json = JSON.parse(zip.readFile('version.json'));
 
+      if (!json) json = JSON.parse(zip.readFile('install_profile.json')).versionInfo;
       json.libraries[0] = {
         name: `minecraftmanager.profiles:mcm-${profile.id}:forge`
       };

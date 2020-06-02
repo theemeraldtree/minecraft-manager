@@ -131,7 +131,7 @@ const EditPageGeneral = ({ id, history, theme }) => {
   };
 
   const changeIcon = () => {
-    const p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialogSync({
       title: 'Select your image file',
       buttonLabel: 'Choose image',
       filters: [{ name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif'] }],
