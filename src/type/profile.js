@@ -347,15 +347,19 @@ export default class Profile extends OAMFAsset {
     });
   }
 
-  addIconToLauncher() {
-    if (SettingsManager.currentSettings.launcherIntegration) {
+  getIconBase64() {
+    return new Promise((resolve) => {
       Jimp.read(this.iconPath).then(jmp =>
         jmp.contain(128, 128).getBase64(Jimp.MIME_PNG, (err, res) => {
-          if (!err) {
-            LauncherManager.setProfileData(this, 'icon', res);
-          }
+          resolve(res);
         })
       );
+    });
+  }
+
+  async addIconToLauncher() {
+    if (SettingsManager.currentSettings.launcherIntegration) {
+      LauncherManager.setProfileData(this, 'icon', this.getIconBase64());
     }
   }
 

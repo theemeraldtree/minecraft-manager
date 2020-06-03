@@ -32,9 +32,14 @@ function Launcher({ theme }) {
     if (!integrationEnabled && (!mcHome || !mcExe)) {
       AlertManager.messageBox('launcher integration', 'Please set your Minecraft Home Directory and Minecraft Executable path now.<br /><br />If you do not set these, Launcher Integration will be automatically turned off.');
     } else if ((!integrationEnabled && mcHome && mcExe) || integrationEnabled) {
-      SettingsManager.currentSettings.launcherIntegration = !integrationEnabled;
+      const newState = !integrationEnabled;
+      SettingsManager.currentSettings.launcherIntegration = newState;
       SettingsManager.save();
-      MCLauncherIntegrationHandler.integrate();
+      if (newState) {
+        MCLauncherIntegrationHandler.integrate(true);
+      } else {
+        MCLauncherIntegrationHandler.removeIntegration();
+      }
     }
     setIntegrationEnabled(!integrationEnabled);
   };
@@ -48,6 +53,7 @@ function Launcher({ theme }) {
       setIntegrationEnabled(true);
       SettingsManager.currentSettings.launcherIntegration = true;
       SettingsManager.save();
+      MCLauncherIntegrationHandler.integrate(true);
     }
   };
 

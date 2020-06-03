@@ -9,6 +9,9 @@ const winston = require('winston');
 const { execFile } = require('child_process');
 require('winston-daily-rotate-file');
 
+const singleInstanceLock = app.requestSingleInstanceLock();
+if (!singleInstanceLock) app.quit();
+
 const logformat = winston.format.printf(
   ({ timestamp, level, message }) => `[${timestamp}] [${level.toUpperCase()}]: ${message}`
 );

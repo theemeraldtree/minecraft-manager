@@ -1,5 +1,6 @@
 import path from 'path';
 import fss, { promises as fs } from 'fs';
+import rimraf from 'rimraf';
 import FSU from '../util/fsu';
 import HTTPRequest from '../host/httprequest';
 import FabricFramework from '../framework/fabric/fabricFramework';
@@ -165,6 +166,12 @@ const MCVersionHandler = {
 
       FSU.deleteFileIfExists(symlinkJSONPath);
       await fs.link(path.join(profile.mcmPath, '/version.json'), symlinkJSONPath);
+    }
+  },
+
+  deleteLauncherIntegration(profile) {
+    if (fss.existsSync(path.join(this.getVersionsPath(), profile.versionname))) {
+      rimraf.sync(path.join(this.getVersionsPath(), profile.versionname));
     }
   }
 };

@@ -95,6 +95,31 @@ const LauncherManager = {
     }
     fs.writeFileSync(this.getLauncherProfiles(), JSON.stringify(obj));
   },
+  async setProfileDataAsync(profile, tag, val) {
+    const id = `mcm-${profile.id}`;
+    const obj = await FSU.readJSON(this.getLauncherProfiles());
+
+    if (tag !== 'icon') {
+      logger.info(`Setting "${tag}" of ${profile.id} to "${val}"`);
+    } else {
+      logger.info(`Setting "icon" of ${profile.id} to [icon base64 string]`);
+    }
+
+    if (!profile.isDefaultProfile) {
+      if (obj.profiles[id]) {
+        obj.profiles[id][tag] = val;
+      }
+    } else if (profile.id === '0-default-profile-latest') {
+      const find = Object.keys(obj.profiles).find(prof => obj.profiles[prof].type === 'latest-release');
+      obj.profiles[find][tag] = val;
+    } else if (profile.id === '0-default-profile-snapshot') {
+      const find = Object.keys(obj.profiles).find(prof => obj.profiles[prof].type === 'latest-snapshot');
+      obj.profiles[find][tag] = val;
+    }
+    fs.writeFile(this.getLauncherProfiles(), JSON.stringify(obj), () => {
+
+    });
+  },
   setMostRecentProfile(profile) {
     logger.info(`Setting most recent profile to ${profile.id}`);
     const date = new Date();
