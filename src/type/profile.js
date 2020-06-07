@@ -382,6 +382,15 @@ export default class Profile extends OAMFAsset {
 
   launch() {
     return new Promise(async resolve => {
+      if (this.id === '0-default-profile-latest') {
+        await Global.updateMCVersions();
+        this.version.minecraft.version = Global.MC_VERSIONS[0];
+        this.minecraftVersion = Global.MC_VERSIONS[0];
+      } else if (this.id === '0-default-profile-snapshot') {
+        await Global.updateMCVersions();
+        this.version.minecraft.version = Global.ALL_VERSIONS[0];
+        this.minecraftVersion = Global.ALL_VERSIONS[0];
+      }
       try {
         await MCVersionHandler.updateProfile(this, false);
       } catch (e) {
@@ -781,10 +790,10 @@ export default class Profile extends OAMFAsset {
     });
   }
 
-  checkMissingMCMValues() {
+  checkMissingMCMValues(force) {
     const { currentSettings } = SettingsManager;
 
-    if (!this.mcm) {
+    if (!this.mcm || force) {
       this.mcm = {
         version: Global.MCM_PROFILE_VERSION,
         syncOptionsTXT: currentSettings.defaultsSyncOptionsTXT,
@@ -793,7 +802,7 @@ export default class Profile extends OAMFAsset {
       };
     }
 
-    if (!this.mcm.java) {
+    if (!this.mcm.java || force) {
       this.mcm.java = {
         releaseName: currentSettings.java.releaseName,
         path: currentSettings.java.path,
@@ -810,27 +819,32 @@ export default class Profile extends OAMFAsset {
 
     this.checkMissingMCMValues();
 
-    if (fs.existsSync(path.join(Global.getMCPath(), 'options.txt'))) {
+    let gd = path.join(Global.PROFILES_PATH, '/0-default-profile-latest/files/');
+    if (SettingsManager.currentSettings.runLatestInIntegration) {
+      gd = Global.getMCPath();
+    }
+
+    if (fs.existsSync(path.join(gd, 'options.txt'))) {
       if (currentSettings.defaultsSyncOptionsTXT) {
-        fs.linkSync(path.join(Global.getMCPath(), 'options.txt'), path.join(this.gameDir, 'options.txt'));
+        fs.linkSync(path.join(gd, 'options.txt'), path.join(this.gameDir, 'options.txt'));
       } else {
-        fs.copyFileSync(path.join(Global.getMCPath(), 'options.txt'), path.join(this.gameDir, 'options.txt'));
+        fs.copyFileSync(path.join(gd, 'options.txt'), path.join(this.gameDir, 'options.txt'));
       }
     }
 
-    if (fs.existsSync(path.join(Global.getMCPath(), 'optionsof.txt'))) {
+    if (fs.existsSync(path.join(gd, 'optionsof.txt'))) {
       if (currentSettings.defaultsSyncOptionsOF) {
-        fs.linkSync(path.join(Global.getMCPath(), 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
-      } else if (fs.existsSync(path.join(Global.getMCPath(), 'optionsof.txt'))) {
-        fs.copyFileSync(path.join(Global.getMCPath(), 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
+        fs.linkSync(path.join(gd, 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
+      } else if (fs.existsSync(path.join(gd, 'optionsof.txt'))) {
+        fs.copyFileSync(path.join(gd, 'optionsof.txt'), path.join(this.gameDir, 'optionsof.txt'));
       }
     }
 
-    if (fs.existsSync(path.join(Global.getMCPath(), 'servers.dat'))) {
+    if (fs.existsSync(path.join(gd, 'servers.dat'))) {
       if (currentSettings.defaultsSyncServers) {
-        fs.linkSync(path.join(Global.getMCPath(), 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
+        fs.linkSync(path.join(gd, 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
       } else {
-        fs.copyFileSync(path.join(Global.getMCPath(), 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
+        fs.copyFileSync(path.join(gd, 'servers.dat'), path.join(this.gameDir, 'servers.dat'));
       }
     }
   }

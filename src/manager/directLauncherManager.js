@@ -8,7 +8,6 @@ import os from 'os';
 import mkdirp from 'mkdirp';
 import crypto from 'crypto';
 import FSU from '../util/fsu';
-import VersionsManager from './versionsManager';
 import LibrariesManager from './librariesManager';
 import logInit from '../util/logger';
 import DownloadsManager from './downloadsManager';
@@ -18,7 +17,6 @@ import JavaHandler from '../minecraft/javaHandler';
 import MCAccountsHandler from '../minecraft/mcAccountsHandler';
 import AlertManager from './alertManager';
 import Downloader from '../util/downloader';
-import ToastManager from './toastManager';
 
 const { exec } = require('child_process');
 const admzip = require('adm-zip');
@@ -179,8 +177,8 @@ const DirectLauncherManager = {
           profile.profilePath,
           '/_mcm/natives'
         )}" -Dminecraft.client.jar="${path.join(
-          VersionsManager.getVersionsPath(),
-          `/${versionJSON.jar}/${versionJSON.jar}.jar`
+          Global.MCM_PATH,
+          `/shared/jars/${versionJSON.jar}.jar`
         )}"`;
         finishedJavaArgs += ` -cp ${classpath}`;
         finishedJavaArgs += ' -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
@@ -225,14 +223,22 @@ const DirectLauncherManager = {
       );
       finishedJavaArgs = finishedJavaArgs.replace('${classpath}', this.generateClasspath(profile, versionJSON));
 
+      let stderror = '';
 
-      exec(`"${JavaHandler.getJavaPath(profile)}" ${finishedJavaArgs}`, {
+      const process = exec(`"${JavaHandler.getJavaPath(profile)}" ${finishedJavaArgs}`, {
         cwd: profile.gameDir
-      }, (err, stdout, stderr) => {
-        if (stderr) {
-          ToastManager.createToast('Error launching', stderr.toString());
+      });
+
+      process.stderr.on('data', (data) => {
+        stderror += data || '';
+      });
+
+      process.on('close', (code) => {
+        if (code !== 0 && code) {
+          AlertManager.messageBox('something went wrong', `Error Code: ${code}\n\n<textarea readOnly>${stderror}</textarea>`);
         }
       });
+
 
       resolve();
     });
@@ -384,6 +390,9 @@ const DirectLauncherManager = {
           const libPath = path.join(LibrariesManager.getLibrariesPath(), mvnPath);
           if (!fs.existsSync(libPath)) {
             logger.info(`Library "${library.name}" is missing. Downloading it...`);
+            if (!library.downloads && !library.url && library.name.indexOf('minecraftmanager') === -1) {
+              library.url = 'https://libraries.minecraft.net/';
+            }
             if (!library.downloads && library.url) {
               // manually parse the downloads
               mkdirp.sync(path.dirname(libPath));

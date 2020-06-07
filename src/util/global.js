@@ -1,3 +1,4 @@
+/* eslint-disable */
 import mkdirp from 'mkdirp';
 import SettingsManager from '../manager/settingsManager';
 import ProfilesManager from '../manager/profilesManager';
@@ -17,6 +18,8 @@ import Analytics from './analytics';
 import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
 import JavaHandler from '../minecraft/javaHandler';
 import MCVersionHandler from '../minecraft/mcVersionHandler';
+import AlertManager from '../manager/alertManager';
+import latestChangelog from './latestChangelog.txt';
 
 const semver = require('semver');
 const { remote } = require('electron');
@@ -42,8 +45,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.4.7',
-  MCM_RELEASE_DATE: '5/25/2020',
+  MCM_VERSION: '2.5.0-beta',
+  MCM_RELEASE_DATE: '6/2/2020',
 
   MCM_PROFILE_VERSION: 1,
   OMAF_VERSION: '1.0.0',
@@ -103,10 +106,7 @@ const Global = {
     const version = SettingsManager.currentSettings.lastVersion;
     if (!version || (semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1)) {
       Analytics.send('update');
-      ToastManager.createToast(
-        `Welcome to ${this.MCM_VERSION}`,
-        `<a href="https://github.com/theemeraldtree/minecraft-manager/blob/v${this.MCM_VERSION}/CHANGELOG.md">View the changelog here</a>`
-      );
+      AlertManager.messageBox(`welcome to minecraft manager ${this.MCM_VERSION}`, `<div style="overflow-y: auto; max-height: 455px;">${latestChangelog}</div>`);
       SettingsManager.setLastVersion(this.MCM_VERSION);
     }
   },

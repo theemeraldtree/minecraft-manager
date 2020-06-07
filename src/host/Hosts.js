@@ -285,7 +285,7 @@ const Hosts = {
         extension = 'zip';
       }
       if (!fs.existsSync(path.join(profile.gameDir, `${pathroot}${mod.id}.${extension}`))) {
-        if (!mod.name || mod.icon.substring(0, 4) !== 'http') {
+        if (!mod.name || (mod.icon && mod.icon.substring(0, 4) !== 'http')) {
           if (host === 'curse') {
             const newm = await Curse.getFullAsset(mod, type);
             if (newm) {

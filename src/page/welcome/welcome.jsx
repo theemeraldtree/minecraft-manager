@@ -18,6 +18,8 @@ import Gap from '../settings/components/gap';
 import SettingsManager from '../../manager/settingsManager';
 import Analytics from '../../util/analytics';
 import AlertManager from '../../manager/alertManager';
+import LatestProfile from '../../defaultProfiles/latestProfile';
+import SnapshotProfile from '../../defaultProfiles/snapshotProfile';
 
 const { dialog } = require('electron').remote;
 
@@ -175,7 +177,7 @@ function WelcomePage({ theme, history }) {
     setSettingUp(true);
     setSetupError(false);
 
-    mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
+    mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager/profiles'));
     mkdirp.sync(path.join(Global.MCM_PATH, '/shared/jars'));
     mkdirp.sync(path.join(Global.MCM_PATH, '/shared/assets'));
 
@@ -195,8 +197,16 @@ function WelcomePage({ theme, history }) {
         setSettingUp(false);
         setSetupError(true);
       } else {
-        setSettingUp(false);
+        LatestProfile.version.minecraft.version = Global.MC_VERSIONS[0];
+        LatestProfile.minecraftVersion = Global.MC_VERSIONS[0];
+        SnapshotProfile.version.minecraft.version = Global.ALL_VERSIONS[0];
+        SnapshotProfile.minecraftVersion = Global.ALL_VERSIONS[0];
+
+        LatestProfile.checkMissingMCMValues(true);
+        SnapshotProfile.checkMissingMCMValues(true);
+
         mkdirp.sync(Global.PROFILES_PATH);
+        setSettingUp(false);
       }
     }, 1000);
   };
@@ -289,7 +299,7 @@ function WelcomePage({ theme, history }) {
               <Logo />
               <h1>Welcome to Minecraft Manager</h1>
               <h2>The easiest way to manage and <br />install mods, modpacks, and more.</h2>
-              <Button onClick={nextStep} color="green">Get Started</Button>
+              <Button disabled={step !== 0} onClick={nextStep} color="green">Get Started</Button>
             </WelcomeContainer>
           </Container>
 
@@ -299,7 +309,7 @@ function WelcomePage({ theme, history }) {
               {!javaError && <h2>Java is automatically being downloaded and installed.<br />We'll let you know when it's done.</h2>}
               {javaError && <h2>Something went wrong while installing Java.<br />Check your internet connection, and try again.</h2>}
               {!javaInstalled && <Spinner />}
-              {(javaInstalled && !javaError) && <Button onClick={nextStep} color="green">Continue</Button>}
+              {(javaInstalled && !javaError) && <Button disabled={step !== 1} onClick={nextStep} color="green">Continue</Button>}
               {(javaError && javaInstalled) && <Button onClick={installJava} color="green">Try Again</Button>}
             </WelcomeContainer>
           </Container>
@@ -340,7 +350,7 @@ function WelcomePage({ theme, history }) {
                 </InputHolder>
 
               </LIAdvanced>
-)}
+              )}
 
               <Gap />
 
@@ -348,16 +358,17 @@ function WelcomePage({ theme, history }) {
               <Button disabled color="green">
                 Please fill in the two settings above
               </Button>
-)}
+              )}
 
               {((enableLauncherIntegration && mcHome && mcExe) || !enableLauncherIntegration) && (
               <Button
+                disabled={step !== 2}
                 color="green"
                 onClick={nextStep}
               >
                 Continue
               </Button>
-)}
+              )}
             </WelcomeContainer>
           </Container>
 
@@ -372,7 +383,7 @@ function WelcomePage({ theme, history }) {
 
               <Gap />
 
-              <Button color="green" onClick={nextStep}>Continue</Button>
+              <Button disabled={step !== 3} color="green" onClick={nextStep}>Continue</Button>
             </WelcomeContainer>
           </Container>
 
@@ -383,7 +394,7 @@ function WelcomePage({ theme, history }) {
               {settingUp && <h2>Minecraft Manager is performing<br />some first time setup.</h2>}
               {(!settingUp && !setupError) && <h2>You're all done with setup</h2>}
               {settingUp && <Spinner />}
-              {(!settingUp && !setupError) && <Button onClick={finish} color="green">Finish</Button>}
+              {(!settingUp && !setupError) && <Button disabled={step !== 4} onClick={finish} color="green">Finish</Button>}
               {setupError && <h2>Something went wrong during setup.<br />Check your internet connection, and try again.</h2>}
               {setupError && <Button onClick={setup} color="green">Try Again</Button>}
             </WelcomeContainer>
@@ -394,7 +405,7 @@ function WelcomePage({ theme, history }) {
         <IssuesLink>
           Setup still not working? <a href="https://theemeraldtree.net/mcm/issues">File a bug report</a>
         </IssuesLink>
-)}
+        )}
         <Pagination>
           <PageDot active={step >= 0} />
           <PageDot active={step >= 1} />

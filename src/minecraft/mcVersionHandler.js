@@ -62,7 +62,7 @@ const MCVersionHandler = {
       const versionPath = path.join(profile.mcmPath, '/version/');
       FSU.createDirIfMissing(versionPath);
 
-      if (!fss.existsSync(path.join(versionPath, '/default.json')) || redownload) {
+      if (!fss.existsSync(path.join(versionPath, '/default.json')) || redownload || (profile.id === '0-default-profile-latest' || profile.id === '0-default-profile-snapshot')) {
         try {
           await fs.writeFile(path.join(versionPath, '/default.json'), JSON.stringify(await this.getDefaultJSON(profile.minecraftVersion)));
         } catch (e) {
@@ -152,7 +152,6 @@ const MCVersionHandler = {
     });
 
     final.id = profile.versionname;
-    final.type = undefined;
     final._priority = undefined;
 
     return final;

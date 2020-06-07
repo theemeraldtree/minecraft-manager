@@ -36,7 +36,6 @@ const MCLauncherIntegrationHandler = {
     const launcherProfiles = await FSU.readJSON(LauncherManager.getLauncherProfiles());
 
     const setData = (profile, tag, val) => {
-      console.log(`setting ${profile.id} ${tag} to ${val}`);
       if (profile.id === '0-default-profile-latest') {
         const find = Object.keys(launcherProfiles.profiles).find(prof => launcherProfiles.profiles[prof].type === 'latest-release');
         launcherProfiles.profiles[find][tag] = val;
@@ -44,7 +43,6 @@ const MCLauncherIntegrationHandler = {
         const find = Object.keys(launcherProfiles.profiles).find(prof => launcherProfiles.profiles[prof].type === 'latest-snapshot');
         launcherProfiles.profiles[find][tag] = val;
       } else {
-        console.log(profile.id);
         launcherProfiles.profiles[`mcm-${profile.id}`][tag] = val;
       }
     };
@@ -66,7 +64,6 @@ const MCLauncherIntegrationHandler = {
           }
 
           MCVersionHandler.createLauncherIntegration(profile);
-          console.log(profile);
           setData(profile, 'lastVersionId', profile.versionname);
 
           if(initial) {
@@ -100,7 +97,6 @@ const MCLauncherIntegrationHandler = {
         setData(profile, 'javaArgs', `-Xmx${ramAmount}G ${remainingArgs || defaultArgs}`);
         setData(profile, 'javaDir', JavaHandler.getJavaPath(profile));
 
-        console.log(profile.gameDir);
         setData(profile, 'gameDir', profile.gameDir); 
         
         resolve();
@@ -110,7 +106,6 @@ const MCLauncherIntegrationHandler = {
   },
   integrateLibraries() {
     if (!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
-      console.log('create smylink');
       fs.symlinkSync(path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager/'), path.join(Global.getMCPath(), '/libraries/minecraftmanager/'), 'junction');
     }
   },

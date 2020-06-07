@@ -1,0 +1,54 @@
+Minecraft Manager 2.5.0 includes a number of bugfixes, improvements, and new features.
+<h2>New Features</h2>
+
+<ul>
+
+<li>
+<b>No more reliance on the regular Minecraft launcher</b><br>
+Minecraft Manager 2.5.0 has finally seperated itself from the Minecraft Launcher.
+You'll no longer have to deal with annoying issues caused by old Java versions, problems syncing, or confusing Minecraft account management.<br><br>
+</li>
+
+<br>
+
+<li>
+<b>Built-in Java Management</b><br>
+Minecraft Manager now automatically handles download and installation of Java. You'll no longer have to mess with the annoying hassles of the previous bundled Java version.
+<br><br>You can even configure custom versions of Java and arguments per-profile.
+</li>
+
+<br>
+
+<li>
+<b>Redesigned Settings</b><br>
+Settings have now been seperated into multiple pages. They now have easy-to-understand descriptions, and look nicer too.
+</li>
+
+</ul>
+
+<h2>Bugfixes</h2>
+
+<ul>
+
+<li>
+"Select file" dialogs actually work now
+</li>
+
+<li>
+Network errors don't fail silently anymore
+</li>
+
+<li>
+Error message now appears if app initialization fails
+</li>
+
+<li>
+Welcome page shouldn't fail silently
+</li>
+
+</ul>
+
+Some changes have been made internally to Modloaders. If you experience a problem or bug, please report it.
+
+Thanks!
+</ul>

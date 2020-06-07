@@ -5,6 +5,10 @@ import SettingsManager from '../manager/settingsManager';
 import HTTPRequest from '../host/httprequest';
 import LauncherManager from '../manager/launcherManager';
 import FSU from '../util/fsu';
+import logInit from '../util/logger';
+import ToastManager from '../manager/toastManager';
+
+const logger = logInit('MCAccountsHandler');
 
 const MCAccountsHandler = {
   getAccountByEmail(email) {
@@ -14,6 +18,7 @@ const MCAccountsHandler = {
     return SettingsManager.currentSettings.authClientToken;
   },
   generateClientToken() {
+    logger.info('Generating client token...');
     SettingsManager.currentSettings.authClientToken = uuidv4();
     SettingsManager.save();
   },
@@ -53,6 +58,7 @@ const MCAccountsHandler = {
   },
   registerAccount(email, password) {
     return new Promise(async resolve => {
+      logger.info(`Registering account ${email}`);
     if (email && password && !this.getAccountByEmail(email)) {
       if (!this.getClientToken()) this.generateClientToken();
 
@@ -66,6 +72,9 @@ const MCAccountsHandler = {
         clientToken: this.getClientToken()
       }).then(async respA => {
         const resp = respA.data;
+
+        // extra information (such as whether the account is paid, legacy, migrated, suspended, or other info)
+        // is not presesnt for some reason; https://wiki.vg/Authentication
 
         const name = resp.selectedProfile.name;
         const uuid = resp.selectedProfile.id;
@@ -113,6 +122,19 @@ const MCAccountsHandler = {
       });
   },
   async deleteAccount(email) {
+    logger.info(`Deleting account ${email}...`);
+
+
+    logger.info(`Sending invalidate request for ${email}...`);
+    HTTPRequest.post('https://authserver.mojang.com/invalidate', {
+      accessToken: this.getAccountByEmail(email).accessToken,
+      clientToken: this.getClientToken()
+    }).then(() => {
+      logger.info(`Successfully invalidated token for ${email}`);
+    }).catch(e => {
+      logger.info(`Unable to invalidate token for ${email}: ${e.response.data}`);
+    });
+
     SettingsManager.currentSettings.accounts.splice(this.getAccounts().findIndex(acc => acc.email === email), 1);
     SettingsManager.save();
 
@@ -145,6 +167,42 @@ const MCAccountsHandler = {
   },
   getAccountFromUUID(uuid) {
     return SettingsManager.currentSettings.accounts.find(acc => acc.uuid === uuid);
+  },
+  refreshAccount(account) {
+    logger.info(`Refreshing token for ${account.email}`);
+    HTTPRequest.post('https://authserver.mojang.com/refresh', {
+      accessToken: account.accessToken,
+      clientToken: this.getClientToken()
+    }).then(resp => {
+      if (resp.data.accessToken) {
+        logger.info(`Received a new valid token for ${account.email}; storing it...`);
+        SettingsManager.currentSettings.accounts.find(acc => acc.email === account.email).accessToken = resp.data.accessToken;
+        SettingsManager.save();
+      }
+    }).catch(() => {
+      logger.info(`Unable to find a new valid token for ${account.email}`);
+      this.deleteAccount(account.email);
+      ToastManager.createToast('Authentication Error', `Minecraft Manager was unable to verify if the account "${account.name}"; try logging in again.`);
+    });
+  },
+  verifyUsable() {
+    this.getAccounts().forEach(async account => {
+      HTTPRequest.post('https://authserver.mojang.com/validate', {
+        accessToken: account.accessToken,
+        clientToken: this.getClientToken()
+      }).then(() => {
+      }).catch(e => {
+        if (e.response.status === 403) {
+          // 403 forbidden; token is not valid
+          this.refreshAccount(account);
+          logger.info(`Account ${account.email} has an invalid access token; requesting a new one...`);
+        } else {
+          // some other error; let the user know
+          logger.error(`Error verifying access token for ${account.email}: ${JSON.stringify(e.response.data)}`);
+          ToastManager.createToast('Something went wrong with Authentication', JSON.stringify(e.response.data));
+        }
+      });
+    });
   }
 };
 

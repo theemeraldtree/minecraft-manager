@@ -103,13 +103,14 @@ MCM Libraries Path: ${LibrariesManager.getMCMLibraries()}
 All MCM Libraries: ${LibrariesManager.dumpAllLibraries().join(',')}
 Extra Libraries: ${Global.checkExtraMinecraftLibraries()}
 
+${SettingsManager.currentSettings.launcherIntegration && `
+
 Minecraft Client Versions
 ---
 Versions Path: ${VersionsManager.getVersionsPath()}
 All Versions: ${VersionsManager.dumpAllVersions().join(',')}
 Extra Versions: ${Global.checkExtraMinecraftVersions()}
 
-${SettingsManager.currentSettings.launcherIntegration && `
 LAUNCHER INTEGRATION: ENABLED
 Minecraft Client Profiles
 ---

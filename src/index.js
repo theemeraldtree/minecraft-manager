@@ -20,6 +20,7 @@ import FSU from './util/fsu';
 import theemeraldtreeLogo from './page/settings/img/theemeraldtree-logo.png';
 import Analytics from './util/analytics';
 import MCLauncherIntegrationHandler from './minecraft/mcLauncherIntegrationHandler';
+import MCAccountsHandler from './minecraft/mcAccountsHandler';
 
 const logger = logInit('index');
 
@@ -114,6 +115,9 @@ async function load() {
       Global.scanProfiles();
 
       ProfilesManager.updateReloadListeners();
+
+      logger.info('Verifying accounts usable...');
+      MCAccountsHandler.verifyUsable();
 
       Analytics.send('launch');
     }

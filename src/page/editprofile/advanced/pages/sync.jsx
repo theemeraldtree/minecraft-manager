@@ -58,8 +58,8 @@ export default function Sync(params) {
   const symlinkFile = (doLink, fileName) => {
     FSU.deleteFileIfExists(path.join(profile.gameDir, fileName));
     if (doLink) {
-      FSU.createFileIfMissing(path.join(Global.getMCPath(), fileName));
-      fs.linkSync(path.join(Global.getMCPath(), fileName), path.join(profile.gameDir, fileName));
+      FSU.createFileIfMissing(path.join(LatestProfile.gameDir, fileName));
+      fs.linkSync(path.join(LatestProfile.gameDir, fileName), path.join(profile.gameDir, fileName));
     }
   };
 
@@ -198,7 +198,7 @@ export default function Sync(params) {
       <Panel>
         <h3>Sync Options</h3>
 
-        {profile.id !== '0-default-profile-latest' && (
+        {(profile.id !== '0-default-profile-latest' && ((profile.id === '0-default-profile-snapshot' && runSnapshotInSeperateFolder) || profile.id !== '0-default-profile-snapshot')) && (
         <>
           <InputHolder>
             <Checkbox lighter checked={syncOptionsTXT} onClick={syncOptionsTXTClick} />
