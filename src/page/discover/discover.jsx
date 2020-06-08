@@ -4,6 +4,7 @@ import ProfilesManager from '../../manager/profilesManager';
 import Hosts from '../../host/Hosts';
 import NavContext from '../../navContext';
 import SearchBox from '../../component/searchbox/searchbox';
+import ToastManager from '../../manager/toastManager';
 
 export default function DiscoverPage() {
   const [forceUpdateNumber, forceUpdate] = useReducer(x => x + 1, 0);
@@ -34,17 +35,23 @@ export default function DiscoverPage() {
 
   const installClick = async e => {
     e.stopPropagation();
-    const cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
-    const modpack = Hosts.cache.assets[cachedID];
-    ProfilesManager.progressState[modpack.id] = {
-      progress: 'installing',
-      version: `temp-${new Date().getTime()}`
-    };
-    updateProgressStates();
-    await Hosts.installModpack('curse', modpack);
-    ProfilesManager.getProfiles().then(() => {
+    if (!Hosts.currentlyInstallingModpack) {
+      const cachedID = e.currentTarget.parentElement.parentElement.dataset.cachedid;
+      const modpack = Hosts.cache.assets[cachedID];
+      ProfilesManager.progressState[modpack.id] = {
+        progress: 'installing',
+        version: `temp-${new Date().getTime()}`
+      };
+      Hosts.currentlyInstallingModpack = true;
       updateProgressStates();
-    });
+      await Hosts.installModpack('curse', modpack);
+      Hosts.currentlyInstallingModpack = false;
+      ProfilesManager.getProfiles().then(() => {
+        updateProgressStates();
+      });
+    } else {
+      ToastManager.createToast('Slow down!', 'You\'re already downloading a modpack. You can only download one at a time.');
+    }
   };
 
   const versionInstall = async (version, mp) => {

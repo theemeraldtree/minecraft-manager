@@ -21,6 +21,7 @@ import SettingsManager from '../manager/settingsManager';
 import logInit from '../util/logger';
 import DirectLauncherManager from '../manager/directLauncherManager';
 import MCVersionHandler from '../minecraft/mcVersionHandler';
+import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
 
 export default class Profile extends OAMFAsset {
   /**
@@ -359,7 +360,7 @@ export default class Profile extends OAMFAsset {
 
   async addIconToLauncher() {
     if (SettingsManager.currentSettings.launcherIntegration) {
-      LauncherManager.setProfileData(this, 'icon', this.getIconBase64());
+      LauncherManager.setProfileData(this, 'icon', await this.getIconBase64());
     }
   }
 
@@ -757,35 +758,48 @@ export default class Profile extends OAMFAsset {
     return new Promise(resolve => {
       this.logger.info(`Renaming to ${newName}...`);
       const newID = Global.createID(newName);
-      const safeName = Global.createSafeName(newName);
-      if (SettingsManager.currentSettings.launcherIntegration) {
-        if (!LauncherManager.profileExists(this)) {
-          LauncherManager.createProfile(this);
-        }
-        LauncherManager.setProfileData(this, 'name', newName);
-        LauncherManager.renameProfile(this, newID);
-      }
 
-      if (this.hasFramework()) {
-        if (SettingsManager.currentSettings.launcherIntegration) {
-          LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
-          if (this.frameworks.forge) {
-            VersionsManager.renameVersion(this, safeName, 'forge');
-          } else if (this.frameworks.fabric) {
-            VersionsManager.renameVersion(this, safeName, 'fabric');
+      this.save().then(async () => {
+        try {
+          fs.renameSync(this.profilePath, path.join(Global.PROFILES_PATH, `/${newID}/`));
+
+          const safeName = Global.createSafeName(newName);
+          if (SettingsManager.currentSettings.launcherIntegration) {
+            if (!LauncherManager.profileExists(this)) {
+              LauncherManager.createProfile(this);
+            }
+            LauncherManager.setProfileData(this, 'name', newName);
+            LauncherManager.renameProfile(this, newID);
           }
-        }
-        LibrariesManager.renameLibrary(this, newID);
-      }
 
-      this.id = newID;
-      this.name = newName;
-      this.versionname = this.safename;
-      this.save().then(() => {
-        fs.renameSync(this.profilePath, path.join(Global.PROFILES_PATH, `/${newID}/`));
-        this.initLocalValues();
-        this.save();
-        resolve(this);
+          if (this.hasFramework()) {
+            if (SettingsManager.currentSettings.launcherIntegration) {
+              LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
+              if (this.frameworks.forge) {
+                VersionsManager.renameVersion(this, safeName, 'forge');
+              } else if (this.frameworks.fabric) {
+                VersionsManager.renameVersion(this, safeName, 'fabric');
+              }
+            }
+            LibrariesManager.renameLibrary(this, newID);
+          }
+
+
+          this.id = newID;
+          this.name = newName;
+          this.versionname = this.safename;
+
+          if (SettingsManager.currentSettings.launcherIntegration) {
+            await MCLauncherIntegrationHandler.integrateAccounts(false);
+          }
+          this.initLocalValues();
+          this.save();
+          resolve(this);
+        } catch (e) {
+          ToastManager.createToast('Error', `Unable to rename: ${ErrorManager.makeReadable(e, 'renaming')}`);
+          this.save();
+          resolve(this);
+        }
       });
     });
   }
@@ -803,13 +817,15 @@ export default class Profile extends OAMFAsset {
     }
 
     if (!this.mcm.java || force) {
-      this.mcm.java = {
-        releaseName: currentSettings.java.releaseName,
-        path: currentSettings.java.path,
-        manual: false,
-        manualPath: '',
-        dedicatedRam: currentSettings.dedicatedRam
-      };
+      if (currentSettings.java) {
+        this.mcm.java = {
+          releaseName: currentSettings.java.releaseName,
+          path: currentSettings.java.path,
+          manual: false,
+          manualPath: '',
+          dedicatedRam: currentSettings.dedicatedRam
+        };
+      }
     }
   }
 

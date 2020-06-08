@@ -12,6 +12,8 @@ import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
 import World from '../type/world';
 import logInit from '../util/logger';
+import SettingsManager from '../manager/settingsManager';
+import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
 
 const logger = logInit('Hosts');
 
@@ -25,6 +27,8 @@ const Hosts = {
   },
 
   concurrentDownloads: [],
+
+  currentlyInstallingModpack: false,
 
   async sendCantConnect() {
     logger.error('Unable to connect to Curse');
@@ -498,7 +502,11 @@ const Hosts = {
                     }
 
                     profile.save();
-                    profile.addIconToLauncher();
+
+                    if (SettingsManager.currentSettings.launcherIntegration) {
+                      await MCLauncherIntegrationHandler.integrateProfiles(true);
+                    }
+
                     ProfilesManager.progressState[profile.id] = {
                       progress: 'installed',
                       version: profile.version.displayName

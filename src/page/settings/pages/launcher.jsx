@@ -95,6 +95,20 @@ function Launcher({ theme }) {
     }
   };
 
+  const questionHomeDirectory = () => {
+    AlertManager.messageBox('minecraft home directory', `
+    Your Minecraft Home directory is where the regular Minecraft Launcher stores info about the game.
+    <br /><br />
+    It's sometimes referred to as the <b>.minecraft folder</b>.`);
+  };
+
+  const questionMCExe = () => {
+    AlertManager.messageBox('minecraft executable', `
+    The Minecraft Executable is the file that is run to launch regular Minecraft.
+    <br /><br />
+    On Windows, it's typically located at<br /><b>C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe</b>
+    `);
+  };
   return (
     <>
       <Gap />
@@ -107,7 +121,7 @@ function Launcher({ theme }) {
       <IntegrationSettings enabled={integrationEnabled}>
         <EmptyOffset>
           <InputHolder vertical>
-            <Detail>Minecraft Home Directory<QuestionButton /></Detail>
+            <Detail>Minecraft Home Directory<QuestionButton onClick={questionHomeDirectory} /></Detail>
             <div style={{ marginTop: '10px' }}>
               <PathInput readOnly theme={theme} value={mcHome} />
               <Button disabled={!integrationEnabled} onClick={chooseMCHome} color="green">browse</Button>
@@ -115,7 +129,7 @@ function Launcher({ theme }) {
           </InputHolder>
           <SettingSeperator />
           <InputHolder vertical>
-            <Detail>Minecraft Executable Path<QuestionButton /></Detail>
+            <Detail>Minecraft Executable Path<QuestionButton onClick={questionMCExe} /></Detail>
             <div style={{ marginTop: '10px' }}>
               <PathInput readOnly theme={theme} value={mcExe} />
               <Button disabled={!integrationEnabled} onClick={chooseMCExe} color="green">browse</Button>

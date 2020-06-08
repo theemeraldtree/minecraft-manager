@@ -611,7 +611,6 @@ const Global = {
     }
 
     if(majorMigrationToPerform === '2.5') {
-
       const migrateLog = (text) => {
         logger.info(`[Migration] ${text}`);
       }
@@ -667,9 +666,9 @@ const Global = {
 
             this.updateMigratorStep(`Setting Java settings for ${prof.name}`);
 
-            migrateLog(`Assigning java release name to ${prof}`)
+            migrateLog(`Assigning java release name to ${prof.id}`)
             prof.mcm.java.releaseName = version;
-            prof.mcm.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/', JavaHandler.getDefaultJavaPath);
+            prof.mcm.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/', JavaHandler.getDefaultJavaPath());
             prof.mcm.version = 1;
             prof.save();
 
@@ -684,12 +683,10 @@ const Global = {
           });
         }
 
-        if(SettingsManager.currentSettings.launcherIntegration) {
-          migrateLog('Calling integrateJava');
-          this.updateMigratorStep('Integrating Java...');
+        migrateLog('Calling integrateProfiles');
+        this.updateMigratorStep('Integrating Profiles...');
 
-          MCLauncherIntegrationHandler.integrateJava();
-        }
+        MCLauncherIntegrationHandler.integrateProfiles(true);
       }
 
       this.updateMigratorStep('Saving...');
@@ -718,6 +715,7 @@ const Global = {
     
           migrateLog('Finished migration');
           this.setMigratorEnabled(false);
+          AlertManager.messageBox(`welcome to minecraft manager ${this.MCM_VERSION}`, `<div style="overflow-y: auto; max-height: 455px;">${latestChangelog}</div>`);
         }, 2000);
       }, 2000);
 

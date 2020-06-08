@@ -206,6 +206,8 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
 
       Global.scanProfiles();
 
+      ToastManager.noticeToast('Added from file!');
+
       // this is a *very* hacky fix
       // but if it ain't broke, don't fix it, right?
       setTimeout(() => {

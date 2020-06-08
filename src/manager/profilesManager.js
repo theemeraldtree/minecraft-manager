@@ -253,7 +253,7 @@ const ProfilesManager = {
 
         ToastManager.createToast(
           'Warning',
-          `The '${path.basename(location)}' profile has a corrupted/malformed JSON info file! That's no good!`,
+          `The '${path.basename(location)}' profile has a corrupted/malformed JSON info file! That's not good!`,
           'OMAF-PROFILE-MALFORMED-JSON'
         );
       }
