@@ -8,12 +8,10 @@ import Mod from '../type/mod';
 import Global from '../util/global';
 import ProfilesManager from '../manager/profilesManager';
 import OMAFFileAsset from '../type/omafFileAsset';
-import ForgeFramework from '../framework/forge/forgeFramework';
-import FabricFramework from '../framework/fabric/fabricFramework';
 import World from '../type/world';
 import logInit from '../util/logger';
-import SettingsManager from '../manager/settingsManager';
-import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
+import FSU from '../util/fsu';
+import Twitch from '../util/twitch';
 
 const logger = logInit('Hosts');
 
@@ -163,39 +161,6 @@ const Hosts = {
     if (!cachedAsset.description) {
       const newAsset = await this.addMissingInfo(host, 'description', cachedAsset);
       this.cache.assets[asset.cachedID] = newAsset;
-    }
-  },
-
-  async downloadModList(host, profile, list, callback, onUpdate, concurrent) {
-    if (concurrent !== 0 && concurrent !== undefined) {
-      for (let i = 0; i < concurrent - 1; i++) {
-        this.downloadModList(host, profile, list, callback, onUpdate);
-      }
-    }
-
-    if (list.length === 0) {
-      callback();
-    } else {
-      const item = { ...list[0] };
-      if (this.concurrentDownloads.includes(item.cachedID)) {
-        const list2 = list.slice();
-        list2.shift();
-        this.downloadModList(host, profile, list2, callback, onUpdate);
-      } else {
-        try {
-          this.concurrentDownloads.push(item.cachedID);
-          const mod = await this.installAssetVersionToProfile(host, profile, item, 'unknown', false);
-          this.cache.assets[item.cachedID] = mod;
-          onUpdate();
-          list.shift();
-          this.downloadModList(host, profile, list, callback, onUpdate);
-        } catch (e) {
-          ToastManager.createToast('Skipped', 'An asset was unable to install.');
-          onUpdate();
-          list.shift();
-          this.downloadModList(host, profile, list, callback, onUpdate);
-        }
-      }
     }
   },
 
@@ -407,10 +372,8 @@ const Hosts = {
 
   async installModpackVersion(host, modpackT, version) {
     return new Promise(async resolve => {
-      let modpack = modpackT;
-      if (!fs.existsSync(Global.MCM_TEMP)) {
-        fs.mkdirSync(Global.MCM_TEMP);
-      }
+      const modpack = modpackT;
+      FSU.createDirIfMissing(Global.MCM_TEMP);
 
       const versions = await this.getVersions(host, modpack);
 
@@ -430,114 +393,37 @@ const Hosts = {
 
       await this.cacheAllAssetInfo(host, modpack);
 
-      let mods = [];
-
       if (host === 'curse') {
-        mods = await Curse.downloadModsListFromModpack(modpack, downloadUrl);
-      }
-
-      let minecraftVersion;
-      if (host === 'curse') {
-        minecraftVersion = Curse.getMinecraftVersionFromModpackInstall(modpack);
-      }
-
-      ProfilesManager.createProfile(modpack.name, minecraftVersion).then(async profileT => {
-        const profile = profileT;
-        if (!modpack.iconURL) {
-          if (host === 'curse') {
-            modpack = await Curse.getFullAsset(modpack);
+        const zipPath = path.join(Global.MCM_TEMP, `/curse-modpack-install-${modpack.id}.zip`);
+        await DownloadsManager.startFileDownload(
+          `Info\n_A_${modpack.name}`,
+          downloadUrl,
+          zipPath,
+          {
+            enableDetailedProgress: true
           }
-        }
-        profile.hosts = modpack.hosts;
+        );
 
-        profile.temp = {};
-        profile.iconURL = modpack.iconURL;
-        profile.iconPath = modpack.iconPath;
-        profile.blurb = modpack.blurb;
-        profile.description = modpack.description ? modpack.description : 'No description available.';
-
-        profile.version = verObj;
-        profile.save();
-        profile.changeMCVersion(minecraftVersion);
-        if (host === 'curse') {
-          profile.hosts.curse.fullyInstalled = false;
-          profile.hosts.curse.fileID = verObj.id;
-          profile.hosts.curse.fileName = version.fileName;
-
-          const forgeVersion = Curse.getForgeVersionForModpackInstall(modpack);
-          if (forgeVersion) {
-            profile.setFrameworkVersion('forge', forgeVersion);
+        Twitch.importZip(zipPath, () => {}, {
+          hostedAsset: modpack,
+          version: {
+            fileID: verObj.hosts.curse.fileID,
+            fileName: verObj.hosts.curse.fileName
           }
-        }
-
-        profile.save();
-        profile.state = 'installing';
-        ProfilesManager.updateProfile(profile);
-        DownloadsManager.createProgressiveDownload(`Mods\n_A_${modpack.name}`).then(download => {
-          let numberDownloaded = 0;
-          const concurrent = mods.length >= 10 ? 10 : 0;
-          this.downloadModList(
-            host,
-            profile,
-            mods.slice(),
-            async () => {
-              if (numberDownloaded === mods.length) {
-                DownloadsManager.removeDownload(download.name);
-                this.concurrentDownloads = [];
-
-                if (host === 'curse') {
-                  await Curse.copyModpackOverrides(profile);
-                }
-
-                const final = () => {
-                  DownloadsManager.startFileDownload(
-                    `Icon\n_A_${profile.name}`,
-                    profile.iconURL,
-                    path.join(profile.profilePath, `/icon${path.extname(profile.iconURL)}`)
-                  ).then(async () => {
-                    if (host === 'curse') {
-                      await Curse.cleanupModpackInstall(profile);
-                      profile.hosts.curse.fullyInstalled = true;
-                    }
-
-                    profile.save();
-
-                    if (SettingsManager.currentSettings.launcherIntegration) {
-                      await MCLauncherIntegrationHandler.integrateProfiles(true);
-                    }
-
-                    ProfilesManager.progressState[profile.id] = {
-                      progress: 'installed',
-                      version: profile.version.displayName
-                    };
-                    if (!modpack.cachedID) {
-                      modpack.cachedID = `${host}-cached-${modpack.id}`;
-                    }
-                    this.cache.assets[modpack.cachedID] = profile;
-                    ProfilesManager.profilesBeingInstalled.splice(
-                      ProfilesManager.profilesBeingInstalled.indexOf(modpack.id),
-                      1
-                    );
-                    resolve(profile);
-                  });
-                };
-                if (profile.frameworks.forge) {
-                  ForgeFramework.setupForge(profile).then(final);
-                } else if (profile.frameworks.fabric) {
-                  FabricFramework.setupFabric(profile).then(final);
-                } else {
-                  final();
-                }
-              }
-            },
-            () => {
-              numberDownloaded++;
-              DownloadsManager.setDownloadProgress(download.name, Math.ceil((numberDownloaded / mods.length) * 100));
-            },
-            concurrent
-          );
+        }).then(() => {
+          fs.unlinkSync(zipPath);
+          ProfilesManager.progressState[modpack.id] = {
+            progress: 'installed',
+            version: verObj.displayName
+          };
+          ProfilesManager.updateProfile(modpack);
+          resolve();
+        }).catch(e => {
+          ProfilesManager.progressState[modpack.id] = undefined;
+          ToastManager.createToast('Unable to install modpack', e);
+          resolve();
         });
-      });
+      }
     });
   },
 

@@ -29,18 +29,23 @@ const Twitch = {
       const extractedPath = path.join(Global.MCM_TEMP, `/twitch-profileimport-${new Date().getTime()}`);
 
       updateState('Extracting...');
-      zip.extractAllToAsync(extractedPath, false, e => {
-        if (e) {
-          logger.error(`Unable to extract Twitch zip: ${e}`);
-          reject(new Error('Unable to extract ZIP'));
-        } else {
-          this.importDir(extractedPath, updateState, extraData).then(() => {
-            resolve();
-          }).catch(err => {
-            reject(err);
-          });
-        }
-      });
+
+      try {
+        zip.extractAllToAsync(extractedPath, false, e => {
+          if (e) {
+            logger.error(`Unable to extract Twitch zip: ${e}`);
+            reject(new Error('Unable to extract ZIP'));
+          } else {
+            this.importDir(extractedPath, updateState, extraData).then(() => {
+              resolve();
+            }).catch(err => {
+              reject(err);
+            });
+          }
+        });
+      } catch (e) {
+        reject(e);
+      }
     });
   },
   /**

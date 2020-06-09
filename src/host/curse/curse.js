@@ -1,18 +1,12 @@
-import fs from 'fs';
-import path from 'path';
-import rimraf from 'rimraf';
 import Global from '../../util/global';
 import Profile from '../../type/profile';
 import Mod from '../../type/mod';
 import Hosts from '../Hosts';
-import DownloadsManager from '../../manager/downloadsManager';
 import OMAFFileAsset from '../../type/omafFileAsset';
 import World from '../../type/world';
 import logInit from '../../util/logger';
-import HTTPRequest from '../httprequest';
 
 const logger = logInit('CurseFramework');
-const ADMZip = require('adm-zip');
 
 // the curse object is used as a sort of "translator" to convert curse's data format to work with OMAF
 const Curse = {
@@ -388,95 +382,6 @@ const Curse = {
   async getFileChangelog(asset, fileID) {
     logger.info(`Getting changelog for ${asset.id} and file ${fileID}`);
     return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/file/${fileID}/changelog`);
-  },
-
-  // downloads, extracts, and reads the version of a modpack to get the mods list
-  async downloadModsListFromModpack(mp, downloadUrl) {
-    return new Promise(resolve => {
-      const modpack = mp;
-      const infoDownload = path.join(Global.MCM_TEMP, `${modpack.id}-install.zip`);
-      DownloadsManager.startFileDownload(`${modpack.name}\n_A_Info`, downloadUrl, infoDownload).then(async () => {
-        const zip = new ADMZip(infoDownload);
-
-        const extractPath = path.join(Global.MCM_TEMP, `${modpack.id}-install/`);
-        zip.extractAllTo(extractPath, false);
-        fs.unlinkSync(infoDownload);
-
-        const manifest = JSON.parse(fs.readFileSync(path.join(extractPath, 'manifest.json')));
-
-        let list = [];
-        try {
-          const projectIDs = manifest.files.map(file => file.required && file.projectID);
-          const allInfo = await HTTPRequest.post(this.URL_BASE, projectIDs);
-          list = allInfo.data.map(asset => {
-            const mod = this.convertToOMAF(asset);
-            mod.hosts.curse.fileID = manifest.files.find(mf => mf.projectID === asset.id).fileID;
-            mod.cachedID = `curse-mod-install-${asset.id}`;
-            return mod;
-          });
-        } catch (e) {
-          logger.error(`Unable to obtain all mod info for ${mp.id} at once.`);
-          list = manifest.files.map(file => {
-            if (file.required) {
-              const mod = new Mod({
-                type: 'mod',
-                hosts: {
-                  curse: {
-                    id: file.projectID,
-                    fileID: file.fileID
-                  }
-                },
-                cachedID: `curse-mod-install-${file.projectID}`
-              });
-              return mod;
-            }
-
-            return undefined;
-          });
-        }
-
-        resolve(list);
-      });
-    });
-  },
-
-  // copies the overrides after a modpack has been downloaded (and is in temp folder)
-  async copyModpackOverrides(profile) {
-    const extractPath = path.join(Global.MCM_TEMP, `${profile.id}-install/`);
-    const overridesFolder = path.join(extractPath, '/overrides');
-    if (fs.existsSync(overridesFolder)) {
-      fs.readdirSync(overridesFolder).forEach(file => {
-        if (file === 'mods') {
-          fs.readdirSync(path.join(overridesFolder, file)).forEach(f => {
-            Global.copyDirSync(path.join(overridesFolder, file, f), path.join(profile.gameDir, file, f));
-          });
-        } else {
-          Global.copyDirSync(path.join(overridesFolder, file), path.join(profile.gameDir, file));
-        }
-      });
-    }
-  },
-
-  // removes leftover files (e.g. extract directory) from modpack install
-  async cleanupModpackInstall(profile) {
-    const extractPath = path.join(Global.MCM_TEMP, `${profile.id}-install/`);
-    rimraf.sync(extractPath);
-  },
-
-  // gets the forge version from the extractpath
-  getForgeVersionForModpackInstall(profile) {
-    const manifest = JSON.parse(fs.readFileSync(path.join(Global.MCM_TEMP, `${profile.id}-install/manifest.json`)));
-    if (manifest.minecraft.modLoaders[0]) {
-      return `${manifest.minecraft.version}-${manifest.minecraft.modLoaders[0].id.substring(6)}`;
-    }
-
-    return undefined;
-  },
-
-  // gets the minecraft version from the extractpath
-  getMinecraftVersionFromModpackInstall(modpack) {
-    const manifest = JSON.parse(fs.readFileSync(path.join(Global.MCM_TEMP, `${modpack.id}-install/manifest.json`)));
-    return manifest.minecraft.version;
   },
 
   // checks if an update is available for an asset

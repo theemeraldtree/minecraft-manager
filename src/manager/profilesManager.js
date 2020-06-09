@@ -3,9 +3,7 @@ import Profile from '../type/profile';
 import LauncherManager from './launcherManager';
 import LibrariesManager from './librariesManager';
 import VersionsManager from './versionsManager';
-import DownloadsManager from './downloadsManager';
 import ToastManager from './toastManager';
-import Hosts from '../host/Hosts';
 import ErrorManager from './errorManager';
 import ForgeFramework from '../framework/forge/forgeFramework';
 import FabricFramework from '../framework/fabric/fabricFramework';
@@ -14,6 +12,7 @@ import SnapshotProfile from '../defaultProfiles/snapshotProfile';
 import SettingsManager from './settingsManager';
 import logInit from '../util/logger';
 import MCVersionHandler from '../minecraft/mcVersionHandler';
+import Downloader from '../util/downloader';
 
 const logger = logInit('ProfilesManager');
 
@@ -135,7 +134,7 @@ const ProfilesManager = {
       stateChange('Reloading profiles...');
 
       logger.info('(ProfileImport) Reloading profiles...');
-      this.getProfiles().then(() => {
+      this.getProfiles().then(async () => {
         const profile = this.getProfileFromID(obj.id);
         profile.state = 'importing...';
 
@@ -148,9 +147,6 @@ const ProfilesManager = {
           logger.info(`(ProfileImport) Removing extraction path from ${profile.id}...`);
           rimraf.sync(extractPath);
 
-          logger.info(`(ProfileImport) Creating version JSON for ${profile.id}`);
-          MCVersionHandler.updateProfile(profile, true);
-
           logger.info(`(ProfileImport) Import Complete for ${profile.id}`);
           stateChange('Done');
 
@@ -162,78 +158,41 @@ const ProfilesManager = {
           logger.info(`(ProfileImport) Starting mod download for ${profile.id}`);
 
           stateChange('Downloading mods...');
-          const curseModsToDownload = profile.mods.map(modT => {
-            const mod = modT;
-            if (mod.hosts) {
-              if (mod.hosts.curse) {
-                logger.info(`(ProfileImport) Adding Curse mod to download queue: ${mod.id}`);
+          await Downloader.downloadHostedAssets('curse', profile.mods, profile);
 
-                mod.cachedID = `profile-import-${mod.id}`;
-                mod.detailedInfo = false;
-                Hosts.cache.assets[mod.cachedID] = mod;
-                return mod;
-              }
-            }
+          if (SettingsManager.currentSettings.launcherIntegration) {
+            stateChange('Creating launcher profile...');
+            logger.info(`(ProfileImport) Creating Launcher profile for ${profile.id}`);
 
-            return undefined;
-          });
+            LauncherManager.createProfile(profile);
+          }
 
-          logger.info(`(ProfileImport) Creating progressive download for ${profile.id}`);
-          DownloadsManager.createProgressiveDownload(`Mods from ${profile.name}`).then(download => {
-            let numberDownloaded = 0;
+          if (profile.frameworks.forge) {
+            logger.info(`(ProfileImport) Installing Forge for ${profile.id}`);
+            stateChange('Installing Forge...');
+            ForgeFramework.setupForge(profile).then(() => {
+              importComplete();
+            });
+          } else if (profile.frameworks.fabric) {
+            logger.info(`(ProfileImport) Installing Fabric for ${profile.id}`);
 
-            const concurrent = curseModsToDownload.length >= 5 ? 5 : 0;
-
-            logger.info(`(ProfileImport) Calling downloadModList for ${profile.id}`);
-            Hosts.downloadModList(
-              'curse',
-              profile,
-              curseModsToDownload.slice(),
-              () => {
-                if (numberDownloaded === curseModsToDownload.length) {
-                  DownloadsManager.removeDownload(download.name);
-
-                  if (SettingsManager.currentSettings.launcherIntegration) {
-                    stateChange('Creating launcher profile...');
-                    logger.info(`(ProfileImport) Creating Launcher profile for ${profile.id}`);
-
-                    LauncherManager.createProfile(profile);
-                  }
-
-                  if (profile.frameworks.forge) {
-                    logger.info(`(ProfileImport) Installing Forge for ${profile.id}`);
-                    stateChange('Installing Forge...');
-                    ForgeFramework.setupForge(profile).then(() => {
-                      importComplete();
-                    });
-                  } else if (profile.frameworks.fabric) {
-                    logger.info(`(ProfileImport) Installing Fabric for ${profile.id}`);
-
-                    stateChange('Installing Fabric...');
-                    FabricFramework.setupFabric(profile).then(() => {
-                      importComplete();
-                    });
-                  } else {
-                    importComplete();
-                  }
-                }
-              },
-              () => {
-                logger.info('(ProfileImport) Finished a mod download');
-                numberDownloaded++;
-                DownloadsManager.setDownloadProgress(
-                  download.name,
-                  Math.ceil((numberDownloaded / curseModsToDownload.length) * 100)
-                );
-              },
-              concurrent
-            );
-          });
+            stateChange('Installing Fabric...');
+            FabricFramework.setupFabric(profile).then(() => {
+              importComplete();
+            });
+          } else {
+            logger.info(`(ProfileImport) Creating version JSON for ${profile.id}`);
+            MCVersionHandler.updateProfile(profile, true);
+            importComplete();
+          }
         } else {
-          stateChange('Creating launcher profile...');
-          logger.info(`(ProfileImport) Creating launcher profile for ${profile.id}...`);
+          if (SettingsManager.currentSettings.launcherIntegration) {
+            stateChange('Creating launcher profile...');
+            logger.info(`(ProfileImport) Creating launcher profile for ${profile.id}...`);
 
-          LauncherManager.createProfile(profile);
+            LauncherManager.createProfile(profile);
+          }
+
           importComplete();
         }
       });

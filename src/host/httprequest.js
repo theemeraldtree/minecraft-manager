@@ -27,7 +27,7 @@ const HTTPRequest = {
     });
   },
 
-  downloadInline(url, dest, onProgress) {
+  downloadInline(url, dest, onProgress, opts = {}) {
     return new Promise(async (resolve, reject) => {
       const { data, headers } = await axios.get(url, {
         responseType: 'stream',
@@ -42,6 +42,7 @@ const HTTPRequest = {
       const ws = fs.createWriteStream(dest);
 
       let progressData = 0;
+      let previousPercent = 0;
 
       data.pipe(ws);
 
@@ -49,7 +50,10 @@ const HTTPRequest = {
         progressData += chunk.length;
 
         const prog = Math.trunc((progressData / contentLength) * 100);
-        onProgress(prog);
+        if ((prog - previousPercent >= 10) || opts.enableDetailedProgress) {
+          previousPercent = prog;
+          onProgress(prog);
+        }
       });
 
       data.on('error', e => {

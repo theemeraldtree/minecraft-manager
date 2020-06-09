@@ -109,28 +109,30 @@ export default class ShareOverlay extends Component {
       ]
     });
 
-    profile
-      .export(p, exportFolders, progress => {
-        this.setState({
-          exportProgress: progress
+    if (p && p[0]) {
+        profile
+        .export(p, exportFolders, progress => {
+          this.setState({
+            exportProgress: progress
+          });
+        })
+        .then(() => {
+          this.props.cancelClick();
+          this.setState({
+            displayState: 'main'
+          });
+        })
+        .catch(() => {
+          this.props.cancelClick();
+          this.setState({
+            displayState: 'main'
+          });
         });
-      })
-      .then(() => {
-        this.props.cancelClick();
-        this.setState({
-          displayState: 'main'
-        });
-      })
-      .catch(() => {
-        this.props.cancelClick();
-        this.setState({
-          displayState: 'main'
-        });
-      });
 
-    this.setState({
-      displayState: 'progress'
-    });
+      this.setState({
+        displayState: 'progress'
+      });
+    }
   };
 
   useProfile() {

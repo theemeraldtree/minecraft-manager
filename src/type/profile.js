@@ -485,8 +485,8 @@ export default class Profile extends OAMFAsset {
         exportProgress('Removing non-chosen folders...');
         fs.readdir(path.join(tempPath, '/files'), (err, files) => {
           files.forEach(file => {
-            if (!exportFolders[file]) {
-              if (file !== 'mods') {
+            if (exportFolders && !exportFolders[file]) {
+              if (file && file !== 'mods') {
                 rimraf.sync(path.join(filesPath, file));
               }
             }

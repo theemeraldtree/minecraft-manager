@@ -52,7 +52,7 @@ const Downloader = {
 
           updateProgress();
           res();
-        }), { concurrency: 30 });
+        }), { concurrency: 10 });
 
       DownloadsManager.removeDownload(download.name);
 
