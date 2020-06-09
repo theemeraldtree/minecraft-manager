@@ -200,7 +200,7 @@ const Hosts = {
   },
 
   /* installers */
-  async installAssetToProfile(host, profile, assetT, type) {
+  async installAssetToProfile(host, profile, assetT, type, opts) {
     let asset = assetT;
     logger.info(`Installing latest compatible version of ${asset.id} to ${profile.id} and host ${host}`);
 
@@ -236,7 +236,8 @@ const Hosts = {
         host,
         asset,
         await this.getClosestOlderVersion(host, asset, profile.version.minecraft.version),
-        modloader
+        modloader,
+        opts
       );
 
       if (!ver) return 'no-version-available';
@@ -272,7 +273,7 @@ const Hosts = {
     }
   },
 
-  async installAssetVersionToProfile(host, profileT, modT, typeT, dependencies) {
+  async installAssetVersionToProfile(host, profileT, modT, typeT, dependencies, opts) {
     return new Promise(async (resolve, reject) => {
       let mod = modT;
 
@@ -380,15 +381,13 @@ const Hosts = {
               }
 
               if (!profile.getSubAssetFromID(type, mod.id)) {
-                profile.addSubAsset(type, modObj);
+                profile.addSubAsset(type, modObj, opts);
               }
 
-              if (profile.progressState[mod.id]) {
-                profile.progressState[mod.id] = {
-                  progress: 'installed',
-                  version: mod.version.displayName
-                };
-              }
+              profile.progressState[mod.id] = {
+                progress: 'installed',
+                version: mod.version.displayName
+              };
 
               resolve(mod);
             })

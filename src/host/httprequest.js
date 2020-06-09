@@ -27,9 +27,9 @@ const HTTPRequest = {
     });
   },
 
-  downloadInline(url, dest) {
+  downloadInline(url, dest, onProgress) {
     return new Promise(async (resolve, reject) => {
-      const { data } = await axios.get(url, {
+      const { data, headers } = await axios.get(url, {
         responseType: 'stream',
         headers: {
           'X-Client': 'MinecraftManager'
@@ -37,9 +37,20 @@ const HTTPRequest = {
         adapter
       });
 
+      const contentLength = headers['content-length'];
+
       const ws = fs.createWriteStream(dest);
 
+      let progressData = 0;
+
       data.pipe(ws);
+
+      data.on('data', chunk => {
+        progressData += chunk.length;
+
+        const prog = Math.trunc((progressData / contentLength) * 100);
+        onProgress(prog);
+      });
 
       data.on('error', e => {
         reject(e);

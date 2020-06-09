@@ -73,8 +73,8 @@ export default function EditPageVersions({ id }) {
   let isMounted = true;
 
   const reloadCurseVersionsList = async () => {
-    if (profile.hosts) {
-      if (profile.hosts.curse) {
+    if (profile.hosts && profile.version.hosts) {
+      if (profile.hosts.curse && profile.version.hosts.curse) {
         const versions = await Hosts.getVersions('curse', profile);
         let nameArray = [];
         versions[0].latest = true;
@@ -304,7 +304,7 @@ export default function EditPageVersions({ id }) {
             </BG>
           </Overlay>
         )}
-        {!profile.hosts.curse && (
+        {(!profile.hosts.curse || !(profile.version.hosts && profile.version.hosts.curse)) && (
           <>
             <Detail>minecraft version</Detail>
             <MCVersionSelector
@@ -316,7 +316,7 @@ export default function EditPageVersions({ id }) {
             <OptionBreak />
           </>
         )}
-        {profile.hosts.curse && (
+        {profile.hosts.curse && profile.version.hosts && profile.version.hosts.curse && (
           <>
             <Detail>profile version</Detail>
             {hostVersionValues && (

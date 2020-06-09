@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import mkdirp from 'mkdirp';
+import ToastManager from '../manager/toastManager';
+import ErrorManager from '../manager/errorManager';
 
 /**
  * File System Utilities
@@ -70,6 +72,25 @@ const FSU = {
    */
   deleteFileIfExists(filePath) {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  },
+
+  copyDir(src, dest) {
+    return new Promise(async resolve => {
+      try {
+        if (fs.existsSync(src) && fs.statSync(src).isDirectory()) {
+          this.createDirIfMissing(dest);
+
+          const files = await fs.promises.readdir(src);
+          await Promise.all(files.map(child => this.copyDir(path.join(src, child), path.join(dest, child))));
+        } else if (!fs.existsSync(dest)) {
+          await fs.promises.copyFile(src, dest);
+        }
+
+        resolve();
+      } catch (e) {
+        ToastManager.createToast('Error', ErrorManager.makeReadable(e));
+      }
+    });
   }
 };
 

@@ -567,14 +567,14 @@ export default class Profile extends OAMFAsset {
     return undefined;
   }
 
-  addSubAsset(type, asset) {
+  addSubAsset(type, asset, opts = {}) {
     if (type === 'mod') {
       if (!this.mods) {
         this.mods = [];
       }
       if (!this.getSubAssetFromID('mod', asset.id)) {
         this.mods.push(asset);
-        this.save();
+        if (!opts.disableSave) this.save();
       }
     } else if (type === 'resourcepack') {
       if (!this.resourcepacks) {
@@ -582,7 +582,7 @@ export default class Profile extends OAMFAsset {
       }
       if (!this.getSubAssetFromID('resourcepack', asset.id)) {
         this.resourcepacks.push(asset);
-        this.save();
+        if (!opts.disableSave) this.save();
       }
     } else if (type === 'world') {
       if (!this.worlds) {
@@ -590,7 +590,7 @@ export default class Profile extends OAMFAsset {
       }
       if (!this.getSubAssetFromID('world', asset.id)) {
         this.worlds.push(asset);
-        this.save();
+        if (!opts.disableSave) this.save();
       }
     }
   }

@@ -21,7 +21,6 @@ const Filler = styled.div.attrs(props => ({
   background: linear-gradient(270deg, #0a993c, #0a993c, #0add53, #0a993c, #0a993c);
   background-size: 600% 600%;
   animation: ${Animation} 1.5s ease infinite;
-  transition: 50ms;
 `;
 
 const ProgressBar = props => (

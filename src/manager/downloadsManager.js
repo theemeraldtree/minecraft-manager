@@ -20,7 +20,8 @@ const DownloadsManager = {
         if (this.onDownload) {
           this.downloadUpdate();
         }
-        HTTPRequest.download(file, downloadPath, progress => {
+
+        HTTPRequest.downloadInline(file, downloadPath, progress => {
           this.handleDownloadProgress(download, progress);
         }, opts)
           .then(() => {

@@ -8,6 +8,7 @@ import Overlay from '../overlay/overlay';
 import AlertBackground from '../alert/alertbackground';
 import HeaderButton from '../headerButton/headerButton';
 import MultiMC from '../../util/multimc';
+import Twitch from '../../util/twitch';
 
 const { dialog } = require('electron').remote;
 
@@ -101,6 +102,7 @@ export default class ImportOverlay extends Component {
         }
       ]
     });
+
     if (p && p[0]) {
       MultiMC.import(p[0], this.stateChange)
         .then(this.done)
@@ -148,6 +150,31 @@ export default class ImportOverlay extends Component {
     });
   };
 
+  switchTwitch = () => {
+    this.setState({
+      displayState: 'twitch'
+    });
+  }
+
+  chooseFileTwitch = () => {
+    const p = dialog.showOpenDialogSync({
+      title: 'Choose a file to import',
+      buttonLabel: 'Import',
+      filters: [
+        {
+          name: 'Twitch zip',
+          extensions: ['zip']
+        }
+      ]
+    });
+
+    if (p && p[0]) {
+      Twitch.importZip(p[0], this.stateChange)
+        .then(this.done)
+        .catch(this.error);
+    }
+  }
+
   clickCancel = () => {
     setTimeout(() => {
       this.setState({
@@ -176,6 +203,9 @@ export default class ImportOverlay extends Component {
               </HeaderButton>
               <HeaderButton active={displayState === 'mmc'} onClick={this.switchMMC}>
                 MultiMC .zip
+              </HeaderButton>
+              <HeaderButton active={displayState === 'twitch'} onClick={this.switchTwitch}>
+                Twitch .zip
               </HeaderButton>
             </HBWrapper>
           )}
@@ -206,6 +236,22 @@ export default class ImportOverlay extends Component {
                   cancel
                 </BTN>
                 <BTN onClick={this.chooseFileMMC} color="green">
+                  choose a file
+                </BTN>
+              </ButtonContainer>
+            </>
+          )}
+
+          {displayState === 'twitch' && !updateState && !showError && !file && (
+            <>
+              <Subtext>
+                Choose the Twitch <b>.zip</b> file that you would like to import
+              </Subtext>
+              <ButtonContainer>
+                <BTN onClick={this.clickCancel} color="red">
+                  cancel
+                </BTN>
+                <BTN onClick={this.chooseFileTwitch} color="green">
                   choose a file
                 </BTN>
               </ButtonContainer>
