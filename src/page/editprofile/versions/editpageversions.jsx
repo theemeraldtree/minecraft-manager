@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Redirect } from 'react-router-dom';
-import { Button, Dropdown, Detail } from '@theemeraldtree/emeraldui';
+import { Button, Dropdown, Detail, Spinner } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../../manager/profilesManager';
 import OptionBreak from '../components/optionbreak';
 import Overlay from '../../../component/overlay/overlay';
@@ -14,6 +14,8 @@ import ForgeFramework from '../../../framework/forge/forgeFramework';
 import FabricFramework from '../../../framework/fabric/fabricFramework';
 import MCVersionSelector from '../../../component/mcVersionSelector/mcVersionSelector';
 import FrameworkInstaller from './frameworkInstaller';
+import MCLauncherIntegrationHandler from '../../../minecraft/mcLauncherIntegrationHandler';
+import SettingsManager from '../../../manager/settingsManager';
 
 const CustomVersions = styled.div`
   background-color: #2b2b2b;
@@ -46,6 +48,18 @@ const Title = styled.p`
   margin: 0;
   font-weight: 200;
   font-size: 21pt;
+`;
+
+const TinySpinner = styled.div`
+  width: 300px;
+  height: 40px;
+  background-color: #404040;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  & > div {
+    transform: scale(0.4);
+  }
 `;
 
 export default function EditPageVersions({ id }) {
@@ -205,6 +219,7 @@ export default function EditPageVersions({ id }) {
     profile.setFrameworkVersion('fabric', version);
     FabricFramework.setupFabric(profile).then(() => {
       if (isMounted) setFabricIsInstalling(false);
+      if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
     });
   };
 
@@ -239,6 +254,7 @@ export default function EditPageVersions({ id }) {
     profile.setFrameworkVersion('forge', version);
     ForgeFramework.setupForge(profile).then(() => {
       if (isMounted) setForgeIsInstalling(false);
+      if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
     });
   };
 
@@ -327,6 +343,7 @@ export default function EditPageVersions({ id }) {
                 disabled={forgeIsInstalling || fabricIsInstalling}
               />
             )}
+            {!hostVersionValues && <TinySpinner><Spinner /></TinySpinner>}
           </>
         )}
 

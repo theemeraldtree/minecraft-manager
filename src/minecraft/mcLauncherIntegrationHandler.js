@@ -108,6 +108,27 @@ const MCLauncherIntegrationHandler = {
     if (!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
       fs.symlinkSync(path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager/'), path.join(Global.getMCPath(), '/libraries/minecraftmanager/'), 'junction');
     }
+
+    FSU.createDirIfMissing(path.join(Global.getMCPath(), `/libraries/net/minecraftforge/forge/`));
+    ProfilesManager.loadedProfiles.forEach(profile => {
+      // 1.13 or newer Forge requires the client and universal exist in the libraries folder
+      // this properly links the Minecraft Manager libraries and Minecraft Launcher libraries
+      if(profile.getPrimaryFramework() === 'forge' && VersionsManager.checkIs113OrHigher(profile)) {
+        const forgeBasePath = `/net/minecraftforge/forge/${profile.frameworks.forge.version}`;
+        const forgePath = path.join(Global.getMCPath(), `/libraries/${forgeBasePath}`);
+
+        FSU.createDirIfMissing(forgePath);
+        FSU.updateSymlink(
+          path.join(forgePath, `/forge-${profile.frameworks.forge.version}-client.jar`),
+          path.join(LibrariesManager.getLibrariesPath(), forgeBasePath, `/forge-${profile.frameworks.forge.version}-client.jar`)
+        );
+
+        FSU.updateSymlink(
+          path.join(forgePath, `/forge-${profile.frameworks.forge.version}-universal.jar`),
+          path.join(LibrariesManager.getLibrariesPath(), forgeBasePath, `/forge-${profile.frameworks.forge.version}-universal.jar`)
+        );
+      }
+    })
   },
   integrate(initial) {
     this.integrateAccounts();

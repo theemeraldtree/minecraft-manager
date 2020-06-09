@@ -245,16 +245,19 @@ const Hosts = {
       logger.info(`Installing ${mod.id} assigned version to ${profileT.id} with host ${host}`);
       let type = typeT;
       const profile = profileT;
-      let pathroot;
-      let extension;
-      if (type === 'mod') {
-        pathroot = '/mods/';
-        extension = 'jar';
-      } else if (type === 'resourcepack') {
-        pathroot = '/resourcepacks/';
-        extension = 'zip';
+      if (host === 'curse') {
+        if (!mod.downloadTemp) {
+          if (host === 'curse') {
+            mod = await Curse.addFileInfo(mod, mod.hosts.curse.fileID);
+          }
+        }
       }
-      if (!fs.existsSync(path.join(profile.gameDir, `${pathroot}${mod.id}.${extension}`))) {
+
+      let fileName;
+      if (host === 'curse') fileName = mod.hosts.curse.fileName;
+
+
+      if (!fs.existsSync(path.join(profile.gameDir, fileName))) {
         if (!mod.name || (mod.icon && mod.icon.substring(0, 4) !== 'http')) {
           if (host === 'curse') {
             const newm = await Curse.getFullAsset(mod, type);
@@ -303,11 +306,6 @@ const Hosts = {
           }
 
           DownloadsManager.removeDownload(download.name);
-          if (!mod.downloadTemp) {
-            if (host === 'curse') {
-              mod = await Curse.addFileInfo(mod, mod.hosts.curse.fileID);
-            }
-          }
 
           let modObj;
           if (type === 'mod') {
@@ -320,18 +318,24 @@ const Hosts = {
 
           DownloadsManager.startAssetDownload(profile, mod, type, mod.downloadTemp, false)
             .then(async () => {
-              if (type === 'mod') {
-                modObj.setJARFile(`${mod.id}.jar`);
-                if (modObj.iconPath) {
-                  modObj.icon = `_mcm/icons/mods/${mod.id}${path.extname(mod.iconPath)}`;
+              if (host === 'curse') {
+                if (type === 'mod') {
+                  modObj.setJARFile(mod.hosts.curse.fileName);
+                  if (modObj.iconPath) {
+                    modObj.icon = `_mcm/icons/mods/${mod.id}${path.extname(mod.iconPath)}`;
+                  }
+                } else if (type === 'resourcepack') {
+                  modObj.setMainFile('resourcepacks', 'resourcepackzip', `${mod.id}.zip`);
+                } else if (type === 'world') {
+                  modObj.setMainFile('saves', 'worldfolder', mod.id);
                 }
-              } else if (type === 'resourcepack') {
-                modObj.setMainFile('resourcepacks', 'resourcepackzip', `${mod.id}.zip`);
+              }
+
+              if (type === 'resourcepack') {
                 if (modObj.iconPath) {
                   modObj.icon = `_mcm/icons/resourcepacks/${mod.id}${path.extname(mod.iconPath)}`;
                 }
               } else if (type === 'world') {
-                modObj.setMainFile('saves', 'worldfolder', mod.id);
                 if (modObj.iconPath) {
                   modObj.icon = `_mcm/icons/worlds/${mod.id}${path.extname(mod.iconPath)}`;
                 }

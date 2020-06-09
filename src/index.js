@@ -16,7 +16,6 @@ import './font/fonts.css';
 import { loadLatestProfile } from './defaultProfiles/latestProfile';
 import { loadSnapshotProfile } from './defaultProfiles/snapshotProfile';
 import logInit from './util/logger';
-import FSU from './util/fsu';
 import theemeraldtreeLogo from './page/settings/img/theemeraldtree-logo.png';
 import Analytics from './util/analytics';
 import MCLauncherIntegrationHandler from './minecraft/mcLauncherIntegrationHandler';
@@ -40,12 +39,6 @@ async function load() {
     if (fs.existsSync(Global.PROFILES_PATH)) {
       logger.info('Attempting to update MC versions...');
       Global.updateMCVersions();
-
-      // Check for directories - we need to make sure everything exists
-      logger.info('Checking for missing essential library directories...');
-
-      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
-      FSU.createDirIfMissing(path.join(Global.getMCPath(), '/libraries/minecraftmanager/profiles'));
     }
   } catch (e) {
     logger.error('Something went wrong');

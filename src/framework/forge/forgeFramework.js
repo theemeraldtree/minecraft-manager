@@ -26,13 +26,15 @@ const ForgeFramework = {
 
         MCVersionHandler.updateProfile(profile);
 
-        const libraryPath = path.join(LibrariesManager.getMCMLibraries(), `/mcm-${profile.id}`);
+        const profileLibraryPath = path.join(LibrariesManager.getMCMLibraries(), `/mcm-${profile.id}/forge/`);
+        FSU.createDirIfMissing(profileLibraryPath);
 
-        FSU.createDirIfMissing(libraryPath);
+        const profileJarPath = path.join(profileLibraryPath, `/mcm-${profile.id}-forge.jar`);
 
-        const forgePath = path.join(libraryPath, 'forge');
-
+        const forgePath = path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager/forge/');
         FSU.createDirIfMissing(forgePath);
+
+        const forgeJarPath = path.join(forgePath, `/forge-${profile.frameworks.forge.version}.jar`);
 
         const mcversion = profile.version.minecraft.version;
         let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-universal.jar`;
@@ -46,8 +48,9 @@ const ForgeFramework = {
         DownloadsManager.startFileDownload(
           `Minecraft Forge ${profile.frameworks.forge.version}\n_A_${profile.name}`,
           downloadURL,
-          path.join(forgePath, `mcm-${profile.id}-forge.jar`)
+          forgeJarPath,
         ).then(() => {
+          FSU.updateSymlink(profileJarPath, forgeJarPath);
           logger.info(`Finished downloading Forge jar for ${profile.id}`);
           profile.unsetFrameworkIsInstalling('forge');
           resolve();
@@ -96,6 +99,17 @@ const ForgeFramework = {
       json.libraries[0] = {
         name: `minecraftmanager.profiles:mcm-${profile.id}:forge`
       };
+
+      if (VersionsManager.checkIs113OrHigher(profile)) {
+        json.libraries.push({
+          name: `net.minecraftforge:forge:${profile.frameworks.forge.version}-client`,
+          _disableDownload: true
+        });
+        json.libraries.push({
+          name: `net.minecraftforge:forge:${profile.frameworks.forge.version}-universal`,
+          _disableDownload: true
+        });
+      }
 
       json['+libraries'] = json.libraries;
 

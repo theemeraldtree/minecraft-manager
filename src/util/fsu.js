@@ -74,6 +74,11 @@ const FSU = {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
   },
 
+  /**
+   * Copies a directory asynchronously
+   * @param {string} src - Source directory to copy
+   * @param {string} dest - The destination of the directory
+   */
   copyDir(src, dest) {
     return new Promise(async resolve => {
       try {
@@ -91,7 +96,18 @@ const FSU = {
         ToastManager.createToast('Error', ErrorManager.makeReadable(e));
       }
     });
-  }
+  },
+
+  /**
+   * Creates or updates a symlink to a specified path
+   * @param {string} symlinkPath - The path to create the symlink at
+   * @param {string} originalPath - The file to link to
+   */
+  updateSymlink(symlinkPath, originalPath) {
+    if (fs.existsSync(symlinkPath)) fs.unlinkSync(symlinkPath);
+
+    fs.linkSync(originalPath, symlinkPath);
+  },
 };
 
 export default FSU;

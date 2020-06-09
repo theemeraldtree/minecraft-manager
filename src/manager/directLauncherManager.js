@@ -7,6 +7,7 @@ import fs from 'fs';
 import os from 'os';
 import mkdirp from 'mkdirp';
 import crypto from 'crypto';
+import rimraf from 'rimraf';
 import FSU from '../util/fsu';
 import LibrariesManager from './librariesManager';
 import logInit from '../util/logger';
@@ -54,14 +55,15 @@ const DirectLauncherManager = {
   },
 
   generateClasspath(profile, versionJSON) {
-    let cpString = '';
+    let cpString = '"';
     versionJSON.libraries.forEach(library => {
       if (this.allowLibrary(library) && !library.natives) {
-        cpString += `"${path.join(LibrariesManager.getLibrariesPath(), this.calculateMavenPath(library.name))}";`;
+        cpString += `../../../shared/libraries/${this.calculateMavenPath(library.name)};`;
       }
     });
 
-    cpString += `"${path.join(Global.MCM_PATH, `/shared/jars/${profile.version.minecraft.version}.jar`)}"`;
+    cpString += `../../../shared/jars/${profile.version.minecraft.version}.jar`;
+    cpString += '"';
 
     return cpString;
   },
@@ -101,7 +103,7 @@ const DirectLauncherManager = {
     return allow;
   },
 
-  runCommand(profile, versionJSON) {
+  runCommand(profile, versionJSON, binName) {
     return new Promise(async resolve => {
       const classpath = this.generateClasspath(profile, versionJSON);
 
@@ -136,8 +138,8 @@ const DirectLauncherManager = {
         '${auth_player_name}',
         MCAccountsHandler.getNameFromUUID(SettingsManager.currentSettings.activeAccount));
       mcArgs = mcArgs.replace('${version_name}', `"${profile.name}"`);
-      mcArgs = mcArgs.replace('${game_directory}', `"${profile.gameDir}"`);
-      mcArgs = mcArgs.replace('${assets_root}', `"${path.join(Global.MCM_PATH, '/shared/assets')}"`);
+      mcArgs = mcArgs.replace('${game_directory}', './');
+      mcArgs = mcArgs.replace('${assets_root}', '"../../../shared/assets"');
       mcArgs = mcArgs.replace('${assets_index_name}', versionJSON.assets);
       mcArgs = mcArgs.replace(
         '${auth_uuid}',
@@ -173,13 +175,7 @@ const DirectLauncherManager = {
 
       if (!versionJSON.arguments) {
         // no arguments, we have to figure them out ourselves
-        finishedJavaArgs = `-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Djava.library.path="${path.join(
-          profile.profilePath,
-          '/_mcm/natives'
-        )}" -Dminecraft.client.jar="${path.join(
-          Global.MCM_PATH,
-          `/shared/jars/${versionJSON.jar}.jar`
-        )}"`;
+        finishedJavaArgs = `-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Djava.library.path="../../../${binName}/natives/" -Dminecraft.client.jar="../../../shared/jars/${profile.version.minecraft.version}.jar"`;
         finishedJavaArgs += ` -cp ${classpath}`;
         finishedJavaArgs += ' -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
         finishedJavaArgs += ` ${endJavaArgs}`;
@@ -219,13 +215,13 @@ const DirectLauncherManager = {
       finishedJavaArgs = finishedJavaArgs.replace('${launcher_version}', 'X');
       finishedJavaArgs = finishedJavaArgs.replace(
         '${natives_directory}',
-        `"${path.join(profile.profilePath, '/_mcm/natives')}"`
+        `"../../../${binName}/natives/"`
       );
-      finishedJavaArgs = finishedJavaArgs.replace('${classpath}', this.generateClasspath(profile, versionJSON));
+      finishedJavaArgs = finishedJavaArgs.replace('${classpath}', classpath);
 
       let stderror = '';
 
-      const process = exec(`"${JavaHandler.getJavaPath(profile)}" ${finishedJavaArgs}`, {
+      const process = exec(`"${path.relative(profile.gameDir, JavaHandler.getJavaPath(profile))}" ${finishedJavaArgs}`, {
         cwd: profile.gameDir
       });
 
@@ -237,6 +233,9 @@ const DirectLauncherManager = {
         if (code !== 0 && code) {
           AlertManager.messageBox('something went wrong', `Error Code: ${code}\n\n<textarea readOnly>${stderror}</textarea>`);
         }
+
+        logger.info(`Removing ${binName} for ${profile.id}`);
+        rimraf.sync(path.join(Global.MCM_PATH, binName));
       });
 
 
@@ -251,6 +250,9 @@ const DirectLauncherManager = {
   launch(profile) {
     return new Promise(async (resolve, reject) => {
       if (!fs.existsSync(path.join(profile.profilePath, 'files'))) mkdirp.sync(path.join(profile.profilePath, 'files'));
+      const binName = `gamebin/${Math.floor(Math.random() * 99999) + 10000}`;
+      const binPath = path.join(Global.MCM_PATH, binName);
+      mkdirp.sync(binPath);
 
       try {
         if (!MCAccountsHandler.getAccountFromUUID(SettingsManager.currentSettings.activeAccount)) {
@@ -274,10 +276,14 @@ const DirectLauncherManager = {
         logger.info('Downloaded assets verification complete');
 
         logger.info('Extracting natives...');
-        await this.extractNatives(profile, versionJSON);
+        await this.extractNatives(profile, versionJSON, binPath);
+
+        logger.info('Symlinking libraries...');
+        this.symlinkLibraries(profile, versionJSON, binPath);
+
         logger.info('Finished extracting natives');
         logger.info('Generating and running command');
-        await this.runCommand(profile, versionJSON);
+        await this.runCommand(profile, versionJSON, binName);
 
         setTimeout(() => {
           resolve();
@@ -331,8 +337,26 @@ const DirectLauncherManager = {
     return doAllow;
   },
 
-  async extractNatives(profile, versionJSON) {
-    const nativesPath = path.join(profile.profilePath, '/_mcm/natives');
+  symlinkLibraries(profile, versionJSON, binPath) {
+    versionJSON.libraries.forEach(library => {
+      if (!library.natives && this.allowLibrary(library)) {
+        const pathToSymlinkTo = path.join(binPath, `/${Global.createID(library.name)}.jar`);
+
+        if (!fs.existsSync(pathToSymlinkTo)) {
+          fs.linkSync(
+            path.join(
+              LibrariesManager.getLibrariesPath(),
+              this.calculateMavenPath(library.name)
+            ),
+            pathToSymlinkTo
+          );
+        }
+      }
+    });
+  },
+
+  async extractNatives(profile, versionJSON, binPath) {
+    const nativesPath = path.join(binPath, '/natives');
 
     FSU.createDirIfMissing(nativesPath);
 
@@ -390,7 +414,7 @@ const DirectLauncherManager = {
           const libPath = path.join(LibrariesManager.getLibrariesPath(), mvnPath);
           if (!fs.existsSync(libPath)) {
             logger.info(`Library "${library.name}" is missing. Downloading it...`);
-            if (!library.downloads && !library.url && library.name.indexOf('minecraftmanager') === -1) {
+            if (!library.downloads && !library.url && library.name.indexOf('minecraftmanager') === -1 && !library._disableDownload) {
               library.url = 'https://libraries.minecraft.net/';
             }
             if (!library.downloads && library.url) {

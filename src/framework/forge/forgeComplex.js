@@ -11,6 +11,7 @@ import LibrariesManager from '../../manager/librariesManager';
 import logInit from '../../util/logger';
 import SettingsManager from '../../manager/settingsManager';
 import MCVersionHandler from '../../minecraft/mcVersionHandler';
+import MCLauncherIntegrationHandler from '../../minecraft/mcLauncherIntegrationHandler';
 
 const logger = logInit('ForgeComplex');
 
@@ -274,6 +275,8 @@ const ForgeComplex = {
             path.join(TEMP_PATH, '/data/net/minecraft/client'),
             path.join(LibrariesManager.getLibrariesPath(), '/net/minecraft/client')
           );
+
+          if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrateLibraries();
 
           rimraf.sync(TEMP_PATH);
           logger.info('Done installing Forge!');
