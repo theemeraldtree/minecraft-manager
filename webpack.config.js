@@ -61,7 +61,12 @@ module.exports = (env, argv) => {
           env: process.env,
           stdio: 'inherit'
         }).on('close', code => process.exit(code));
-      }
+      },
+      stats: {
+        warningsFilter: [
+          'Can\'t resolve \'fsevents\''
+        ] // Disables the Chokidar fsevents warning on non-macOS systems
+      },
     },
     output: {
       filename: 'index.js',

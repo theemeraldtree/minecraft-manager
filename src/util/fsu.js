@@ -85,9 +85,11 @@ const FSU = {
         if (fs.existsSync(src) && fs.statSync(src).isDirectory()) {
           this.createDirIfMissing(dest);
 
+
           const files = await fs.promises.readdir(src);
           await Promise.all(files.map(child => this.copyDir(path.join(src, child), path.join(dest, child))));
         } else if (!fs.existsSync(dest)) {
+          this.createDirIfMissing(path.basename(dest));
           await fs.promises.copyFile(src, dest);
         }
 

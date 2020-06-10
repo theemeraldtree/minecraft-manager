@@ -20,6 +20,7 @@ import theemeraldtreeLogo from './page/settings/img/theemeraldtree-logo.png';
 import Analytics from './util/analytics';
 import MCLauncherIntegrationHandler from './minecraft/mcLauncherIntegrationHandler';
 import MCAccountsHandler from './minecraft/mcAccountsHandler';
+import Scanner from './util/scanner/scanner';
 
 const logger = logInit('index');
 
@@ -106,6 +107,7 @@ async function load() {
 
       logger.info('Scanning profiles...');
       // Global.scanProfiles();
+      await Scanner.scanProfiles();
 
       ProfilesManager.updateReloadListeners();
 

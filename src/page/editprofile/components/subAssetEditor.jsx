@@ -1,6 +1,7 @@
 import React, { useState, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import chokidar from 'chokidar';
 import transition from 'styled-transition-group';
 import path from 'path';
 import fs from 'fs';
@@ -21,6 +22,9 @@ import useKeyPress from '../../../util/useKeyPress';
 import AlertManager from '../../../manager/alertManager';
 import FSU from '../../../util/fsu';
 import Scanner from '../../../util/scanner/scanner';
+import DragAndDrop from './dragAndDrop';
+import logInit from '../../../util/logger';
+import useDebounced from '../../../util/useDebounced';
 
 const { dialog } = require('electron').remote;
 
@@ -35,6 +39,8 @@ const Container = styled.div`
   display: flex;
   flex-flow: column;
   height: calc(100vh - 80px);
+  position: relative;
+  padding-top: 10px;
 `;
 
 const List = styled.div`
@@ -51,7 +57,6 @@ const Search = styled(TextInput)`
 `;
 
 const SearchContainer = styled(InputHolder)`
-  margin-top: 10px;
   flex-shrink: 0;
   background-color: #404040;
   overflow: hidden;
@@ -80,6 +85,8 @@ const FilterHeader = styled.div`
     width: 130px;
   }
 `;
+
+const logger = logInit('SubAssetEditor');
 
 function SubAssetEditor({ id, assetType, dpWorld, theme }) {
   const [forceUpdateNumber, forceUpdate] = useReducer(x => x + 1, 0);
@@ -114,6 +121,15 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
     setProgressState(profile.progressState);
     forceUpdate(); // necessary for some reason
   };
+
+  const reloadListener = () => {
+    setProfile(ProfilesManager.getProfileFromID(id));
+    forceUpdate();
+  };
+
+  const scanDebounce = useDebounced(async () => {
+    await Scanner.scanProfile(profile);
+  }, 500);
 
   const showInfoClick = e => {
     let mod;
@@ -164,6 +180,65 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
     }
   };
 
+  const addFile = filePath => new Promise(async (resolve, reject) => {
+    const fileName = path.basename(filePath);
+    const ext = path.extname(filePath);
+
+
+    if (assetType === 'mod') {
+      if (ext !== '.jar') {
+        ToastManager.noticeToast('Invalid Filetype!');
+        reject(new Error('Invalid Filetype'));
+      } else {
+        FSU.createDirIfMissing(profile.modsPath);
+
+        profile.addSubAsset('mod', await Scanner.mods.scanMod(profile, filePath));
+
+        fs.copyFileSync(filePath, path.join(profile.modsPath, fileName));
+
+        resolve();
+      }
+    } else if (assetType === 'datapack') {
+      FSU.createDirIfMissing(path.join(profile.gameDir, dpWorld.getMainFile().path, '/datapacks'));
+
+      fs.copyFileSync(
+        filePath,
+        path.join(profile.gameDir, dpWorld.getMainFile().path, `/datapacks/${fileName}`)
+      );
+
+      resolve();
+    } else if (assetType === 'world') {
+      if (fs.lstatSync(filePath).isDirectory() || ext === '.zip') {
+        FSU.createDirIfMissing(path.join(profile.gameDir, '/saves'));
+        await Scanner.worlds.importWorld(profile, filePath, true);
+
+        resolve();
+      } else {
+        ToastManager.noticeToast('Invalid Filetype!');
+        reject(new Error('Invalid Filetype'));
+      }
+    } else if (assetType === 'resourcepack') {
+      if (fs.lstatSync(filePath).isDirectory() || ext === '.zip') {
+        FSU.createDirIfMissing(path.join(profile.gameDir), '/resourcepacks');
+
+        profile.addSubAsset(
+          'resourcepack',
+          await Scanner.resourcepacks.scanResourcePack(profile, filePath)
+        );
+
+        await FSU.copyDir(
+          filePath,
+          path.join(profile.gameDir, `/resourcepacks/${fileName}`)
+        );
+
+        resolve();
+      } else {
+        ToastManager.noticeToast('Invalid Filetype!');
+        reject(new Error('Invalid Filetype'));
+      }
+    }
+  });
+
   const addFromFile = async () => {
     let filterName, filterExtensions;
     if (assetType === 'mod') {
@@ -188,27 +263,15 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
     });
 
     if (p && p[0]) {
-      const filePath = p[0];
-      const fileName = path.basename(filePath);
-
-      if (assetType === 'mod') {
-        FSU.createDirIfMissing(profile.modsPath);
-
-        profile.addSubAsset('mod', await Scanner.mods.scanMod(profile, filePath));
-
-        fs.copyFileSync(filePath, path.join(profile.modsPath, fileName));
-      } else if (assetType === 'datapack') {
-        FSU.createDirIfMissing(path.join(profile.gameDir, dpWorld.getMainFile().path, '/datapacks'));
-
-        fs.copyFileSync(
-          filePath,
-          path.join(profile.gameDir, dpWorld.getMainFile().path, `/datapacks/${fileName}`)
-        );
+      try {
+        await addFile(p[0]);
+        reloadListener();
+        ToastManager.noticeToast('Added from file!');
+      } catch (e) {
+        if (e) {
+          logger.error(`Error adding file manually: ${e.message}`);
+        }
       }
-
-      // Global.scanProfiles();
-
-      ToastManager.noticeToast('Added from file!');
     }
   };
 
@@ -389,17 +452,47 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
     }
   }, [escPress]);
 
-  const reloadListener = () => {
-    setProfile(ProfilesManager.getProfileFromID(id));
-    forceUpdate();
-  };
 
   useEffect(() => {
     ProfilesManager.registerReloadListener(reloadListener);
+
+    let pathToWatch;
+    if (assetType === 'mod') {
+      pathToWatch = path.join(profile.gameDir, '/mods/');
+    } else if (assetType === 'world') {
+      pathToWatch = path.join(profile.gameDir, '/saves/');
+    } else if (assetType === 'resourcepacks') {
+      pathToWatch = path.join(profile.gameDir, '/resourcepacks');
+    }
+
+    const watcher = chokidar.watch(pathToWatch, {
+      depth: 0
+    });
+
+    watcher.on('all', () => {
+      scanDebounce();
+    });
     return () => {
       ProfilesManager.unregisterReloadListener(reloadListener);
+      watcher.unwatch();
     };
   }, []);
+
+  const fileDrop = (files) => {
+    files.forEach(async file => {
+      if (fs.existsSync(file.path)) {
+        try {
+          await addFile(file.path);
+          reloadListener();
+        } catch (e) {
+          if (e) {
+            logger.error(`Error drag-and-dropping file: ${e.message}`);
+          }
+        }
+      }
+    });
+  };
+
   return (
     <>
       <Wrapper>
@@ -455,7 +548,8 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
                 <Dropdown items={sortOptions} value={sortValue} onChange={sortValueChange} />
               </FilterHeader>
               <List>
-                {selobj[po]
+                <DragAndDrop onDrop={fileDrop}>
+                  {selobj[po]
                   .sort((a, b) => {
                     if (a.name && b.name) {
                       if (sortValue === 'a-z') {
@@ -504,9 +598,13 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
 
                     return <></>;
                   })}
+                </DragAndDrop>
                 {selobj[po].length === 0 && (
                   <>
                     <h1 style={{ textAlign: 'center' }}>There's nothing here!</h1>
+                    <p style={{ textAlign: 'center', fontSize: '13pt' }}>Add stuff from CurseForge by clicking <b>add</b>,<br />
+                      or drag and drop files here.
+                    </p>
                   </>
                 )}
               </List>

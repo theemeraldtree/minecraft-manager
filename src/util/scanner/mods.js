@@ -1,4 +1,4 @@
-import ADMZip from 'adm-zip';
+ import ADMZip from 'adm-zip';
 import path from 'path';
 import fs from 'fs';
 import logInit from '../logger';
@@ -139,7 +139,55 @@ const Mods = {
           }
         ]
       }));
-    })
+    }),
+
+    checkMod(profile, file) {
+      return new Promise(async resolve => {
+        const fullPath = path.join(profile.gameDir, `/mods/${file}`);
+
+        const doesExist = profile.mods.find(
+          mod => path.join(profile.gameDir, mod.getMainFile().path) === fullPath
+        );
+
+        if (!doesExist) {
+          const mod = await this.scanMod(profile, fullPath);
+          profile.addSubAsset('mod', mod, { disableSave: true });
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
+    },
+
+  scanProfile(profile) {
+    return new Promise(resolve => {
+      let changed = false;
+
+      // Check for mods that have been removed
+      profile.mods.forEach(mod => {
+        if (!fs.existsSync(path.join(profile.gameDir, mod.getMainFile().path))) {
+          logger.info(`Mod "${mod.id}" in "${profile.id}" is missing. Removing it...`);
+          profile.deleteSubAsset('mod', mod, false);
+          changed = true;
+        }
+      });
+
+      // Check for mods that have been added
+      fs.readdir(path.join(profile.gameDir, '/mods'), async (err, files) => {
+        if (!err && files.length !== profile.mods.length) {
+          await Promise.all(
+            files.map(file => new Promise(async res => {
+              const c = await this.checkMod(profile, file);
+              if (c && !changed) changed = true;
+              res();
+            })
+          ));
+        }
+
+        resolve(changed);
+      });
+    });
+  }
 };
 
 export default Mods;
