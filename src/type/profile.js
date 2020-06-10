@@ -607,8 +607,8 @@ export default class Profile extends OAMFAsset {
           asset = new Mod(asset);
         }
         if (asset && asset instanceof Mod && asset.getMainFile().path !== undefined) {
-          this.mods.splice(this.mods.indexOf(asset), 1);
           this.progressState[asset.id] = undefined;
+          this.mods.splice(this.mods.indexOf(asset), 1);
           fs.unlink(path.join(this.gameDir, `/${asset.getMainFile().path}`), e => {
             if (e && e.code !== 'ENOENT') {
               if (e) {

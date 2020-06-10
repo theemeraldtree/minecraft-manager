@@ -105,7 +105,7 @@ async function load() {
       Global.checkMigration();
 
       logger.info('Scanning profiles...');
-      Global.scanProfiles();
+      // Global.scanProfiles();
 
       ProfilesManager.updateReloadListeners();
 

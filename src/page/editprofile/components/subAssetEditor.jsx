@@ -9,7 +9,6 @@ import ProfilesManager from '../../../manager/profilesManager';
 import DiscoverList from '../../../component/discoverlist/discoverlist';
 import AssetCard from '../../../component/assetcard/assetcard';
 import Mod from '../../../type/mod';
-import Global from '../../../util/global';
 import AssetInfo from '../../../component/assetinfo/assetinfo';
 import ToastManager from '../../../manager/toastManager';
 import Hosts from '../../../host/Hosts';
@@ -20,6 +19,8 @@ import MoveToOverlay from './moveToOverlay';
 import ErrorManager from '../../../manager/errorManager';
 import useKeyPress from '../../../util/useKeyPress';
 import AlertManager from '../../../manager/alertManager';
+import FSU from '../../../util/fsu';
+import Scanner from '../../../util/scanner/scanner';
 
 const { dialog } = require('electron').remote;
 
@@ -93,6 +94,7 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
   const [showMoveToOverlay, setShowMoveToOverlay] = useState(false);
   const [actionAsset, setActionAsset] = useState({});
   const [sortValue, setSortValue] = useState('a-z');
+  const [deletingAssets, setDeletingAssets] = useState([]);
   const escPress = useKeyPress('Escape');
 
   let po;
@@ -162,7 +164,7 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
     }
   };
 
-  const addFromFile = () => {
+  const addFromFile = async () => {
     let filterName, filterExtensions;
     if (assetType === 'mod') {
       filterName = 'Mod Files';
@@ -175,7 +177,7 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
       filterExtensions = ['zip'];
     }
 
-    const p = dialog.showOpenDialog({
+    const p = dialog.showOpenDialogSync({
       title: 'Choose your file',
       buttonLabel: 'Choose File',
       properties: ['openFile'],
@@ -184,37 +186,29 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
         { name: 'All Files', extensions: ['*'] }
       ]
     });
+
     if (p && p[0]) {
-      const pth = p[0];
+      const filePath = p[0];
+      const fileName = path.basename(filePath);
 
       if (assetType === 'mod') {
-        if (!fs.existsSync(profile.modsPath)) {
-          fs.mkdirSync(profile.modsPath);
-        }
+        FSU.createDirIfMissing(profile.modsPath);
 
-        fs.copyFileSync(pth, path.join(profile.modsPath, path.basename(pth)));
+        profile.addSubAsset('mod', await Scanner.mods.scanMod(profile, filePath));
+
+        fs.copyFileSync(filePath, path.join(profile.modsPath, fileName));
       } else if (assetType === 'datapack') {
-        if (!fs.existsSync(path.join(profile.gameDir, dpWorld.getMainFile().path, '/datapacks'))) {
-          fs.mkdirSync(path.join(profile.gameDir, dpWorld.getMainFile().path, '/datapacks'));
-        }
+        FSU.createDirIfMissing(path.join(profile.gameDir, dpWorld.getMainFile().path, '/datapacks'));
 
         fs.copyFileSync(
-          pth,
-          path.join(profile.gameDir, dpWorld.getMainFile().path, `/datapacks/${path.basename(pth)}`)
+          filePath,
+          path.join(profile.gameDir, dpWorld.getMainFile().path, `/datapacks/${fileName}`)
         );
       }
 
-      Global.scanProfiles();
+      // Global.scanProfiles();
 
       ToastManager.noticeToast('Added from file!');
-
-      // this is a *very* hacky fix
-      // but if it ain't broke, don't fix it, right?
-      setTimeout(() => {
-        if (assetType === 'datapack') {
-          updateProgressStates();
-        }
-      }, 500);
     }
   };
 
@@ -296,7 +290,7 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
       updateProgressStates();
       installErrorHandler(m, asset);
     } catch (err) {
-      profile.progressState[asset.id] = {};
+    profile.progressState[asset.id] = {};
       updateProgressStates();
     }
   };
@@ -304,18 +298,22 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
   const deleteClick = assetid => {
     if (assetType !== 'datapack') {
       const del = () => {
+        setDeletingAssets([...deletingAssets, assetid]);
+
         const asset = profile.getSubAssetFromID(assetType, assetid);
-        profile
-          .deleteSubAsset(assetType, asset)
-          .then(() => {
-            // hacky fix
-            setTimeout(() => {
-              updateProgressStates();
-            }, 100);
-          })
-          .catch(e => {
-            ToastManager.createToast('Unable to delete', ErrorManager.makeReadable(e, 'subasset'));
-          });
+
+        // wait for animation to complete
+        setTimeout(() => {
+          profile
+            .deleteSubAsset(assetType, asset)
+            .then(() => {
+                setDeletingAssets(deletingAssets.splice(deletingAssets.indexOf(asset.id), 1));
+                updateProgressStates();
+            })
+            .catch(e => {
+              ToastManager.createToast('Unable to delete', ErrorManager.makeReadable(e, 'subasset'));
+            });
+        }, 100);
       };
       if (assetType === 'world') {
         AlertManager.alert('are you sure?', '', del, 'delete', 'cancel');
@@ -498,6 +496,7 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
                             copyToClick={copyToClick}
                             moveToClick={moveToClick}
                             compact
+                            shrink={deletingAssets.includes(asset.id)}
                           />
                         );
                       }

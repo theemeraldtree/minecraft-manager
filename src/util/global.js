@@ -77,6 +77,9 @@ const Global = {
     }
     return undefined;
   },
+  replaceWindowsPath(string) {
+    return string.replace(/\\/g, '/');
+  },
   dateMatches(d1) {
     const d2 = new Date();
     return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();

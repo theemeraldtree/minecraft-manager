@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { ContextMenu, ContextMenuTrigger, MenuItem, SubMenu } from 'react-contextmenu';
 import { shell, clipboard } from 'electron';
 import { Button, Spinner } from '@theemeraldtree/emeraldui';
@@ -8,6 +8,16 @@ import Global from '../../util/global';
 import downloadsIcon from '../navbar/downloads/downloads.png';
 import ToastManager from '../../manager/toastManager';
 import FluentHover from '../../util/fluentHover';
+
+const shrinkAnim = keyframes`
+  0% {
+    height: 70px;
+  }
+
+  100% {
+    height: 0;
+  }
+`;
 
 const BG = styled.div`
   margin-top: 4px;
@@ -44,6 +54,9 @@ const BG = styled.div`
       &:hover {
         transform: scale(1);
       }
+    `}
+    ${props => props.shrink && css`
+      animation: ${shrinkAnim} 100ms forwards;
     `}
 `;
 
@@ -166,7 +179,8 @@ const AssetCard = ({
   showBlurb,
   copyToClick,
   moveToClick,
-  compact
+  compact,
+  shrink
 }) => {
   const ref = React.createRef();
   return (
@@ -187,6 +201,7 @@ const AssetCard = ({
           aria-pressed="false"
           compact={compact}
           ref={ref}
+          shrink={shrink}
           onMouseMove={e => !disableHover && FluentHover.mouseMove(e, ref, '#414141', true, true)}
           onMouseLeave={() => !disableHover && FluentHover.mouseLeave(ref, '#313131')}
         >
@@ -339,7 +354,8 @@ AssetCard.propTypes = {
   showBlurb: PropTypes.bool,
   copyToClick: PropTypes.func,
   moveToClick: PropTypes.func,
-  compact: PropTypes.bool
+  compact: PropTypes.bool,
+  shrink: PropTypes.bool
 };
 
 export default AssetCard;
