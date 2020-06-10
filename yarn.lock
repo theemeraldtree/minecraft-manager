@@ -1337,10 +1337,10 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@theemeraldtree/emeraldui@^0.1.1":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@theemeraldtree/emeraldui/-/emeraldui-0.1.2.tgz#093d4ab42a99e2ff58a6b95201c0a281de2c786e"
-  integrity sha512-oRJ1N378ygM8l5hURXqNKEIrzvT+iOBQI0Kq3u9h0Cg9B8Hu2cre15roEb/Pn32p7vTmWoJF5VFxyJxLx7+wYg==
+"@theemeraldtree/emeraldui@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@theemeraldtree/emeraldui/-/emeraldui-0.1.3.tgz#c464df04f2e444a24f23dceacf25e027aa1264b2"
+  integrity sha512-LwEmuWZF8jOY0k91i4kvxUcOCnJDZp+EnjMX53lx9qka3DAvpf/yn6OjzHBKzYId3ivaEblEw1jFfdVZvi8k8Q==
 
 "@types/color-name@^1.1.1":
   version "1.1.1"
