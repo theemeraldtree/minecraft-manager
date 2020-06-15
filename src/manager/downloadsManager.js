@@ -2,9 +2,9 @@ import path from 'path';
 import HTTPRequest from '../host/httprequest';
 import Download from '../type/download';
 import Global from '../util/global';
-import FileScanner from '../util/fileScanner';
 import logInit from '../util/logger';
 import FSU from '../util/fsu';
+import Scanner from '../util/scanner/scanner';
 
 const logger = logInit('DownloadsManager');
 
@@ -87,9 +87,9 @@ const DownloadsManager = {
       }
       if (modpack === false) {
         this.startFileDownload(`${mod.name}\n_A_${profile.name}`, url, downloadPath)
-          .then(() => {
+          .then(async () => {
             if (type === 'world') {
-              FileScanner.scanInstallingWorld(profile, downloadPath, mod);
+              await Scanner.worlds.importWorld(profile, downloadPath, false, mod.id);
             }
 
             resolve();

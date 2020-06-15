@@ -8,6 +8,8 @@ export default class World extends OMAFFileAsset {
     if (!this.datapacks) {
       this.datapacks = [];
     }
+
+    this.datapacks = this.datapacks.map(datapack => new OMAFFileAsset(datapack));
   }
 
   deleteDatapack(profile, assetT) {

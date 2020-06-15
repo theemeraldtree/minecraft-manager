@@ -2,6 +2,9 @@ import pMap from 'p-map';
 import HTTPRequest from '../host/httprequest';
 import Hosts from '../host/Hosts';
 import DownloadsManager from '../manager/downloadsManager';
+import logInit from './logger';
+
+const logger = logInit('Downloader');
 
 /**
  * Downloader Utility class for handling multiple concurrent downloads
@@ -17,7 +20,9 @@ const Downloader = {
     return pMap(items, item => new Promise(async resolve => {
         if (item !== undefined) {
           await HTTPRequest.downloadInline(item.url, item.dest);
-          if (item.onFinish) item.onFinish();
+          if (item.onFinish) {
+            item.onFinish();
+          }
           resolve();
         } else {
           resolve();

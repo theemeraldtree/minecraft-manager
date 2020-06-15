@@ -86,7 +86,7 @@ const MCLauncherIntegrationHandler = {
         if (SettingsManager.currentSettings.java.customArgsActive && !profile.mcm.java.overrideArgs) {
           remainingArgs += `${SettingsManager.currentSettings.java.customJavaArgs}`;
         }
-        if (profile.mcm.java.overrideArgs) {
+        if (profile.mcm.java && profile.mcm.java.overrideArgs) {
           remainingArgs += `${profile.mcm.java.customArgs}`;
         }
 

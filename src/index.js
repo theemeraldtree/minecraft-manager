@@ -83,6 +83,10 @@ async function load() {
       rimraf.sync(path.join(Global.MCM_TEMP));
       fs.mkdirSync(path.join(Global.MCM_TEMP));
 
+      // reset gamebin
+      rimraf.sync(path.join(Global.MCM_PATH, '/gamebin'));
+      fs.mkdirSync(path.join(Global.MCM_PATH, '/gamebin'));
+
       logger.info('Checking for libraries...');
       LibrariesManager.checkExist();
 

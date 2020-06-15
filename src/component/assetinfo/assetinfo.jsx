@@ -281,6 +281,7 @@ export default class AssetInfo extends Component {
   render() {
     const { displayState, description, versions, activeAsset, assetDependencies, cantConnect } = this.state;
     const { type, installClick, localAsset, progressState, profileID } = this.props;
+
     return (
       <>
         <AssetCard

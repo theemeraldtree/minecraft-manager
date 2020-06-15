@@ -349,6 +349,8 @@ const Hosts = {
                 );
               }
 
+              modObj.installed = true;
+
               if (!profile.getSubAssetFromID(type, mod.id)) {
                 profile.addSubAsset(type, modObj, opts);
               }

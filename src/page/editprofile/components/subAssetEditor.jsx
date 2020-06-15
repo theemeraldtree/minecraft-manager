@@ -46,6 +46,9 @@ const Container = styled.div`
 const List = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
+  & > div {
+    overflow-y: auto;
+  }
   &::-webkit-scrollbar-track {
     background: none;
   }
@@ -205,6 +208,8 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
         filePath,
         path.join(profile.gameDir, dpWorld.getMainFile().path, `/datapacks/${fileName}`)
       );
+
+      await Scanner.datapacks.scanProfile(profile);
 
       resolve();
     } else if (assetType === 'world') {
@@ -384,9 +389,15 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
         del();
       }
     } else {
-      const asset = dpWorld.datapacks.find(dp => dp.id === assetid);
-      dpWorld.deleteDatapack(profile, asset);
-      updateProgressStates();
+      setDeletingAssets([...deletingAssets, assetid]);
+
+      // wait for animation
+      setTimeout(() => {
+        const asset = dpWorld.datapacks.find(dp => dp.id === assetid);
+        dpWorld.deleteDatapack(profile, asset);
+        updateProgressStates();
+        setDeletingAssets(deletingAssets.splice(deletingAssets.indexOf(asset.id), 1));
+      }, 100);
     }
   };
 
@@ -472,9 +483,10 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
     watcher.on('all', () => {
       scanDebounce();
     });
+
     return () => {
       ProfilesManager.unregisterReloadListener(reloadListener);
-      watcher.unwatch();
+      watcher.close();
     };
   }, []);
 

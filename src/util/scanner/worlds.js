@@ -7,6 +7,7 @@ import Global from '../global';
 import FSU from '../fsu';
 import logInit from '../logger';
 import World from '../../type/world';
+import Scanner from './scanner';
 
 
 const logger = logInit('ScanWorlds');
@@ -79,7 +80,7 @@ const Worlds = {
     }
   });
   },
-  importWorldDir(profile, dirPath, doScan) {
+  importWorldDir(profile, dirPath, doScan, forceName) {
     return new Promise(async resolve => {
     const worlds = [];
     fs.readdirSync(dirPath).forEach(file => {
@@ -106,7 +107,7 @@ const Worlds = {
 
       await Promise.all(worlds.map(world => FSU.copyDir(
         path.join(dirPath, world.path),
-        path.join(profile.gameDir, `/saves/${world.name}`)
+        path.join(profile.gameDir, `/saves/${!forceName ? world.name : forceName}`)
       )));
 
       if (doScan) {
@@ -124,27 +125,28 @@ const Worlds = {
         profile.save();
       }
 
+      Scanner.datapacks.scanProfile(profile);
       resolve();
     });
   },
-  importWorldZip(profile, filePath, doScan) {
+  importWorldZip(profile, filePath, doScan, forceName) {
     return new Promise(resolve => {
       const zip = new ADMZip(filePath);
       const tempExtPath = path.join(Global.MCM_TEMP, `/world-extract-${path.basename(filePath, '.zip')}/`);
       zip.extractAllToAsync(tempExtPath, false, async () => {
-        await this.importWorldDir(profile, tempExtPath, doScan);
+        await this.importWorldDir(profile, tempExtPath, doScan, forceName);
         rimraf.sync(tempExtPath);
         resolve();
       });
     });
   },
-  importWorld(profile, filePath, doScan) {
+  importWorld(profile, filePath, doScan, forceName) {
     if (fs.lstatSync(filePath).isDirectory()) {
       // world is a directory; skip to directory scannig
-      return this.importWorldDir(profile, filePath, doScan);
+      return this.importWorldDir(profile, filePath, doScan, forceName);
     } if (path.extname(filePath) === '.zip') {
       // World is zipped; unzip to temp first
-      return this.importWorldZip(profile, filePath, doScan);
+      return this.importWorldZip(profile, filePath, doScan, forceName);
     }
 
     return Promise.resolve();

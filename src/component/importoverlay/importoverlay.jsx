@@ -10,6 +10,7 @@ import HeaderButton from '../headerButton/headerButton';
 import MultiMC from '../../util/multimc';
 import Twitch from '../../util/twitch';
 import Global from '../../util/global';
+import Scanner from '../../util/scanner/scanner';
 
 const { dialog } = require('electron').remote;
 
@@ -118,9 +119,9 @@ export default class ImportOverlay extends Component {
   };
 
   done = () => {
-    Global.scanProfiles();
     Global.updateCache();
-    ProfilesManager.getProfiles().then(() => {
+    ProfilesManager.getProfiles().then(async () => {
+      await Scanner.scanProfiles();
       this.props.cancelClick();
       this.setState({
         updateState: ''

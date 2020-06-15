@@ -52,7 +52,9 @@ const HTTPRequest = {
         const prog = Math.trunc((progressData / contentLength) * 100);
         if ((prog - previousPercent >= 10) || opts.enableDetailedProgress) {
           previousPercent = prog;
-          onProgress(prog);
+          if (onProgress) {
+            onProgress(prog);
+          }
         }
       });
 

@@ -561,7 +561,6 @@ const DirectLauncherManager = {
           });
 
           await Downloader.downloadConcurrently(toDownload);
-
           DownloadsManager.removeDownload(download.name);
           resolve();
         }

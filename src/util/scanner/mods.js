@@ -18,6 +18,7 @@ const Mods = {
    */
   scanMod: (profile, filePath) => new Promise(async resolve => {
     logger.info(`Scanning "${filePath}" for ${profile.id}`);
+    if (path.extname(filePath) === '.jar') {
       const zip = new ADMZip(filePath);
       const entries = zip.getEntries();
       const fileName = path.basename(filePath);
@@ -35,6 +36,7 @@ const Mods = {
           e => infoFiles.includes(e.entryName)
         ).map(entry => new Promise(async res => {
           entry.getDataAsync(rawData => {
+            try {
             const data = JSON.parse(rawData.toString('utf8'));
 
             const { entryName } = entry;
@@ -86,6 +88,9 @@ const Mods = {
                 res();
               }
             }
+          } catch (e) {
+            res();
+          }
           });
         }
       )));
@@ -139,7 +144,10 @@ const Mods = {
           }
         ]
       }));
-    }),
+    } else {
+      resolve();
+    }
+  }),
 
     checkMod(profile, file) {
       return new Promise(async resolve => {
@@ -151,8 +159,12 @@ const Mods = {
 
         if (!doesExist) {
           const mod = await this.scanMod(profile, fullPath);
-          profile.addSubAsset('mod', mod, { disableSave: true });
-          resolve(true);
+          if (mod) {
+            profile.addSubAsset('mod', mod, { disableSave: true });
+            resolve(true);
+          } else {
+            resolve(false);
+          }
         } else {
           resolve(false);
         }
