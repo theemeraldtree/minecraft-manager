@@ -16,7 +16,6 @@ import './font/fonts.css';
 import { loadLatestProfile } from './defaultProfiles/latestProfile';
 import { loadSnapshotProfile } from './defaultProfiles/snapshotProfile';
 import logInit from './util/logger';
-import theemeraldtreeLogo from './page/settings/img/theemeraldtree-logo.png';
 import Analytics from './util/analytics';
 import MCLauncherIntegrationHandler from './minecraft/mcLauncherIntegrationHandler';
 import MCAccountsHandler from './minecraft/mcAccountsHandler';
@@ -83,10 +82,6 @@ async function load() {
       rimraf.sync(path.join(Global.MCM_TEMP));
       fs.mkdirSync(path.join(Global.MCM_TEMP));
 
-      // reset gamebin
-      rimraf.sync(path.join(Global.MCM_PATH, '/gamebin'));
-      fs.mkdirSync(path.join(Global.MCM_PATH, '/gamebin'));
-
       logger.info('Checking for libraries...');
       LibrariesManager.checkExist();
 
@@ -110,7 +105,6 @@ async function load() {
       Global.checkMigration();
 
       logger.info('Scanning profiles...');
-      // Global.scanProfiles();
       await Scanner.scanProfiles();
 
       ProfilesManager.updateReloadListeners();
@@ -126,8 +120,19 @@ async function load() {
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
   }
 
+  try {
+    if (fs.existsSync(Global.PROFILES_PATH)) {
+      // reset gamebin
+      logger.info('Resetting gamebin...');
+      rimraf.sync(path.join(Global.MCM_PATH, '/gamebin'));
+      fs.mkdirSync(path.join(Global.MCM_PATH, '/gamebin'));
+    }
+  } catch (e) {
+    logger.info('Failed to reset gamebin; Probably running...');
+  }
+
   logger.info('Caching images...');
-  Global.cacheImage(theemeraldtreeLogo);
+  // Global.cacheImage(theemeraldtreeLogo);
 
   if (SettingsManager.currentSettings.launcherIntegration && fs.existsSync(Global.PROFILES_PATH)) {
     logger.info('Reintregating...');
@@ -143,12 +148,15 @@ if (module.hot) {
 }
 
 async function init() {
-try {
-  await load();
-} catch (e) {
-  logger.error(`Unable to intiailize: ${e.stack}`);
-  dialog.showErrorBox('Error initializing app', `${e.stack}\n\n---\nMinecraft Manager ${Global.MCM_VERSION}\nfile a bug at https://theemeraldtree.net/mcm/issues`);
-}
+  try {
+    await load();
+  } catch (e) {
+    logger.error(`Unable to intiailize: ${e.stack}`);
+    dialog.showErrorBox(
+      'Error initializing app',
+      `${e.stack}\n\n---\nMinecraft Manager ${Global.MCM_VERSION}\nfile a bug at https://theemeraldtree.net/mcm/issues`
+    );
+  }
 }
 
 init();

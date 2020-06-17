@@ -8,6 +8,7 @@ const os = require('os');
 const winston = require('winston');
 const { execFile } = require('child_process');
 require('winston-daily-rotate-file');
+require('v8-compile-cache');
 
 const singleInstanceLock = app.requestSingleInstanceLock();
 if (!singleInstanceLock) app.quit();
@@ -146,6 +147,7 @@ function createWindow() {
   // on linux CSD (client-side decoration) causes a ton of problems without a frame
   // so unfortunately it has to be disabled
   mainLogger.info('Creating Electron BrowserWindow');
+  mainLogger.info('OPEN BROWSERWINDOW!!!!!!!!!!!!!!!!!!!!!!');
 
   mainWindow = new BrowserWindow({
     width: 800,
@@ -157,7 +159,7 @@ function createWindow() {
       experimentalFeatures: true,
       nodeIntegration: true
     },
-    titleBarStyle: 'hidden',
+    titleBarStyle: 'hidden'
   });
 
   mainWindow.removeMenu();

@@ -24,13 +24,9 @@ const Scanner = {
     });
   },
   scanProfiles() {
-    return pMap(
-      ProfilesManager.loadedProfiles,
-      profile => this.scanProfile(profile),
-      {
-        concurrency: 30
-      }
-    );
+    return pMap(ProfilesManager.loadedProfiles, profile => this.scanProfile(profile), {
+      concurrency: 30
+    });
   }
 };
 

@@ -41,8 +41,10 @@ const ProfilesManager = {
         fs.readdir(Global.PROFILES_PATH, (err, files) => {
           if (files.length >= 1) {
             files.forEach(async file => {
-              if (file !== '0-default-profile-latest' && file !== '0-default-profile-snapshot') {
-                await this.processProfileFolder(path.join(Global.PROFILES_PATH + file));
+              if (fs.lstatSync(path.join(Global.PROFILES_PATH, file)).isDirectory()) {
+                if (file !== '0-default-profile-latest' && file !== '0-default-profile-snapshot') {
+                  await this.processProfileFolder(path.join(Global.PROFILES_PATH, file));
+                }
               }
 
               this.updateReloadListeners();
@@ -308,8 +310,8 @@ const ProfilesManager = {
       profile.applyDefaults();
 
       if (SettingsManager.currentSettings.launcherIntegration) {
-      logger.info(`Creating launcher profile for ${profile.id}`);
-      LauncherManager.createProfile(profile);
+        logger.info(`Creating launcher profile for ${profile.id}`);
+        LauncherManager.createProfile(profile);
       }
 
       logger.info(`Saving new profile ${profile.id}`);
