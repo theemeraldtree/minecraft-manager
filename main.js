@@ -147,7 +147,6 @@ function createWindow() {
   // on linux CSD (client-side decoration) causes a ton of problems without a frame
   // so unfortunately it has to be disabled
   mainLogger.info('Creating Electron BrowserWindow');
-  mainLogger.info('OPEN BROWSERWINDOW!!!!!!!!!!!!!!!!!!!!!!');
 
   mainWindow = new BrowserWindow({
     width: 800,
