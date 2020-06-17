@@ -57,6 +57,8 @@ const TryAgain = styled.p`
 `;
 
 export default class AssetInfo extends Component {
+  isMounted = true;
+
   constructor(props) {
     super(props);
     this.versionsListRef = React.createRef();
@@ -90,17 +92,21 @@ export default class AssetInfo extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.isMounted = false;
+  }
+
   showDescription = async () => {
     const { host } = this.props;
     const { activeAsset } = this.state;
     if (activeAsset.hosts.curse) {
       const newAsset = await Hosts.addMissingInfo(host, 'description', activeAsset);
-      if (newAsset.description) {
+      if (this.isMounted && newAsset.description) {
         this.setState({
           activeAsset: newAsset,
           description: true
         });
-      } else {
+      } else if (this.isMounted) {
         this.setState({
           description: false,
           cantConnect: true
@@ -294,10 +300,7 @@ export default class AssetInfo extends Component {
           showBlurb
         />
         <HeaderButtons>
-          <HeaderButton
-            active={displayState === 'description'}
-            onClick={() => this.displayStateSwitch('description')}
-          >
+          <HeaderButton active={displayState === 'description'} onClick={() => this.displayStateSwitch('description')}>
             Description
           </HeaderButton>
           {activeAsset.hosts.curse && (
@@ -314,10 +317,7 @@ export default class AssetInfo extends Component {
             </HeaderButton>
           )}
           {activeAsset.installed && type === 'world' && (
-            <HeaderButton
-              active={displayState === 'datapacks'}
-              onClick={() => this.displayStateSwitch('datapacks')}
-            >
+            <HeaderButton active={displayState === 'datapacks'} onClick={() => this.displayStateSwitch('datapacks')}>
               Datapacks
             </HeaderButton>
           )}

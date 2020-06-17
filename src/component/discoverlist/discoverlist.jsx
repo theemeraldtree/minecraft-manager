@@ -63,11 +63,13 @@ const SortDropdown = styled(Dropdown)`
 
 const MCVerSel = styled(MCVersionSelector)`
   && {
-    width: 168px; 
+    width: 168px;
   }
 `;
 
 export default class DiscoverList extends Component {
+  isMounted = false;
+
   constructor(props) {
     super(props);
     this.listRef = React.createRef();
@@ -121,6 +123,10 @@ export default class DiscoverList extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.isMounted = false;
+  }
+
   browseAssets = async (options = { sort: 'popular', minecraftVersion: 'All' }) => {
     const { host, type } = this.props;
     this.setState({
@@ -130,12 +136,12 @@ export default class DiscoverList extends Component {
     });
 
     const assets = await Hosts.getTopAssets(host, type, options);
-    if (assets) {
+    if (this.isMounted && assets) {
       this.setState({
         assets,
         loading: false
       });
-    } else {
+    } else if (this.isMounted) {
       this.setState({
         cantConnect: true
       });

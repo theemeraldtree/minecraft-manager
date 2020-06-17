@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import path from 'path';
 import { Button, Detail } from '@theemeraldtree/emeraldui';
-import { shell } from 'electron';
+import { remote } from 'electron';
 
 const Panel = styled.div`
   background-color: #2b2b2b;
@@ -45,28 +45,28 @@ export default function Other(args) {
       </Panel>
       <Panel>
         <h3>Technical Functions</h3>
-        <Button color="red" onClick={() => shell.openExternal(path.join(profile.profilePath, '/profile.json'))}>
+        <Button color="red" onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/profile.json'))}>
           open profile.json
         </Button>
         <Button
           color="red"
-          onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/mods.json'))}
+          onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/mods.json'))}
         >
           open subAssets/mods.json
         </Button>
         <Button
           color="red"
-          onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/resourcepacks.json'))}
+          onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/resourcepacks.json'))}
         >
           open subAssets/resourcepacks.json
         </Button>
         <Button
           color="red"
-          onClick={() => shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/worlds.json'))}
+          onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/worlds.json'))}
         >
           open subAssets/worlds.json
         </Button>
-        <Button color="red" onClick={() => shell.openExternal(profile.profilePath)}>
+        <Button color="red" onClick={() => remote.shell.openExternal(profile.profilePath)}>
           open OMAF data folder
         </Button>
       </Panel>

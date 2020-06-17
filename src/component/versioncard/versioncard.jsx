@@ -107,12 +107,18 @@ const ButtonContainer = styled.div`
 `;
 
 export default class VersionCard extends PureComponent {
+  isMounted = true;
+
   constructor(props) {
     super(props);
     this.state = {
       showMoreInfo: false,
       changelog: 'loading...'
     };
+  }
+
+  componentWillUnmount() {
+    this.isMounted = false;
   }
 
   toggleMoreInfo = async () => {
@@ -126,9 +132,11 @@ export default class VersionCard extends PureComponent {
     if (version.hosts.curse) {
       if (changelog === 'loading...') {
         const newChangelog = await Hosts.getFileChangelog(host, asset, version.hosts.curse.fileID);
-        this.setState({
-          changelog: newChangelog
-        });
+        if (this.isMounted) {
+          this.setState({
+            changelog: newChangelog
+          });
+        }
       }
     }
   };
