@@ -21,12 +21,6 @@ const LatestProfile = new Profile({
     minecraft: {
       version: Global.MC_VERSIONS[0]
     }
-  },
-  mcm: {
-    java: {
-
-    },
-    version: 1
   }
 });
 
@@ -61,6 +55,7 @@ function loadLatestProfile() {
     LatestProfile.mcm = json.mcm;
   }
 
+  LatestProfile.checkMissingMCMValues();
   LatestProfile.version.minecraft.version = Global.MC_VERSIONS[0];
   LatestProfile.minecraftVersion = Global.MC_VERSIONS[0];
 }

@@ -45,8 +45,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.5.0-beta.2',
-  MCM_RELEASE_DATE: '6/10/2020',
+  MCM_VERSION: '2.5.0-pre.1',
+  MCM_RELEASE_DATE: '6/19/2020',
 
   MCM_PROFILE_VERSION: 1,
   OMAF_VERSION: '1.0.0',
@@ -296,8 +296,11 @@ const Global = {
   getDefaultMCExePath: () => {
     if (os.platform() === 'win32') {
       const def = path.join('C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe');
+      const other = path.join('C:\\Program Files (x86)\\Minecraft Launcher\\MinecraftLauncher.exe');
       if (fs.existsSync(def)) {
         return def;
+      } else if (fs.existsSync(other)) {
+        return other;
       }
       return path.join('C:\\Program Files (x86)');
     }

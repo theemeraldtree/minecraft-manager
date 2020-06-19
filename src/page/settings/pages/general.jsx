@@ -6,6 +6,7 @@ import SettingSeperator from '../../../component/settingSeparator/settingSeparat
 import Gap from '../components/gap';
 import ProfilesManager from '../../../manager/profilesManager';
 import Description from '../components/description';
+import MCLauncherIntegrationHandler from '../../../minecraft/mcLauncherIntegrationHandler';
 
 function General() {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
@@ -27,6 +28,7 @@ function General() {
             value={SettingsManager.currentSettings.allowSnapshotProfile}
             onClick={() => {
             toggleSetting('allowSnapshotProfile');
+            MCLauncherIntegrationHandler.updateSnapshotEnabled();
             ProfilesManager.getProfiles();
           }}
           />

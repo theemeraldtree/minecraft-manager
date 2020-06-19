@@ -51,7 +51,11 @@ async function load() {
 
     loadLatestProfile();
     loadSnapshotProfile();
+
+    logger.info('Running initial integration...');
+    await MCLauncherIntegrationHandler.integrateFirst();
   }
+
 
   logger.info('Loading profiles...');
   await ProfilesManager.getProfiles();
@@ -135,7 +139,7 @@ async function load() {
   // Global.cacheImage(theemeraldtreeLogo);
 
   if (SettingsManager.currentSettings.launcherIntegration && fs.existsSync(Global.PROFILES_PATH)) {
-    logger.info('Reintregating...');
+    logger.info('Reintegrating...');
     MCLauncherIntegrationHandler.integrate();
   }
 

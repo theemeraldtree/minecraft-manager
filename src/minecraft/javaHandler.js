@@ -89,7 +89,7 @@ const JavaHandler = {
 
       DownloadsManager.startFileDownload(`Java ${version}`, url, tempPath, {
         disableErrorToast: true
-      }).then(() => {
+      }).then(() => setTimeout(() => {
         const tempExtract = path.join(Global.MCM_TEMP, `/java-extract-${new Date().getTime()}`);
 
         if (ext === 'zip') {
@@ -124,10 +124,10 @@ const JavaHandler = {
           resolve('error');
         }
         });
-      })
-      .catch((e) => {
+      }, 300)
+      ).catch((e) => {
+        this.logger.error(`Unable to download Java: ${e.toString()}`);
         if (fs.existsSync(Global.PROFILES_PATH)) {
-          this.logger.error(`Unable to download Java: ${e.toString()}`);
           ToastManager.createToast('Unable to download Java', 'Check your internet connection, and try again');
         }
         resolve('error');

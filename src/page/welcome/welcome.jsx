@@ -20,6 +20,8 @@ import Analytics from '../../util/analytics';
 import AlertManager from '../../manager/alertManager';
 import LatestProfile from '../../defaultProfiles/latestProfile';
 import SnapshotProfile from '../../defaultProfiles/snapshotProfile';
+import logInit from '../../util/logger';
+import MCLauncherIntegrationHandler from '../../minecraft/mcLauncherIntegrationHandler';
 
 const { dialog } = require('electron').remote;
 
@@ -132,6 +134,8 @@ const IssuesLink = styled.div`
   bottom: 10px;
 `;
 
+const logger = logInit('WelcomePage');
+
 function WelcomePage({ theme, history }) {
   const { header } = useContext(NavContext);
   const [step, setStep] = useState(0);
@@ -165,6 +169,7 @@ function WelcomePage({ theme, history }) {
 
       setJavaInstalled(true);
     } else {
+      logger.info('Java install errored');
       setStep(1);
       setJavaError(true);
       setJavaInstalled(true);
@@ -184,6 +189,7 @@ function WelcomePage({ theme, history }) {
     SettingsManager.currentSettings.launcherIntegration = enableLauncherIntegration;
     SettingsManager.currentSettings.analyticsEnabled = enableAnalytics;
     SettingsManager.currentSettings.lastVersion = Global.MCM_VERSION;
+    SettingsManager.currentSettings.runLatestInIntegrated = true;
 
     SettingsManager.save();
 
@@ -191,7 +197,7 @@ function WelcomePage({ theme, history }) {
 
     const versions = await Global.updateMCVersions(true);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (versions === 'no-connection') {
         setErrorHappened(true);
         setSettingUp(false);
@@ -206,6 +212,13 @@ function WelcomePage({ theme, history }) {
         SnapshotProfile.checkMissingMCMValues(true);
 
         mkdirp.sync(Global.PROFILES_PATH);
+
+        if (enableLauncherIntegration) {
+          LatestProfile.gameDir = Global.getMCPath();
+          await MCLauncherIntegrationHandler.integrateFirst();
+          MCLauncherIntegrationHandler.integrate(true);
+        }
+
         setSettingUp(false);
       }
     }, 1000);

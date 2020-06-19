@@ -125,10 +125,18 @@ const LauncherManager = {
     const date = new Date();
     const iso = date.toISOString();
     this.setProfileData(profile, 'lastUsed', iso);
-    this.setProfileData(profile, 'gameDir', profile.gameDir);
+    this.updateGameDir(profile);
   },
   updateGameDir(profile) {
-    this.setProfileData(profile, 'gameDir', profile.gameDir);
+    if (
+      (profile.id === '0-default-profile-latest' && SettingsManager.currentSettings.runLatestInIntegrated)
+      ||
+      (profile.id === '0-default-profile-snapshot' && !SettingsManager.currentSettings.runSnapshotInSeperateFolder && SettingsManager.currentSettings.runLatestInIntegrated)
+    ) {
+      this.setProfileData(profile, 'gameDir', '');
+    } else {
+      this.setProfileData(profile, 'gameDir', profile.gameDir);
+    }
   },
   openLauncher() {
     logger.info('Opening launcher');

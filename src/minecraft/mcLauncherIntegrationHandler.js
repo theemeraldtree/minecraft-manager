@@ -12,6 +12,7 @@ import MCVersionHandler from './mcVersionHandler';
 import JavaHandler from './javaHandler';
 import rimraf from 'rimraf';
 import VersionsManager from '../manager/versionsManager';
+import mkdirp from 'mkdirp';
 
 const MCLauncherIntegrationHandler = {
   integrateAccounts() {
@@ -31,6 +32,32 @@ const MCLauncherIntegrationHandler = {
 
       resolve();
     });
+  },
+  integrateFirst() {
+    return new Promise(async resolve => {
+      const launcherProfiles = await FSU.readJSON(LauncherManager.getLauncherProfiles());
+
+      if(launcherProfiles.settings.enableSnapshots !== SettingsManager.currentSettings.allowSnapshotProfile) {
+        SettingsManager.currentSettings.allowSnapshotProfile = launcherProfiles.settings.enableSnapshots;
+      }
+
+      if(!MCAccountsHandler.getAccountFromUUID(SettingsManager.currentSettings.activeAccount)) {
+        if(SettingsManager.currentSettings.accounts.length) {
+          SettingsManager.currentSettings.activeAccount = SettingsManager.currentSettings.accounts[0].uuid;
+        }
+      }
+
+      SettingsManager.save();
+
+      resolve();
+    });
+  },
+  async updateSnapshotEnabled() {
+    const launcherProfiles = await FSU.readJSON(LauncherManager.getLauncherProfiles());
+
+    launcherProfiles.settings.enableSnapshots = SettingsManager.currentSettings.allowSnapshotProfile;
+
+    fs.writeFileSync(LauncherManager.getLauncherProfiles(), JSON.stringify(launcherProfiles));
   },
   async integrateProfiles(initial) {
     const launcherProfiles = await FSU.readJSON(LauncherManager.getLauncherProfiles());
@@ -97,14 +124,20 @@ const MCLauncherIntegrationHandler = {
         setData(profile, 'javaArgs', `-Xmx${ramAmount}G ${remainingArgs || defaultArgs}`);
         setData(profile, 'javaDir', JavaHandler.getJavaPath(profile));
 
-        setData(profile, 'gameDir', profile.gameDir); 
-        
+        LauncherManager.updateGameDir(profile);
+
+   
         resolve();
       })));
 
+      SettingsManager.save();
+      ProfilesManager.updateReloadListeners();
       fs.writeFileSync(LauncherManager.getLauncherProfiles(), JSON.stringify(launcherProfiles));
   },
   integrateLibraries() {
+    if(!fs.existsSync(path.join(Global.getMCPath(), '/libraries/'))) {
+      mkdirp.sync(path.join(Global.getMCPath(), '/libraries/'));
+    }
     if (!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
       fs.symlinkSync(path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager/'), path.join(Global.getMCPath(), '/libraries/minecraftmanager/'), 'junction');
     }

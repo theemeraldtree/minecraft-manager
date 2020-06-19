@@ -104,21 +104,28 @@ const Twitch = {
             // We'll try to download info for all of the assets at once,
             // to save network requests
             const projectIDs = manifest.files.map(file => file.required && file.projectID);
-            assetsList = (await HTTPRequest.post(Curse.URL_BASE, projectIDs)).data.map(rawAsset => {
-              // Convert the asset to OMAF format
-              const asset = Curse.convertToOMAF(rawAsset);
+            const returnedCurseData = (await HTTPRequest.post(Curse.URL_BASE, projectIDs)).data;
 
-              // Apply file info and a cachedID
-              asset.hosts.curse.fileID = manifest.files.find(mf => mf.projectID === rawAsset.id).fileID;
-              asset.cachedID = `twitch-asset-install-${asset.id}`;
-              return asset;
-            });
+            // We have to check lengths, because sometimes CurseForge doesn't return everything
+            if (returnedCurseData.length === projectIDs.length) {
+              assetsList = returnedCurseData.map(rawAsset => {
+                // Convert the asset to OMAF format
+                const asset = Curse.convertToOMAF(rawAsset);
+
+                // Apply file info and a cachedID
+                asset.hosts.curse.fileID = manifest.files.find(mf => mf.projectID === rawAsset.id).fileID;
+                asset.cachedID = `twitch-asset-install-${asset.id}`;
+                return asset;
+              });
+            } else {
+              throw new Error('Curse data does not match');
+            }
           } catch (e) {
             // Downloading info for every asset at once has failed;
             // instead we'll download info for each asset
             logger.info('Unable to download all asset info at once; maybe an asset is removed from CurseForge?');
 
-            assetsList = manifest.files.filter(file => file.required).map(file => Curse.convertToOMAF({
+            assetsList = manifest.files.filter(file => file.required).map(file => ({
               type: 'mod', // mod is an assumed type
               hosts: {
                 curse: {

@@ -307,7 +307,7 @@ const AssetCard = ({
                 <MenuItem
                   onClick={() => {
                     clipboard.writeText(
-                      `${asset.name} on CurseForge:\n${asset.blurb}\nhttps://minecraft.curseforge.com/projects/${asset.hosts.curse.id}\n\nTry it with Minecraft Manager, the easiest way to manage Minecraft Mods and Modpacks (is.gd/mcmtet)`
+                      `${asset.name} on CurseForge:\n${asset.blurb}\nhttps://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`
                     );
 
                     ToastManager.noticeToast('Copied!');

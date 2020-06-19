@@ -121,13 +121,15 @@ function Accounts({ theme }) {
     setAddAccountStage(1);
     const verify = await MCAccountsHandler.registerAccount(addAccountEmail, addAccountPW);
     if (verify === 'good') {
-      setAddAccountStage(0);
       setShowAddAccount(false);
-      const accs = MCAccountsHandler.getAccounts();
-      MCAccountsHandler.setActiveAccount(MCAccountsHandler.getAccountByEmail(addAccountEmail).uuid);
-      setAccounts([...accs]);
-      setAddAccountEmail('');
-      setAddAccountPW('');
+        setTimeout(() => {
+        setAddAccountStage(0);
+        const accs = MCAccountsHandler.getAccounts();
+        MCAccountsHandler.setActiveAccount(MCAccountsHandler.getAccountByEmail(addAccountEmail).uuid);
+        setAccounts([...accs]);
+        setAddAccountEmail('');
+        setAddAccountPW('');
+      }, 300);
     } else {
       setAddAccountStage(0);
       setAddAccountError(verify);

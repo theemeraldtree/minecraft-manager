@@ -362,7 +362,7 @@ const DirectLauncherManager = {
 
     for (const library of versionJSON.libraries) {
       if (library.natives && this.allowLibrary(library)) {
-        const nativeClassifier = library.natives[this.getOSName()];
+        const nativeClassifier = library.natives[this.getOSName()].replace('${arch}', process.arch.substring(1));
 
         const zip = new admzip(
           path.join(LibrariesManager.getLibrariesPath(), `/${library.downloads.classifiers[nativeClassifier].path}`)
@@ -442,7 +442,7 @@ const DirectLauncherManager = {
           }
         } else {
           logger.info(`Library "${library.name}" has natives.`);
-          const nativeClassifier = library.natives[this.getOSName()];
+          const nativeClassifier = library.natives[this.getOSName()].replace('${arch}', process.arch.substring(1));
           if (library.downloads) {
             const libPath = path.join(
               LibrariesManager.getLibrariesPath(),

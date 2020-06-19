@@ -22,12 +22,6 @@ const SnapshotProfile = new Profile({
     minecraft: {
       version: Global.MC_VERSIONS[0]
     }
-  },
-  mcm: {
-    java: {
-
-    },
-    version: 1
   }
 });
 
@@ -63,6 +57,7 @@ function loadSnapshotProfile() {
     LatestProfile.mcm = json.mcm;
   }
 
+  SnapshotProfile.checkMissingMCMValues();
   SnapshotProfile.version.minecraft.version = Global.ALL_VERSIONS[0];
   SnapshotProfile.minecraftVersion = Global.ALL_VERSIONS[0];
 

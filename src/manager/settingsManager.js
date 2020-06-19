@@ -67,7 +67,7 @@ const SettingsManager = {
 
         if (this.currentSettings.runLatestInIntegrated === undefined) {
           logger.info('Setting "runLatestInIntegrated" was missing. Adding it...');
-          this.currentSettings.runLatestInIntegrated = false;
+          this.currentSettings.runLatestInIntegrated = true;
         }
 
         if (this.currentSettings.mcAccount === undefined && LauncherManager.getMCAccounts()) {

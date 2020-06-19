@@ -68,7 +68,7 @@ const MCVerSel = styled(MCVersionSelector)`
 `;
 
 export default class DiscoverList extends Component {
-  isMounted = false;
+  isMounted = true;
 
   constructor(props) {
     super(props);

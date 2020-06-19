@@ -35,7 +35,8 @@ const MCAccountsHandler = {
           name: skinReq.name,
           uuid,
           headTexture,
-          accessToken: token
+          accessToken: token,
+          fromIntegration: true
         });
 
         SettingsManager.save();
@@ -172,7 +173,7 @@ const MCAccountsHandler = {
     logger.info(`Refreshing token for ${account.email}`);
     HTTPRequest.post('https://authserver.mojang.com/refresh', {
       accessToken: account.accessToken,
-      clientToken: this.getClientToken()
+      clientToken: !account.fromIntegration ? this.getClientToken() : FSU.readJSONSync(LauncherManager.getLauncherProfiles()).clientToken
     }).then(resp => {
       if (resp.data.accessToken) {
         logger.info(`Received a new valid token for ${account.email}; storing it...`);

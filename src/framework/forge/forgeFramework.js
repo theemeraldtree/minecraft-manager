@@ -86,9 +86,18 @@ const ForgeFramework = {
     }),
   getVersionJSON: (profile) => new Promise(async resolve => {
       const installerPath = path.join(Global.MCM_TEMP, `/forge-installer-${new Date().getTime()}`);
+      let url;
+      switch (profile.version.minecraft.version) {
+        case '1.7.10':
+          url = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-1.7.10/forge-${profile.frameworks.forge.version}-1.7.10-installer.jar`;
+          break;
+        default:
+          url = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`;
+          break;
+      }
       await DownloadsManager.startFileDownload(
         'Minecraft Forge Installer',
-        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`,
+        url,
         installerPath
       );
 

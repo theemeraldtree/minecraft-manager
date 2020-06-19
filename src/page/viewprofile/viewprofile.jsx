@@ -96,9 +96,8 @@ function ViewProfilePage({ match, history }) {
   };
 
   const confirmDelete = () => {
-    ProfilesManager.deleteProfile(profile).then(() => {
-      history.push('/');
-    });
+    history.push('/');
+    ProfilesManager.deleteProfile(profile);
   };
 
   if (profile) {

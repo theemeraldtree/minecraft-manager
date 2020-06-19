@@ -341,7 +341,7 @@ const ProfilesManager = {
     profile.state = 'Deleting...';
     this.updateProfile(profile);
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       if (SettingsManager.currentSettings.launcherIntegration) {
         logger.info(`Deleting launcher profile for ${profile.id}`);
         LauncherManager.deleteProfile(profile);
@@ -353,6 +353,9 @@ const ProfilesManager = {
           logger.error(`Error deleting profile ${profile.id}`);
           logger.error(err.toString());
           ToastManager.createToast('Error', `Error deleting profile: ${ErrorManager.makeReadable(err)}`);
+
+          profile.state = '';
+          this.updateProfile(profile);
           return;
         }
 

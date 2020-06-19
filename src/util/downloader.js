@@ -2,6 +2,7 @@ import pMap from 'p-map';
 import HTTPRequest from '../host/httprequest';
 import Hosts from '../host/Hosts';
 import DownloadsManager from '../manager/downloadsManager';
+import Curse from '../host/curse/curse';
 
 
 /**
@@ -44,7 +45,12 @@ const Downloader = {
         DownloadsManager.setDownloadProgress(download.name, Math.floor((numberFinished / assets.length) * 100));
       };
 
-      await pMap(assets, asset => new Promise(async res => {
+      await pMap(assets, rawAsset => new Promise(async res => {
+        let asset = rawAsset;
+        if (!asset.name && host === 'curse') {
+          asset = await Curse.getFullAsset(asset);
+          asset.hosts.curse.fileID = rawAsset.hosts.curse.fileID;
+        }
           await Hosts.installAssetVersionToProfile(
             host,
             profile,
