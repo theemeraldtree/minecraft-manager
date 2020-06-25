@@ -13,6 +13,9 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.js', '.jsx']
     },
+    externals: {
+      fsevents: "require('fsevents')"
+    },
     plugins: isDev
       ? [
           new HtmlWebpackPlugin({
