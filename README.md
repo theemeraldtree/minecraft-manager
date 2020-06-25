@@ -1,10 +1,12 @@
 # [Minecraft Manager](https://theemeraldtree.net/mcm/)
 
-## The easiest way to manage your Minecraft Launcher
+## The easiest way to install Mods, Modpacks, and more
 
 ### Install and manage mods, modpacks, worlds, and resource packs with ease
 
-Minecraft Manager is a program used for installation of Minecraft mods/modpacks and more.
+Minecraft Manager is a program used for installation of Minecraft mods, modpacks, resource packs and more.
+
+You can create your own Profile with mods downloaded directly from CurseForge, or download a modpack and have it automatically installed.
 
 ## Getting Started
 
@@ -20,7 +22,7 @@ cd minecraft-manager
 yarn
 ```
 
-Personally I use Yarn instead of NPM, but you don't have to
+Yarn should be used because of the lockfile.
 
 ### Running in a development environment
 
@@ -35,7 +37,7 @@ This will spawn the Electron process and start webpack-dev-server on port 9483.
 The simplest way to build Minecraft Manager is to run
 
 ```
-yarn run package
+yarn package
 ```
 
 This will compile Webpack, then run electron-builder and compile for your current OS and architecture.
@@ -44,7 +46,7 @@ However you can also compile Webpack and electron-builder seperately
 To build webpack:
 
 ```
-yarn run compile
+yarn compile
 ```
 
 This will compile Webpack with the settings defined in `webpack.config.json` and place the output in /bundles
@@ -52,7 +54,7 @@ This will compile Webpack with the settings defined in `webpack.config.json` and
 To run electron-builder
 
 ```
-yarn run build
+yarn build
 ```
 
 This will run electron-builder for your current OS and architecture, and place the output in /dist

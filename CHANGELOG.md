@@ -1,6 +1,50 @@
 # Changelog
 
-Changelogs for development versions are located in their corresponding branch.
+Changelogs for development versions are located in the work branch
+
+## 2.5.0
+
+#### Released 2020-06-24
+
+### Features
+
+- Built-in Java Management
+- Redesigned Settings page
+- An error message will now occur if app initialization fails
+- Improved asset editing, allowing you to drag-and-drop mods, resourcepacks, and worlds
+- New welcome page
+- Twitch ZIP format import
+- You can now manually add Mojang accounts from within the launcher
+- Mojang account access tokens will automatically be refreshed
+- Minecraft crash reports will be shown if the game crashes
+- Custom Java arguments and a custom Java install can now be used
+- Profiles can now override certain global settings
+- New post-update changelog
+
+### Changes
+
+- Launcher Integration is now optional
+- Internal changes to modloaders with new patch files
+- A profile's respective assets will now update if changes to the folder are made
+- Improved asset importing
+- Reduced app bundle size
+- Each game instance is now run in a seperate bin folder
+- Downloading of Minecraft game assets is now significantly faster
+- Internal changes to Version JSON files
+- Improved failed to launch error handling
+- Imrproved startup time by using v8-compile-cache
+
+### Fixes
+
+- "Select file" dialogs will work now
+- Network errors won't fail silently
+- Welcome page won't faily silently
+- Profile deletion won't fail silently
+- Memory leaks with asynchronous network requests have been fixed
+- "Too long" errors when launching a profile should no longer occur
+- Forge 1.13+ should work better now
+- You will now be warned if you don't have an account
+- Non-directories in the profiles folder will no longer throw errors
 
 ## 2.4.7
 
@@ -37,7 +81,6 @@ Changelogs for development versions are located in their corresponding branch.
 ### Fixes
 
 - Search in Discover is no longer slow
-
 
 ## 2.4.3
 

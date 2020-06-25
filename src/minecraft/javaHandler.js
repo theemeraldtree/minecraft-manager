@@ -22,7 +22,7 @@ const JavaHandler = {
    * @param {object} [profile] - The profile to use
    */
   getJavaPath(profile) {
-    if (profile && profile.mcm.java.overridePath) {
+    if (profile && profile.mcm.java && profile.mcm.java.overridePath) {
       if (profile.mcm.java.manual) {
         return profile.mcm.java.manualPath;
       }

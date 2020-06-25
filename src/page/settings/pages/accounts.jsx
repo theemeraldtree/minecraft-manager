@@ -168,6 +168,10 @@ function Accounts({ theme }) {
     setShowAddAccount(true);
   };
 
+  const clickHelp = () => {
+    AlertManager.messageBox('accounts help', 'Before you launch Minecraft, you\'ll need to add your Mojang account. Your account email, username, and password are never sent to anyone besides Mojang.<br><br>If you have Launcher Integration enabled, Minecraft Manager may import accounts from the regular launcher');
+  };
+
   return (
     <>
       <Overlay in={showAddAccount}>
@@ -196,7 +200,7 @@ function Accounts({ theme }) {
       </Overlay>
       <Header>
         <Button onClick={clickAddAccount} color="green">Add Account</Button>
-        <Button color="#333333">Help</Button>
+        <Button onClick={clickHelp} color="#333333">Help</Button>
       </Header>
       <List>
         {accounts.map(account => {

@@ -45,7 +45,7 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.5.0-pre.1',
+  MCM_VERSION: '2.5.0',
   MCM_RELEASE_DATE: '6/19/2020',
 
   MCM_PROFILE_VERSION: 1,
@@ -109,7 +109,7 @@ const Global = {
     const version = SettingsManager.currentSettings.lastVersion;
     if (!version || (semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1)) {
       Analytics.send('update');
-      AlertManager.messageBox(`welcome to minecraft manager ${this.MCM_VERSION}`, `<div style="overflow-y: auto; max-height: 455px;">${latestChangelog}</div>`);
+      AlertManager.messageBox(`welcome to minecraft manager ${this.MCM_VERSION}`, `<div style="overflow-y: auto; max-height: 460px;">${latestChangelog}</div>`);
       SettingsManager.setLastVersion(this.MCM_VERSION);
     }
   },
@@ -479,262 +479,264 @@ const Global = {
     this.migratorListeners.forEach(listener => listener({ active: val }));
   },
 
+  // TODO: Refactor this disaster
   /* eslint-disable */
   async checkMigration() {
-    // let showMigrationmessage = false;
-    // let majorMigrationToPerform = '';
+    let showMigrationmessage = false;
+    let majorMigrationToPerform = '';
 
-    // for (const profile of ProfilesManager.loadedProfiles) {
-    //   // From beta 4.1 and earlier there was no info about the OMAF format version
-    //   if (!profile.omafVersion) {
-    //     profile.omafVersion = '0.1';
+    for (const profile of ProfilesManager.loadedProfiles) {
+      // From beta 4.1 and earlier there was no info about the OMAF format version
+      if (!profile.omafVersion) {
+        profile.omafVersion = '0.1';
 
-    //     if (profile.hosts.curse) {
-    //       profile.hosts.curse.fullyInstalled = true;
-    //     }
+        if (profile.hosts.curse) {
+          profile.hosts.curse.fullyInstalled = true;
+        }
 
-    //     profile.save();
-    //   } else if (profile.omafVersion === '0.1') {
-    //     profile.omafVersion = '0.1.1';
+        profile.save();
+      } else if (profile.omafVersion === '0.1') {
+        profile.omafVersion = '0.1.1';
 
-    //     profile.version = 'unknown';
-    //     profile.save();
-    //   } else if (profile.omafVersion === '0.1.1') {
-    //     profile.omafVersion = '0.1.2';
-    //     if (profile.hosts.curse) {
-    //       profile.hosts.curse.slug = profile.hosts.curse.id;
-    //       profile.hosts.curse.id = 'unknown';
-    //     }
+        profile.version = 'unknown';
+        profile.save();
+      } else if (profile.omafVersion === '0.1.1') {
+        profile.omafVersion = '0.1.2';
+        if (profile.hosts.curse) {
+          profile.hosts.curse.slug = profile.hosts.curse.id;
+          profile.hosts.curse.id = 'unknown';
+        }
 
-    //     if (profile.mods) {
-    //       for (const mod of profile.mods) {
-    //         if (mod.hosts) {
-    //           if (mod.hosts.curse) {
-    //             mod.hosts.curse.slug = mod.hosts.curse.id;
-    //             mod.hosts.curse.id = 'unknown';
-    //           }
-    //         }
-    //       }
-    //     }
+        if (profile.mods) {
+          for (const mod of profile.mods) {
+            if (mod.hosts) {
+              if (mod.hosts.curse) {
+                mod.hosts.curse.slug = mod.hosts.curse.id;
+                mod.hosts.curse.id = 'unknown';
+              }
+            }
+          }
+        }
 
-    //     profile.addIconToLauncher();
+        profile.addIconToLauncher();
 
-    //     profile.save();
-    //   } else if (profile.omafVersion === '0.1.2') {
-    //     profile.omafVersion = '0.1.3';
-    //     if (!(profile.version instanceof Object)) {
-    //       profile.version = {
-    //         displayname: profile.version,
-    //         timestamp: profile.versionTimestamp
-    //       };
+        profile.save();
+      } else if (profile.omafVersion === '0.1.2') {
+        profile.omafVersion = '0.1.3';
+        if (!(profile.version instanceof Object)) {
+          profile.version = {
+            displayname: profile.version,
+            timestamp: profile.versionTimestamp
+          };
 
-    //       profile.versionTimestamp = undefined;
-    //     }
+          profile.versionTimestamp = undefined;
+        }
 
-    //     profile.save();
+        profile.save();
 
-    //     showMigrationmessage = true;
-    //   } else if (profile.omafVersion === '0.1.3') {
-    //     logger.info(`Running migration on ${profile.id}`);
-    //     if (!fs.existsSync(path.join(profile.profilePath, '/_mcm'))) {
-    //       fs.mkdirSync(path.join(profile.profilePath, '/_mcm'));
-    //       fs.mkdirSync(path.join(profile.profilePath, '/_mcm/icons'));
-    //       fs.mkdirSync(path.join(profile.profilePath, '/_mcm/icons/mods'));
-    //     }
-    //     if (!fs.existsSync(path.join(profile.profilePath, '/_omaf'))) {
-    //       fs.mkdirSync(path.join(profile.profilePath, '/_omaf'));
-    //       fs.mkdirSync(path.join(profile.profilePath, '/_omaf/subAssets'));
-    //     }
+        showMigrationmessage = true;
+      } else if (profile.omafVersion === '0.1.3') {
+        logger.info(`Running migration on ${profile.id}`);
+        if (!fs.existsSync(path.join(profile.profilePath, '/_mcm'))) {
+          fs.mkdirSync(path.join(profile.profilePath, '/_mcm'));
+          fs.mkdirSync(path.join(profile.profilePath, '/_mcm/icons'));
+          fs.mkdirSync(path.join(profile.profilePath, '/_mcm/icons/mods'));
+        }
+        if (!fs.existsSync(path.join(profile.profilePath, '/_omaf'))) {
+          fs.mkdirSync(path.join(profile.profilePath, '/_omaf'));
+          fs.mkdirSync(path.join(profile.profilePath, '/_omaf/subAssets'));
+        }
 
-    //     if (profile.minecraftVersion) {
-    //       profile.version.minecraft = {};
-    //       profile.version.minecraft.version = profile.minecraftVersion;
-    //     }
+        if (profile.minecraftVersion) {
+          profile.version.minecraft = {};
+          profile.version.minecraft.version = profile.minecraftVersion;
+        }
 
-    //     for (const mod of profile.mods) {
-    //       if (mod.version.minecraftversions) {
-    //         mod.version.minecraft = {
-    //           supportedVersions: mod.version.minecraftversions
-    //         };
+        for (const mod of profile.mods) {
+          if (mod.version.minecraftversions) {
+            mod.version.minecraft = {
+              supportedVersions: mod.version.minecraftversions
+            };
 
-    //         mod.version.minecraftversions = undefined;
-    //       }
+            mod.version.minecraftversions = undefined;
+          }
 
-    //       if (mod.version.hosts) {
-    //         mod.version.hosts = undefined;
-    //       }
+          if (mod.version.hosts) {
+            mod.version.hosts = undefined;
+          }
 
-    //       if (mod.iconURL) {
-    //         mod.icon = mod.iconURL;
-    //         mod.iconURL = undefined;
-    //       }
+          if (mod.iconURL) {
+            mod.icon = mod.iconURL;
+            mod.iconURL = undefined;
+          }
 
-    //       if (mod.files) {
-    //         if (mod.files[0]) {
-    //           mod.files[0].path = `mods/${mod.files[0].path}`;
-    //         }
-    //       }
+          if (mod.files) {
+            if (mod.files[0]) {
+              mod.files[0].path = `mods/${mod.files[0].path}`;
+            }
+          }
 
-    //       if (mod.url) {
-    //         mod.url = undefined;
-    //       }
+          if (mod.url) {
+            mod.url = undefined;
+          }
 
-    //       mod.omafVersion = '1.0.0';
-    //     }
+          mod.omafVersion = '1.0.0';
+        }
 
-    //     if (profile.version.minecraftversions) {
-    //       profile.version.minecraftversions = undefined;
-    //     }
+        if (profile.version.minecraftversions) {
+          profile.version.minecraftversions = undefined;
+        }
 
-    //     if (profile.customVersions) {
-    //       profile.frameworks = profile.customVersions;
-    //       profile.customVersions = undefined;
-    //     }
-    //     profile.save();
-    //   }
+        if (profile.customVersions) {
+          profile.frameworks = profile.customVersions;
+          profile.customVersions = undefined;
+        }
+        profile.save();
+      }
 
-    //   if(!profile.mcm.version) {
-    //     profile.mcm.version = 1;
+      if(!profile.mcm.version) {
+        profile.mcm.version = 1;
         
-    //     majorMigrationToPerform = '2.5';
+        majorMigrationToPerform = '2.5';
 
-    //     mkdirp.sync(path.join(profile.mcmPath, '/binaries'));
-    //     mkdirp.sync(path.join(profile.mcmPath, '/version'));
+        mkdirp.sync(path.join(profile.mcmPath, '/binaries'));
+        mkdirp.sync(path.join(profile.mcmPath, '/version'));
 
-    //     profile.mcm.java = {
-    //       overrideRam: false,
-    //       dedicatedRam: SettingsManager.currentSettings.dedicatedRam,
-    //       overrideArgs: false,
-    //       overridePath: false,
-    //       releaseName: '',
-    //       manual: false,
-    //       manualPath: '',
-    //       customArgs: ''
-    //     };
+        profile.mcm.java = {
+          overrideRam: false,
+          dedicatedRam: SettingsManager.currentSettings.dedicatedRam,
+          overrideArgs: false,
+          overridePath: false,
+          releaseName: '',
+          manual: false,
+          manualPath: '',
+          customArgs: ''
+        };
 
-    //     profile.save();
-    //   }
-    // }
+        profile.save();
+      }
+    }
 
-    // if(majorMigrationToPerform === '2.5') {
-    //   const migrateLog = (text) => {
-    //     logger.info(`[Migration] ${text}`);
-    //   }
-    //   this.setMigratorEnabled(true);
-    //   this.updateMigratorStep('Making necessary folders...');
+    if(majorMigrationToPerform === '2.5') {
+      const migrateLog = (text) => {
+        logger.info(`[Migration] ${text}`);
+      }
+      this.setMigratorEnabled(true);
+      this.updateMigratorStep('Making necessary folders...');
 
-    //   migrateLog('Creating all required directories');
+      migrateLog('Creating all required directories');
 
-    //   mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries'));
-    //   mkdirp.sync(path.join(Global.MCM_PATH, '/shared/binaries'));
-    //   mkdirp.sync(path.join(Global.MCM_PATH, '/shared/assets'));
-    //   mkdirp.sync(path.join(Global.MCM_PATH, '/shared/jars'));
+      mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries'));
+      mkdirp.sync(path.join(Global.MCM_PATH, '/shared/binaries'));
+      mkdirp.sync(path.join(Global.MCM_PATH, '/shared/assets'));
+      mkdirp.sync(path.join(Global.MCM_PATH, '/shared/jars'));
 
-    //   this.updateMigratorStep('Migrating accounts...');
+      this.updateMigratorStep('Migrating accounts...');
 
-    //   migrateLog('Calling integrateAccounts');
-    //   await MCLauncherIntegrationHandler.integrateAccounts();
+      migrateLog('Calling integrateAccounts');
+      await MCLauncherIntegrationHandler.integrateAccounts();
 
-    //   this.updateMigratorStep('Setting active account...');
+      if(SettingsManager.currentSettings.accounts[0]) {
+        this.updateMigratorStep('Setting active account...');
 
-    //   migrateLog('Assigning activeAccount to UUID of account 0');
-
-    //   SettingsManager.currentSettings.activeAccount = SettingsManager.currentSettings.accounts[0].uuid;
-    //   SettingsManager.currentSettings.launcherIntegration = true;
-    //   if(!SettingsManager.currentSettings.java) {
-
-    //     this.updateMigratorStep('Assigning Java settings...');
-
-    //     migrateLog('Setting minimum global Java settings');
-    //     SettingsManager.currentSettings.java = {
-    //       path: path.join(Global.MCM_PATH, '/shared/binaries/java/', JavaHandler.getDefaultJavaPath()),
-    //       manual: false,
-    //       customJavaArgs: '',
-    //       customArgsActive: false,
-    //       manualPath: '',
-    //       releaseName: 'currently installing...'
-    //     }
-
-    //     this.updateMigratorStep('Installing Java...');
-
-    //     migrateLog('Installing java version "latest" to shared java binary path');
-    //     const version = await JavaHandler.installVersion('latest', path.join(Global.MCM_PATH, '/shared/binaries/java'));
-
-    //     if(version !== 'error') {
-
-    //       this.updateMigratorStep('Assigning Java name...');
-
-    //       migrateLog('Assigning latest Global java release name');
-    //       SettingsManager.currentSettings.java.releaseName = version;
-    //       SettingsManager.save();
-
-    //       ProfilesManager.loadedProfiles.forEach(prof => {
-
-    //         this.updateMigratorStep(`Setting Java settings for ${prof.name}`);
-
-    //         migrateLog(`Assigning java release name to ${prof.id}`)
-    //         prof.mcm.java.releaseName = version;
-    //         prof.mcm.java.path = path.join(Global.MCM_PATH, '/shared/binaries/java/', JavaHandler.getDefaultJavaPath());
-    //         prof.mcm.version = 1;
-    //         prof.save();
-
-    //         this.updateMigratorStep(`Downloading Version JSON for ${prof.name}`);
-            
-    //         migrateLog(`Downloading version json for ${prof.id}`);
-    //         MCVersionHandler.updateProfile(prof);
-
-    //         if(!fs.existsSync(path.join(prof.profilePath, '/files'))) {
-    //           mkdirp.sync(path.join(prof.profilePath, '/files'));
-    //         }
-    //       });
-    //     }
-
-    //     migrateLog('Calling integrateProfiles');
-    //     this.updateMigratorStep('Integrating Profiles...');
-
-    //     MCLauncherIntegrationHandler.integrateProfiles(true);
-    //   }
-
-    //   this.updateMigratorStep('Saving...');
-
-    //   SettingsManager.currentSettings.runLatestInIntegrated = true;
-    //   SettingsManager.save();
-
-    //   this.updateMigratorStep('Copying assets... (this may take a while)');
-
-    //   // timeout to allow visuals to update
-    //   setTimeout(() => {
-    //     migrateLog('Copying assets directory to shared');
-    //     Global.copyDirSync(path.join(Global.getMCPath(), '/assets/'), path.join(Global.MCM_PATH, '/shared/assets/'));
-      
-    //     this.updateMigratorStep('Copying libraries...');
+        migrateLog('Assigning activeAccount to UUID of account 0');
   
-    //     // timeout to allow visuals to update
-    //     setTimeout(() => {
+        SettingsManager.currentSettings.activeAccount = SettingsManager.currentSettings.accounts[0].uuid;
+      }
+      
+      SettingsManager.currentSettings.launcherIntegration = true;
+      if(!SettingsManager.currentSettings.java) {
 
-    //       if(fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
-    //         migrateLog('Copying libraries/minecraftmanager to shared');
-    //         Global.copyDirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'), path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
-    //       }else{
-    //         mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
-    //       }
+        this.updateMigratorStep('Assigning Java settings...');
+
+        migrateLog('Setting minimum global Java settings');
+        SettingsManager.currentSettings.java = {
+          path: path.join(Global.MCM_PATH, '/shared/binaries/java/', JavaHandler.getDefaultJavaPath()),
+          manual: false,
+          customJavaArgs: '',
+          customArgsActive: false,
+          manualPath: '',
+          releaseName: 'currently installing...'
+        }
+
+        this.updateMigratorStep('Installing Java...');
+
+        migrateLog('Installing java version "latest" to shared java binary path');
+        const version = await JavaHandler.installVersion('latest', path.join(Global.MCM_PATH, '/shared/binaries/java'));
+
+        if(version !== 'error') {
+
+          this.updateMigratorStep('Assigning Java name...');
+
+          migrateLog('Assigning latest Global java release name');
+          SettingsManager.currentSettings.java.releaseName = version;
+          SettingsManager.save();
+
+          ProfilesManager.loadedProfiles.forEach(prof => {
+
+            this.updateMigratorStep(`Setting Java settings for ${prof.name}`);
+
+            migrateLog(`Assigning java release name to ${prof.id}`);
+            prof.checkMissingMCMValues();
+            prof.mcm.version = 1;
+            prof.save();
+
+            this.updateMigratorStep(`Downloading Version JSON for ${prof.name}`);
+            
+            migrateLog(`Downloading version json for ${prof.id}`);
+            MCVersionHandler.updateProfile(prof);
+
+            if(!fs.existsSync(path.join(prof.profilePath, '/files'))) {
+              mkdirp.sync(path.join(prof.profilePath, '/files'));
+            }
+          });
+        }
+
+        migrateLog('Calling integrateProfiles');
+        this.updateMigratorStep('Integrating Profiles...');
+
+        MCLauncherIntegrationHandler.integrateProfiles(true);
+      }
+
+      this.updateMigratorStep('Saving...');
+
+      SettingsManager.currentSettings.runLatestInIntegrated = true;
+      SettingsManager.save();
+
+      this.updateMigratorStep('Copying assets... (this may take a while)');
+
+      // timeout to allow visuals to update
+      setTimeout(() => {
+        migrateLog('Copying assets directory to shared');
+        Global.copyDirSync(path.join(Global.getMCPath(), '/assets/'), path.join(Global.MCM_PATH, '/shared/assets/'));
+       
+        this.updateMigratorStep('Copying libraries...');
+  
+        // timeout to allow visuals to update
+        setTimeout(() => {
+
+          if(fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
+            migrateLog('Copying libraries/minecraftmanager to shared');
+            Global.copyDirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'), path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
+          }else{
+            mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
+          }
     
-    //       migrateLog('Finished migration');
-    //       this.setMigratorEnabled(false);
-    //       AlertManager.messageBox(`welcome to minecraft manager ${this.MCM_VERSION}`, `<div style="overflow-y: auto; max-height: 455px;">${latestChangelog}</div>`);
-    //     }, 2000);
-    //   }, 2000);
+          migrateLog('Finished migration');
+          this.setMigratorEnabled(false);
+        }, 2000);
+      }, 2000);
 
-    // }
+    }
 
-    // if (showMigrationmessage) {
-    //   ToastManager.createToast(
-    //     'Hey There!',
-    //     'Hello there beta tester! Just a quick message about this new version: your old profiles will not work 100%. Some features may work, some may not. This is due to internal restructuring as to how many things are stored. We hope you understand!'
-    //   );
-    // }
+    if (showMigrationmessage) {
+      ToastManager.createToast(
+        'Hey There!',
+        'Hello there beta tester! Just a quick message about this new version: your old profiles will not work 100%. Some features may work, some may not. This is due to internal restructuring as to how many things are stored. We hope you understand!'
+      );
+    }
 
-    // ProfilesManager.updateReloadListeners();
+    ProfilesManager.updateReloadListeners();
   },
   /* eslint-enable */
   updateCache() {

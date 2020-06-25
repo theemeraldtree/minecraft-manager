@@ -52,8 +52,10 @@ async function load() {
     loadLatestProfile();
     loadSnapshotProfile();
 
-    logger.info('Running initial integration...');
-    await MCLauncherIntegrationHandler.integrateFirst();
+    if (SettingsManager.currentSettings.launcherIntegration) {
+      logger.info('Running initial integration...');
+      await MCLauncherIntegrationHandler.integrateFirst();
+    }
   }
 
 

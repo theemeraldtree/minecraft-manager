@@ -151,7 +151,7 @@ function ViewProfilePage({ match, history }) {
             <SanitizedHTML html={profile.description} />
           </Description>
         </MiddlePanel>
-        <ShareOverlay show={showShareOverlay} cancelClick={() => setShowShareOverlay(false)} profile={profile} />}
+        <ShareOverlay show={showShareOverlay} cancelClick={() => setShowShareOverlay(false)} profile={profile} />
         <UpdateOverlay show={showUpdateOverlay} cancelClick={() => setShowUpdateOverlay(false)} profile={profile} />
       </>
     );

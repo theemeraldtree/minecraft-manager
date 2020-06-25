@@ -114,11 +114,9 @@ const Curse = {
   },
 
   async getDescription(asset) {
-    return (
-      await Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/description`, {
+      return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/description`, {
         addonID: asset.hosts.curse.id
-      })
-    ).replace(/&nbsp;/gi, '');
+      });
   },
 
   convertCurseVersion(ver) {
@@ -228,7 +226,7 @@ const Curse = {
     const sort = this.convertSortString(options.sort);
 
     const params = {
-      searchFilter: term.split(' ').join('%20'),
+      searchFilter: term.split(' ').join('+'),
       gameId: 432,
       sectionId: this.getCurseIDFromType(type),
       categoryId: 0,

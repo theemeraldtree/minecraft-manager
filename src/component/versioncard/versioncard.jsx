@@ -234,7 +234,7 @@ export default class VersionCard extends PureComponent {
         <InfoSection>
           <Detail>changelog</Detail>
           <Changelog>
-            <SanitizedHTML small html={changelog} />
+            <SanitizedHTML small html={changelog || '¯\\_(ツ)_/¯ unable to find a changelog'} />
           </Changelog>
           {showMoreInfo && <MoreInfo onClick={this.toggleMoreInfo}>less info</MoreInfo>}
         </InfoSection>

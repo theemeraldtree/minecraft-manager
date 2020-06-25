@@ -20,6 +20,7 @@ import AlertBackground from '../../../component/alert/alertbackground';
 import useDebounced from '../../../util/useDebounced';
 import PathInput from '../components/pathInput';
 import MCLauncherIntegrationHandler from '../../../minecraft/mcLauncherIntegrationHandler';
+import AlertManager from '../../../manager/alertManager';
 
 const { dialog } = require('electron').remote;
 
@@ -239,6 +240,15 @@ function Java({ theme, profileScope }) {
     doReingrate();
   };
 
+  const helpJavaArgs = () => {
+    AlertManager.messageBox(
+      'custom java args',
+      `Minecraft Manager allows you to configure custom Java arguments that are included when Minecraft is ran.
+      <br><br>
+       These settings are advanced, so it's only recommended to change them if you know what you're doing.`
+    );
+  };
+
   return (
     <>
       <InstallWizard
@@ -275,7 +285,7 @@ function Java({ theme, profileScope }) {
       <SettingSeperator />
       <InputHolder>
         <ToggleSwitch onClick={javaArgsToggle} value={javaArgsActive} />
-        <Detail>Custom Java Arguments <QuestionButton /></Detail>
+        <Detail>Custom Java Arguments <QuestionButton onClick={helpJavaArgs} /></Detail>
       </InputHolder>
       <EmptyOffset>
         <DisabledBox active={javaArgsActive}>

@@ -219,7 +219,13 @@ export default function About() {
               <a href="https://github.com/oliver-moran/jimp">jimp</a>
             </li>
             <li>
-              <a href="https://github.com/apostrophecms/sanitize-html">sanitize-html</a>
+              <a href="https://github.com/sindresorhus/p-map">p-map</a>
+            </li>
+            <li>
+              <a href="https://github.com/lodash/lodash">lodash.debounce</a>
+            </li>
+            <li>
+              <a href="https://github.com/paulmillr/chokidar">chokidar</a>
             </li>
             <li>
               <a href="https://fonts.google.com/specimen/Roboto">the Roboto font</a>

@@ -1,4 +1,9 @@
 {
-  "presets": ["airbnb"],
-  "plugins": ["@babel/plugin-proposal-class-properties", "babel-plugin-styled-components"]
+  "presets": [
+    "airbnb"
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-class-properties",
+    "babel-plugin-styled-components"
+  ]
 }

@@ -117,7 +117,10 @@ const MCLauncherIntegrationHandler = {
           remainingArgs += `${profile.mcm.java.customArgs}`;
         }
 
-        const ramAmount = profile.mcm.java.overrideRam ? profile.mcm.java.dedicatedRam : SettingsManager.currentSettings.dedicatedRam;
+        let ramAmount = SettingsManager.currentSettings.dedicatedRam;
+        if(profile.mcm.java && profile.mcm.java.overrideRam) {
+          ramAmount = profile.mcm.java.dedicatedRam;
+        }
 
         const defaultArgs = '-XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
 
@@ -135,9 +138,8 @@ const MCLauncherIntegrationHandler = {
       fs.writeFileSync(LauncherManager.getLauncherProfiles(), JSON.stringify(launcherProfiles));
   },
   integrateLibraries() {
-    if(!fs.existsSync(path.join(Global.getMCPath(), '/libraries/'))) {
-      mkdirp.sync(path.join(Global.getMCPath(), '/libraries/'));
-    }
+    FSU.createDirIfMissing(path.join(Global.getMCPath(), '/libraries/'));
+
     if (!fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
       fs.symlinkSync(path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager/'), path.join(Global.getMCPath(), '/libraries/minecraftmanager/'), 'junction');
     }
@@ -151,15 +153,23 @@ const MCLauncherIntegrationHandler = {
         const forgePath = path.join(Global.getMCPath(), `/libraries/${forgeBasePath}`);
 
         FSU.createDirIfMissing(forgePath);
-        FSU.updateSymlink(
-          path.join(forgePath, `/forge-${profile.frameworks.forge.version}-client.jar`),
-          path.join(LibrariesManager.getLibrariesPath(), forgeBasePath, `/forge-${profile.frameworks.forge.version}-client.jar`)
-        );
 
-        FSU.updateSymlink(
-          path.join(forgePath, `/forge-${profile.frameworks.forge.version}-universal.jar`),
-          path.join(LibrariesManager.getLibrariesPath(), forgeBasePath, `/forge-${profile.frameworks.forge.version}-universal.jar`)
-        );
+        const clientPath = path.join(LibrariesManager.getLibrariesPath(), forgeBasePath, `/forge-${profile.frameworks.forge.version}-client.jar`);
+        if(fs.existsSync(clientPath)) {
+          FSU.updateSymlink(
+            path.join(forgePath, `/forge-${profile.frameworks.forge.version}-client.jar`),
+            clientPath
+          );
+        }
+
+        const universalPath = path.join(LibrariesManager.getLibrariesPath(), forgeBasePath, `/forge-${profile.frameworks.forge.version}-universal.jar`);
+
+        if(fs.existsSync(universalPath)) {
+          FSU.updateSymlink(
+            path.join(forgePath, `/forge-${profile.frameworks.forge.version}-universal.jar`),
+            universalPath
+          );
+        }
       }
     })
   },

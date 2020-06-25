@@ -48,7 +48,7 @@ Welcome page shouldn't fail silently
 
 </ul>
 
-Some changes have been made internally to Modloaders. If you experience a problem or bug, please report it.
+<h3>Some changes have been made internally to Modloaders. You may have to reinstall Forge or Fabric. If bugs still exist after that, please report them.</h3>
 
 Thanks!
 </ul>

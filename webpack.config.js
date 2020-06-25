@@ -2,21 +2,27 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { spawn } = require('child_process');
 const process = require('process');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = (env, argv) => {
   const isDev = argv.mode === 'development';
 
-  return ({
+  return {
     context: `${__dirname}/src`,
     entry: './index.js',
     resolve: {
       extensions: ['.js', '.jsx']
     },
-    plugins: isDev ? [
-      new HtmlWebpackPlugin({
-        template: './index.html'
-      })
-    ] : [new HtmlWebpackPlugin({ template: './index.html' })],
+    plugins: isDev
+      ? [
+          new HtmlWebpackPlugin({
+            template: './index.html'
+          })
+        ]
+      : [
+          new HtmlWebpackPlugin({ template: './index.html' }),
+          new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /en/)
+        ],
     devtool: isDev ? 'cheap-module-eval-source-map' : 'none',
     target: 'electron-main',
     module: {
@@ -63,14 +69,12 @@ module.exports = (env, argv) => {
         }).on('close', code => process.exit(code));
       },
       stats: {
-        warningsFilter: [
-          'Can\'t resolve \'fsevents\''
-        ] // Disables the Chokidar fsevents warning on non-macOS systems
-      },
+        warningsFilter: ["Can't resolve 'fsevents'"] // Disables the Chokidar fsevents warning on non-macOS systems
+      }
     },
     output: {
       filename: 'index.js',
       path: `${__dirname}/bundles`
     }
-  });
+  };
 };

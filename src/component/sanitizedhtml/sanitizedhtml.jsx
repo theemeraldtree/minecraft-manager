@@ -2,26 +2,61 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-const sanitizeHTML = require('sanitize-html');
-
 const Styling = styled.div`
+  height: 100%;
+  width: calc(100% - 20px);
   color: #ececec;
+
+  * {
+    color: #ececec;
+    font-family: sans-serif;
+    overflow-x: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    padding-top: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    border: 2px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 30px;
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 2px solid rgba(0, 0, 0, 0);
+    background-clip: padding-box;
+    border-radius: 30px;
+    background-color: #5c5c5c;
+  } 
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #323232;
+  }
+
+  ::-webkit-scrollbar-corner {
+    opacity: 0;
+  } 
+
   p,
   h1,
   h2,
   h3,
   h4,
   h5,
-  h6,
+  h6, 
   span {
     color: #ececec;
+    overflow-y: hidden;
   }
 
   img {
     max-width: 100%;
     display: inline;
     vertical-align: top;
-    height: 100%;
+    height: auto;
   }
 
   a {
@@ -46,10 +81,6 @@ const Styling = styled.div`
     color: white !important;
   }
 
-  pre {
-    white-space: pre-line;
-  }
-
   ${props =>
     props.small &&
     `
@@ -61,52 +92,18 @@ const Styling = styled.div`
       font-size: 11pt;
     }
   `}
+
+  hr {
+    border: 0;
+  }
 `;
 
 // TODO: Spoiler control buttons
-const SanitizedHTML = ({ html, small }) => (
-  <Styling
-    small={small}
-    dangerouslySetInnerHTML={{
-      __html: sanitizeHTML(html, {
-        allowedTags: [
-          'br',
-          'b',
-          'i',
-          'em',
-          'strong',
-          'pre',
-          'a',
-          'iframe',
-          'h1',
-          'p',
-          'img',
-          'span',
-          'h2',
-          'h3',
-          'h4',
-          'h5',
-          'h6',
-          'ul',
-          'li',
-          'div'
-        ],
-        allowedAttributes: {
-          '*': ['style'],
-          a: ['href'],
-          iframe: ['src', 'allowfullscreen'],
-          img: ['src', 'width', 'height'],
-          div: ['class']
-        },
-        allowedIframeHostnames: ['www.youtube.com', 'player.vimeo.com']
-      })
-    }}
-  />
-);
+export default function SanitizedHTML({ html, small }) {
+  return <Styling dangerouslySetInnerHTML={{ __html: html }} small={small} />;
+}
 
 SanitizedHTML.propTypes = {
   html: PropTypes.string,
   small: PropTypes.bool
 };
-
-export default SanitizedHTML;

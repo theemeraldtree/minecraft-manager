@@ -27,6 +27,7 @@ const Description = styled.div`
   background-color: #404040;
   margin-top: 3px;
   margin-bottom: 10px;
+  height: 100%;
   &::-webkit-scrollbar-track {
     background: transparent;
   }

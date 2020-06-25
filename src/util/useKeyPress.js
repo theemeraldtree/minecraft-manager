@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 
-// Hook
-
 function useKeyPress(targetKey) {
   const [keyPressed, setKeyPressed] = useState(false);
 

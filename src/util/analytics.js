@@ -13,7 +13,7 @@ const Analytics = {
     try {
       if (SettingsManager.currentSettings.analyticsEnabled && Global.MCM_VERSION.indexOf('beta') === -1) {
         logger.info(`Sending ${type} analytic`);
-        HTTPRequest.get(`https://github.com/theemeraldtree/analytics/releases/download/minecraftmanager/${type}`);
+        HTTPRequest.get(`https://github.com/theemeraldtree/analytics/releases/download/mcm15/${type}`);
       }
     } catch (e) {
       logger.error(`Unable to send ${type} analytic`);
