@@ -2,6 +2,14 @@
 
 Changelogs for development versions are located in the work branch
 
+## 2.5.1
+
+#### Released 2020-06-25
+
+### Fixes
+
+- Fixed a bug where Forge on 1.13+ would fail to launch; you will need to reinstall Forge
+
 ## 2.5.0
 
 #### Released 2020-06-24

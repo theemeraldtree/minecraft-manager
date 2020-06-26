@@ -111,11 +111,11 @@ const ForgeFramework = {
 
       if (VersionsManager.checkIs113OrHigher(profile)) {
         json.libraries.push({
-          name: `net.minecraftforge:forge:${profile.frameworks.forge.version}-client`,
+          name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:client`,
           _disableDownload: true
         });
         json.libraries.push({
-          name: `net.minecraftforge:forge:${profile.frameworks.forge.version}-universal`,
+          name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:universal`,
           _disableDownload: true
         });
       }

@@ -48,6 +48,12 @@ Welcome page shouldn't fail silently
 
 </ul>
 
+<h4>Changes in 2.5.1</h4>
+
+<li>
+Forge on 1.13+ will no longer fail to launch; Forge will have to be reinstalled
+</li>
+
 <h3>Some changes have been made internally to Modloaders. You may have to reinstall Forge or Fabric. If bugs still exist after that, please report them.</h3>
 
 Thanks!

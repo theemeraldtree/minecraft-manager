@@ -45,8 +45,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.5.0',
-  MCM_RELEASE_DATE: '6/19/2020',
+  MCM_VERSION: '2.5.1',
+  MCM_RELEASE_DATE: '2020-06-25',
 
   MCM_PROFILE_VERSION: 1,
   OMAF_VERSION: '1.0.0',
@@ -109,7 +109,10 @@ const Global = {
     const version = SettingsManager.currentSettings.lastVersion;
     if (!version || (semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1)) {
       Analytics.send('update');
-      AlertManager.messageBox(`welcome to minecraft manager ${this.MCM_VERSION}`, `<div style="overflow-y: auto; max-height: 460px;">${latestChangelog}</div>`);
+      AlertManager.messageBox(
+        `welcome to minecraft manager ${this.MCM_VERSION}`,
+        `<div style="overflow-y: auto; max-height: 460px;">${latestChangelog}</div>`
+      );
       SettingsManager.setLastVersion(this.MCM_VERSION);
     }
   },
@@ -255,7 +258,8 @@ const Global = {
     }
     if (dev && os.platform() !== 'linux') {
       return path.join('resources');
-    } if (dev && os.platform() === 'linux') {
+    }
+    if (dev && os.platform() === 'linux') {
       return path.join(__dirname, '../../../../../../resources');
     }
 
@@ -594,9 +598,9 @@ const Global = {
         profile.save();
       }
 
-      if(!profile.mcm.version) {
+      if (!profile.mcm.version) {
         profile.mcm.version = 1;
-        
+
         majorMigrationToPerform = '2.5';
 
         mkdirp.sync(path.join(profile.mcmPath, '/binaries'));
@@ -617,10 +621,10 @@ const Global = {
       }
     }
 
-    if(majorMigrationToPerform === '2.5') {
-      const migrateLog = (text) => {
+    if (majorMigrationToPerform === '2.5') {
+      const migrateLog = text => {
         logger.info(`[Migration] ${text}`);
-      }
+      };
       this.setMigratorEnabled(true);
       this.updateMigratorStep('Making necessary folders...');
 
@@ -636,17 +640,16 @@ const Global = {
       migrateLog('Calling integrateAccounts');
       await MCLauncherIntegrationHandler.integrateAccounts();
 
-      if(SettingsManager.currentSettings.accounts[0]) {
+      if (SettingsManager.currentSettings.accounts[0]) {
         this.updateMigratorStep('Setting active account...');
 
         migrateLog('Assigning activeAccount to UUID of account 0');
-  
+
         SettingsManager.currentSettings.activeAccount = SettingsManager.currentSettings.accounts[0].uuid;
       }
-      
-      SettingsManager.currentSettings.launcherIntegration = true;
-      if(!SettingsManager.currentSettings.java) {
 
+      SettingsManager.currentSettings.launcherIntegration = true;
+      if (!SettingsManager.currentSettings.java) {
         this.updateMigratorStep('Assigning Java settings...');
 
         migrateLog('Setting minimum global Java settings');
@@ -657,15 +660,14 @@ const Global = {
           customArgsActive: false,
           manualPath: '',
           releaseName: 'currently installing...'
-        }
+        };
 
         this.updateMigratorStep('Installing Java...');
 
         migrateLog('Installing java version "latest" to shared java binary path');
         const version = await JavaHandler.installVersion('latest', path.join(Global.MCM_PATH, '/shared/binaries/java'));
 
-        if(version !== 'error') {
-
+        if (version !== 'error') {
           this.updateMigratorStep('Assigning Java name...');
 
           migrateLog('Assigning latest Global java release name');
@@ -673,7 +675,6 @@ const Global = {
           SettingsManager.save();
 
           ProfilesManager.loadedProfiles.forEach(prof => {
-
             this.updateMigratorStep(`Setting Java settings for ${prof.name}`);
 
             migrateLog(`Assigning java release name to ${prof.id}`);
@@ -682,11 +683,11 @@ const Global = {
             prof.save();
 
             this.updateMigratorStep(`Downloading Version JSON for ${prof.name}`);
-            
+
             migrateLog(`Downloading version json for ${prof.id}`);
             MCVersionHandler.updateProfile(prof);
 
-            if(!fs.existsSync(path.join(prof.profilePath, '/files'))) {
+            if (!fs.existsSync(path.join(prof.profilePath, '/files'))) {
               mkdirp.sync(path.join(prof.profilePath, '/files'));
             }
           });
@@ -709,24 +710,25 @@ const Global = {
       setTimeout(() => {
         migrateLog('Copying assets directory to shared');
         Global.copyDirSync(path.join(Global.getMCPath(), '/assets/'), path.join(Global.MCM_PATH, '/shared/assets/'));
-       
+
         this.updateMigratorStep('Copying libraries...');
-  
+
         // timeout to allow visuals to update
         setTimeout(() => {
-
-          if(fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
+          if (fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
             migrateLog('Copying libraries/minecraftmanager to shared');
-            Global.copyDirSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'), path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
-          }else{
+            Global.copyDirSync(
+              path.join(Global.getMCPath(), '/libraries/minecraftmanager'),
+              path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager')
+            );
+          } else {
             mkdirp.sync(path.join(Global.MCM_PATH, '/shared/libraries/minecraftmanager'));
           }
-    
+
           migrateLog('Finished migration');
           this.setMigratorEnabled(false);
         }, 2000);
       }, 2000);
-
     }
 
     if (showMigrationmessage) {
