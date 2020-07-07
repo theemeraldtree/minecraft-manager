@@ -11,7 +11,7 @@ import LaunchingOverlay from '../../../component/launchingOverlay/launchingOverl
 const BG = styled.div`
   overflow-y: auto;
   flex: 1 1 auto;
-  padding-bottom: 10px;
+  padding: 5px;
 `;
 
 const NoProfileText = styled.p`

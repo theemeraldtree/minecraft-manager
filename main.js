@@ -158,7 +158,8 @@ function createWindow() {
       experimentalFeatures: true,
       nodeIntegration: true
     },
-    titleBarStyle: 'hidden'
+    titleBarStyle: 'hidden',
+    transparent: true
   });
 
   mainWindow.removeMenu();

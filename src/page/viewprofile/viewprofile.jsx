@@ -85,7 +85,7 @@ function ViewProfilePage({ match, history }) {
   const [showLaunching, setShowLaunching] = useState(false);
 
   useEffect(() => {
-    header.setTitle('profile');
+    header.setTitle('VIEW INSTANCE');
     header.setShowChildren(false);
     header.setBackLink('/');
     header.setShowBackButton(true);

@@ -45,8 +45,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.5.1',
-  MCM_RELEASE_DATE: '2020-06-25',
+  MCM_VERSION: '2.6.0-beta.0',
+  MCM_RELEASE_DATE: '2020-07-07',
 
   MCM_PROFILE_VERSION: 1,
   OMAF_VERSION: '1.0.0',

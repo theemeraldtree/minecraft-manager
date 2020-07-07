@@ -11,16 +11,19 @@ const BG = styled.div`
   display: flex;
   align-items: center;
   white-space: nowrap;
+  border-radius: 20px 20px 0 0;
+  width: calc(100% - 20px);
 `;
 
 const Title = styled.p`
   color: white;
   margin: 0;
   margin-left: 10px;
-  font-size: 27pt;
+  font-size: 18pt;
   font-weight: 900;
   transition: 150ms;
   color: #e0e0e0;
+  text-transform: uppercase;
 `;
 
 const BackButton = transition.button`
@@ -77,24 +80,19 @@ const Items = transition.div`
     align-items: center;
     padding-right: 10px;
     opacity: 1;
+    position: absolute;
+    right: 10px;
     &:enter {
-        position: relative;
-        left: 50px;
         opacity: 0;
     }
     &:enter-active {
-        position: relative;
-        left: 0;
         opacity: 1;
         transition: 150ms;
     }
     &:exit {
-        position: relative;
         opacity: 1;
     }
     &:exit-active {
-        position: relative;
-        left: 50px;
         opacity: 0;
         transition: 150ms;
     }

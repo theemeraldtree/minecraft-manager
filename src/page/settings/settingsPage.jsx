@@ -89,7 +89,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     header.setTitle('settings');
-    header.setShowBackButton(true);
+    header.setShowBackButton(false);
     header.setShowChildren(false);
     header.setBackLink(undefined);
     header.setOnBackClick(undefined);
