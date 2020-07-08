@@ -5,7 +5,7 @@ import { Link, withRouter } from 'react-router-dom';
 import transition from 'styled-transition-group';
 import NavContext from '../../navContext';
 
-const BG = styled.div`
+const Container = styled.div`
   min-height: 50px;
   background-color: #2b2b2b;
   display: flex;
@@ -13,6 +13,7 @@ const BG = styled.div`
   white-space: nowrap;
   border-radius: 20px 20px 0 0;
   width: calc(100% - 20px);
+  overflow: hidden;
 `;
 
 const Title = styled.p`
@@ -110,7 +111,7 @@ const Header = ({ history }) => {
     }
   };
   return (
-    <BG>
+    <Container>
       <BackButton
         isLink={backLink !== undefined}
         unmountOnExit
@@ -126,7 +127,7 @@ const Header = ({ history }) => {
       <Items unmountOnExit in={showChildren} timeout={150}>
         {children}
       </Items>
-    </BG>
+    </Container>
   );
 };
 

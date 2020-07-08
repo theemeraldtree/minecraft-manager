@@ -71,7 +71,7 @@ export default function DiscoverPage() {
     updateProgressStates();
 
     header.setOnBackClick(backClick);
-    header.setTitle('discover');
+    header.setTitle('DISCOVER MODPACKS');
     header.setShowBackButton(false);
     header.setBackLink(undefined);
     header.setShowChildren(true);
@@ -89,7 +89,8 @@ export default function DiscoverPage() {
         value={searchValue}
         onChange={searchChange}
         onKeyPress={searchChange}
-        placeholder="search curseforge"
+        placeholder="Search CurseForge..."
+        rounded
       />
     );
   }, [searchValue]);

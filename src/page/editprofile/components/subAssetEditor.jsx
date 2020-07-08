@@ -1,11 +1,11 @@
 import React, { useState, useReducer, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
-import chokidar from 'chokidar';
+import styled, { css, keyframes } from 'styled-components';
 import transition from 'styled-transition-group';
+import chokidar from 'chokidar';
 import path from 'path';
 import fs from 'fs';
-import { Button, TextInput, InputHolder, Dropdown, withTheme } from '@theemeraldtree/emeraldui';
+import { Button, TextInput, Dropdown, withTheme } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../../manager/profilesManager';
 import DiscoverList from '../../../component/discoverlist/discoverlist';
 import AssetCard from '../../../component/assetcard/assetcard';
@@ -26,7 +26,6 @@ import DragAndDrop from './dragAndDrop';
 import logInit from '../../../util/logger';
 import useDebounced from '../../../util/useDebounced';
 
-const { dialog } = require('electron').remote;
 
 const Wrapper = styled.div`
   height: 100%;
@@ -38,7 +37,7 @@ const Container = styled.div`
   overflow: hidden;
   display: flex;
   flex-flow: column;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 97px);
   position: relative;
   padding-top: 10px;
 `;
@@ -55,37 +54,76 @@ const List = styled.div`
 `;
 
 const Search = styled(TextInput)`
-  width: 100%;
-  flex-shrink: 9999;
+  border-radius: 10px;
+  font-size: 13pt;
 `;
 
-const SearchContainer = styled(InputHolder)`
+const ListHeader = styled.div`
   flex-shrink: 0;
-  background-color: #404040;
+  background-color: #353535;
   overflow: hidden;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+
+  > div {
+    display: inline-block;
+  }
+
+  > div.buttons {
+    flex: 1 1 auto;
+  }
 `;
 
-const AnimateButton = transition(Button)`
-    &:enter {
-        margin-left: -39px;
-    }
-    &:enter-active {
-        margin-left: 0;
-        transition: margin-left 150ms;
-    }
-    &:exit {
-        margin-left: 0;
-    }
-    &:exit-active {
-        margin-left: -39px;
-        transition: margin-left 150ms;
-    }
+const SectionButton = styled.button`
+  font-size: 15pt;
+  padding: 5px;
+  border-radius: 5px;
+  background: transparent;
+  color: #c7c7c7;
+  border: 0;
+  margin-right: 5px;
+  cursor: pointer;
+  transition: 150ms;
+  &:hover {
+    color: white;
+  }
+  ${props => props.active && css`
+    background: #545454;
+    color: white;
+  `}
 `;
 
 const FilterHeader = styled.div`
   margin-top: 5px;
   & > div {
     width: 130px;
+  }
+`;
+
+const buttonSlideIn = keyframes`
+  0% {
+    margin-left: -49px;
+  }
+  100% {
+    margin-left: 0;
+  }
+`;
+
+const buttonSlideOut = keyframes`
+  0% {
+    margin-left: 0;
+  }
+  100% {
+    margin-left: -49px;
+  }
+`;
+
+const AnimateButton = transition(Button)`
+  animation: ${buttonSlideIn} 150ms forwards;
+  margin-right: 10px;
+  &:exit {
+    animation: ${buttonSlideOut} 150ms forwards;
   }
 `;
 
@@ -171,15 +209,10 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
   };
 
   const goBack = () => {
-    if (listState === 'browseAssets') {
+    if (displayState === 'modInfo') {
       setDisplayState('assetsList');
-      setLiveSearchTerm('');
-    } else {
-      let newState;
-      if (listState === 'viewAsset') {
-        newState = 'browseAssets';
-      }
-      setListState(newState);
+    } else if (displayState === 'addMods' && listState === 'viewAsset') {
+      setListState('browseAssets');
     }
   };
 
@@ -244,56 +277,54 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
     }
   });
 
-  const addFromFile = async () => {
-    let filterName, filterExtensions;
-    if (assetType === 'mod') {
-      filterName = 'Mod Files';
-      filterExtensions = ['jar'];
-    } else if (assetType === 'resourcepack') {
-      filterName = 'Resource Packs';
-      filterExtensions = ['zip'];
-    } else if (assetType === 'datapack') {
-      filterName = 'Datapacks';
-      filterExtensions = ['zip'];
-    }
+  // const addFromFile = async () => {
+  //   let filterName, filterExtensions;
+  //   if (assetType === 'mod') {
+  //     filterName = 'Mod Files';
+  //     filterExtensions = ['jar'];
+  //   } else if (assetType === 'resourcepack') {
+  //     filterName = 'Resource Packs';
+  //     filterExtensions = ['zip'];
+  //   } else if (assetType === 'datapack') {
+  //     filterName = 'Datapacks';
+  //     filterExtensions = ['zip'];
+  //   }
 
-    const p = dialog.showOpenDialogSync({
-      title: 'Choose your file',
-      buttonLabel: 'Choose File',
-      properties: ['openFile'],
-      filters: [
-        { name: filterName, extensions: filterExtensions },
-        { name: 'All Files', extensions: ['*'] }
-      ]
-    });
+  //   const p = dialog.showOpenDialogSync({
+  //     title: 'Choose your file',
+  //     buttonLabel: 'Choose File',
+  //     properties: ['openFile'],
+  //     filters: [
+  //       { name: filterName, extensions: filterExtensions },
+  //       { name: 'All Files', extensions: ['*'] }
+  //     ]
+  //   });
 
-    if (p && p[0]) {
-      try {
-        await addFile(p[0]);
-        reloadListener();
-        ToastManager.noticeToast('Added from file!');
-      } catch (e) {
-        if (e) {
-          logger.error(`Error adding file manually: ${e.message}`);
-        }
-      }
-    }
-  };
+  //   if (p && p[0]) {
+  //     try {
+  //       await addFile(p[0]);
+  //       reloadListener();
+  //       ToastManager.noticeToast('Added from file!');
+  //     } catch (e) {
+  //       if (e) {
+  //         logger.error(`Error adding file manually: ${e.message}`);
+  //       }
+  //     }
+  //   }
+  // };
 
-  const browseMods = () => {
-    if (assetType !== 'datapack') {
-      setDisplayState('addMods');
-      setLiveSearchTerm('');
-    } else {
-      addFromFile();
-    }
-  };
+  // const browseMods = () => {
+  //   if (assetType !== 'datapack') {
+  //     setDisplayState('addMods');
+  //     setLiveSearchTerm('');
+  //   } else {
+  //     addFromFile();
+  //   }
+  // };
 
   const searchChange = e => {
     const term = e.target.value;
-    if (displayState === 'assetsList') {
-      setLiveSearchTerm(term);
-    }
+    setLiveSearchTerm(term);
     if (e.key === 'Enter') {
       setSearchTerm(term);
       setListState('browseAssets');
@@ -505,6 +536,18 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
     });
   };
 
+  const showAssetsList = () => {
+    setListState('browseAssets');
+    setDisplayState('assetsList');
+    setLiveSearchTerm('');
+  };
+
+  const showDiscover = () => {
+    setListState('browseAssets');
+    setDisplayState('addMods');
+    setLiveSearchTerm('');
+  };
+
   return (
     <>
       <Wrapper>
@@ -526,34 +569,27 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
           }}
         />
         <Container>
-          <SearchContainer>
-            <AnimateButton in={displayState !== 'assetsList'} timeout={150} unmountOnExit onClick={goBack} color="red">
+          <ListHeader>
+
+            <AnimateButton in={listState === 'viewAsset' || displayState === 'modInfo'} timeout={500} unmountOnExit onClick={goBack} color="red">
               ←
             </AnimateButton>
-            {displayState !== 'assetsList' && displayState !== 'modInfo' && (
-              <Search theme={theme} onChange={searchChange} onKeyPress={searchChange} placeholder="search curseforge" />
-            )}
-
-            {displayState === 'assetsList' && (
-              <Search
-                theme={theme}
-                value={liveSearchTerm}
-                onChange={searchChange}
-                onKeyPress={searchChange}
-                placeholder="search installed"
-              />
-            )}
-            {displayState === 'addMods' && listState !== 'viewAsset' && (
-              <Button timeout={150} unmountOnExit onClick={addFromFile} color="green">
-                from file
-              </Button>
-            )}
-            {displayState === 'assetsList' && (
-              <Button timeout={150} unmountOnExit onClick={browseMods} color="green">
-                add
-              </Button>
-            )}
-          </SearchContainer>
+            <div className="buttons">
+              <SectionButton onClick={showAssetsList} active={displayState === 'assetsList'}>
+                Installed
+              </SectionButton>
+              <SectionButton onClick={showDiscover} active={displayState === 'addMods' && listState === 'browseAssets'}>
+                Discover
+              </SectionButton>
+            </div>
+            {
+              displayState !== 'modInfo' && (
+                <div>
+                  <Search theme={theme} value={liveSearchTerm} onChange={searchChange} onKeyPress={searchChange} placeholder={displayState === 'assetsList' ? 'Search installed...' : 'Search CurseForge...'} />
+                </div>
+              )
+            }
+          </ListHeader>
           {displayState === 'assetsList' && (
             <>
               <FilterHeader>
@@ -571,8 +607,8 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
                     }
                     return true;
                   })
+                  .filter(asset => asset.name.toLowerCase().includes(liveSearchTerm.toLowerCase()))
                   .map(asset => {
-                    if (displayState === 'assetsList') {
                       if (!asset.name) {
                         return (
                           <AssetCard
@@ -589,32 +625,27 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
                           />
                         );
                       }
-                      if (asset.name.toLowerCase().includes(liveSearchTerm.toLowerCase())) {
-                        return (
-                          <AssetCard
-                            progressState={progressState}
-                            key={asset.id}
-                            asset={asset}
-                            showDelete
-                            onClick={showInfoClick}
-                            deleteClick={deleteClick}
-                            installed
-                            copyToClick={copyToClick}
-                            moveToClick={moveToClick}
-                            compact
-                            shrink={deletingAssets.includes(asset.id)}
-                          />
-                        );
-                      }
-                    }
-
-                    return <></>;
+                      return (
+                        <AssetCard
+                          progressState={progressState}
+                          key={asset.id}
+                          asset={asset}
+                          showDelete
+                          onClick={showInfoClick}
+                          deleteClick={deleteClick}
+                          installed
+                          copyToClick={copyToClick}
+                          moveToClick={moveToClick}
+                          compact
+                          shrink={deletingAssets.includes(asset.id)}
+                        />
+                      );
                   })}
                 </DragAndDrop>
                 {selobj[po].length === 0 && (
                   <>
                     <h1 style={{ textAlign: 'center' }}>There's nothing here!</h1>
-                    <p style={{ textAlign: 'center', fontSize: '13pt' }}>Add stuff from CurseForge by clicking <b>add</b>,<br />
+                    <p style={{ textAlign: 'center', fontSize: '13pt' }}>Install mods from CurseForge in <b>Discover</b>,<br />
                       or drag and drop files here.
                     </p>
                   </>

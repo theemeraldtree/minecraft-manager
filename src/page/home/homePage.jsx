@@ -10,6 +10,7 @@ import Global from '../../util/global';
 import ImportOverlay from '../../component/importoverlay/importoverlay';
 import NavContext from '../../navContext';
 import MCVersionSelector from '../../component/mcVersionSelector/mcVersionSelector';
+import useKeyPress from '../../util/useKeyPress';
 
 const CreateOverlay = transition.div`
   position: absolute;
@@ -17,9 +18,12 @@ const CreateOverlay = transition.div`
   right: 20px;
   width: 300px;
   height: 209px;
-  background: #212121;
-  box-shadow: 0px 0px 9px 1px rgba(0,0,0,0.75);
+  background: #2d2d2d;
+  box-shadow: 0px 0px 6px 3px rgba(0, 0, 0, 0.35);
   padding: 5px;
+  input {
+    width: 290px;
+  }
 
   h1 {
     margin: 0;
@@ -55,7 +59,7 @@ const CreateOverlay = transition.div`
     right: 0;
     border-width: 15px;
     border-style: solid;
-    border-color: transparent transparent #212121 transparent;
+    border-color: transparent transparent #2d2d2d transparent;
   }
 `;
 
@@ -86,6 +90,7 @@ export default withRouter(({ history }) => {
   const [showImport, setShowImport] = useState(false);
   const createRef = useRef(null);
   const nameRef = useRef(null);
+  const escapePress = useKeyPress('Escape');
 
   const { header } = useContext(NavContext);
 
@@ -107,6 +112,10 @@ export default withRouter(({ history }) => {
       document.removeEventListener('mousedown', handleClick);
     };
   }, [createRef]);
+
+  useEffect(() => {
+    if (escapePress && showCreate) setShowCreate(false);
+  }, [escapePress]);
 
   const createClick = () => {
     setShowCreate(true);
@@ -146,7 +155,8 @@ export default withRouter(({ history }) => {
     setCreateName(input);
   };
 
-  const create = () => {
+  const create = e => {
+    e.preventDefault();
     ProfilesManager.createProfile(createName, mcVersion).then(() => {
       history.push(`/profile/${Global.createID(createName)}`);
     });
@@ -158,20 +168,22 @@ export default withRouter(({ history }) => {
       <ImportOverlay in={showImport} cancelClick={() => setShowImport(false)} />
 
       <CreateOverlay unmountOnExit timeout={500} in={showCreate} ref={createRef}>
-        <h1>CREATE A NEW INSTANCE</h1>
-        <Detail>instance name</Detail>
-        <TextInput ref={nameRef} onChange={createNameChange} />
-        <Detail>minecraft version</Detail>
-        <MCVersionSelector value={mcVersion} onChange={ver => setMCCVersion(ver)} />
+        <form onSubmit={create}>
+          <h1>CREATE A NEW INSTANCE</h1>
+          <Detail>instance name</Detail>
+          <TextInput ref={nameRef} onChange={createNameChange} />
+          <Detail>minecraft version</Detail>
+          <MCVersionSelector value={mcVersion} onChange={ver => setMCCVersion(ver)} />
 
-        <CreateControls>
-          <Button onClick={() => setShowCreate(false)} color="red">
-            cancel
-          </Button>
-          <Button disabled={!nameEntered} onClick={create} color="green">
-            create
-          </Button>
-        </CreateControls>
+          <CreateControls>
+            <Button type="button" onClick={() => setShowCreate(false)} color="red">
+              cancel
+            </Button>
+            <Button type="submit" disabled={!nameEntered} color="green">
+              create
+            </Button>
+          </CreateControls>
+        </form>
       </CreateOverlay>
     </>
   );

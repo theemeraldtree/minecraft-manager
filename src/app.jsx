@@ -20,7 +20,7 @@ import Overlay from './component/overlay/overlay';
 import AlertBackground from './component/alert/alertbackground';
 
 const Container = styled.div`
-  background-color: #131517;
+  background-color: #000;
   height: 100vh;
   width: 100vw;
   display: flex;
@@ -34,6 +34,8 @@ const Content = styled.div`
   width: calc(100% - 20px);
   overflow: hidden;
   background-color: #212121;
+  display: flex;
+  flex-flow: column;
 `;
 
 

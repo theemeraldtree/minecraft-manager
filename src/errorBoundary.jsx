@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import os from 'os';
 import styled from 'styled-components';
-import WindowBar from './component/windowbar/windowbar';
+import Navbar from './component/navbar/navbar';
 import ErrorIcon from './img/error-icon.png';
 import MCMDataDump from './component/debug/mcmdatadump';
 
@@ -96,7 +96,7 @@ class ErrorBoundary extends Component {
     if (hasError) {
       return (
         <Container>
-          {os.platform() !== 'linux' && <WindowBar />}
+          {os.platform() !== 'linux' && <Navbar />}
           <BG>
             <div>
               <img alt="Error" src={ErrorIcon} />

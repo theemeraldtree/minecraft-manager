@@ -34,7 +34,7 @@ export default function EditPage({ match }) {
   const { page, id } = params;
 
   useEffect(() => {
-    header.setTitle('edit profile');
+    header.setTitle('EDIT INSTANCE');
     header.setShowChildren(false);
     header.setBackLink(`/profile/${id}`);
     header.setShowBackButton(true);
