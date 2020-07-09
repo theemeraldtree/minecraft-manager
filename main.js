@@ -158,8 +158,7 @@ function createWindow() {
       experimentalFeatures: true,
       nodeIntegration: true
     },
-    titleBarStyle: 'hidden',
-    transparent: true
+    titleBarStyle: 'hidden'
   });
 
   mainWindow.removeMenu();

@@ -13,8 +13,9 @@ import FSU from '../../util/fsu';
 const logger = logInit('ForgeFramework');
 
 const ForgeFramework = {
-  setupForge: profile =>
-    new Promise(resolve => {
+  versionJSONCache: {},
+  setupForge(profile) {
+    return new Promise(resolve => {
       if (VersionsManager.checkIs113OrHigher(profile)) {
         // we are version 1.13 or higher
         // we have to do the hard forge install process
@@ -23,8 +24,6 @@ const ForgeFramework = {
         ForgeComplex.setupForge(profile, resolve);
       } else {
         profile.setFrameworkIsInstalling('forge');
-
-        MCVersionHandler.updateProfile(profile);
 
         const profileLibraryPath = path.join(LibrariesManager.getMCMLibraries(), `/mcm-${profile.id}/forge/`);
         FSU.createDirIfMissing(profileLibraryPath);
@@ -37,26 +36,44 @@ const ForgeFramework = {
         const forgeJarPath = path.join(forgePath, `/forge-${profile.frameworks.forge.version}.jar`);
 
         const mcversion = profile.version.minecraft.version;
-        let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-universal.jar`;
+        let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`;
         if (mcversion === '1.7.10') {
-          downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-1.7.10/forge-${profile.frameworks.forge.version}-1.7.10-universal.jar`;
+          downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-1.7.10/forge-${profile.frameworks.forge.version}-1.7.10-installer.jar`;
         } else if (mcversion === '1.8.9' || mcversion === '1.8.8' || mcversion === '1.8') {
-          downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-${mcversion}/forge-${profile.frameworks.forge.version}-${mcversion}-universal.jar`;
+          downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-${mcversion}/forge-${profile.frameworks.forge.version}-${mcversion}-installer.jar`;
         }
+
+        const tempJarPath = path.join(Global.MCM_TEMP, `/${profile.id}-forgeinstaller.jar`);
 
         logger.info(`Starting download of Forge jar for ${profile.id}`);
         DownloadsManager.startFileDownload(
           `Minecraft Forge ${profile.frameworks.forge.version}\n_A_${profile.name}`,
           downloadURL,
-          forgeJarPath,
+          tempJarPath,
         ).then(() => {
+          logger.info(`Finished downloading Forge installer jar for ${profile.id}`);
+          logger.info('Extracting Universal');
+
+
+          const zip = new AdmZip(tempJarPath);
+          zip.extractEntryTo(`maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}.jar`, forgePath, false, true);
+
+          logger.info('Exctracting Version JSON');
+          const versionJSON = this.extractVersionJSON(zip);
+          this.versionJSONCache[profile.frameworks.forge.version] = versionJSON;
+
           FSU.updateSymlink(profileJarPath, forgeJarPath);
-          logger.info(`Finished downloading Forge jar for ${profile.id}`);
+
+
+          MCVersionHandler.updateProfile(profile);
+
           profile.unsetFrameworkIsInstalling('forge');
+
           resolve();
         });
       }
-    }),
+    });
+  },
   uninstallForge: profile =>
     new Promise(resolve => {
       logger.info(`Starting removal of Forge from ${profile.id}`);
@@ -84,58 +101,73 @@ const ForgeFramework = {
       );
       resolve(metadata.data[minecraftVersion]);
     }),
-  getVersionJSON: (profile) => new Promise(async resolve => {
-      const installerPath = path.join(Global.MCM_TEMP, `/forge-installer-${new Date().getTime()}`);
-      let url;
-      switch (profile.version.minecraft.version) {
-        case '1.7.10':
-          url = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-1.7.10/forge-${profile.frameworks.forge.version}-1.7.10-installer.jar`;
-          break;
-        default:
-          url = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`;
-          break;
-      }
-      await DownloadsManager.startFileDownload(
-        'Minecraft Forge Installer',
-        url,
-        installerPath
-      );
+  applyVersionJSONPatches(profile, rawJSON) {
+    const json = { ...rawJSON };
+    json['+libraries'][0] = {
+      name: `minecraftmanager.profiles:mcm-${profile.id}:forge`
+    };
 
-      const zip = new AdmZip(installerPath);
-      let json = JSON.parse(zip.readFile('version.json'));
+    if (VersionsManager.checkIs113OrHigher(profile)) {
+      json['+libraries'].push({
+        name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:client`,
+        _disableDownload: true
+      });
+      json['+libraries'].push({
+        name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:universal`,
+        _disableDownload: true
+      });
+    }
 
-      if (!json) json = JSON.parse(zip.readFile('install_profile.json')).versionInfo;
-      json.libraries[0] = {
-        name: `minecraftmanager.profiles:mcm-${profile.id}:forge`
+    return json;
+  },
+  extractVersionJSON(zip) {
+    let json = JSON.parse(zip.readFile('version.json'));
+
+    if (!json) json = JSON.parse(zip.readFile('install_profile.json')).versionInfo;
+
+    json['+libraries'] = json.libraries;
+    json.libraries = undefined;
+    json._comment_ = undefined;
+    json._priority = 1;
+    json.inheritsFrom = undefined;
+    json.id = undefined;
+    json.time = undefined;
+
+    if (json.arguments && json.arguments.game) {
+      json.arguments = {
+        '+game': json.arguments.game
       };
+    }
 
-      if (VersionsManager.checkIs113OrHigher(profile)) {
-        json.libraries.push({
-          name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:client`,
-          _disableDownload: true
-        });
-        json.libraries.push({
-          name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:universal`,
-          _disableDownload: true
-        });
+    return json;
+  },
+  getVersionJSON(profile) {
+    return new Promise(async resolve => {
+      if (this.versionJSONCache[profile.frameworks.forge.version]) {
+        resolve(this.applyVersionJSONPatches(profile, this.versionJSONCache[profile.frameworks.forge.version]));
+      } else {
+        const installerPath = path.join(Global.MCM_TEMP, `/forge-installer-${new Date().getTime()}`);
+        let url;
+        switch (profile.version.minecraft.version) {
+          case '1.7.10':
+            url = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-1.7.10/forge-${profile.frameworks.forge.version}-1.7.10-installer.jar`;
+            break;
+          default:
+            url = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`;
+            break;
+        }
+        await DownloadsManager.startFileDownload(
+          'Minecraft Forge Installer',
+          url,
+          installerPath
+        );
+
+        const json = this.applyVersionJSONPatches(profile, this.extractVersionJSON(new AdmZip(installerPath)));
+
+        resolve(json);
       }
-
-      json['+libraries'] = json.libraries;
-
-      json._comment_ = undefined;
-      json.libraries = undefined;
-      json._priority = 1;
-      json.inheritsFrom = undefined;
-      json.id = undefined;
-      json.time = undefined;
-
-      if (json.arguments && json.arguments.game) {
-        json.arguments = {
-          '+game': json.arguments.game
-        };
-      }
-      resolve(json);
-    })
+    });
+  }
 };
 
 export default ForgeFramework;

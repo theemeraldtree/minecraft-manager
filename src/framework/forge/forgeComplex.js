@@ -12,6 +12,7 @@ import logInit from '../../util/logger';
 import SettingsManager from '../../manager/settingsManager';
 import MCVersionHandler from '../../minecraft/mcVersionHandler';
 import MCLauncherIntegrationHandler from '../../minecraft/mcLauncherIntegrationHandler';
+import ForgeFramework from './forgeFramework';
 
 const logger = logInit('ForgeComplex');
 
@@ -95,6 +96,7 @@ const ForgeComplex = {
 
       logger.info('Reading install_profile.json');
       const INSTALL_PROFILE = JSON.parse(fs.readFileSync(path.join(JAR_PATH, '/install_profile.json')));
+      ForgeFramework.versionJSONCache[profile.frameworks.forge.version] = ForgeFramework.extractVersionJSON(zip);
 
       this.installState[profile.id].INSTALL_PROFILE = INSTALL_PROFILE;
       logger.info('Starting read of libraries and downloading them');
