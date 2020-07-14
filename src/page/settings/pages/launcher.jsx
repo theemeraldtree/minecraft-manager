@@ -29,19 +29,23 @@ function Launcher({ theme }) {
   const [mcExe, setMCExe] = useState(SettingsManager.currentSettings.mcExe);
 
   const toggleEnabled = () => {
-    if (!integrationEnabled && (!mcHome || !mcExe)) {
-      AlertManager.messageBox('launcher integration', 'Please set your Minecraft Home Directory and Minecraft Executable path now.<br /><br />If you do not set these, Launcher Integration will be automatically turned off.');
+    const newValue = !integrationEnabled;
+    if (!mcHome || !mcExe) {
+      if (newValue) {
+        AlertManager.messageBox('launcher integration', 'Please set your Minecraft Home Directory and Minecraft Executable path now.<br /><br />If you do not set these, Launcher Integration will be automatically turned off.');
+      } else {
+        setIntegrationEnabled(false);
+      }
     } else if ((!integrationEnabled && mcHome && mcExe) || integrationEnabled) {
-      const newState = !integrationEnabled;
-      SettingsManager.currentSettings.launcherIntegration = newState;
+      SettingsManager.currentSettings.launcherIntegration = newValue;
       SettingsManager.save();
-      if (newState) {
+      if (newValue) {
         MCLauncherIntegrationHandler.integrate(true);
       } else {
         MCLauncherIntegrationHandler.removeIntegration();
       }
     }
-    setIntegrationEnabled(!integrationEnabled);
+    setIntegrationEnabled(newValue);
   };
 
   const showInfo = () => {

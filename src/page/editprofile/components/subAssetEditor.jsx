@@ -146,16 +146,21 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
   const escPress = useKeyPress('Escape');
 
   let po;
+  let hrName;
   let selobj = profile;
   if (assetType === 'mod') {
     po = 'mods';
+    hrName = 'mods';
   } else if (assetType === 'resourcepack') {
     po = 'resourcepacks';
+    hrName = 'resource packs';
   } else if (assetType === 'world') {
     po = 'worlds';
+    hrName = 'worlds';
   } else if (assetType === 'datapack') {
     po = 'datapacks';
     selobj = dpWorld;
+    hrName = 'datapacks';
   }
 
   const updateProgressStates = () => {
@@ -645,7 +650,7 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
                 {selobj[po].length === 0 && (
                   <>
                     <h1 style={{ textAlign: 'center' }}>There's nothing here!</h1>
-                    <p style={{ textAlign: 'center', fontSize: '13pt' }}>Install mods from CurseForge in <b>Discover</b>,<br />
+                    <p style={{ textAlign: 'center', fontSize: '13pt' }}>Install {hrName} from CurseForge in <b>Discover</b>,<br />
                       or drag and drop files here.
                     </p>
                   </>

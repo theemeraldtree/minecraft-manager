@@ -61,32 +61,32 @@ Item.propTypes = {
 const Sidebar = ({ id, isDefaultProfile }) => (
   <BG>
     <Item to={`/edit/general/${id}`}>
-      general
+      General
     </Item>
     {!isDefaultProfile && (
       <>
         <Item to={`/edit/versions/${id}`}>
-          versions
+          Version
         </Item>
         <ContextMenuTrigger holdToDisplay={-1} id="editsidebarmods">
           <Item to={`/edit/mods/${id}`}>
-            mods
+            Mods
           </Item>
         </ContextMenuTrigger>
       </>
     )}
     <ContextMenuTrigger holdToDisplay={-1} id="editsidebarworlds">
       <Item to={`/edit/worlds/${id}`}>
-        worlds
+        Worlds
       </Item>
     </ContextMenuTrigger>
     <ContextMenuTrigger holdToDisplay={-1} id="editsidebarresourcepacks">
       <Item to={`/edit/resourcepacks/${id}`}>
-        resource packs
+        Resource Packs
       </Item>
     </ContextMenuTrigger>
     <Item to={`/edit/advanced/${id}`}>
-      advanced
+      Settings
     </Item>
 
     <ContextMenu id="editsidebarmods">

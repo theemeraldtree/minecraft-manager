@@ -35,7 +35,7 @@ function General() {
           <Detail>Show Latest Snapshot Profile</Detail>
         </div>
         <Description>
-          Enabled the Latest Snapshot Profile, which runs the latest Minecraft Snapshot. Snapshots may be unstable and buggy.
+          Enables the Latest Snapshot Profile, which runs the latest Minecraft Snapshot. Snapshots may be unstable and buggy.
         </Description>
       </InputHolder>
 

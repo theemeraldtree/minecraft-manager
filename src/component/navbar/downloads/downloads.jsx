@@ -8,24 +8,26 @@ import DownloadsManager from '../../../manager/downloadsManager';
 import Global from '../../../util/global';
 
 const Wrapper = styled.div`
-  width: 80px;
-  height: 80px;
+  width: 20px;
+  height: 35px;
   display: flex;
   justify-content: center;
   position: absolute;
-  bottom: 0;
+  top: 0;
+  right: 150px;
   align-items: flex-end;
   z-index: 51;
+  -webkit-app-region: no-drag;
   ${props => !props.isSetup && css`
     z-index: 1;
   `}
 `;
 
 const DownloadsButton = styled.button`
-  width: 50px;
-  height: 50px;
+  width: 24px;
+  height: 28px;
   position: absolute;
-  bottom: 23px;
+  bottom: 5px;
   cursor: pointer;
   background-color: transparent;
   border: 0;
@@ -49,9 +51,9 @@ const Animation = keyframes`
 
 const AnimationBar = styled.div`
   width: 50px;
-  height: 4px;
+  height: 3px;
   background: grey;
-  margin-bottom: 20px;
+  margin-bottom: 2px;
   ${props =>
     props.active &&
     css`
@@ -59,6 +61,16 @@ const AnimationBar = styled.div`
       background-size: 600% 600% !important;
       animation: ${Animation} 1.5s ease infinite normal !important;
     `}
+`;
+
+const slideIn = keyframes`
+  0% {
+    top: 37px;
+    opacity: 0;
+  }
+  100% {
+    top: 47px;
+  }
 `;
 
 const DownloadsOverlay = styled.div`
@@ -69,11 +81,12 @@ const DownloadsOverlay = styled.div`
   z-index: 10000;
   cursor: default;
   position: absolute;
-  left: 110px;
-  bottom: 10px;
+  right: -130px;
+  top: 47px;
   color: white;
   display: flex;
   flex-flow: column;
+  animation: 150ms ${slideIn} linear;
 `;
 
 const Title = styled.p`
