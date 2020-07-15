@@ -201,7 +201,7 @@ export default class AssetInfo extends Component {
           });
 
         if (final.length === 0) {
-          final.push(<LoadingText key="none1">no versions found</LoadingText>);
+          final.push(<LoadingText key="none1">No versions found</LoadingText>);
         }
 
         this.setState(
@@ -221,7 +221,7 @@ export default class AssetInfo extends Component {
       }
     } else {
       this.setState({
-        versions: [<LoadingText key="none2">no versions found, as this is a local file</LoadingText>]
+        versions: [<LoadingText key="none2">Mo versions found, as this is a local file</LoadingText>]
       });
     }
   };

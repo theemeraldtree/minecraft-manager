@@ -6,7 +6,7 @@ import OMAFFileAsset from '../../type/omafFileAsset';
 import World from '../../type/world';
 import logInit from '../../util/logger';
 
-const logger = logInit('CurseFramework');
+const logger = logInit('CurseHost');
 
 // the curse object is used as a sort of "translator" to convert curse's data format to work with OMAF
 const Curse = {

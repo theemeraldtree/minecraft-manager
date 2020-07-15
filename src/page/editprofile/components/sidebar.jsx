@@ -65,7 +65,7 @@ const Sidebar = ({ id, isDefaultProfile }) => (
     </Item>
     {!isDefaultProfile && (
       <>
-        <Item to={`/edit/versions/${id}`}>
+        <Item to={`/edit/version/${id}`}>
           Version
         </Item>
         <ContextMenuTrigger holdToDisplay={-1} id="editsidebarmods">
@@ -85,7 +85,7 @@ const Sidebar = ({ id, isDefaultProfile }) => (
         Resource Packs
       </Item>
     </ContextMenuTrigger>
-    <Item to={`/edit/advanced/${id}`}>
+    <Item to={`/edit/settings/${id}`}>
       Settings
     </Item>
 

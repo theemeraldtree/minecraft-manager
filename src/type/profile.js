@@ -88,7 +88,11 @@ export default class Profile extends OAMFAsset {
    * Checks for missing directories, and if they're missing, creates them
    */
   checkMissingDirectories() {
-    if (this.installed) {
+    if (this.installed || (
+      this.id === '0-default-profile-latest' ||
+      this.id === '0-default-profile-snapshot'
+    )) {
+      FSU.createDirIfMissing(this.gameDir);
       FSU.createDirIfMissing(path.join(this.profilePath, '/_mcm/icons/resourcepacks'));
       FSU.createDirIfMissing(path.join(this.profilePath, '/_mcm/icons/worlds'));
       FSU.createDirIfMissing(path.join(this.profilePath, '/_mcm/icons/mods'));
@@ -257,12 +261,16 @@ export default class Profile extends OAMFAsset {
     }, 2000);
   }
 
-  // TODO: Write JSDoc info for these functions
-
+  /**
+   * Returns true if the profile has Forge or Fabric installed
+   */
   hasFramework() {
     return this.frameworks.forge || this.frameworks.fabric;
   }
 
+  /**
+   * Opens the game directory using the system's file manager
+   */
   openGameDir() {
     this.logger.info('Opening Game Directory');
     try {
@@ -273,6 +281,9 @@ export default class Profile extends OAMFAsset {
     }
   }
 
+  /**
+   * Returns the name of the currently installed framework as a string
+   */
   getPrimaryFramework() {
     if (this.frameworks.forge) {
       return 'forge';
@@ -284,6 +295,9 @@ export default class Profile extends OAMFAsset {
     return 'none';
   }
 
+  /**
+   * Saves the profile to disk
+   */
   save() {
     this.logger.info('Saving...');
     return new Promise(resolve => {
@@ -348,6 +362,9 @@ export default class Profile extends OAMFAsset {
     });
   }
 
+  /**
+   * Returns a base64 string of the icon
+   */
   getIconBase64() {
     return new Promise((resolve) => {
       Jimp.read(this.iconPath).then(jmp =>
@@ -358,12 +375,19 @@ export default class Profile extends OAMFAsset {
     });
   }
 
+  /**
+   * Adds the profiles icon to the integrated Minecraft Launcher
+   */
   async addIconToLauncher() {
     if (SettingsManager.currentSettings.launcherIntegration) {
       LauncherManager.setProfileData(this, 'icon', await this.getIconBase64());
     }
   }
 
+  /**
+   * Sets the profiles icon to the icon located at the supplied path
+   * @param {string} img - The path of the new icon
+   */
   setIcon(img) {
     if (fs.existsSync(this.iconPath)) {
       fs.unlinkSync(this.iconPath);
@@ -377,10 +401,16 @@ export default class Profile extends OAMFAsset {
     this.save();
   }
 
+  /**
+   * Resets the icon of the profile to the default icon
+   */
   resetIcon() {
     this.setIcon(path.join(Global.getResourcesPath(), '/logo-sm.png'));
   }
 
+  /**
+   * Launches the profile
+   */
   launch() {
     return new Promise(async resolve => {
       if (this.id === '0-default-profile-latest') {
@@ -434,6 +464,9 @@ export default class Profile extends OAMFAsset {
     });
   }
 
+  /**
+   * Removes all mods and the mods directory
+   */
   removeAllMods() {
     this.mods = [];
     rimraf.sync(this.modsPath);
@@ -441,6 +474,10 @@ export default class Profile extends OAMFAsset {
     this.save();
   }
 
+  /**
+   * Changes the Minecraft Version of the profile
+   * @param {string} newVer - The new version to set to
+   */
   changeMCVersion(newVer) {
     if (this.hasFramework()) {
       this.removeAllMods();
@@ -455,6 +492,12 @@ export default class Profile extends OAMFAsset {
     this.save();
   }
 
+  /**
+   * Exports the profile to a .mcjprofile file
+   * @param {string} output - The file to output to
+   * @param {array} exportFolders - The folders to include in the export
+   * @param {function} exportProgress - Called when progress is made during export
+   */
   export(output, exportFolders, exportProgress) {
     return new Promise((resolve, reject) => {
       try {
@@ -516,7 +559,11 @@ export default class Profile extends OAMFAsset {
     });
   }
 
-  // ugh.. frameworks...
+  /**
+   * Sets the version of the specified framework
+   * @param {string} framework - The framework's name
+   * @param {string} newVer - The new version of the framework
+   */
   setFrameworkVersion(framework, newVer) {
     if (!this.frameworks[framework]) {
       this.frameworks[framework] = {};
@@ -526,23 +573,39 @@ export default class Profile extends OAMFAsset {
     this.save();
   }
 
+  /**
+   * Removes a framework from the profile
+   * @param {string} framework - The fraemwork's name
+   */
   removeFramework(framework) {
     this.frameworks[framework] = undefined;
     this.save();
   }
 
+  /**
+   * Sets a frameworks status to "installing"
+   * @param {string} framework - The framework's name
+   */
   setFrameworkIsInstalling(framework) {
     this.frameworks[framework].isInstalling = true;
     this.save();
   }
 
+  /**
+   * Unsets a framework's installing status
+   * @param {string} framework - The framework's name
+   */
   unsetFrameworkIsInstalling(framework) {
     this.frameworks[framework].isInstalling = false;
     ProfilesManager.updateProfile(this);
     this.save();
   }
 
-  // ugh.. subassets...
+  /**
+   * Returns a sub-asset based on type and id
+   * @param {string} type - The type of subAsset
+   * @param {string} id - The ID of the subasset
+   */
   getSubAssetFromID(type, id) {
     if (type === 'mod') {
       if (!this.mods) {
@@ -567,6 +630,13 @@ export default class Profile extends OAMFAsset {
     return undefined;
   }
 
+  /**
+   * Adds a sub-asset with specified type
+   * @param {string} type - The type of asset
+   * @param {Object} asset - The sub-asset to add
+   * @param {Object} opts - Other options
+   * @param {Object} opts.disableSave - Disables saving
+   */
   addSubAsset(type, asset, opts = {}) {
     if (type === 'mod') {
       if (!this.mods) {
@@ -595,6 +665,12 @@ export default class Profile extends OAMFAsset {
     }
   }
 
+  /**
+   * Deletes a specified sub-asset
+   * @param {string} type - The type of sub-asset to remove
+   * @param {Object} assetT - The asset to remove
+   * @param {boolean} doSave - Whether or not to save afterwards
+   */
   deleteSubAsset(type, assetT, doSave = true) {
     return new Promise((resolve, reject) => {
       let asset = assetT;
@@ -712,7 +788,12 @@ export default class Profile extends OAMFAsset {
     });
   }
 
-  // ugh.. hosts...
+  /**
+   * Changes the version of a hosted profile
+   * @param {string} host - The name of the host
+   * @param {string} versionToChangeTo - The version to change to
+   * @param {function} onUpdate - Called when progress is made
+   */
   changeHostVersion(host, versionToChangeTo, onUpdate) {
     if (host === 'curse') {
       return new Promise(async (resolve, reject) => {
@@ -753,7 +834,10 @@ export default class Profile extends OAMFAsset {
     return undefined;
   }
 
-  // ugh.. renaming...
+  /**
+   * Renames a profile
+   * @param {string} newName - The new name of the profile
+   */
   rename(newName) {
     return new Promise(resolve => {
       this.logger.info(`Renaming to ${newName}...`);
@@ -804,6 +888,10 @@ export default class Profile extends OAMFAsset {
     });
   }
 
+  /**
+   * Checks if profile.mcm values are missing and creates them
+   * @param {boolean} force - Force reset values
+   */
   checkMissingMCMValues(force) {
     const { currentSettings } = SettingsManager;
 
@@ -829,6 +917,9 @@ export default class Profile extends OAMFAsset {
     }
   }
 
+  /**
+   * Applies default values, options, and synced files
+   */
   applyDefaults() {
     this.logger.info('Applying defaults...');
     const { currentSettings } = SettingsManager;

@@ -29,7 +29,7 @@ const Content = styled.div`
   }
 `;
 
-export default function EditPageAdvanced({ id }) {
+export default function EditPageSettings({ id }) {
   const profile = ProfilesManager.getProfileFromID(id);
 
   const [currentPage, setCurrentPage] = useState('java');
@@ -55,6 +55,6 @@ export default function EditPageAdvanced({ id }) {
   );
 }
 
-EditPageAdvanced.propTypes = {
+EditPageSettings.propTypes = {
   id: PropTypes.string
 };

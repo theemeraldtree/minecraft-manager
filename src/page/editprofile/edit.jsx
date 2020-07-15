@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import EditPageGeneral from './general/editpagegeneral';
 import Sidebar from './components/sidebar';
-import EditPageVersions from './versions/editpageversions';
+import EditPageVersion from './version/editpageversion';
 import NavContext from '../../navContext';
 import EditPageMods from './mods/editpagemods';
-import EditPageAdvanced from './advanced/editpageadvanced';
+import EditPageSettings from './settings/editpagesettings';
 import EditPageResourcePacks from './resourcepacks/editpageresourcepacks';
 import ProfilesManager from '../../manager/profilesManager';
 import EditPageWorlds from './worlds/editpageworlds';
@@ -45,11 +45,11 @@ export default function EditPage({ match }) {
       <Sidebar isDefaultProfile={ProfilesManager.getProfileFromID(id).isDefaultProfile} id={id} />
       <CC>
         {page === 'general' && <EditPageGeneral id={id} />}
-        {page === 'versions' && <EditPageVersions id={id} />}
+        {page === 'version' && <EditPageVersion id={id} />}
         {page === 'mods' && <EditPageMods id={id} />}
         {page === 'resourcepacks' && <EditPageResourcePacks id={id} />}
         {page === 'worlds' && <EditPageWorlds id={id} />}
-        {page === 'advanced' && <EditPageAdvanced id={id} />}
+        {page === 'settings' && <EditPageSettings id={id} />}
       </CC>
     </BG>
   );
