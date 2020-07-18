@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Button, TextInput, Detail } from '@theemeraldtree/emeraldui';
+import { Button, TextInput, Detail, InputHolder } from '@theemeraldtree/emeraldui';
 import styled from 'styled-components';
 import transition from 'styled-transition-group';
 import SearchBox from '../../component/searchbox/searchbox';
@@ -18,9 +18,10 @@ const CreateOverlay = transition.div`
   right: 20px;
   width: 300px;
   height: 209px;
-  background: #2d2d2d;
-  box-shadow: 0px 0px 6px 3px rgba(0, 0, 0, 0.35);
+  background: #333;
+  box-shadow: 0px 0px 14px 4px rgba(0,0,0,0.35);
   padding: 5px;
+  border-radius: 10px;
   input {
     width: 290px;
   }
@@ -51,16 +52,6 @@ const CreateOverlay = transition.div`
     top: 90px;
     transition: 150ms ease-in;
   }
-
-  &::before {
-    content: " ";
-    position: absolute;
-    top: -30px;
-    right: 0;
-    border-width: 15px;
-    border-style: solid;
-    border-color: transparent transparent #2d2d2d transparent;
-  }
 `;
 
 const CreateControls = styled.div`
@@ -72,11 +63,9 @@ const CreateControls = styled.div`
   }
 `;
 
-const Rounded = styled.div`
-  border-radius: 5px;
-  display: flex;
-  overflow: hidden;
+const IH = styled(InputHolder)`
   button {
+    height: 32px;
     padding: 2px 10px;
   }
 `;
@@ -101,7 +90,7 @@ export default withRouter(({ history }) => {
   }, []);
 
   useEffect(() => {
-    const handleClick = (e) => {
+    const handleClick = e => {
       if (createRef.current && !createRef.current.contains(e.target)) {
         setShowCreate(false);
       }
@@ -130,7 +119,7 @@ export default withRouter(({ history }) => {
 
   useEffect(() => {
     header.setChildren(
-      <Rounded>
+      <IH text>
         <SearchBox
           value={searchTerm}
           type="text"
@@ -140,7 +129,7 @@ export default withRouter(({ history }) => {
         <Button onClick={() => createClick()} color="green">
           +
         </Button>
-      </Rounded>
+      </IH>
     );
   }, [searchTerm]);
 

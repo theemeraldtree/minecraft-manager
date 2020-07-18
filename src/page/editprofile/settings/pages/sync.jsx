@@ -205,17 +205,17 @@ export default function Sync(params) {
         <>
           <InputHolder>
             <Checkbox lighter checked={syncOptionsTXT} onClick={syncOptionsTXTClick} />
-            Sync in-game Minecraft Options with this profile
+            Sync in-game Minecraft Options with this instance
           </InputHolder>
 
           <InputHolder>
             <Checkbox lighter checked={syncOptionsOF} onClick={syncOptionsOFClick} />
-            Sync in-game OptiFine Options with this profile
+            Sync in-game OptiFine Options with this instance
           </InputHolder>
 
           <InputHolder>
             <Checkbox lighter checked={syncServers} onClick={syncServersClick} />
-            Sync in-game Server List with this profile
+            Sync in-game Server List with this instance
           </InputHolder>
           <br />
         </>

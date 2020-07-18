@@ -169,7 +169,7 @@ function Accounts({ theme }) {
   };
 
   const clickHelp = () => {
-    AlertManager.messageBox('accounts help', 'Before you launch Minecraft, you\'ll need to add your Mojang account. Your account email, username, and password are never sent to anyone besides Mojang.<br><br>If you have Launcher Integration enabled, Minecraft Manager may import accounts from the regular launcher');
+    AlertManager.messageBox('accounts help', 'Before you launch Minecraft, you\'ll need to add your Mojang account. Your account email, username, and password are only sent to Mojang.<br><br>If you have Launcher Integration enabled, Minecraft Manager may import accounts from the regular launcher');
   };
 
   return (

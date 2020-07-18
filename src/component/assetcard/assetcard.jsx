@@ -19,8 +19,8 @@ const shrinkAnim = keyframes`
   }
 `;
 
-const BG = styled.div`
-  margin-top: 4px;
+const Container = styled.div`
+  margin-top: 6px;
   display: flex;
   width: 100%;
   height: 90px;
@@ -34,6 +34,7 @@ const BG = styled.div`
   overflow: hidden;
   flex-shrink: 0;
   transition: 150ms;
+  border-radius: 10px;
   ${props =>
     !props.disableHover &&
     css`
@@ -65,9 +66,11 @@ const Image = styled.div.attrs(props => ({
     backgroundImage: `url('${props.src}')`
   }
 }))`
-  width: 90px;
-  height: 90px;
-  background-size: contain;
+  width: 85px;
+  height: 85px;
+  background-size: 85px;
+  margin: 3px;
+  border-radius: 10px;
   background-repeat: no-repeat;
   background-position: center;
   flex-shrink: 0;
@@ -126,13 +129,14 @@ const Version = styled.p`
 const Buttons = styled.div`
   display: flex;
   flex-flow: row;
-  right: 0;
-  bottom: 0;
+  right: 10px;
+  bottom: 10px;
   position: absolute;
 
   button {
     padding: 7px;
     font-size: 11pt;
+    border-radius: 5px;
   }
 `;
 
@@ -147,8 +151,8 @@ const Details = styled.div`
 const ExtraInfo = styled.div`
   color: #dbdbdb;
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: 10px;
+  right: 10px;
   text-align: right;
   display: flex;
   align-items: center;
@@ -186,7 +190,7 @@ const AssetCard = ({
   return (
     <>
       <ContextMenuTrigger holdToDisplay={-1} id={`assetcard${asset.id}`}>
-        <BG
+        <Container
           disableHover={disableHover}
           tabIndex={disableHover ? -1 : 0}
           data-cachedid={asset.cachedID}
@@ -238,30 +242,30 @@ const AssetCard = ({
             )}
 
             {showInstall && (installed || progressState.progress === 'installed') && (
-              <Button disabled color="green">
+              <Button disabled color="#0e6f1e">
                 installed
               </Button>
             )}
 
             {showInstall && !installed && !progressState.progress && (
-              <Button color="green" onClick={installClick}>
+              <Button color="#0e6f1e" onClick={installClick}>
                 install
               </Button>
             )}
 
             {showInstall && !installed && progressState.progress === 'notavailable' && (
-              <Button color="green" disabled>
+              <Button color="#0e6f1e" disabled>
                 not available
               </Button>
             )}
 
             {progressState.progress === 'installing' && !installed && showInstall && (
-              <Button color="green" disabled>
+              <Button color="#0e6f1e" disabled>
                 <Spinner />
               </Button>
             )}
           </Buttons>
-        </BG>
+        </Container>
       </ContextMenuTrigger>
       <ContextMenu holdToDisplay={-1} id={`assetcard${asset.id}`}>
         <>
@@ -320,7 +324,7 @@ const AssetCard = ({
                     shell.openExternal(`https://minecraft.curseforge.com/projects/${asset.hosts.curse.id}`)
                   }
                 >
-                  View
+                  View in Browser
                 </MenuItem>
 
                 <MenuItem

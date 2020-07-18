@@ -130,7 +130,7 @@ export default class UpdateOverlay extends Component {
           {displayState === 'done' && (
             <>
               <Title>done</Title>
-              <Subtext>The profile update is complete</Subtext>
+              <Subtext>The instance update is complete</Subtext>
               <ButtonsContainer>
                 <Button onClick={cancelClick} color="green">
                   ok
@@ -140,7 +140,7 @@ export default class UpdateOverlay extends Component {
           )}
           {displayState === 'main' && isHosted && (
             <>
-              {displayState !== 'done' && <Title>update your profile</Title>}
+              {displayState !== 'done' && <Title>update your instance</Title>}
               {!noUpdates && !updateAvailable && !noConnection && <Subtext>Checking for updates...</Subtext>}
               {noUpdates && !noConnection && <Subtext>You have the latest version. No update is available</Subtext>}
               {noConnection && <Subtext>Unable to check for updates. Check your internet connection, and try again.</Subtext>}
@@ -178,7 +178,7 @@ export default class UpdateOverlay extends Component {
           {!isHosted && (
             <>
               <Title>cannot update</Title>
-              <Subtext>This profile was not downloaded from Discover. It cannot be updated.</Subtext>
+              <Subtext>This instance was not downloaded from Discover. It cannot be updated.</Subtext>
               <ButtonsContainer>
                 <Button color="green" onClick={cancelClick}>
                   close

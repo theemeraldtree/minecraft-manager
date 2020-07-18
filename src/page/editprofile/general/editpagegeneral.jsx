@@ -189,7 +189,7 @@ const EditPageGeneral = ({ id, history, theme }) => {
           <>
             <AboutContainer>
               <div>
-                <Detail>profile icon</Detail>
+                <Detail>icon</Detail>
                 <IconWrapper disabled={profile.isDefaultProfile} onClick={changeIcon}>
                   <Icon src={`file:///${profile.iconPath}#${new Date().getTime()}`} />
                 </IconWrapper>
@@ -199,8 +199,8 @@ const EditPageGeneral = ({ id, history, theme }) => {
               </div>
               <AboutRight>
                 <div>
-                  <Detail>profile name</Detail>
-                  <InputHolder>
+                  <Detail>name</Detail>
+                  <InputHolder text>
                     <TextInput
                       disabled={profile.isDefaultProfile}
                       value={nameValue}
@@ -214,7 +214,7 @@ const EditPageGeneral = ({ id, history, theme }) => {
                 </div>
                 <div>
                   <DescContainer>
-                    <Detail>blurb</Detail>
+                    <Detail>summary</Detail>
                     <TextBox
                       defaultValue={profile.blurb}
                       onChange={blurbChange}

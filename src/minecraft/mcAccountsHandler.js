@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+  import { v4 as uuidv4 } from 'uuid';
 import jimp from 'jimp';
 import fs from 'fs';
 import SettingsManager from '../manager/settingsManager';
@@ -70,12 +70,14 @@ const MCAccountsHandler = {
         },
         username: email,
         password,
-        clientToken: this.getClientToken()
+        clientToken: this.getClientToken(),
+        requestUser: true
       }).then(async respA => {
         const resp = respA.data;
 
         // extra information (such as whether the account is paid, legacy, migrated, suspended, or other info)
-        // is not presesnt for some reason; https://wiki.vg/Authentication
+        // is not present for some reason; https://wiki.vg/Authentication
+        // if you're reading this and the problem has been solved and paid is now returned, PLEASE FIX!!
 
         const name = resp.selectedProfile.name;
         const uuid = resp.selectedProfile.id;

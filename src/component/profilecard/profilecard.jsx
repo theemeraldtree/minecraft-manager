@@ -188,13 +188,13 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate, sh
               <MenuItem onClick={() => history.push(`/edit/general/${profile.id}`)}>General</MenuItem>
               {!profile.isDefaultProfile && (
                 <>
-                  <MenuItem onClick={() => history.push(`/edit/versions/${profile.id}`)}>Version</MenuItem>
+                  <MenuItem onClick={() => history.push(`/edit/version/${profile.id}`)}>Version</MenuItem>
                   <MenuItem onClick={() => history.push(`/edit/mods/${profile.id}`)}>Mods</MenuItem>
                 </>
               )}
               <MenuItem onClick={() => history.push(`/edit/worlds/${profile.id}`)}>Worlds</MenuItem>
               <MenuItem onClick={() => history.push(`/edit/resourcepacks/${profile.id}`)}>Resource Packs</MenuItem>
-              <MenuItem onClick={() => history.push(`/edit/advanced/${profile.id}`)}>Settings</MenuItem>
+              <MenuItem onClick={() => history.push(`/edit/settings/${profile.id}`)}>Settings</MenuItem>
             </SubMenu>
 
             {!profile.isDefaultProfile && (
@@ -217,7 +217,7 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate, sh
         {!profile.error && profile.state !== 'installing' && (
           <>
             <MenuItem divider />
-            <MenuItem onClick={() => profile.openGameDir()}>Open Profile Folder</MenuItem>
+            <MenuItem onClick={() => profile.openGameDir()}>Open Instance Folder</MenuItem>
           </>
         )}
         {!profile.error && profile.state !== 'installing' && profile.hosts.curse && (

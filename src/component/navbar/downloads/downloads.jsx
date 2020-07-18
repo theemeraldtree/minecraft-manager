@@ -87,12 +87,13 @@ const DownloadsOverlay = styled.div`
   display: flex;
   flex-flow: column;
   animation: 150ms ${slideIn} linear;
+  border-radius: 10px;
 `;
 
 const Title = styled.p`
-  font-size: 21pt;
+  font-size: 16pt;
   margin: 5px;
-  font-weight: 200;
+  font-weight: 900;
 `;
 
 const List = styled.div`
@@ -152,7 +153,7 @@ export default class Downloads extends Component {
         <AnimationBar active={downloadsList.length} />
         {this.state.showOverlay && (
           <DownloadsOverlay>
-            <Title>downloads</Title>
+            <Title>Active Downloads</Title>
             <List>
               {downloadsList.map(download => (
                 <DownloadItem key={download.name} download={download} />

@@ -19,7 +19,7 @@ const Container = styled.div`
 const Title = styled.p`
   color: white;
   margin: 0;
-  margin-left: 10px;
+  margin-left: 15px;
   font-size: 18pt;
   font-weight: 900;
   transition: 150ms;

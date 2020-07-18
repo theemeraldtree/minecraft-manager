@@ -23,8 +23,8 @@ const List = styled.div`
   flex: 1 1 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 10px;
-  padding-top: 0;
+  margin: 0 10px;
+  padding: 0 5px;
   &::-webkit-scrollbar-track {
     background: transparent;
   }
@@ -44,12 +44,16 @@ const Persists = styled.p`
 `;
 
 const Header = styled.div`
-  margin: 10px;
-  margin-bottom: 0;
+  margin: 10px 20px 0 20px;
   flex-shrink: 0;
 
   & > div {
     display: inline-flex;
+    border-radius: 5px;
+    margin: 0;
+    & > div {
+      border-radius: 5px;
+    }
   }
 `;
 

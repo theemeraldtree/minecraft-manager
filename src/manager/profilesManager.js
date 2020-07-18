@@ -292,8 +292,8 @@ const ProfilesManager = {
         name,
         icon: 'icon.png',
         omafVersion: Global.OMAF_VERSION,
-        description: 'Minecraft Manager Profile',
-        blurb: 'Minecraft Manager Profile',
+        description: 'Minecraft Manager Instance',
+        blurb: 'Minecraft Manager Instance',
         version: {
           displayName: '1.0.0',
           timestamp: new Date().getTime(),

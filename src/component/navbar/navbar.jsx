@@ -75,7 +75,7 @@ const WindowButton = styled.div`
   height: 30px;
   z-index: 20;
   top: 0;
-  background-color: black;
+  background-color: #0e0e0e;
   background-size: 13px;
   background-position: center;
   background-repeat: no-repeat;

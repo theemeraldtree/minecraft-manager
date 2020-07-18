@@ -35,7 +35,7 @@ export default function Other(args) {
       <Panel>
         <h3>Advanced Info</h3>
         <Button color="red" onClick={() => profile.openGameDir()}>
-          open profile folder
+          open instance folder
         </Button>
 
         <Detail>internal id: {profile.id}</Detail>
@@ -67,7 +67,7 @@ export default function Other(args) {
           open subAssets/worlds.json
         </Button>
         <Button color="red" onClick={() => remote.shell.openExternal(profile.profilePath)}>
-          open OMAF data folder
+          open data folder
         </Button>
       </Panel>
     </>

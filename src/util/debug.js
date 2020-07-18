@@ -49,8 +49,8 @@ Begin Minecraft Manager Data Dump
 =======
 
 Minecraft Manager Version ${Global.MCM_VERSION} ${Global.MCM_RELEASE_DATE}
-Implementing OMAF Version ${Global.OMAF_VERSION}
-
+Implementing OMAF Format Version ${Global.OMAF_VERSION}
+MCM Format Version ${Global.MCM_PROFILE_VERSION}
 Directory Locations
 ---
 MCM_PATH: ${Global.MCM_PATH}
@@ -136,7 +136,7 @@ LAUNCHER INTREGRATION: DISABLED
 `}
 
 All Minecraft Manager Settings:
-${JSON.stringify(SettingsManager.currentSettings.launcherIntegration)}
+${JSON.stringify(SettingsManager.currentSettings)}
 =======
 End Minecraft Manager Data Dump
 =======`;
