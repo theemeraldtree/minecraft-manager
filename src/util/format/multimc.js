@@ -1,11 +1,11 @@
 import path from 'path';
 import fs from 'fs';
-import Global from './global';
-import FSU from './fsu';
-import ForgeFramework from '../framework/forge/forgeFramework';
-import FabricFramework from '../framework/fabric/fabricFramework';
-import ProfilesManager from '../manager/profilesManager';
-import logInit from './logger';
+import Global from '../global';
+import FSU from '../fsu';
+import ForgeFramework from '../../framework/forge/forgeFramework';
+import FabricFramework from '../../framework/fabric/fabricFramework';
+import ProfilesManager from '../../manager/profilesManager';
+import logInit from '../logger';
 
 const AdmZip = require('adm-zip');
 

@@ -11,7 +11,7 @@ import OMAFFileAsset from '../type/omafFileAsset';
 import World from '../type/world';
 import logInit from '../util/logger';
 import FSU from '../util/fsu';
-import Twitch from '../util/twitch';
+import Twitch from '../util/format/twitch';
 
 const logger = logInit('Hosts');
 

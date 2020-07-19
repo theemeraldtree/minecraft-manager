@@ -269,7 +269,13 @@ const ProfilesManager = {
     logger.info('Starting profile creation...');
 
     const id = Global.createID(name);
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
+      const existing = this.getProfileFromID(id);
+      if (existing) {
+        reject(new Error(`An instance with the ID of "${id}" already exists`));
+        return;
+      }
+
       logger.info('Creating directories for new profile...');
 
       fs.mkdirSync(path.join(Global.PROFILES_PATH, id));

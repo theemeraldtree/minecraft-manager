@@ -45,12 +45,14 @@ const Downloader = {
         DownloadsManager.setDownloadProgress(download.name, Math.floor((numberFinished / assets.length) * 100));
       };
 
-      await pMap(assets, rawAsset => new Promise(async res => {
+      await pMap(assets, rawAsset => new Promise(async (res, rej) => {
         let asset = rawAsset;
         if (!asset.name && host === 'curse') {
           asset = await Curse.getFullAsset(asset);
           asset.hosts.curse.fileID = rawAsset.hosts.curse.fileID;
         }
+
+        try {
           await Hosts.installAssetVersionToProfile(
             host,
             profile,
@@ -61,6 +63,9 @@ const Downloader = {
 
           updateProgress();
           res();
+        } catch (e) {
+          rej(e);
+        }
         }), { concurrency: 10 });
 
       DownloadsManager.removeDownload(download.name);

@@ -120,6 +120,9 @@ export default withRouter(({ history }) => {
   useEffect(() => {
     header.setChildren(
       <IH text>
+        <Button onClick={() => setShowImport(true)} color="purple">
+          import
+        </Button>
         <SearchBox
           value={searchTerm}
           type="text"

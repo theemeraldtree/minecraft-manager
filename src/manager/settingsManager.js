@@ -4,8 +4,6 @@ import path from 'path';
 import { remote } from 'electron';
 import LauncherManager from './launcherManager';
 import logInit from '../util/logger';
-import ToastManager from './toastManager';
-import Global from '../util/global';
 
 const logger = logInit('SettingsManager');
 

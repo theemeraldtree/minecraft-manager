@@ -1,5 +1,6 @@
 import path from 'path';
 import AdmZip from 'adm-zip';
+import fs from 'fs';
 import VersionsManager from '../../manager/versionsManager';
 import LibrariesManager from '../../manager/librariesManager';
 import DownloadsManager from '../../manager/downloadsManager';
@@ -39,7 +40,7 @@ const ForgeFramework = {
         let downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`;
         if (mcversion === '1.7.10') {
           downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-1.7.10/forge-${profile.frameworks.forge.version}-1.7.10-installer.jar`;
-        } else if (mcversion === '1.8.9' || mcversion === '1.8.8' || mcversion === '1.8') {
+        } else if (mcversion === '1.8.9') {
           downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}-${mcversion}/forge-${profile.frameworks.forge.version}-${mcversion}-installer.jar`;
         }
 
@@ -56,7 +57,26 @@ const ForgeFramework = {
 
 
           const zip = new AdmZip(tempJarPath);
-          zip.extractEntryTo(`maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}.jar`, forgePath, false, true);
+
+          const mavenUniversalPath = `maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}.jar`;
+          let rootUniversalPath = `forge-${profile.frameworks.forge.version}-universal.jar`;
+
+          if (
+            mcversion === '1.7.10' ||
+            mcversion === '1.8.9'
+          ) {
+            rootUniversalPath = `forge-${profile.frameworks.forge.version}-${mcversion}-universal.jar`;
+          }
+
+          const entryNames = zip.getEntries().map(entry => entry.name);
+
+
+          if (entryNames.includes(mavenUniversalPath)) {
+            zip.extractEntryTo(mavenUniversalPath, forgePath, false, true);
+          } else if (entryNames.includes(rootUniversalPath)) {
+            zip.extractEntryTo(rootUniversalPath, forgePath, false, true);
+            fs.renameSync(path.join(forgePath, rootUniversalPath), forgeJarPath);
+          }
 
           logger.info('Exctracting Version JSON');
           const versionJSON = this.extractVersionJSON(zip);

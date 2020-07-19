@@ -1,17 +1,17 @@
 import path from 'path';
 import fs from 'fs';
 import ADMZip from 'adm-zip';
-import Global from './global';
-import logInit from './logger';
-import FSU from './fsu';
-import Curse from '../host/curse/curse';
-import HTTPRequest from '../host/httprequest';
-import Downloader from './downloader';
-import ProfilesManager from '../manager/profilesManager';
-import DownloadsManager from '../manager/downloadsManager';
-import ForgeFramework from '../framework/forge/forgeFramework';
-import SettingsManager from '../manager/settingsManager';
-import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
+import Global from '../global';
+import logInit from '../logger';
+import FSU from '../fsu';
+import Curse from '../../host/curse/curse';
+import HTTPRequest from '../../host/httprequest';
+import Downloader from '../downloader';
+import ProfilesManager from '../../manager/profilesManager';
+import DownloadsManager from '../../manager/downloadsManager';
+import ForgeFramework from '../../framework/forge/forgeFramework';
+import SettingsManager from '../../manager/settingsManager';
+import MCLauncherIntegrationHandler from '../../minecraft/mcLauncherIntegrationHandler';
 
 const logger = logInit('Twitch-Compat');
 
@@ -70,7 +70,14 @@ const Twitch = {
           // Let's create the profile
           const { hostedAsset } = extraData;
           const name = hostedAsset ? hostedAsset.name : manifest.name;
-          const profile = await ProfilesManager.createProfile(name, manifest.minecraft.version);
+
+          let profile;
+          try {
+            profile = await ProfilesManager.createProfile(name, manifest.minecraft.version);
+          } catch (e) {
+            // Error creating profile
+            reject(e);
+          }
 
           if (hostedAsset) {
             updateState('Assigning data...');

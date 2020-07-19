@@ -6,11 +6,10 @@ import { Button } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../manager/profilesManager';
 import Overlay from '../overlay/overlay';
 import AlertBackground from '../alert/alertbackground';
-import HeaderButton from '../headerButton/headerButton';
-import MultiMC from '../../util/multimc';
-import Twitch from '../../util/twitch';
+import Twitch from '../../util/format/twitch';
 import Global from '../../util/global';
 import Scanner from '../../util/scanner/scanner';
+import FormatImporter from '../../util/format/formatImporter';
 
 const { dialog } = require('electron').remote;
 
@@ -52,19 +51,12 @@ const ButtonContainer = styled.div`
   align-items: center;
 `;
 
-const HBWrapper = styled.div`
-  margin-top: 5px;
-  margin-bottom: 5px;
-  min-height: 46px;
-`;
-
 export default class ImportOverlay extends Component {
   constructor(props) {
     super(props);
     this.state = {
       updateState: '',
-      error: '',
-      displayState: 'omaf'
+      error: ''
     };
   }
 
@@ -81,32 +73,13 @@ export default class ImportOverlay extends Component {
       buttonLabel: 'Import',
       filters: [
         {
-          name: 'Minecraft Java Profile',
-          extensions: ['mcjprofile']
+          name: 'Importable Filetype',
+          extensions: ['mcjprofile', 'zip']
         }
       ]
     });
     if (p && p[0]) {
-      ProfilesManager.importProfile(p[0], this.stateChange)
-        .then(this.done)
-        .catch(this.error);
-    }
-  };
-
-  chooseFileMMC = () => {
-    const p = dialog.showOpenDialogSync({
-      title: 'Choose a file to import',
-      buttonLabel: 'Import',
-      filters: [
-        {
-          name: 'MultiMC zip',
-          extensions: ['zip']
-        }
-      ]
-    });
-
-    if (p && p[0]) {
-      MultiMC.import(p[0], this.stateChange)
+      FormatImporter.importFile(p[0], this.stateChange)
         .then(this.done)
         .catch(this.error);
     }
@@ -142,24 +115,6 @@ export default class ImportOverlay extends Component {
       .catch(this.error);
   };
 
-  switchOMAF = () => {
-    this.setState({
-      displayState: 'omaf'
-    });
-  };
-
-  switchMMC = () => {
-    this.setState({
-      displayState: 'mmc'
-    });
-  };
-
-  switchTwitch = () => {
-    this.setState({
-      displayState: 'twitch'
-    });
-  }
-
   chooseFileTwitch = () => {
     const p = dialog.showOpenDialogSync({
       title: 'Choose a file to import',
@@ -184,8 +139,7 @@ export default class ImportOverlay extends Component {
       this.setState({
         error: '',
         showError: false,
-        updateState: false,
-        displayState: 'omaf'
+        updateState: false
       });
     }, 150);
 
@@ -193,7 +147,7 @@ export default class ImportOverlay extends Component {
   }
 
   render() {
-    const { updateState, showError, error, displayState } = this.state;
+    const { updateState, showError, error } = this.state;
     const { file } = this.props;
 
     return (
@@ -201,65 +155,22 @@ export default class ImportOverlay extends Component {
         <BG>
           {!updateState && !showError && !file && <Title>import a profile</Title>}
           {!updateState && !showError && !file && (
-            <HBWrapper>
-              <HeaderButton active={displayState === 'omaf'} onClick={this.switchOMAF}>
-                OMAF .mcjprofile
-              </HeaderButton>
-              <HeaderButton active={displayState === 'mmc'} onClick={this.switchMMC}>
-                MultiMC .zip
-              </HeaderButton>
-              <HeaderButton active={displayState === 'twitch'} onClick={this.switchTwitch}>
-                Twitch .zip
-              </HeaderButton>
-            </HBWrapper>
-          )}
-
-          {displayState === 'omaf' && !updateState && !showError && !file && (
             <>
               <Subtext>
-                Choose the <b>.mcjprofile</b> file that you would like to import
+                Choose the file you'd like to import. Minecraft Manager suports <b>.mcjprofile</b>, <b>Twitch zips</b>, <b>MultiMC zips</b>, and <b>Packwiz zips</b>
               </Subtext>
-              <ButtonContainer>
-                <BTN onClick={this.clickCancel} color="red">
-                  cancel
-                </BTN>
-                <BTN onClick={this.chooseFile} color="green">
-                  choose a file
-                </BTN>
-              </ButtonContainer>
             </>
           )}
 
-          {displayState === 'mmc' && !updateState && !showError && !file && (
-            <>
-              <Subtext>
-                Choose the MultiMC <b>.zip</b> file that you would like to import
-              </Subtext>
-              <ButtonContainer>
-                <BTN onClick={this.clickCancel} color="red">
-                  cancel
-                </BTN>
-                <BTN onClick={this.chooseFileMMC} color="green">
-                  choose a file
-                </BTN>
-              </ButtonContainer>
-            </>
-          )}
-
-          {displayState === 'twitch' && !updateState && !showError && !file && (
-            <>
-              <Subtext>
-                Choose the Twitch <b>.zip</b> file that you would like to import
-              </Subtext>
-              <ButtonContainer>
-                <BTN onClick={this.clickCancel} color="red">
-                  cancel
-                </BTN>
-                <BTN onClick={this.chooseFileTwitch} color="green">
-                  choose a file
-                </BTN>
-              </ButtonContainer>
-            </>
+          {!updateState && !showError && (
+          <ButtonContainer>
+            <BTN onClick={this.clickCancel} color="red">
+              cancel
+            </BTN>
+            <BTN onClick={this.chooseFile} color="green">
+              choose a file
+            </BTN>
+          </ButtonContainer>
           )}
 
           {file && !updateState && !showError && (
@@ -295,7 +206,7 @@ export default class ImportOverlay extends Component {
             <>
               <Title>importing...</Title>
               <Subtext>{updateState}</Subtext>
-              <Subtext>To check progress, open the Downloads viewer in the sidebar</Subtext>
+              <Subtext>To check progress, open the Downloads viewer</Subtext>
             </>
           )}
         </BG>
