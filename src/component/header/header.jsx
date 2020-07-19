@@ -11,8 +11,8 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   white-space: nowrap;
-  border-radius: 20px 20px 0 0;
-  width: calc(100% - 20px);
+  border-radius: 10px 10px 0 0;
+  width: 100%;
   overflow: hidden;
 `;
 

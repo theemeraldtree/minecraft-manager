@@ -49,11 +49,7 @@ const Header = styled.div`
 
   & > div {
     display: inline-flex;
-    border-radius: 5px;
     margin: 0;
-    & > div {
-      border-radius: 5px;
-    }
   }
 `;
 

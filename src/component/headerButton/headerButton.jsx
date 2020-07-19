@@ -7,6 +7,7 @@ const HeaderButtonBase = styled(Button)`
   && {
     background-color: #404040;
     border: 0;
+    border-radius: 0;
     &:hover {
       transform: scale(1);
       filter: brightness(1);

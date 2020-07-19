@@ -255,6 +255,7 @@ function Java({ theme, profileScope }) {
         cancelClick={() => setShowJavaDialog(false)}
         installClick={installJavaClick}
         name="Java"
+        simpleText="The latest version of Java 8 will be installed."
         show={showJavaDialog}
         versions={javaVersions}
         getVersions={getJavaVersions}

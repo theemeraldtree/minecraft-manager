@@ -20,7 +20,7 @@ const shrinkAnim = keyframes`
 `;
 
 const Container = styled.div`
-  margin-top: 6px;
+  margin-top: 4px;
   display: flex;
   width: 100%;
   height: 90px;
@@ -34,14 +34,11 @@ const Container = styled.div`
   overflow: hidden;
   flex-shrink: 0;
   transition: 150ms;
-  border-radius: 10px;
-  ${props =>
-    !props.disableHover &&
-    css`
+  border-radius: 5px;
+  ${props => !props.disableHover && css`
       cursor: pointer;
       &:hover {
         background-color: #414141;
-        transform: scale(1.02);
       }
     `}
   &:focus-visible {
@@ -70,7 +67,7 @@ const Image = styled.div.attrs(props => ({
   height: 85px;
   background-size: 85px;
   margin: 3px;
-  border-radius: 10px;
+  border-radius: 5px;
   background-repeat: no-repeat;
   background-position: center;
   flex-shrink: 0;

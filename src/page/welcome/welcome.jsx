@@ -16,7 +16,6 @@ import PathInput from '../settings/components/pathInput';
 import QuestionButton from '../../component/questionButton/questionButton';
 import Gap from '../settings/components/gap';
 import SettingsManager from '../../manager/settingsManager';
-import Analytics from '../../util/analytics';
 import AlertManager from '../../manager/alertManager';
 import LatestProfile from '../../defaultProfiles/latestProfile';
 import SnapshotProfile from '../../defaultProfiles/snapshotProfile';
@@ -144,7 +143,6 @@ function WelcomePage({ theme, history }) {
   const [enableLauncherIntegration, setEnableLauncherIntegration] = useState(false);
   const [mcHome, setMCHome] = useState('');
   const [mcExe, setMCExe] = useState('');
-  const [enableAnalytics, setEnableAnalytics] = useState(true);
   const [settingUp, setSettingUp] = useState(true);
   const [setupError, setSetupError] = useState(false);
   const [errorHappened, setErrorHappened] = useState(false);
@@ -187,13 +185,10 @@ function WelcomePage({ theme, history }) {
     mkdirp.sync(path.join(Global.MCM_PATH, '/shared/assets'));
 
     SettingsManager.currentSettings.launcherIntegration = enableLauncherIntegration;
-    SettingsManager.currentSettings.analyticsEnabled = enableAnalytics;
     SettingsManager.currentSettings.lastVersion = Global.MCM_VERSION;
     SettingsManager.currentSettings.runLatestInIntegrated = true;
 
     SettingsManager.save();
-
-    if (enableAnalytics) Analytics.send('first-install');
 
     const versions = await Global.updateMCVersions(true);
 
@@ -280,8 +275,6 @@ function WelcomePage({ theme, history }) {
       setMCExe(p[0]);
     }
   };
-
-  const clickAnalytics = () => setEnableAnalytics(!enableAnalytics);
 
   const finish = () => {
     history.push('/');
@@ -386,21 +379,6 @@ function WelcomePage({ theme, history }) {
           </Container>
 
           <Container in={step === 3} timeout={500} unmountOnExit>
-            <WelcomeContainer>
-              <h1>Analytics</h1>
-              <h2>Minecraft Manager includes anonymous,<br />privacy-respecting analytics.<br /><br />Do you want these enabled?</h2>
-              <InputHolder>
-                <ToggleSwitch value={enableAnalytics} onClick={clickAnalytics} />
-                <Detail>Enable Analytics</Detail>
-              </InputHolder>
-
-              <Gap />
-
-              <Button disabled={step !== 3} color="green" onClick={nextStep}>Continue</Button>
-            </WelcomeContainer>
-          </Container>
-
-          <Container in={step === 4} timeout={500} unmountOnExit>
             <WelcomeContainer>
               {!setupError && <h1>All Done!</h1>}
               {setupError && <h1>Uh oh!</h1>}

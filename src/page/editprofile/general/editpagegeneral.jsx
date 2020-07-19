@@ -43,6 +43,9 @@ const IconWrapper = styled.button`
   cursor: pointer;
   flex-flow: column;
   position: relative;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  
   div {
     width: 60px;
     text-align: center;
@@ -65,6 +68,8 @@ const ResetIconButton = styled(Button)`
     width: 150px;
     padding: 11.5px 0;
     text-align: center;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 `;
 

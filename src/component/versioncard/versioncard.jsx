@@ -8,9 +8,9 @@ import Global from '../../util/global';
 
 const BG = styled.div`
   margin-top: 5px;
-  width: 100%;
   height: 90px;
   display: flex;
+  border-radius: 10px;
   background-color: #404040;
   flex-flow: column;
   user-select: none;

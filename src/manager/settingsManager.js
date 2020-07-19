@@ -85,13 +85,6 @@ const SettingsManager = {
           this.currentSettings.accounts = [];
         }
 
-        if (this.currentSettings.analyticsEnabled === undefined && fs.existsSync(Global.PROFILES_PATH)) {
-          logger.info('Showing analytics message');
-          this.currentSettings.analyticsEnabled = true;
-          ToastManager.createToast('Analytics', 'Minecraft Manager 2.4.3 includes new privacy-respecting analytics. If you want to turn them off, go to Settings');
-          this.save();
-        }
-
         logger.info('Finished loading settings');
         resolve();
       });

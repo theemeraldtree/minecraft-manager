@@ -35,7 +35,7 @@ function General() {
           <Detail>Show Latest Snapshot Profile</Detail>
         </div>
         <Description>
-          Enables the Latest Snapshot Profile, which runs the latest Minecraft Snapshot. Snapshots may be unstable and buggy.
+          Enables the Latest Snapshot Profile, which runs the latest Minecraft Snapshot. Snapshots may be unstable and contain bugs.
         </Description>
       </InputHolder>
 
@@ -52,22 +52,6 @@ function General() {
         </div>
         <Description>
           News snippets may include Minecraft Manager news or fun announcements.
-        </Description>
-      </InputHolder>
-
-      <SettingSeperator />
-
-      <InputHolder vertical>
-        <div>
-          <ToggleSwitch
-            value={SettingsManager.currentSettings.analyticsEnabled}
-            onClick={() => toggleSetting('analyticsEnabled')}
-          />
-          <Detail>Enable Analytics</Detail>
-        </div>
-        <Description>
-          Minecraft Manager contains fully-anonymous, privacy respecting analytics.
-          No system information, or data of any kind is sent to Minecraft Manager or theemeraldtree.
         </Description>
       </InputHolder>
 

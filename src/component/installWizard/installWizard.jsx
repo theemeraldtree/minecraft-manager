@@ -93,7 +93,7 @@ const TryAgain = styled.p`
 `;
 
 
-export default function InstallWizard({ show, name, cancelClick, installClick, versions, getVersions }) {
+export default function InstallWizard({ show, name, simpleText, cancelClick, installClick, versions, getVersions }) {
   const [displayState, setDisplayState] = useState('simple');
   const [allVersions, setAllVersions] = useState([]);
 
@@ -133,7 +133,7 @@ export default function InstallWizard({ show, name, cancelClick, installClick, v
         <Container>
           {displayState === 'simple' && (
             <>
-              <p>The Latest version of {name} will be installed.</p>
+              <p>{simpleText || `The Latest version of ${name} will be installed.`}</p>
               <ButtonHolder>
                 <Button onClick={cancelClick} color="red">
                   cancel
@@ -191,6 +191,7 @@ export default function InstallWizard({ show, name, cancelClick, installClick, v
 
 InstallWizard.propTypes = {
   name: PropTypes.string,
+  simpleText: PropTypes.string,
   show: PropTypes.bool,
   cancelClick: PropTypes.func,
   installClick: PropTypes.func,

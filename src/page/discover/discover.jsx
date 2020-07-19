@@ -1,10 +1,20 @@
 import React, { useState, useEffect, useContext, useReducer } from 'react';
+import styled from 'styled-components';
 import DiscoverList from '../../component/discoverlist/discoverlist';
 import ProfilesManager from '../../manager/profilesManager';
 import Hosts from '../../host/Hosts';
 import NavContext from '../../navContext';
 import SearchBox from '../../component/searchbox/searchbox';
 import ToastManager from '../../manager/toastManager';
+
+const Container = styled.div`
+  width: calc(100% - 20px);
+  padding-left: 10px;
+  padding-bottom: 0;
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+`;
 
 export default function DiscoverPage() {
   const [forceUpdateNumber, forceUpdate] = useReducer(x => x + 1, 0);
@@ -96,7 +106,7 @@ export default function DiscoverPage() {
   }, [searchValue]);
 
   return (
-    <>
+    <Container>
       <DiscoverList
         host="curse"
         mcVerFilter="All"
@@ -109,6 +119,6 @@ export default function DiscoverPage() {
         searchTerm={searchTerm}
         forceUpdate={forceUpdateNumber}
       />
-    </>
+    </Container>
   );
 }

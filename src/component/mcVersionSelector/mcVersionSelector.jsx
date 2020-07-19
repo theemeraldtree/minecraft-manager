@@ -30,6 +30,7 @@ const Container = styled.div`
     font-size: 13pt;
     width: 100%;
     max-width: 242px;
+    border-radius: 0;
   }
 
   button {
@@ -37,11 +38,9 @@ const Container = styled.div`
     background: #6e6e6e;
   }
 
-  ${props =>
-    props.open &&
-    css`
+  ${props => props.open && css`
       height: 300px;
-    `}
+  `}
 `;
 
 const OptionsButton = styled.button`

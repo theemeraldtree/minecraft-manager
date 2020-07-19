@@ -14,7 +14,6 @@ import OMAFFileAsset from '../type/omafFileAsset';
 import FileScanner from './fileScanner';
 import World from '../type/world';
 import logInit from './logger';
-import Analytics from './analytics';
 import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
 import JavaHandler from '../minecraft/javaHandler';
 import MCVersionHandler from '../minecraft/mcVersionHandler';
@@ -112,8 +111,7 @@ const Global = {
   checkChangelog() {
     const version = SettingsManager.currentSettings.lastVersion;
     if (!version || (semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1)) {
-      Analytics.send('update');
-      AlertManager.messageBox(
+          AlertManager.messageBox(
         `welcome to minecraft manager ${this.MCM_VERSION}`,
         `<div style="overflow-y: auto; max-height: 460px;">${latestChangelog}</div>`
       );

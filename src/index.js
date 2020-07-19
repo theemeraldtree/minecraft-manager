@@ -16,7 +16,6 @@ import './font/fonts.css';
 import { loadLatestProfile } from './defaultProfiles/latestProfile';
 import { loadSnapshotProfile } from './defaultProfiles/snapshotProfile';
 import logInit from './util/logger';
-import Analytics from './util/analytics';
 import MCLauncherIntegrationHandler from './minecraft/mcLauncherIntegrationHandler';
 import MCAccountsHandler from './minecraft/mcAccountsHandler';
 import Scanner from './util/scanner/scanner';
@@ -117,8 +116,6 @@ async function load() {
 
       logger.info('Verifying accounts usable...');
       MCAccountsHandler.verifyUsable();
-
-      Analytics.send('launch');
     }
   } catch (e) {
     logger.error('Something went wrong[1]');
