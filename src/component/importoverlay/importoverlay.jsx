@@ -157,7 +157,7 @@ export default class ImportOverlay extends Component {
           {!updateState && !showError && !file && (
             <>
               <Subtext>
-                Choose the file you'd like to import. Minecraft Manager suports <b>.mcjprofile</b>, <b>Twitch zips</b>, <b>MultiMC zips</b>, and <b>Packwiz zips</b>
+                Choose the file you'd like to import. Minecraft Manager suports <b>.mcjprofile</b>, <b>Twitch zips</b>, and <b>MultiMC zips</b>.
               </Subtext>
             </>
           )}

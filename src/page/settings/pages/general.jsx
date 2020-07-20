@@ -28,14 +28,14 @@ function General() {
             value={SettingsManager.currentSettings.allowSnapshotProfile}
             onClick={() => {
             toggleSetting('allowSnapshotProfile');
-            MCLauncherIntegrationHandler.updateSnapshotEnabled();
+            if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.updateSnapshotEnabled();
             ProfilesManager.getProfiles();
           }}
           />
-          <Detail>Show Latest Snapshot Profile</Detail>
+          <Detail>Show Latest Snapshot Instance</Detail>
         </div>
         <Description>
-          Enables the Latest Snapshot Profile, which runs the latest Minecraft Snapshot. Snapshots may be unstable and contain bugs.
+          Enables the Latest Snapshot Instance, which runs the latest Minecraft Snapshot. Snapshots may be unstable and contain bugs.
         </Description>
       </InputHolder>
 
@@ -64,10 +64,10 @@ function General() {
             value={SettingsManager.currentSettings.closeOnLaunch}
             onClick={() => toggleSetting('closeOnLaunch')}
           />
-          <Detail>Close Minecraft Manager on profile launch</Detail>
+          <Detail>Close Minecraft Manager on instance launch</Detail>
         </div>
         <Description>
-          The Minecraft Manager window will be closed when you launch a Profile.
+          The Minecraft Manager window will be closed when you launch an instance.
         </Description>
       </InputHolder>
     </>

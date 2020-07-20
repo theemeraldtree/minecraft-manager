@@ -30,6 +30,7 @@ const VersionPanel = styled.div`
   background-color: #454547;
   transition: filter 150ms;
   width: calc(100% - 35px);
+  border-radius: 5px;
   ${props => props.disabled && css`
     filter: brightness(0.65);
     cursor: not-allowed;
@@ -326,7 +327,7 @@ function Java({ theme, profileScope }) {
       </InputHolder>
       <EmptyOffset>
         <DisabledBox active={(disableStandardJava && !profileScope) || (profileScope && overrideProfileJava && disableStandardJava)}>
-          <InputHolder vertical>
+          <InputHolder text vertical>
             <PathInput theme={theme} readOnly value={javaPath} />
             <Button onClick={chooseJavaPath} color="green">
               browse

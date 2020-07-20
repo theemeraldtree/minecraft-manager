@@ -165,7 +165,13 @@ export default withRouter(({ history }) => {
           <Detail>instance name</Detail>
           <TextInput ref={nameRef} onChange={createNameChange} />
           <Detail>minecraft version</Detail>
-          <MCVersionSelector value={mcVersion} onChange={ver => setMCCVersion(ver)} />
+          <MCVersionSelector
+            value={mcVersion}
+            onChange={(ver, _, e) => {
+              e.preventDefault();
+              setMCCVersion(ver);
+            }}
+          />
 
           <CreateControls>
             <Button type="button" onClick={() => setShowCreate(false)} color="red">

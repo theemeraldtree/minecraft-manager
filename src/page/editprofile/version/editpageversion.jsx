@@ -158,8 +158,9 @@ export default function EditPageVersions({ id }) {
   const confirmVersionChange = newVer => {
     profile.changeMCVersion(newVer);
     profile.progressState = {};
-    uninstallForge();
-    uninstallFabric();
+
+    if (profile.frameworks.forge) uninstallForge();
+    if (profile.frameworks.fabric) uninstallFabric();
 
     setMCVerValue(newVer);
   };
