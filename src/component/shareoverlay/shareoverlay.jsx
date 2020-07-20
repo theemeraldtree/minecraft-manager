@@ -176,7 +176,7 @@ export default class ShareOverlay extends Component {
         <BG>
           {this.state.displayState === 'main' && (
             <>
-              <Title>share your instance</Title>
+              <Title>export your instance</Title>
               <Subtext>
                 Exporting your instance will export it to the <b>.mcjprofile</b> file format, which can be used in
                 Minecraft Manager.
@@ -193,11 +193,11 @@ export default class ShareOverlay extends Component {
                 </>
               )}
               <ButtonsContainer>
-                <Button onClick={this.props.cancelClick} color="red">
-                  cancel
+                <Button onClick={this.props.cancelClick} color="transparent">
+                  Cancel
                 </Button>
                 <Button onClick={this.exportClick} color="green">
-                  export
+                  Export to file...
                 </Button>
               </ButtonsContainer>
             </>

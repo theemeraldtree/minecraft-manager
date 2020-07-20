@@ -169,7 +169,7 @@ export default class UpdateOverlay extends Component {
                 )}
                 {(noUpdates || noConnection) && (
                   <Button color="green" onClick={cancelClick}>
-                    close
+                    Done
                   </Button>
                 )}
               </ButtonsContainer>
@@ -180,8 +180,8 @@ export default class UpdateOverlay extends Component {
               <Title>cannot update</Title>
               <Subtext>This instance was not downloaded from Discover. It cannot be updated.</Subtext>
               <ButtonsContainer>
-                <Button color="green" onClick={cancelClick}>
-                  close
+                <Button color="#444" onClick={cancelClick}>
+                  Done
                 </Button>
               </ButtonsContainer>
             </>

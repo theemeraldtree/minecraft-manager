@@ -23,10 +23,10 @@ const AlertManager = {
       .toString(36)
       .substring(6)}`;
 
-    let confirm = 'confirm';
+    let confirm = 'Confirm';
     if (confirmText) confirm = confirmText;
 
-    let cancel = 'cancel';
+    let cancel = 'Cancel';
     if (cancelText) cancel = cancelText;
 
     this.alerts.push({
@@ -40,7 +40,7 @@ const AlertManager = {
           text: cancel,
           isCancel: true,
           onClick: () => AlertManager.dismissAlert(id),
-          color: 'red'
+          color: 'transparent'
         },
         {
           text: confirm,
@@ -48,7 +48,7 @@ const AlertManager = {
             AlertManager.dismissAlert(id);
             onConfirm();
           },
-          color: 'green'
+          color: '#444'
         }
       ]
     });

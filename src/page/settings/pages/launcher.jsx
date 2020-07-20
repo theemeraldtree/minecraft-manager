@@ -124,21 +124,21 @@ function Launcher({ theme }) {
       <SettingSeperator />
       <IntegrationSettings enabled={integrationEnabled}>
         <EmptyOffset>
-          <InputHolder vertical>
+          <div>
             <Detail>Minecraft Home Directory<QuestionButton onClick={questionHomeDirectory} /></Detail>
-            <div style={{ marginTop: '10px' }}>
+            <InputHolder text style={{ marginTop: '10px' }}>
               <PathInput readOnly theme={theme} value={mcHome} />
               <Button disabled={!integrationEnabled} onClick={chooseMCHome} color="green">browse</Button>
-            </div>
-          </InputHolder>
+            </InputHolder>
+          </div>
           <SettingSeperator />
-          <InputHolder vertical>
+          <div>
             <Detail>Minecraft Executable Path<QuestionButton onClick={questionMCExe} /></Detail>
-            <div style={{ marginTop: '10px' }}>
+            <InputHolder text style={{ marginTop: '10px' }}>
               <PathInput readOnly theme={theme} value={mcExe} />
               <Button disabled={!integrationEnabled} onClick={chooseMCExe} color="green">browse</Button>
-            </div>
-          </InputHolder>
+            </InputHolder>
+          </div>
         </EmptyOffset>
 
       </IntegrationSettings>

@@ -198,8 +198,8 @@ const EditPageGeneral = ({ id, history, theme }) => {
                 <IconWrapper disabled={profile.isDefaultProfile} onClick={changeIcon}>
                   <Icon src={`file:///${profile.iconPath}#${new Date().getTime()}`} />
                 </IconWrapper>
-                <ResetIconButton disabled={profile.isDefaultProfile} onClick={resetIcon} color="green">
-                  reset
+                <ResetIconButton disabled={profile.isDefaultProfile} onClick={resetIcon} color="#555">
+                  Reset Icon
                 </ResetIconButton>
               </div>
               <AboutRight>
@@ -212,8 +212,8 @@ const EditPageGeneral = ({ id, history, theme }) => {
                       onChange={nameChange}
                       placeholder="Enter a name"
                     />
-                    <Button onClick={confirmNameChange} disabled={nameDisabled} color="green">
-                      change
+                    <Button onClick={confirmNameChange} disabled={nameDisabled} color="#777">
+                      Confirm
                     </Button>
                   </InputHolder>
                 </div>

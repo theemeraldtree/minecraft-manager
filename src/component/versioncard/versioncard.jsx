@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Button, Detail } from '@theemeraldtree/emeraldui';
+import { Button, Detail, Spinner } from '@theemeraldtree/emeraldui';
 import SanitizedHTML from '../sanitizedhtml/sanitizedhtml';
 import Hosts from '../../host/Hosts';
 import Global from '../../util/global';
@@ -10,7 +10,6 @@ const BG = styled.div`
   margin-top: 5px;
   height: 90px;
   display: flex;
-  border-radius: 10px;
   background-color: #404040;
   flex-flow: column;
   user-select: none;
@@ -204,39 +203,39 @@ export default class VersionCard extends PureComponent {
         {!hideButtons && (
           <ButtonContainer>
             {progress === 'bad-mc-ver' && (
-              <Button disabled title="minecraft version is incompatible" color="green">
-                incompatible
+              <Button disabled title="Minecraft version is incompatible" color="green">
+                Incompatible
               </Button>
             )}
             {installed && !disableMcVer && progress !== 'disable-install' && (
               <Button disabled color="green">
-                installed
+                Installed
               </Button>
             )}
             {progress === 'installing' && (
               <Button disabled color="green">
-                installing
+                <Spinner />
               </Button>
             )}
             {progress === 'disable-install' && (
               <Button disabled color="green">
-                install
+                Install
               </Button>
             )}
             {!installed && freeToInstall && progress !== 'bad-mc-ver' && (
               <Button data-version={version.cachedID} onClick={installClick} color="green">
-                install
+                Install
               </Button>
             )}
           </ButtonContainer>
         )}
-        {!showMoreInfo && <MoreInfo onClick={this.toggleMoreInfo}>more info</MoreInfo>}
+        {!showMoreInfo && <MoreInfo onClick={this.toggleMoreInfo}>More info</MoreInfo>}
         <InfoSection>
           <Detail>changelog</Detail>
           <Changelog>
-            <SanitizedHTML small html={changelog || '¯\\_(ツ)_/¯ unable to find a changelog'} />
+            <SanitizedHTML small html={changelog || '¯\\_(ツ)_/¯ Unable to find a changelog'} />
           </Changelog>
-          {showMoreInfo && <MoreInfo onClick={this.toggleMoreInfo}>less info</MoreInfo>}
+          {showMoreInfo && <MoreInfo onClick={this.toggleMoreInfo}>Less info</MoreInfo>}
         </InfoSection>
       </BG>
     );

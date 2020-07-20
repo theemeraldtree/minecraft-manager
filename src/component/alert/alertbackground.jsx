@@ -22,7 +22,7 @@ const AlertBackground = styled.div`
   position: relative;
   padding: 10px;
   padding-bottom: 70px;
-  border-radius: 10px;
+  border-radius : 10px;
   h1 {
     margin: 0;
     font-weight: 200;

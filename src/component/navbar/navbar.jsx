@@ -82,7 +82,7 @@ const WindowButton = styled.div`
   cursor: pointer;
   -webkit-app-region: no-drag;
   &:hover {
-    background-color: #1d1d1d;
+    background-color: #000;
   }
 `;
 

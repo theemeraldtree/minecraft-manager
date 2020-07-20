@@ -63,7 +63,7 @@ const CustomButton = styled(Button)`
 const ButtonGroup = styled.div`
   width: 200px;
   button:not(:first-child) {
-    margin-top: 5px;
+    margin-top: 3px;
   }
 `;
 
@@ -105,7 +105,8 @@ function ViewProfilePage({ match, history }) {
       <>
         {showDelete && (
           <Confirmation
-            questionText="are you sure?"
+            questionText="delete instance?"
+            confirmText="Delete instance"
             cancelDelete={() => setShowDelete(false)}
             confirmDelete={confirmDelete}
           />
@@ -128,21 +129,21 @@ function ViewProfilePage({ match, history }) {
               }}
               color="green"
             >
-              launch
+              Launch
             </CustomButton>
             <CustomButton onClick={editProfile} color="yellow">
-              edit
+              Edit
             </CustomButton>
             {!profile.isDefaultProfile && (
               <>
                 <CustomButton onClick={() => setShowUpdateOverlay(true)} color="purple">
-                  update
+                  Update
                 </CustomButton>
                 <CustomButton onClick={() => setShowShareOverlay(true)} color="blue">
-                  share
+                  Export
                 </CustomButton>
                 <CustomButton onClick={() => setShowDelete(true)} color="red">
-                  delete
+                  Delete
                 </CustomButton>
               </>
             )}

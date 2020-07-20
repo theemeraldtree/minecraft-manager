@@ -77,7 +77,7 @@ export default class ProfileGrid extends Component {
       deletingProfile: profile
     });
 
-    AlertManager.alert('are you sure?', '', this.confirmDelete, 'delete');
+    AlertManager.alert('delete instance?', '', this.confirmDelete, 'Delete instance');
   };
 
   confirmDelete = () => {

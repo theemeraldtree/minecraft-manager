@@ -28,11 +28,11 @@ const Confirmation = ({
       {questionText && <h1>{questionText}</h1>}
       {children && children}
       <DelButtons>
-        <Button onClick={cancelDelete} color="green">
+        <Button onClick={cancelDelete} color="transparent">
           {cancelText}
         </Button>
         {!hideConfirm && (
-          <Button onClick={confirmDelete} color="red">
+          <Button onClick={confirmDelete} color="green">
             {confirmText}
           </Button>
         )}
@@ -54,8 +54,8 @@ Confirmation.propTypes = {
 };
 
 Confirmation.defaultProps = {
-  cancelText: 'cancel',
-  confirmText: 'confirm'
+  cancelText: 'Cancel',
+  confirmText: 'Confirm'
 };
 
 export default Confirmation;

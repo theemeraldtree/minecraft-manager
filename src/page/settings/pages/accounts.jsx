@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Button, TextInput, Detail, withTheme, FluentHover, Spinner } from '@theemeraldtree/emeraldui';
@@ -85,6 +85,9 @@ const AccountError = styled.div`
 
 const AB = styled(AlertBackground)`
   width: 260px;
+  input {
+    width: calc(100% - 10px);
+  }
 `;
 
 const List = styled.div`
@@ -107,6 +110,7 @@ function Accounts({ theme }) {
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [addAccountEmail, setAddAccountEmail] = useState('');
   const [addAccountPW, setAddAccountPW] = useState('');
+  const emailInput = useRef(null);
 
   const changeAddAccountEmail = e => {
     setAddAccountEmail(e.target.value);
@@ -166,10 +170,20 @@ function Accounts({ theme }) {
     setAddAccountPW('');
     setAddAccountStage(0);
     setShowAddAccount(true);
+
+    // wait for alert to appear
+    setTimeout(() => {
+      emailInput.current.focus();
+    }, 150);
   };
 
   const clickHelp = () => {
-    AlertManager.messageBox('accounts help', 'Before you launch Minecraft, you\'ll need to add your Mojang account. Your account email, username, and password are only sent to Mojang.<br><br>If you have Launcher Integration enabled, Minecraft Manager may import accounts from the regular launcher');
+    AlertManager.messageBox('accounts help',
+      `Before you launch Minecraft, you'll need to add your Mojang account. 
+      Your account email, username, and password are only sent to Mojang.
+      <br><br>
+      If you have Launcher Integration enabled, Minecraft Manager may import accounts from the regular launcher.
+    `);
   };
 
   return (
@@ -181,7 +195,7 @@ function Accounts({ theme }) {
           <>
             {addAccountError && <AccountError>{addAccountError}</AccountError>}
             <Detail>mojang email/username</Detail>
-            <TextInput value={addAccountEmail} onChange={changeAddAccountEmail} />
+            <TextInput ref={emailInput} value={addAccountEmail} onChange={changeAddAccountEmail} />
             <Detail>password</Detail>
             <PasswordInput theme={theme} type="password" value={addAccountPW} onChange={changeAddAccountPW} />
 

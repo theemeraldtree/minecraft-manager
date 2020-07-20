@@ -257,8 +257,9 @@ export default class Profile extends OAMFAsset {
     Global.scanProfile(this);
 
     setTimeout(() => {
+      ToastManager.noticeToast('Refreshed!');
       ProfilesManager.updateProfile(this);
-    }, 2000);
+    }, 500);
   }
 
   /**

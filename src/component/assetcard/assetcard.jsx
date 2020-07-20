@@ -7,7 +7,6 @@ import { Button, Spinner } from '@theemeraldtree/emeraldui';
 import Global from '../../util/global';
 import downloadsIcon from '../navbar/downloads/downloads.png';
 import ToastManager from '../../manager/toastManager';
-import FluentHover from '../../util/fluentHover';
 
 const shrinkAnim = keyframes`
   0% {
@@ -75,8 +74,9 @@ const Image = styled.div.attrs(props => ({
   ${props =>
     props.compact &&
     css`
-      height: 70px;
-      width: 70px;
+      height: 65px;
+      width: 65px;
+      background-size: 65px;
     `}
 `;
 
@@ -203,8 +203,6 @@ const AssetCard = ({
           compact={compact}
           ref={ref}
           shrink={shrink}
-          onMouseMove={e => !disableHover && FluentHover.mouseMove(e, ref, '#414141', true, true)}
-          onMouseLeave={() => !disableHover && FluentHover.mouseLeave(ref, '#313131')}
         >
           {asset.iconPath && (
             <Image
@@ -234,25 +232,25 @@ const AssetCard = ({
                 }}
                 color="red"
               >
-                delete
+                Delete
               </Button>
             )}
 
             {showInstall && (installed || progressState.progress === 'installed') && (
               <Button disabled color="#0e6f1e">
-                installed
+                Installed
               </Button>
             )}
 
             {showInstall && !installed && !progressState.progress && (
               <Button color="#0e6f1e" onClick={installClick}>
-                install
+                Install
               </Button>
             )}
 
             {showInstall && !installed && progressState.progress === 'notavailable' && (
               <Button color="#0e6f1e" disabled>
-                not available
+                Not Available
               </Button>
             )}
 

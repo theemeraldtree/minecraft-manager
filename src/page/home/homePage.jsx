@@ -174,11 +174,11 @@ export default withRouter(({ history }) => {
           />
 
           <CreateControls>
-            <Button type="button" onClick={() => setShowCreate(false)} color="red">
-              cancel
+            <Button type="button" onClick={() => setShowCreate(false)} color="transparent">
+              Cancel
             </Button>
-            <Button type="submit" disabled={!nameEntered} color="green">
-              create
+            <Button type="submit" disabled={!nameEntered} color="#444">
+              Create instance
             </Button>
           </CreateControls>
         </form>
