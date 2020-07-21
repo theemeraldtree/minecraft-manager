@@ -49,7 +49,7 @@ function Launcher({ theme }) {
   };
 
   const showInfo = () => {
-    AlertManager.messageBox('launcher integration', 'Launcher Integration allows Minecraft Manager to integrate with the regular Minecraft launcher. It will sync your profiles and accounts with the vanilla Minecraft launcher.');
+    AlertManager.messageBox('launcher integration', 'Launcher Integration allows Minecraft Manager to integrate with the regular Minecraft launcher. It will sync your instances and accounts with the vanilla Minecraft launcher.');
   };
 
   const checkDone = (exe, home) => {
@@ -128,7 +128,7 @@ function Launcher({ theme }) {
             <Detail>Minecraft Home Directory<QuestionButton onClick={questionHomeDirectory} /></Detail>
             <InputHolder text style={{ marginTop: '10px' }}>
               <PathInput readOnly theme={theme} value={mcHome} />
-              <Button disabled={!integrationEnabled} onClick={chooseMCHome} color="green">browse</Button>
+              <Button disabled={!integrationEnabled} onClick={chooseMCHome} color="green">Browse</Button>
             </InputHolder>
           </div>
           <SettingSeperator />
@@ -136,7 +136,7 @@ function Launcher({ theme }) {
             <Detail>Minecraft Executable Path<QuestionButton onClick={questionMCExe} /></Detail>
             <InputHolder text style={{ marginTop: '10px' }}>
               <PathInput readOnly theme={theme} value={mcExe} />
-              <Button disabled={!integrationEnabled} onClick={chooseMCExe} color="green">browse</Button>
+              <Button disabled={!integrationEnabled} onClick={chooseMCExe} color="green">Browse</Button>
             </InputHolder>
           </div>
         </EmptyOffset>

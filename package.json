@@ -38,9 +38,10 @@
     },
     "nsis": {
       "license": "LICENSE",
-      "oneClick": "true",
+      "oneClick": "false",
       "allowElevation": "false",
-      "packElevateHelper": "false"
+      "packElevateHelper": "false",
+      "allowToChangeInstallationDirectory": "true"
     },
     "dmg": {
       "title": "Install Minecraft Manager"

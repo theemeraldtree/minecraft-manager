@@ -48,7 +48,7 @@ const AlertManager = {
             AlertManager.dismissAlert(id);
             onConfirm();
           },
-          color: '#444'
+          color: 'green'
         }
       ]
     });
@@ -66,7 +66,7 @@ const AlertManager = {
             `,
       buttons: [
         {
-          text: 'close',
+          text: 'Done',
           onClick: () => AlertManager.dismissAlert(id),
           color: '#444'
         }

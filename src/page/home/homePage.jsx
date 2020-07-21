@@ -119,20 +119,24 @@ export default withRouter(({ history }) => {
 
   useEffect(() => {
     header.setChildren(
-      <IH text>
-        <Button onClick={() => setShowImport(true)} color="purple">
-          import
-        </Button>
-        <SearchBox
-          value={searchTerm}
-          type="text"
-          onChange={e => setSearchTerm(e.target.value.toLowerCase())}
-          placeholder="Search instances..."
-        />
-        <Button onClick={() => createClick()} color="green">
-          +
-        </Button>
-      </IH>
+      <>
+        <IH style={{ marginRight: '5px' }}>
+          <Button onClick={() => setShowImport(true)} color="purple">
+            Import
+          </Button>
+        </IH>
+        <IH text>
+          <SearchBox
+            value={searchTerm}
+            type="text"
+            onChange={e => setSearchTerm(e.target.value.toLowerCase())}
+            placeholder="Search instances..."
+          />
+          <Button onClick={() => createClick()} color="green">
+            +
+          </Button>
+        </IH>
+      </>
     );
   }, [searchTerm]);
 
@@ -162,9 +166,9 @@ export default withRouter(({ history }) => {
       <CreateOverlay unmountOnExit timeout={500} in={showCreate} ref={createRef}>
         <form onSubmit={create}>
           <h1>CREATE A NEW INSTANCE</h1>
-          <Detail>instance name</Detail>
+          <Detail>Instance name</Detail>
           <TextInput ref={nameRef} onChange={createNameChange} />
-          <Detail>minecraft version</Detail>
+          <Detail>Minecraft version</Detail>
           <MCVersionSelector
             value={mcVersion}
             onChange={(ver, _, e) => {

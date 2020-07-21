@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Button, TextInput, Detail, withTheme, FluentHover, Spinner } from '@theemeraldtree/emeraldui';
+import { Button, TextInput, withTheme, FluentHover, Spinner } from '@theemeraldtree/emeraldui';
 import Overlay from '../../../component/overlay/overlay';
 import AlertBackground from '../../../component/alert/alertbackground';
 import MCAccountsHandler from '../../../minecraft/mcAccountsHandler';
@@ -10,7 +10,9 @@ import AlertManager from '../../../manager/alertManager';
 
 const PasswordInput = styled(TextInput).attrs({
   type: 'password'
-})``;
+})`
+  margin-top: 5px;
+`;
 
 const Account = styled.div`
   width: calc(100% - 20px);
@@ -23,6 +25,7 @@ const Account = styled.div`
   cursor: pointer;
   color: white;
   transition: 150ms;
+  border-radius: 5px;
   h1 {
     font-size: 14pt;
   }
@@ -120,8 +123,10 @@ function Accounts({ theme }) {
     setAddAccountPW(e.target.value);
   };
 
-  const loginAddAccount = async () => {
+  const loginAddAccount = async (e) => {
     // setShowAddAccount(false);
+    e.preventDefault();
+    e.stopPropagation();
     setAddAccountStage(1);
     const verify = await MCAccountsHandler.registerAccount(addAccountEmail, addAccountPW);
     if (verify === 'good') {
@@ -137,6 +142,7 @@ function Accounts({ theme }) {
     } else {
       setAddAccountStage(0);
       setAddAccountError(verify);
+      emailInput.current.focus();
     }
   };
 
@@ -193,16 +199,16 @@ function Accounts({ theme }) {
           <h1>add an account</h1>
           {addAccountStage === 0 && (
           <>
-            {addAccountError && <AccountError>{addAccountError}</AccountError>}
-            <Detail>mojang email/username</Detail>
-            <TextInput ref={emailInput} value={addAccountEmail} onChange={changeAddAccountEmail} />
-            <Detail>password</Detail>
-            <PasswordInput theme={theme} type="password" value={addAccountPW} onChange={changeAddAccountPW} />
+            <form onSubmit={loginAddAccount}>
+              {addAccountError && <AccountError>{addAccountError}</AccountError>}
+              <TextInput placeholder="Mojang Email/Username" ref={emailInput} value={addAccountEmail} onChange={changeAddAccountEmail} />
+              <PasswordInput placeholder="Password" theme={theme} type="password" value={addAccountPW} onChange={changeAddAccountPW} />
 
-            <ButtonContainer>
-              <Button onClick={() => setShowAddAccount(false)} color="red">cancel</Button>
-              <Button onClick={loginAddAccount} color="green">add account</Button>
-            </ButtonContainer>
+              <ButtonContainer>
+                <Button type="button" onClick={() => setShowAddAccount(false)} color="transparent">Cancel</Button>
+                <Button type="submit" color="green">Add account</Button>
+              </ButtonContainer>
+            </form>
           </>
           )}
           {addAccountStage === 1 && (

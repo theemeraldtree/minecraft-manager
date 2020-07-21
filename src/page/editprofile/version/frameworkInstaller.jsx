@@ -165,7 +165,7 @@ export default function FrameworkInstaller({ show, profile, framework, cancelCli
                 <Button onClick={cancelClick} color="transparent">
                   Cancel
                 </Button>
-                <Button onClick={simpleInstallClick} color="#444">
+                <Button onClick={simpleInstallClick} color="green">
                   Install
                 </Button>
               </ButtonHolder>
@@ -204,7 +204,7 @@ export default function FrameworkInstaller({ show, profile, framework, cancelCli
                 )}
               </VersionsList>
               <ButtonHolder>
-                <Button onClick={cancelClick} color="#222">
+                <Button onClick={cancelClick} color="#444">
                   Cancel
                 </Button>
               </ButtonHolder>

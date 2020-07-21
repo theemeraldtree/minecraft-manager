@@ -80,37 +80,37 @@ const SplitSection = styled(Section)`
 
 export default function About() {
   const [updateDisabled, setUpdateDisabled] = useState(false);
-  const [updateText, setUpdateText] = useState('check for updates');
+  const [updateText, setUpdateText] = useState('Check for updates');
   const [updateSubText, setUpdateSubText] = useState('');
 
   const checkForUpdates = () => {
     if (updateText !== 'restart') {
       setUpdateDisabled(true);
-      setUpdateText('checking for updates...');
+      setUpdateText('Checking for updates...');
       setUpdateSubText('');
       ipcRenderer.send('check-for-updates');
 
       ipcRenderer.on('update-available', () => {
         setUpdateDisabled(true);
-        setUpdateText('downloading');
+        setUpdateText('Downloading...');
         setUpdateSubText('Update available. Downloading...');
       });
 
       ipcRenderer.on('update-downloaded', () => {
         setUpdateDisabled(false);
-        setUpdateText('restart');
+        setUpdateText('Restart');
         setUpdateSubText('Restart to update');
       });
 
       ipcRenderer.on('error', () => {
         setUpdateDisabled(false);
-        setUpdateText('check for updates');
+        setUpdateText('Check for updates');
         setUpdateSubText('Error checking for updates');
       });
 
       ipcRenderer.on('in-dev', () => {
         setUpdateDisabled(true);
-        setUpdateText('in dev');
+        setUpdateText('In dev mode');
         setUpdateSubText('Cannot update while in dev mode');
       });
 
@@ -242,7 +242,7 @@ export default function About() {
             }
             color="green"
           >
-            view full license info
+            View full license info
           </Button>
         </div>
         <div>

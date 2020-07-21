@@ -315,7 +315,7 @@ function Java({ theme, profileScope }) {
       <EmptyOffset>
         <VersionPanel disabled={disableStandardJava || (profileScope && !overrideProfileJava)}>
           <p>Currently using JRE version <b>{javaReleaseName}</b></p>
-          <Button disabled={disableStandardJava || (profileScope && !overrideProfileJava)} onClick={changeJavaVersion} color="green">change version</Button>
+          <Button disabled={disableStandardJava || (profileScope && !overrideProfileJava)} onClick={changeJavaVersion} color="green">Change version</Button>
         </VersionPanel>
       </EmptyOffset>
 
@@ -330,7 +330,7 @@ function Java({ theme, profileScope }) {
           <InputHolder text vertical>
             <PathInput theme={theme} readOnly value={javaPath} />
             <Button onClick={chooseJavaPath} color="green">
-              browse
+              Browse
             </Button>
           </InputHolder>
         </DisabledBox>

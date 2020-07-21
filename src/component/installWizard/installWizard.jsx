@@ -135,11 +135,11 @@ export default function InstallWizard({ show, name, simpleText, cancelClick, ins
             <>
               <p>{simpleText || `The Latest version of ${name} will be installed.`}</p>
               <ButtonHolder>
-                <Button onClick={cancelClick} color="red">
-                  cancel
+                <Button onClick={cancelClick} color="transparent">
+                  Cancel
                 </Button>
                 <Button onClick={simpleInstallClick} color="green">
-                  install
+                  Install
                 </Button>
               </ButtonHolder>
             </>
@@ -177,8 +177,8 @@ export default function InstallWizard({ show, name, simpleText, cancelClick, ins
                 )}
               </VersionsList>
               <ButtonHolder>
-                <Button onClick={cancelClick} color="red">
-                  cancel
+                <Button onClick={cancelClick} color="#444">
+                  Cancel
                 </Button>
               </ButtonHolder>
             </>

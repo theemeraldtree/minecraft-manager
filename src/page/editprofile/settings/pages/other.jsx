@@ -35,39 +35,40 @@ export default function Other(args) {
       <Panel>
         <h3>Advanced Info</h3>
         <Button color="red" onClick={() => profile.openGameDir()}>
-          open instance folder
+          Open instance folder
         </Button>
 
         <Detail>internal id: {profile.id}</Detail>
         <Detail>version-safe name: {profile.safename}</Detail>
         <Detail>version timestamp: {profile.version.timestamp}</Detail>
         <Detail>OMAF version: {profile.omafVersion}</Detail>
+        <Detail>MCM Format version: {profile.mcm.version}</Detail>
       </Panel>
       <Panel>
         <h3>Technical Functions</h3>
         <Button color="red" onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/profile.json'))}>
-          open profile.json
+          Open profile.json
         </Button>
         <Button
           color="red"
           onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/mods.json'))}
         >
-          open subAssets/mods.json
+          Open subAssets/mods.json
         </Button>
         <Button
           color="red"
           onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/resourcepacks.json'))}
         >
-          open subAssets/resourcepacks.json
+          Open subAssets/resourcepacks.json
         </Button>
         <Button
           color="red"
           onClick={() => remote.shell.openExternal(path.join(profile.profilePath, '/_omaf/subAssets/worlds.json'))}
         >
-          open subAssets/worlds.json
+          Open subAssets/worlds.json
         </Button>
         <Button color="red" onClick={() => remote.shell.openExternal(profile.profilePath)}>
-          open data folder
+          Open data folder
         </Button>
       </Panel>
     </>

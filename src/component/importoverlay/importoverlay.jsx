@@ -132,7 +132,7 @@ export default class ImportOverlay extends Component {
         .then(this.done)
         .catch(this.error);
     }
-  }
+  };
 
   clickCancel = () => {
     setTimeout(() => {
@@ -144,7 +144,7 @@ export default class ImportOverlay extends Component {
     }, 150);
 
     this.props.cancelClick();
-  }
+  };
 
   render() {
     const { updateState, showError, error } = this.state;
@@ -153,24 +153,25 @@ export default class ImportOverlay extends Component {
     return (
       <Overlay in={this.props.in}>
         <BG>
-          {!updateState && !showError && !file && <Title>import a profile</Title>}
+          {!updateState && !showError && !file && <Title>import an instance</Title>}
           {!updateState && !showError && !file && (
             <>
               <Subtext>
-                Choose the file you'd like to import. Minecraft Manager suports <b>.mcjprofile</b>, <b>Twitch zips</b>, and <b>MultiMC zips</b>.
+                Choose the file you'd like to import. Minecraft Manager suports <b>.mcjprofile</b>, <b>Twitch zips</b>,
+                and <b>MultiMC zips</b>.
               </Subtext>
             </>
           )}
 
           {!updateState && !showError && (
-          <ButtonContainer>
-            <BTN onClick={this.clickCancel} color="red">
-              cancel
-            </BTN>
-            <BTN onClick={this.chooseFile} color="green">
-              choose a file
-            </BTN>
-          </ButtonContainer>
+            <ButtonContainer>
+              <BTN onClick={this.clickCancel} color="transparent">
+                Cancel
+              </BTN>
+              <BTN onClick={this.chooseFile} color="green">
+                Choose a file
+              </BTN>
+            </ButtonContainer>
           )}
 
           {file && !updateState && !showError && (

@@ -28,7 +28,7 @@ const Renaming = styled.div`
 
 const LongDesc = styled(TextBox)`
   height: 400px;
-  width: calc(100vw - 285px);
+  width: calc(100vw - 159px);
   max-width: 770px;
 `;
 
@@ -97,13 +97,13 @@ const AboutRight = styled.div`
   }
 
   textarea {
-    width: calc(100vw - 450px);
+    width: calc(100vw - 319px);
     max-width: 600px;
     max-height: 107px;
   }
 
   input {
-    width: calc(100vw - 524px);
+    width: calc(100vw - 400px);
     max-width: 527px;
   }
 `;
@@ -194,7 +194,7 @@ const EditPageGeneral = ({ id, history, theme }) => {
           <>
             <AboutContainer>
               <div>
-                <Detail>icon</Detail>
+                <Detail>Icon</Detail>
                 <IconWrapper disabled={profile.isDefaultProfile} onClick={changeIcon}>
                   <Icon src={`file:///${profile.iconPath}#${new Date().getTime()}`} />
                 </IconWrapper>
@@ -204,7 +204,7 @@ const EditPageGeneral = ({ id, history, theme }) => {
               </div>
               <AboutRight>
                 <div>
-                  <Detail>name</Detail>
+                  <Detail>Name</Detail>
                   <InputHolder text>
                     <TextInput
                       disabled={profile.isDefaultProfile}
@@ -219,7 +219,7 @@ const EditPageGeneral = ({ id, history, theme }) => {
                 </div>
                 <div>
                   <DescContainer>
-                    <Detail>summary</Detail>
+                    <Detail>Summary</Detail>
                     <TextBox
                       defaultValue={profile.blurb}
                       onChange={blurbChange}
@@ -232,7 +232,7 @@ const EditPageGeneral = ({ id, history, theme }) => {
             </AboutContainer>
 
             <DescContainer>
-              <Detail>long description</Detail>
+              <Detail>Description</Detail>
               <LongDesc
                 defaultValue={profile.description}
                 onChange={descChange}

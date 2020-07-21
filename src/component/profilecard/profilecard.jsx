@@ -200,7 +200,7 @@ const ProfileCard = ({ profile, history, showDeletion, showShare, showUpdate, sh
             {!profile.isDefaultProfile && (
               <>
                 <MenuItem onClick={() => showUpdate(profile)}>Update</MenuItem>
-                <MenuItem onClick={() => showShare(profile)}>Share</MenuItem>
+                <MenuItem onClick={() => showShare(profile)}>Export</MenuItem>
               </>
             )}
           </>

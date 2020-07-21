@@ -78,13 +78,13 @@ export default function Help() {
         <h2>Technical Troubleshooting</h2>
         <List>
           <Button onClick={() => technicalAction('open-profiles-folder')} color="green">
-            open profiles folder
+            Open profiles folder
           </Button>
           <Button onClick={() => technicalAction('open-electron-logs-folder')} color="green">
-            open electron logs folder
+            Open Electron logs folder
           </Button>
           <Button onClick={() => technicalAction('open-main-logs-folder')} color="green">
-            open main node logs folder
+            Open Main Node logs folder
           </Button>
         </List>
       </Section>
@@ -96,16 +96,16 @@ export default function Help() {
         </h3>
         <List>
           <Button onClick={() => prepareAction('clean-launcher-profiles')} color="red">
-            clean launcher profiles
+            Clean launcher instances
           </Button>
           <Button onClick={() => prepareAction('clean-launcher-libraries')} color="red">
-            clean launcher libraries
+            Clean launcher libraries
           </Button>
           <Button onClick={() => prepareAction('clean-launcher-versions')} color="red">
-            clean launcher versions
+            Clean launcher versions
           </Button>
           <Button onClick={() => prepareAction('reload-profiles')} color="red">
-            force reload profiles
+            Force reload instances
           </Button>
         </List>
       </Section>
@@ -113,7 +113,7 @@ export default function Help() {
         <h2>Minecraft Manager Data Dump</h2>
         <h3>Dumps most of the data that Minecraft Manager has. This can be helpful for error/crash reports.</h3>
         <Button onClick={dumpData} color="green">
-          dump data
+          Dump data
         </Button>
       </Section>
     </>

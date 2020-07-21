@@ -15,7 +15,7 @@ export default function Defaults() {
   return (
     <>
       <p>
-        The following are default settings that are used for <b>new</b> profiles only
+        The following are default settings that are used for <b>new</b> instances only
       </p>
       <Section>
         <h3>Sync Options</h3>
