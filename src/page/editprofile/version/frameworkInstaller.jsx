@@ -126,7 +126,7 @@ export default function FrameworkInstaller({ show, profile, framework, cancelCli
         }
       } else if (framework === 'fabric') {
         const versions = await FabricFramework.getFabricLoaderVersions(profile.version.minecraft.version);
-        if (versions) {
+        if (versions && versions.length) {
           setAllVersions(
             versions.map(ver => ({
               name: ver.loader.version
@@ -162,11 +162,11 @@ export default function FrameworkInstaller({ show, profile, framework, cancelCli
             <>
               <p>The Latest version of {humanName(framework)} will be installed.</p>
               <ButtonHolder>
-                <Button onClick={cancelClick} color="red">
-                  cancel
+                <Button onClick={cancelClick} color="transparent">
+                  Cancel
                 </Button>
-                <Button onClick={simpleInstallClick} color="green">
-                  install
+                <Button onClick={simpleInstallClick} color="#444">
+                  Install
                 </Button>
               </ButtonHolder>
             </>
@@ -192,21 +192,20 @@ export default function FrameworkInstaller({ show, profile, framework, cancelCli
                   ))}
                 {noVersions && (
                   <>
-                    <p>
-                      Unfortunately there are no {humanName(framework)} versions compatible with{' '}
-                      {profile.version.minecraft.version}
-                    </p>
+                    <b>
+                      There are no {humanName(framework)} versions compatible with Minecraft {profile.version.minecraft.version}.
+                    </b>
                   </>
                 )}
-                {allVersions.length === 0 && (
+                {allVersions.length === 0 && !noVersions && (
                   <Loading>
                     <Spinner />
                   </Loading>
                 )}
               </VersionsList>
               <ButtonHolder>
-                <Button onClick={cancelClick} color="red">
-                  cancel
+                <Button onClick={cancelClick} color="#222">
+                  Cancel
                 </Button>
               </ButtonHolder>
             </>

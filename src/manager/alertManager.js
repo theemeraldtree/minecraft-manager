@@ -68,7 +68,7 @@ const AlertManager = {
         {
           text: 'close',
           onClick: () => AlertManager.dismissAlert(id),
-          color: 'green'
+          color: '#444'
         }
       ]
     });

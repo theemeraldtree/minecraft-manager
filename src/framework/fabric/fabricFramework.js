@@ -9,6 +9,7 @@ import LauncherManager from '../../manager/launcherManager';
 import logInit from '../../util/logger';
 import MCVersionHandler from '../../minecraft/mcVersionHandler';
 import FSU from '../../util/fsu';
+import SettingsManager from '../../manager/settingsManager';
 
 const logger = logInit('FabricFramework');
 
@@ -51,7 +52,7 @@ const FabricFramework = {
       logger.info(`Beginning uninstall of Fabric from ${profile.id}`);
       LibrariesManager.deleteLibrary(profile).then(() => {
         VersionsManager.deleteVersion(profile).then(() => {
-          LauncherManager.setProfileData(profile, 'lastVersionId', profile.version.minecraft.version);
+          if (SettingsManager.currentSettings.launcherIntegration) LauncherManager.setProfileData(profile, 'lastVersionId', profile.version.minecraft.version);
           profile.removeFramework('fabric');
           resolve();
         });

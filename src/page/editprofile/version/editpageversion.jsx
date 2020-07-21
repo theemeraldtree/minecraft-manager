@@ -323,7 +323,7 @@ export default function EditPageVersions({ id }) {
         )}
         {(!profile.hosts.curse || !(profile.version.hosts && profile.version.hosts.curse)) && (
           <>
-            <Detail>minecraft version</Detail>
+            <Detail>Minecraft version</Detail>
             <MCVersionSelector
               onChange={mcverChange}
               value={mcverValue}
@@ -335,7 +335,7 @@ export default function EditPageVersions({ id }) {
         )}
         {profile.hosts.curse && profile.version.hosts && profile.version.hosts.curse && (
           <>
-            <Detail>profile version</Detail>
+            <Detail>Instance version</Detail>
             {hostVersionValues && (
               <Dropdown
                 value={curseVerValue}
@@ -349,14 +349,14 @@ export default function EditPageVersions({ id }) {
         )}
 
         <OptionBreak />
-        <Detail>modloaders</Detail>
+        <Detail>Modloaders</Detail>
         {!profile.frameworks.fabric && !fabricIsInstalling && (
           <CustomVersions>
             <h3>Minecraft Forge</h3>
-            <Detail>The most popular modloader. Currently used in just about every mod.</Detail>
+            <Detail>The most popular modloader. Used in many large and popular mods.</Detail>
             {!profile.frameworks.forge && !forgeIsInstalling && (
               <Button onClick={() => setShowConfirmForge(true)} color="green">
-                install
+                Install Forge
               </Button>
             )}
             {forgeIsInstalling && (
@@ -369,7 +369,7 @@ export default function EditPageVersions({ id }) {
               <>
                 <p>Version: {profile.frameworks.forge.version}</p>
                 <Button onClick={uninstallForge} color="red">
-                  uninstall
+                  Uninstall
                 </Button>
               </>
             )}
@@ -378,10 +378,10 @@ export default function EditPageVersions({ id }) {
         {!profile.frameworks.forge && !forgeIsInstalling && (
           <CustomVersions>
             <h3>Fabric</h3>
-            <Detail>The Next-Generation Modloader. Currently used in small, quality-of-life mods.</Detail>
+            <Detail>The next-generation modloader. Used in quality-of-life and content mods.</Detail>
             {!profile.frameworks.fabric && !fabricIsInstalling && (
               <Button onClick={() => setShowConfirmFabric(true)} color="green">
-                install
+                Install Fabric
               </Button>
             )}
             {fabricIsInstalling && (
@@ -392,7 +392,7 @@ export default function EditPageVersions({ id }) {
               <>
                 <p>Version: {profile.frameworks.fabric.version}</p>
                 <Button onClick={uninstallFabric} color="red">
-                  uninstall
+                  Uninstall
                 </Button>
               </>
             )}

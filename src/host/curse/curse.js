@@ -1,3 +1,4 @@
+import fuzzysort from 'fuzzysort';
 import Global from '../../util/global';
 import Profile from '../../type/profile';
 import Mod from '../../type/mod';
@@ -48,6 +49,10 @@ const Curse = {
           obj.icon = attachment.url;
           obj.iconPath = attachment.url;
           obj.iconURL = attachment.url;
+        } else if (!attachment && asset.attachments[0]) {
+          obj.icon = asset.attachments[0].url;
+          obj.iconPath = asset.attachments[0].url;
+          obj.iconURL = asset.attachments[0].url;
         }
       }
 
@@ -114,9 +119,9 @@ const Curse = {
   },
 
   async getDescription(asset) {
-      return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/description`, {
-        addonID: asset.hosts.curse.id
-      });
+    return Hosts.HTTPGet(`${this.URL_BASE}/${asset.hosts.curse.id}/description`, {
+      addonID: asset.hosts.curse.id
+    });
   },
 
   convertCurseVersion(ver) {
@@ -231,7 +236,7 @@ const Curse = {
       sectionId: this.getCurseIDFromType(type),
       categoryId: 0,
       sort,
-      pageSize: 20,
+      pageSize: 25,
       index: 0
     };
 
@@ -242,7 +247,25 @@ const Curse = {
     logger.info(`Searching ${type}s for "${term}"`);
     const result = await Hosts.HTTPGet(`${this.URL_BASE}/search`, params);
 
-    if (result) return this.readAssetList(result);
+    if (result) {
+      const al = this.readAssetList(result);
+
+      if (!term.trim()) {
+        const readyToSort = al.map(assetRaw => {
+          const asset = assetRaw;
+          asset.searchName = asset.name.replace(/[^\w]/gi, ' ');
+          return asset;
+        });
+
+        const fuzzed = fuzzysort.go(term, readyToSort, { key: 'searchName', threshold: -Infinity, allowTypo: true });
+        const sorted = fuzzed.map(res => res.obj);
+
+        return [...sorted, ...al.filter(res => !sorted.find(mod => mod.id === res.id))];
+      }
+
+      return al;
+    }
+
     return undefined;
   },
 
