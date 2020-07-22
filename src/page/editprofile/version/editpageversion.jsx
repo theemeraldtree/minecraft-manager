@@ -16,6 +16,7 @@ import MCVersionSelector from '../../../component/mcVersionSelector/mcVersionSel
 import FrameworkInstaller from './frameworkInstaller';
 import MCLauncherIntegrationHandler from '../../../minecraft/mcLauncherIntegrationHandler';
 import SettingsManager from '../../../manager/settingsManager';
+import MCVersionHandler from '../../../minecraft/mcVersionHandler';
 
 const CustomVersions = styled.div`
   background-color: #2b2b2b;
@@ -157,6 +158,7 @@ export default function EditPageVersions({ id }) {
 
   const confirmVersionChange = newVer => {
     profile.changeMCVersion(newVer);
+    MCVersionHandler.updateProfile(profile, true);
     profile.progressState = {};
 
     if (profile.frameworks.forge) uninstallForge();
@@ -170,6 +172,7 @@ export default function EditPageVersions({ id }) {
       setMCVerValue(version);
       profile.progressState = {};
       profile.changeMCVersion(version);
+      MCVersionHandler.updateProfile(profile, true);
     } else {
       cancel();
       AlertManager.alert(

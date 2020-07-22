@@ -7,7 +7,8 @@ import fs from 'fs';
 import os from 'os';
 import mkdirp from 'mkdirp';
 import crypto from 'crypto';
-import rimraf from 'rimraf';
+import archiver from 'archiver';
+import AdmZip from 'adm-zip';
 import FSU from '../util/fsu';
 import LibrariesManager from './librariesManager';
 import logInit from '../util/logger';
@@ -55,6 +56,7 @@ const DirectLauncherManager = {
   },
 
   generateClasspath(profile, versionJSON) {
+    return new Promise((resolve) => {
     let cpString = '"';
     versionJSON.libraries.forEach(library => {
       if (this.allowLibrary(library) && !library.natives) {
@@ -62,10 +64,50 @@ const DirectLauncherManager = {
       }
     });
 
-    cpString += `../../../shared/jars/${profile.version.minecraft.version}.jar`;
-    cpString += '"';
+    let files = [];
+    if (fs.existsSync(path.join(profile.mcmPath, '/jarmods'))) {
+      files = fs.readdirSync(path.join(profile.mcmPath, '/jarmods'));
+    }
 
-    return cpString;
+    if (!files.length) {
+      cpString += `../../../shared/jars/${profile.version.minecraft.version}.jar`;
+      cpString += '"';
+      resolve(cpString);
+    } else {
+      // Jarmods are installed; we need to patch the Minecraft jar
+      const archive = archiver('zip');
+
+      const zip = new AdmZip(path.join(Global.MCM_PATH, `/shared/jars/${profile.version.minecraft.version}.jar`));
+
+      const appendedJarEntries = [];
+
+      files.forEach(jarFile => {
+        const jarZip = new AdmZip(path.join(profile.mcmPath, `/jarmods/${jarFile}`));
+        jarZip.getEntries().forEach(entry => {
+          appendedJarEntries.push(entry.entryName);
+          archive.append(entry.getData(), { name: entry.entryName });
+        });
+      });
+
+      zip.getEntries().forEach(entry => {
+        if (entry.entryName !== 'META-INF/' && entry.entryName !== 'META-INF/MANIFEST.MF' && !appendedJarEntries.includes(entry.entryName)) {
+          archive.append(entry.getData(), { name: entry.entryName });
+        }
+      });
+
+
+      archive.pipe(fs.createWriteStream(path.join(profile.mcmPath, '/patched.jar')));
+
+      archive.finalize();
+
+      archive.on('end', () => {
+        cpString += `../../../profiles/${profile.id}/_mcm/patched.jar`;
+        cpString += '"';
+
+        resolve(cpString);
+      });
+    }
+  });
   },
 
   allowRule(rule) {
@@ -105,7 +147,7 @@ const DirectLauncherManager = {
 
   runCommand(profile, versionJSON, binName) {
     return new Promise(async resolve => {
-      const classpath = this.generateClasspath(profile, versionJSON);
+      const classpath = await this.generateClasspath(profile, versionJSON);
 
       let mcArgs = '';
       if (versionJSON.minecraftArguments) {
@@ -138,8 +180,10 @@ const DirectLauncherManager = {
         '${auth_player_name}',
         MCAccountsHandler.getNameFromUUID(SettingsManager.currentSettings.activeAccount));
       mcArgs = mcArgs.replace('${version_name}', `"${profile.name}"`);
-      mcArgs = mcArgs.replace('${game_directory}', './');
+      mcArgs = mcArgs.replace('${game_directory}', `"${profile.gameDir}"`);
       mcArgs = mcArgs.replace('${assets_root}', '"../../../shared/assets"');
+      mcArgs = mcArgs.replace('${game_assets}', '"../../../shared/assets"');
+
       mcArgs = mcArgs.replace('${assets_index_name}', versionJSON.assets);
       mcArgs = mcArgs.replace(
         '${auth_uuid}',
@@ -151,6 +195,7 @@ const DirectLauncherManager = {
       );
       mcArgs = mcArgs.replace('${user_type}', 'mojang');
       mcArgs = mcArgs.replace('${user_properties}', '{}');
+      mcArgs = mcArgs.replace('${auth_session}', `token:${MCAccountsHandler.getAccessTokenFromUUID(SettingsManager.currentSettings.activeAccount)}`);
 
       if (versionJSON.type) {
         mcArgs = mcArgs.replace('${version_type}', versionJSON.type);
@@ -175,7 +220,7 @@ const DirectLauncherManager = {
 
       if (!versionJSON.arguments) {
         // no arguments, we have to figure them out ourselves
-        finishedJavaArgs = `-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Djava.library.path="../../../${binName}/natives/" -Dminecraft.client.jar="../../../shared/jars/${profile.version.minecraft.version}.jar"`;
+        finishedJavaArgs = `-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Djava.library.path="../../../${binName}/natives/"`;
         finishedJavaArgs += ` -cp ${classpath}`;
         finishedJavaArgs += ' -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
         finishedJavaArgs += ` ${endJavaArgs}`;
@@ -235,7 +280,7 @@ const DirectLauncherManager = {
         }
 
         logger.info(`Removing ${binName} for ${profile.id}`);
-        rimraf.sync(path.join(Global.MCM_PATH, binName));
+        // rimraf.sync(path.join(Global.MCM_PATH, binName));
       });
 
 
@@ -562,6 +607,23 @@ const DirectLauncherManager = {
 
           await Downloader.downloadConcurrently(toDownload);
           DownloadsManager.removeDownload(download.name);
+
+          if (versionJSON.assets === 'pre-1.6') {
+            // this is a pre-1.6 version;
+            // assets must be copied to the resources folder
+            const resourcesPath = path.join(profile.gameDir, '/resources');
+            FSU.createDirIfMissing(resourcesPath);
+            Object.keys(indexJSON.objects).forEach(object => {
+              const hash = indexJSON.objects[object].hash;
+              const hashedObjectPath = `/objects/${hash.substring(0, 2)}/${hash}`;
+              if (!fs.existsSync(path.join(resourcesPath, hashedObjectPath))) {
+                const objResourcesPath = path.join(resourcesPath, object);
+                FSU.createDirIfMissing(path.dirname(objResourcesPath));
+                fs.copyFileSync(path.join(assetsPath, hashedObjectPath), objResourcesPath);
+              }
+            });
+          }
+
           resolve();
         }
       }

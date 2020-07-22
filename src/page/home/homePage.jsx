@@ -18,8 +18,8 @@ const CreateOverlay = transition.div`
   right: 20px;
   width: 300px;
   height: 209px;
-  background: #333;
-  box-shadow: 0px 0px 14px 4px rgba(0,0,0,0.35);
+  background: #2b2b2b;
+  box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.53);
   padding: 5px;
   border-radius: 10px;
   input {
@@ -121,7 +121,7 @@ export default withRouter(({ history }) => {
     header.setChildren(
       <>
         <IH style={{ marginRight: '5px' }}>
-          <Button onClick={() => setShowImport(true)} color="purple">
+          <Button onClick={() => setShowImport(true)} color="#404040">
             Import
           </Button>
         </IH>

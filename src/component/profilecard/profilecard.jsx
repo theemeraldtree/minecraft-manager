@@ -22,6 +22,7 @@ const BG = styled.div`
   user-select: none;
   position: relative;
   transition: 100ms;
+  border-radius: 5px;
   .buttons {
     transition: 100ms;
     bottom: -40px;
