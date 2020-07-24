@@ -250,7 +250,7 @@ const Curse = {
     if (result) {
       const al = this.readAssetList(result);
 
-      if (!term.trim()) {
+      if (term.trim()) {
         const readyToSort = al.map(assetRaw => {
           const asset = assetRaw;
           asset.searchName = asset.name.replace(/[^\w]/gi, ' ');

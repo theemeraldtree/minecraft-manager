@@ -14,8 +14,8 @@ import SettingsManager from '../../manager/settingsManager';
 const logger = logInit('FabricFramework');
 
 const FabricFramework = {
-  setupFabric: profile =>
-    new Promise(async resolve => {
+  setupFabric(profile) {
+    return new Promise(async (resolve, reject) => {
       logger.info(`Beginning install of Fabric ${profile.frameworks.fabric.version} to ${profile.id}`);
       profile.setFrameworkIsInstalling('fabric');
 
@@ -29,26 +29,44 @@ const FabricFramework = {
       mkdirp.sync(path.join(libraryPath, '/fabric-intermediary'));
       mkdirp.sync(path.join(libraryPath, '/fabric-loader'));
 
+      let intermediaryDone, loaderDone;
+
+      const checkDone = () => {
+        if (intermediaryDone && loaderDone) {
+          profile.unsetFrameworkIsInstalling('fabric');
+          resolve();
+        }
+      };
+
       logger.info(`Starting download of Fabric Intermediary for ${profile.id}`);
       DownloadsManager.startFileDownload(
         `Fabric Intermediary\n_A_${profile.name}`,
         `https://maven.fabricmc.net/net/fabricmc/intermediary/${profile.version.minecraft.version}/intermediary-${profile.version.minecraft.version}.jar`,
         path.join(libraryPath, `fabric-intermediary/mcm-${profile.id}-fabric-intermediary.jar`)
-      );
+      ).then(() => {
+        intermediaryDone = true;
+        checkDone();
+      }).catch(async e => {
+        await this.uninstallFabric(profile);
+        reject(e);
+      });
 
       logger.info(`Starting download of Fabric Loader for ${profile.id}`);
       DownloadsManager.startFileDownload(
         `Fabric Loader\n_A_${profile.name}`,
         `https://maven.fabricmc.net/net/fabricmc/fabric-loader/${profile.frameworks.fabric.version}/fabric-loader-${profile.frameworks.fabric.version}.jar`,
         path.join(libraryPath, `fabric-loader/mcm-${profile.id}-fabric-loader.jar`)
-      );
-
-      profile.unsetFrameworkIsInstalling('fabric');
-
-      resolve();
-    }),
-  uninstallFabric: profile =>
-    new Promise(resolve => {
+      ).then(() => {
+        loaderDone = true;
+        checkDone();
+      }).catch(async e => {
+        await this.uninstallFabric(profile);
+        reject(e);
+      });
+    });
+  },
+  uninstallFabric(profile) {
+    return new Promise(resolve => {
       logger.info(`Beginning uninstall of Fabric from ${profile.id}`);
       LibrariesManager.deleteLibrary(profile).then(() => {
         VersionsManager.deleteVersion(profile).then(() => {
@@ -57,7 +75,8 @@ const FabricFramework = {
           resolve();
         });
       });
-    }),
+    });
+  },
   getFabricLoaderVersions: mcversion =>
     new Promise((resolve, reject) => {
       logger.info('Downloading Fabric Loader versions...');

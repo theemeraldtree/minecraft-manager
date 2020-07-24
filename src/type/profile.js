@@ -81,6 +81,16 @@ export default class Profile extends OAMFAsset {
     if (!this.frameworks) this.frameworks = {};
     if (this.hosts && this.hosts.curse && !this.hosts.curse.fullyInstalled) this.error = true;
 
+    if (this.frameworks.forge && this.frameworks.forge.isInstalling) {
+      this.frameworks.forge.isInstalling = false;
+      this.logger.error('Forge "isInstalling" was true while loading profile');
+    }
+
+    if (this.frameworks.fabric && this.frameworks.fabric.isInstalling) {
+      this.frameworks.fabric.isInstalling = false;
+      this.logger.error('Fabric "isInstalling" was true while loading profile');
+    }
+
     this.progressState = {};
   }
 
@@ -457,7 +467,7 @@ export default class Profile extends OAMFAsset {
             }
             resolve();
           } else {
-            this.logger.info(`Unable to launch Minecraft directly. Not launcher integrated. Error: ${e.toString()}`);
+            this.logger.info(`Unable to launch Minecraft directly. Not launcher integrated. Error: ${e.stack}`);
             ToastManager.createToast('Unable to launch', `${e.toString()}`);
             resolve();
           }
@@ -581,6 +591,11 @@ export default class Profile extends OAMFAsset {
   removeFramework(framework) {
     this.frameworks[framework] = undefined;
     this.save();
+
+    // Remove the version JSON if it's present
+    FSU.deleteFileIfExists(
+      path.join(this.mcmPath, `/version/${framework}.json`)
+    );
   }
 
   /**

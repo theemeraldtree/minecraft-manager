@@ -29,42 +29,44 @@ const HTTPRequest = {
 
   downloadInline(url, dest, onProgress, opts = {}) {
     return new Promise(async (resolve, reject) => {
-      const { data, headers } = await axios.get(url, {
+       axios.get(url, {
         responseType: 'stream',
         headers: {
           'X-Client': 'MinecraftManager'
         },
         adapter
-      });
+      }).then(({ data, headers }) => {
+        const contentLength = headers['content-length'];
 
-      const contentLength = headers['content-length'];
+        const ws = fs.createWriteStream(dest);
 
-      const ws = fs.createWriteStream(dest);
+        let progressData = 0;
+        let previousPercent = 0;
 
-      let progressData = 0;
-      let previousPercent = 0;
+        data.pipe(ws);
 
-      data.pipe(ws);
+        data.on('data', chunk => {
+          progressData += chunk.length;
 
-      data.on('data', chunk => {
-        progressData += chunk.length;
-
-        const prog = Math.trunc((progressData / contentLength) * 100);
-        if ((prog - previousPercent >= 10) || opts.enableDetailedProgress) {
-          previousPercent = prog;
-          if (onProgress) {
-            onProgress(prog);
+          const prog = Math.trunc((progressData / contentLength) * 100);
+          if ((prog - previousPercent >= 10) || opts.enableDetailedProgress) {
+            previousPercent = prog;
+            if (onProgress) {
+              onProgress(prog);
+            }
           }
-        }
-      });
+        });
 
-      data.on('error', e => {
+        data.on('error', e => {
+          reject(e);
+        });
+
+        data.on('end', () => {
+          ws.end();
+          resolve();
+        });
+      }).catch(e => {
         reject(e);
-      });
-
-      data.on('end', () => {
-        ws.end();
-        resolve();
       });
     });
   },

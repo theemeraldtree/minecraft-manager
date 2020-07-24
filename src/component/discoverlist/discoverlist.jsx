@@ -56,6 +56,7 @@ const Header = styled.div`
 const SortDropdown = styled(Dropdown)`
   && {
     width: 130px;
+    margin-left: 5px;
     margin-right: 5px;
     margin-bottom: 5px;
   }
@@ -253,30 +254,33 @@ export default class DiscoverList extends Component {
     this.renderSearch({ sort: this.state.sortValue, minecraftVersion: this.state.mcVerValue });
   };
 
+  rerender = () => {
+    const {
+      displayState,
+      sortValue,
+      mcVerValue,
+      isSearching
+    } = this.state;
+
+    if (displayState === 'browseAssets' && !isSearching) {
+      this.browseAssets({ sort: sortValue, minecraftVersion: mcVerValue });
+    } else if (this.state.isSearching) {
+      this.renderSearch({ sort: sortValue, minecraftVersion: mcVerValue });
+    }
+  }
+
   sortValueChange = newValue => {
     this.setState({
       sortValue: newValue,
       loading: true
-    });
-
-    if (this.state.displayState === 'browseAssets' && !this.state.isSearching) {
-      this.browseAssets({ sort: newValue, minecraftVersion: this.state.mcVerValue });
-    } else if (this.state.isSearching) {
-      this.renderSearch({ sort: newValue, minecraftVersion: this.state.mcVerValue });
-    }
+    }, this.rerender);
   };
 
   mcVerValueChange = newValue => {
     this.setState({
       mcVerValue: newValue,
       loading: true
-    });
-
-    if (this.state.displayState === 'browseAssets' && !this.state.isSearching) {
-      this.browseAssets({ sort: this.state.sortValue, minecraftVersion: newValue });
-    } else if (this.state.isSearching) {
-      this.renderSearch({ sort: this.state.sortValue, minecraftVersion: newValue });
-    }
+    }, this.rerender);
   };
 
   render() {
@@ -288,8 +292,9 @@ export default class DiscoverList extends Component {
       progressState,
       cantConnect,
       sortValue,
-      mcVerValue
+      mcVerValue,
     } = this.state;
+
     const {
       type,
       forceFramework,

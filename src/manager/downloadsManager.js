@@ -35,6 +35,7 @@ const DownloadsManager = {
           });
       } else {
         logger.error('Missing file download path');
+        reject(new Error('Missing file download path'));
       }
     });
   },

@@ -214,8 +214,8 @@ const ProfilesManager = {
 
         ToastManager.createToast(
           'Warning',
-          `The '${path.basename(location)}' profile has a corrupted/malformed JSON info file! That's not good!`,
-          'OMAF-PROFILE-MALFORMED-JSON'
+          `The '${path.basename(location)}' instance has a corrupted/malformed JSON info file! That's not good!`,
+          'INSTANCE-MALFORMED-JSON'
         );
       }
       if (rawOMAF) {
@@ -249,7 +249,7 @@ const ProfilesManager = {
       ToastManager.createToast(
         'Warning',
         `In your profiles folder, the '${path.basename(location)}' folder is missing the essential profile.json file!`,
-        'OMAF-PROFILE-MISSING-JSON'
+        'INSTANCE-MISSING-JSON'
       );
     }
   },

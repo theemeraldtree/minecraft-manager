@@ -224,6 +224,12 @@ export default function EditPageVersions({ id }) {
     FabricFramework.setupFabric(profile).then(() => {
       if (isMounted) setFabricIsInstalling(false);
       if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
+    }).catch(err => {
+      if (isMounted) setFabricIsInstalling(false);
+      AlertManager.messageBox(
+        'error installing fabric',
+        err
+      );
     });
   };
 
@@ -244,21 +250,37 @@ export default function EditPageVersions({ id }) {
       const latestPromo = promos.promos[`${profile.version.minecraft.version}-latest`];
 
       if (!latestPromo) {
-        AlertManager.messageBox(
-          'no minecraft forge version',
-          `There is no Minecraft Forge version available for Minecraft ${profile.version.minecraft.version}`
-        );
-        setForgeIsInstalling(false);
-        return;
-      }
+        const forgeVersions = await ForgeFramework.getForgeVersions(profile.version.minecraft.version);
+        if (!forgeVersions) {
+          AlertManager.messageBox(
+            'no minecraft forge version',
+            `There is no Minecraft Forge version available for Minecraft ${profile.version.minecraft.version}`
+          );
+          setForgeIsInstalling(false);
+          return;
+        }
 
-      version = `${profile.version.minecraft.version}-${latestPromo.version}`;
+        let firstVersion = forgeVersions[forgeVersions.length - 1];
+        if (firstVersion.substring(0, profile.version.minecraft.version.length) === profile.version.minecraft.version) {
+          firstVersion = firstVersion.substring(profile.version.minecraft.version.length + 1);
+        }
+
+        version = `${profile.version.minecraft.version}-${firstVersion}`;
+      } else {
+        version = `${profile.version.minecraft.version}-${latestPromo.version}`;
+      }
     }
 
     profile.setFrameworkVersion('forge', version);
     ForgeFramework.setupForge(profile).then(() => {
       if (isMounted) setForgeIsInstalling(false);
       if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
+    }).catch(err => {
+      if (isMounted) setForgeIsInstalling(false);
+      AlertManager.messageBox(
+        'error installing forge',
+        err
+      );
     });
   };
 
@@ -356,7 +378,7 @@ export default function EditPageVersions({ id }) {
         {!profile.frameworks.fabric && !fabricIsInstalling && (
           <CustomVersions>
             <h3>Minecraft Forge</h3>
-            <Detail>The most popular modloader. Used in many large and popular mods.</Detail>
+            <Detail>The most popular modloader.</Detail>
             {!profile.frameworks.forge && !forgeIsInstalling && (
               <Button onClick={() => setShowConfirmForge(true)} color="green">
                 Install Forge
@@ -380,11 +402,11 @@ export default function EditPageVersions({ id }) {
         )}
         {!profile.frameworks.forge && !forgeIsInstalling && (
           <CustomVersions>
-            <h3>Fabric</h3>
-            <Detail>The next-generation modloader. Used in quality-of-life and content mods.</Detail>
+            <h3>Fabric Loader</h3>
+            <Detail>The next-generation modloader.</Detail>
             {!profile.frameworks.fabric && !fabricIsInstalling && (
               <Button onClick={() => setShowConfirmFabric(true)} color="green">
-                Install Fabric
+                Install Fabric Loader
               </Button>
             )}
             {fabricIsInstalling && (

@@ -76,9 +76,9 @@ const LibrariesManager = {
       logger.info(`Deleting Library for ${profile.id}`);
       const libraryPath = path.join(this.getMCMLibraries(), `/mcm-${profile.id}`);
       if (fs.existsSync(libraryPath)) {
-        rimraf(libraryPath, () => {
-          resolve();
-        });
+        // rimraf(libraryPath, () => {
+        resolve();
+        // });
       } else {
         resolve();
       }

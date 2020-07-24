@@ -53,82 +53,87 @@ const ForgeComplex = {
     }
     return `${split[0].replace(/\./g, '/')}/${split[1]}/${split[2]}/${split[1]}-${split[2]}${EXTENSION}`;
   },
-  setupForge(profile, callback) {
-    logger.info(`Installing Forge for ${profile.id}`);
-    logger.info('Downloading installer jar');
+  setupForge(profile) {
+    return new Promise((resolve, reject) => {
+      logger.info(`Installing Forge for ${profile.id}`);
+      logger.info('Downloading installer jar');
 
-    const workFolder = path.join(Global.MCM_TEMP, `/forge-install-${profile.id}-${new Date().getTime()}`);
-    if (!fs.existsSync(Global.MCM_TEMP)) {
-      fs.mkdirSync(Global.MCM_TEMP);
-    }
+      const workFolder = path.join(Global.MCM_TEMP, `/forge-install-${profile.id}-${new Date().getTime()}`);
+      if (!fs.existsSync(Global.MCM_TEMP)) {
+        fs.mkdirSync(Global.MCM_TEMP);
+      }
 
-    fs.mkdirSync(workFolder);
+      fs.mkdirSync(workFolder);
 
-    DownloadsManager.startFileDownload(
-      `Forge Installer Jar\n_A_${profile.name}`,
-      `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`,
-      path.join(workFolder, 'installer.jar')
-    ).then(() => {
-      logger.info('Installer Jar download finished');
-      logger.info('Extracting installer jar');
+      DownloadsManager.startFileDownload(
+        `Forge Installer Jar\n_A_${profile.name}`,
+        `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-installer.jar`,
+        path.join(workFolder, 'installer.jar')
+      ).then(() => {
+        logger.info('Installer Jar download finished');
+        logger.info('Extracting installer jar');
 
-      const TEMP_PATH = path.join(workFolder);
-      const JAR_PATH = path.join(TEMP_PATH, '/jar');
-      const DATA_PATH = path.join(TEMP_PATH, '/data');
+        const TEMP_PATH = path.join(workFolder);
+        const JAR_PATH = path.join(TEMP_PATH, '/jar');
+        const DATA_PATH = path.join(TEMP_PATH, '/data');
 
-      this.installState[profile.id] = {
-        TEMP_PATH,
-        JAR_PATH,
-        DATA_PATH,
-        totalLibraryCount: 0,
-        totalDataCount: 0,
-        processorNumber: 0,
-        callback,
+        this.installState[profile.id] = {
+          TEMP_PATH,
+          JAR_PATH,
+          DATA_PATH,
+          totalLibraryCount: 0,
+          totalDataCount: 0,
+          processorNumber: 0,
+          callback: resolve,
 
-        LIBRARIES: {},
-        DATA: {}
-      };
+          LIBRARIES: {},
+          DATA: {}
+        };
 
-      const { LIBRARIES } = this.installState[profile.id];
+        const { LIBRARIES } = this.installState[profile.id];
 
-      const zip = new AdmZip(path.join(workFolder, 'installer.jar'));
-      zip.extractAllTo(JAR_PATH);
+        const zip = new AdmZip(path.join(workFolder, 'installer.jar'));
+        zip.extractAllTo(JAR_PATH);
 
-      logger.info('Reading install_profile.json');
-      const INSTALL_PROFILE = JSON.parse(fs.readFileSync(path.join(JAR_PATH, '/install_profile.json')));
-      ForgeFramework.versionJSONCache[profile.frameworks.forge.version] = ForgeFramework.extractVersionJSON(zip);
+        logger.info('Reading install_profile.json');
+        const INSTALL_PROFILE = JSON.parse(fs.readFileSync(path.join(JAR_PATH, '/install_profile.json')));
+        ForgeFramework.versionJSONCache[profile.frameworks.forge.version] = ForgeFramework.extractVersionJSON(zip);
 
-      this.installState[profile.id].INSTALL_PROFILE = INSTALL_PROFILE;
-      logger.info('Starting read of libraries and downloading them');
-      for (const library of INSTALL_PROFILE.libraries) {
-        logger.info(`Reading library ${library.name}`);
-        const mvnPath = path.join(DATA_PATH, library.downloads.artifact.path);
-        logger.info(`Starting download of library ${library.name} from ${library.downloads.artifact.url}`);
+        this.installState[profile.id].INSTALL_PROFILE = INSTALL_PROFILE;
+        logger.info('Starting read of libraries and downloading them');
+        for (const library of INSTALL_PROFILE.libraries) {
+          logger.info(`Reading library ${library.name}`);
+          const mvnPath = path.join(DATA_PATH, library.downloads.artifact.path);
+          logger.info(`Starting download of library ${library.name} from ${library.downloads.artifact.url}`);
 
-        mkdirp(path.dirname(path.join(DATA_PATH, library.downloads.artifact.path)), () => {
-          if (library.downloads.artifact.url) {
-            DownloadsManager.startFileDownload(
-              `Forge Library ${library.name}\n_A_${profile.name}`,
-              library.downloads.artifact.url,
-              mvnPath
-            ).then(() => {
+          mkdirp(path.dirname(path.join(DATA_PATH, library.downloads.artifact.path)), () => {
+            if (library.downloads.artifact.url) {
+              DownloadsManager.startFileDownload(
+                `Forge Library ${library.name}\n_A_${profile.name}`,
+                library.downloads.artifact.url,
+                mvnPath
+              ).then(() => {
+                LIBRARIES[library.name] = mvnPath;
+                this.installState[profile.id].totalLibraryCount++;
+                this.checkLibraryDone(profile);
+              });
+            } else {
+              logger.info(`Library ${library.name} is a local file. Finding it...`);
+
               LIBRARIES[library.name] = mvnPath;
+              fs.copyFileSync(
+                path.join(JAR_PATH, 'maven', library.downloads.artifact.path),
+                path.join(DATA_PATH, library.downloads.artifact.path)
+              );
               this.installState[profile.id].totalLibraryCount++;
               this.checkLibraryDone(profile);
-            });
-          } else {
-            logger.info(`Library ${library.name} is a local file. Finding it...`);
-
-            LIBRARIES[library.name] = mvnPath;
-            fs.copyFileSync(
-              path.join(JAR_PATH, 'maven', library.downloads.artifact.path),
-              path.join(DATA_PATH, library.downloads.artifact.path)
-            );
-            this.installState[profile.id].totalLibraryCount++;
-            this.checkLibraryDone(profile);
-          }
-        });
-      }
+            }
+          });
+        }
+      }).catch(async e => {
+        await ForgeFramework.uninstallForge(profile);
+        reject(e);
+      });
     });
   },
   checkLibraryDone(profile) {
