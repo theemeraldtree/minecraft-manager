@@ -1,6 +1,6 @@
-/* eslint-disable */
 import fs from 'fs';
 import path from 'path';
+import rimraf from 'rimraf';
 import FSU from '../util/fsu';
 import LauncherManager from '../manager/launcherManager';
 import MCAccountsHandler from './mcAccountsHandler';
@@ -10,9 +10,7 @@ import Global from '../util/global';
 import LibrariesManager from '../manager/librariesManager';
 import MCVersionHandler from './mcVersionHandler';
 import JavaHandler from './javaHandler';
-import rimraf from 'rimraf';
 import VersionsManager from '../manager/versionsManager';
-import mkdirp from 'mkdirp';
 
 const MCLauncherIntegrationHandler = {
   integrateAccounts() {
@@ -37,12 +35,12 @@ const MCLauncherIntegrationHandler = {
     return new Promise(async resolve => {
       const launcherProfiles = await FSU.readJSON(LauncherManager.getLauncherProfiles());
 
-      if(launcherProfiles.settings.enableSnapshots !== SettingsManager.currentSettings.allowSnapshotProfile) {
+      if (launcherProfiles.settings.enableSnapshots !== SettingsManager.currentSettings.allowSnapshotProfile) {
         SettingsManager.currentSettings.allowSnapshotProfile = launcherProfiles.settings.enableSnapshots;
       }
 
-      if(!MCAccountsHandler.getAccountFromUUID(SettingsManager.currentSettings.activeAccount)) {
-        if(SettingsManager.currentSettings.accounts.length) {
+      if (!MCAccountsHandler.getAccountFromUUID(SettingsManager.currentSettings.activeAccount)) {
+        if (SettingsManager.currentSettings.accounts.length) {
           SettingsManager.currentSettings.activeAccount = SettingsManager.currentSettings.accounts[0].uuid;
         }
       }
@@ -85,7 +83,7 @@ const MCLauncherIntegrationHandler = {
               lastUsed: new Date().toISOString()
             };
           }
-  
+
           if (!fs.existsSync(path.join(profile.mcmPath, '/version.json'))) {
             await MCVersionHandler.updateProfile(profile);
           }
@@ -93,12 +91,12 @@ const MCLauncherIntegrationHandler = {
           MCVersionHandler.createLauncherIntegration(profile);
           setData(profile, 'lastVersionId', profile.versionname);
 
-          if(initial) {
+          if (initial) {
             setData(profile, 'icon', await profile.getIconBase64());
           }
         }
 
-        if(profile.id === '0-default-profile-latest' && initial) {
+        if (profile.id === '0-default-profile-latest' && initial) {
           SettingsManager.currentSettings.prevLauncherLatestArgs = launcherProfiles.profiles[Object.keys(launcherProfiles.profiles).find(prof => launcherProfiles.profiles[prof].type === 'latest-release')].javaArgs;
 
           SettingsManager.save();
@@ -107,7 +105,7 @@ const MCLauncherIntegrationHandler = {
 
           SettingsManager.save();
         }
-        
+
 
         let remainingArgs = '';
         if (SettingsManager.currentSettings.java.customArgsActive && !profile.mcm.java.overrideArgs) {
@@ -118,7 +116,7 @@ const MCLauncherIntegrationHandler = {
         }
 
         let ramAmount = SettingsManager.currentSettings.dedicatedRam;
-        if(profile.mcm.java && profile.mcm.java.overrideRam) {
+        if (profile.mcm.java && profile.mcm.java.overrideRam) {
           ramAmount = profile.mcm.java.dedicatedRam;
         }
 
@@ -129,7 +127,7 @@ const MCLauncherIntegrationHandler = {
 
         LauncherManager.updateGameDir(profile);
 
-   
+
         resolve();
       })));
 
@@ -144,18 +142,18 @@ const MCLauncherIntegrationHandler = {
       fs.symlinkSync(path.join(LibrariesManager.getLibrariesPath(), '/minecraftmanager/'), path.join(Global.getMCPath(), '/libraries/minecraftmanager/'), 'junction');
     }
 
-    FSU.createDirIfMissing(path.join(Global.getMCPath(), `/libraries/net/minecraftforge/forge/`));
+    FSU.createDirIfMissing(path.join(Global.getMCPath(), '/libraries/net/minecraftforge/forge/'));
     ProfilesManager.loadedProfiles.forEach(profile => {
       // 1.13 or newer Forge requires the client and universal exist in the libraries folder
       // this properly links the Minecraft Manager libraries and Minecraft Launcher libraries
-      if(profile.getPrimaryFramework() === 'forge' && VersionsManager.checkIs113OrHigher(profile)) {
+      if (profile.getPrimaryFramework() === 'forge' && VersionsManager.checkIs113OrHigher(profile)) {
         const forgeBasePath = `/net/minecraftforge/forge/${profile.frameworks.forge.version}`;
         const forgePath = path.join(Global.getMCPath(), `/libraries/${forgeBasePath}`);
 
         FSU.createDirIfMissing(forgePath);
 
         const clientPath = path.join(LibrariesManager.getLibrariesPath(), forgeBasePath, `/forge-${profile.frameworks.forge.version}-client.jar`);
-        if(fs.existsSync(clientPath)) {
+        if (fs.existsSync(clientPath)) {
           FSU.updateSymlink(
             path.join(forgePath, `/forge-${profile.frameworks.forge.version}-client.jar`),
             clientPath
@@ -164,14 +162,14 @@ const MCLauncherIntegrationHandler = {
 
         const universalPath = path.join(LibrariesManager.getLibrariesPath(), forgeBasePath, `/forge-${profile.frameworks.forge.version}-universal.jar`);
 
-        if(fs.existsSync(universalPath)) {
+        if (fs.existsSync(universalPath)) {
           FSU.updateSymlink(
             path.join(forgePath, `/forge-${profile.frameworks.forge.version}-universal.jar`),
             universalPath
           );
         }
       }
-    })
+    });
   },
   integrate(initial) {
     this.integrateAccounts();
@@ -179,7 +177,7 @@ const MCLauncherIntegrationHandler = {
     this.integrateLibraries();
   },
   removeIntegration() {
-    if(fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
+    if (fs.existsSync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'))) {
       rimraf.sync(path.join(Global.getMCPath(), '/libraries/minecraftmanager'));
     }
 
@@ -187,7 +185,7 @@ const MCLauncherIntegrationHandler = {
       MCVersionHandler.deleteLauncherIntegration(profile);
       LauncherManager.deleteProfile(profile);
 
-      if(profile.id === '0-default-profile-latest') {
+      if (profile.id === '0-default-profile-latest') {
         LauncherManager.setProfileData(profile, 'javaArgs', SettingsManager.currentSettings.prevLauncherLatestArgs);
         LauncherManager.setProfileData(profile, 'gameDir', undefined);
         LauncherManager.setProfileData(profile, 'javaDir', undefined);
@@ -196,7 +194,7 @@ const MCLauncherIntegrationHandler = {
         LauncherManager.setProfileData(profile, 'gameDir', undefined);
         LauncherManager.setProfileData(profile, 'javaDir', undefined);
       }
-    })
+    });
   }
 };
 

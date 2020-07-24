@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext, useReducer } from 'react';
+import fs from 'fs';
+import path from 'path';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Redirect } from 'react-router-dom';
 import { Button, Dropdown, Detail, Spinner } from '@theemeraldtree/emeraldui';
 import ProfilesManager from '../../../manager/profilesManager';
@@ -18,11 +20,20 @@ import MCLauncherIntegrationHandler from '../../../minecraft/mcLauncherIntegrati
 import SettingsManager from '../../../manager/settingsManager';
 import MCVersionHandler from '../../../minecraft/mcVersionHandler';
 
-const CustomVersions = styled.div`
+const { dialog } = require('electron').remote;
+
+const ModloaderSection = styled.div`
   background-color: #2b2b2b;
-  width: 350px;
+  width: 440px;
   padding: 10px;
   margin-bottom: 5px;
+  display: flex;
+  flex-flow: row;
+  height: 47px;
+
+  > div:first-child {
+    flex: 1;
+  }
 
   h3 {
     margin: 0;
@@ -31,6 +42,15 @@ const CustomVersions = styled.div`
   button {
     margin-top: 5px;
   }
+
+  .spinner {
+    margin-top: -17px;
+    transform: scale(0.5);
+  }
+
+  ${props => props.disabled && css`
+    filter: brightness(0.75);
+  `}
 `;
 
 const BG = styled.div`
@@ -63,6 +83,49 @@ const TinySpinner = styled.div`
   }
 `;
 
+const Card = styled.div`
+  width: 450px;
+  background: #2b2b2b;
+  padding: 5px;
+  margin-top: 5px;
+  display: flex;
+
+  > img {
+    width: 30px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 15pt;
+    font-weight: 700;
+  }
+
+  > .flex-fill {
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+  }
+
+  .version-detail {
+    color: #c1c1c1;
+    margin-top: 10px;
+    font-size: 9pt;
+  }
+
+  .version-detail p {
+    margin: 0;
+  }
+`;
+
+const HeaderCard = styled(Card)`
+  background: #424242;
+`;
+
+const CardMCVersionSelector = styled(MCVersionSelector)`
+  width: 200px;
+`;
+
 export default function EditPageVersions({ id }) {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
@@ -84,6 +147,8 @@ export default function EditPageVersions({ id }) {
 
   const [showConfirmForge, setShowConfirmForge] = useState(false);
   const [showConfirmFabric, setShowConfirmFabric] = useState(false);
+
+  const [jarMods, setJarMods] = useState([]);
 
   let isMounted = true;
 
@@ -221,16 +286,15 @@ export default function EditPageVersions({ id }) {
     }
 
     profile.setFrameworkVersion('fabric', version);
-    FabricFramework.setupFabric(profile).then(() => {
-      if (isMounted) setFabricIsInstalling(false);
-      if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
-    }).catch(err => {
-      if (isMounted) setFabricIsInstalling(false);
-      AlertManager.messageBox(
-        'error installing fabric',
-        err
-      );
-    });
+    FabricFramework.setupFabric(profile)
+      .then(() => {
+        if (isMounted) setFabricIsInstalling(false);
+        if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
+      })
+      .catch(err => {
+        if (isMounted) setFabricIsInstalling(false);
+        AlertManager.messageBox('error installing fabric', err);
+      });
   };
 
   const downloadForge = async versionT => {
@@ -272,16 +336,15 @@ export default function EditPageVersions({ id }) {
     }
 
     profile.setFrameworkVersion('forge', version);
-    ForgeFramework.setupForge(profile).then(() => {
-      if (isMounted) setForgeIsInstalling(false);
-      if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
-    }).catch(err => {
-      if (isMounted) setForgeIsInstalling(false);
-      AlertManager.messageBox(
-        'error installing forge',
-        err
-      );
-    });
+    ForgeFramework.setupForge(profile)
+      .then(() => {
+        if (isMounted) setForgeIsInstalling(false);
+        if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
+      })
+      .catch(err => {
+        if (isMounted) setForgeIsInstalling(false);
+        AlertManager.messageBox('error installing forge', err);
+      });
   };
 
   const curseVersionChange = e => {
@@ -303,12 +366,21 @@ export default function EditPageVersions({ id }) {
     setFabricIsInstalling(profile.frameworks.fabric ? profile.frameworks.fabric.isInstalling : false);
   };
 
+  const reloadJarMods = () => {
+    const jarmodPath = path.join(profile.mcmPath, '/jarmods');
+    if (fs.existsSync(jarmodPath)) {
+      setJarMods(fs.readdirSync(jarmodPath).filter(file => profile.frameworks.forge?.jarmodFile !== file));
+    }
+  };
+
   useEffect(() => {
     setMCVerValue(profile.version.minecraft.version);
     reloadCurseVersionsList();
     updateIsInstalling();
 
     ProfilesManager.registerReloadListener(updateIsInstalling);
+
+    reloadJarMods();
 
     return () => {
       isMounted = false;
@@ -319,6 +391,37 @@ export default function EditPageVersions({ id }) {
   useEffect(() => {
     reloadCurseVersionsList();
   }, [profile]);
+
+  const uninstallJarmod = (file) => {
+    setJarMods(jarMods.filter(mod => mod !== file));
+    fs.unlinkSync(path.join(profile.mcmPath, `/jarmods/${file}`));
+  };
+
+  const installJarmod = () => {
+    const p = dialog.showOpenDialogSync({
+      title: 'Select a jar mod',
+      filters: [
+        {
+          name: 'Jar Mod Formats',
+          extensions: ['zip', 'jar']
+        },
+        {
+          name: 'All files',
+          extensions: ['*']
+        }
+      ],
+      properties: [
+        'openFile'
+      ]
+    });
+
+    if (p && p[0]) {
+      fs.copyFileSync(p[0], path.join(profile.mcmPath, `/jarmods/${path.basename(p[0])}`));
+      reloadJarMods();
+    }
+  };
+
+  const hosted = profile.hosts.curse && profile.version.hosts && profile.version.hosts.curse;
 
   if (profile) {
     return (
@@ -338,6 +441,7 @@ export default function EditPageVersions({ id }) {
           installClick={downloadFabric}
           show={showConfirmFabric}
         />
+
         {updateOverlay && (
           <Overlay force>
             <BG>
@@ -346,19 +450,13 @@ export default function EditPageVersions({ id }) {
             </BG>
           </Overlay>
         )}
-        {(!profile.hosts.curse || !(profile.version.hosts && profile.version.hosts.curse)) && (
-          <>
-            <Detail>Minecraft version</Detail>
-            <MCVersionSelector
-              onChange={mcverChange}
-              value={mcverValue}
-              disabled={forgeIsInstalling || fabricIsInstalling}
-              dontAutoSelectFirst
-            />
-            <OptionBreak />
-          </>
-        )}
-        {profile.hosts.curse && profile.version.hosts && profile.version.hosts.curse && (
+
+        <HeaderCard>
+          <img alt={`${profile.name} Icon`} src={profile.iconPath} />
+          <h1>{profile.name}</h1>
+        </HeaderCard>
+
+        {hosted && (
           <>
             <Detail>Instance version</Detail>
             {hostVersionValues && (
@@ -369,60 +467,131 @@ export default function EditPageVersions({ id }) {
                 disabled={forgeIsInstalling || fabricIsInstalling}
               />
             )}
-            {!hostVersionValues && <TinySpinner><Spinner /></TinySpinner>}
+            {!hostVersionValues && (
+              <TinySpinner>
+                <Spinner />
+              </TinySpinner>
+            )}
           </>
         )}
 
+        {!hosted && (
+          <Card>
+            <div className="flex-fill">
+              <h1>Minecraft Version</h1>
+            </div>
+            <div>
+              <CardMCVersionSelector
+                onChange={mcverChange}
+                value={mcverValue}
+                disabled={forgeIsInstalling || fabricIsInstalling}
+                dontAutoSelectFirst
+              />
+            </div>
+          </Card>
+        )}
+
+
+        {
+          profile.frameworks.forge && (
+            <Card>
+              <div className="flex-fill">
+                <h1>Minecraft Forge</h1>
+                <Detail>The most popular modloader.</Detail>
+                <div className="version-detail">
+                  <p>Minecraft Forge Version: {profile.frameworks.forge.version}</p>
+                </div>
+              </div>
+              <div>
+                <Button onClick={uninstallForge} color="#424242">
+                  Uninstall
+                </Button>
+              </div>
+            </Card>
+          )
+        }
+
+        {
+          profile.frameworks.fabric && (
+            <Card>
+              <div className="flex-fill">
+                <h1>Fabric Loader</h1>
+                <Detail>The next-generation modloader.</Detail>
+                <div className="version-detail">
+                  <p>Fabric Loader Version: {profile.frameworks.fabric.version}</p>
+                </div>
+              </div>
+              <div>
+                <Button onClick={uninstallFabric} color="#424242">
+                  Uninstall
+                </Button>
+              </div>
+            </Card>
+          )
+        }
+
+        {
+          jarMods.map(mod => (
+            <Card key={mod}>
+              <div className="flex-fill">
+                <h1>{mod}</h1>
+                <Detail>Jar mod</Detail>
+              </div>
+              <div>
+                <Button onClick={() => uninstallJarmod(mod)} color="#424242">
+                  Uninstall
+                </Button>
+              </div>
+            </Card>
+          ))
+        }
+
+
         <OptionBreak />
-        <Detail>Modloaders</Detail>
-        {!profile.frameworks.fabric && !fabricIsInstalling && (
-          <CustomVersions>
-            <h3>Minecraft Forge</h3>
-            <Detail>The most popular modloader.</Detail>
-            {!profile.frameworks.forge && !forgeIsInstalling && (
-              <Button onClick={() => setShowConfirmForge(true)} color="green">
-                Install Forge
-              </Button>
-            )}
-            {forgeIsInstalling && (
-              <p>
-                Forge is installing. This may take a while. To check progress, open the Downloads viewer in the sidebar
-              </p>
-            )}
-            {forgeIsUninstalling && <p>Forge is being removed...</p>}
-            {profile.frameworks.forge && !forgeIsUninstalling && !forgeIsInstalling && (
-              <>
-                <p>Version: {profile.frameworks.forge.version}</p>
-                <Button onClick={uninstallForge} color="red">
-                  Uninstall
+
+        <Detail>Install Modloaders</Detail>
+
+        {!profile.frameworks.forge && (
+          <ModloaderSection disabled={(profile.frameworks.fabric !== undefined) || fabricIsInstalling}>
+            <div>
+              <h3>Minecraft Forge</h3>
+              <Detail>The most popular modloader.</Detail>
+            </div>
+            <div>
+              {!profile.frameworks.forge && !forgeIsInstalling && (
+                <Button disabled={(profile.frameworks.fabric !== undefined) || forgeIsInstalling} onClick={() => setShowConfirmForge(true)} color="#424242">
+                  Install Minecraft Forge
                 </Button>
-              </>
-            )}
-          </CustomVersions>
+              )}
+              {(forgeIsInstalling || forgeIsUninstalling) && <Spinner /> }
+            </div>
+          </ModloaderSection>
         )}
-        {!profile.frameworks.forge && !forgeIsInstalling && (
-          <CustomVersions>
-            <h3>Fabric Loader</h3>
-            <Detail>The next-generation modloader.</Detail>
-            {!profile.frameworks.fabric && !fabricIsInstalling && (
-              <Button onClick={() => setShowConfirmFabric(true)} color="green">
-                Install Fabric Loader
-              </Button>
-            )}
-            {fabricIsInstalling && (
-              <p>Fabric is installing. To check progress, open the Downloads viewer in the sidebar</p>
-            )}
-            {fabricIsUninstalling && <p>Fabric is being removed...</p>}
-            {profile.frameworks.fabric && !fabricIsUninstalling && !forgeIsInstalling && (
-              <>
-                <p>Version: {profile.frameworks.fabric.version}</p>
-                <Button onClick={uninstallFabric} color="red">
-                  Uninstall
+
+        {!profile.frameworks.fabric && (
+          <ModloaderSection disabled={(profile.frameworks.forge !== undefined) || forgeIsInstalling}>
+            <div>
+              <h3>Fabric Loader</h3>
+              <Detail>The next-generation modloader.</Detail>
+            </div>
+            <div>
+              {!profile.frameworks.fabric && !fabricIsInstalling && (
+                <Button disabled={(profile.frameworks.forge !== undefined) || forgeIsInstalling} onClick={() => setShowConfirmFabric(true)} color="#424242">
+                  Install Fabric Loader
                 </Button>
-              </>
-            )}
-          </CustomVersions>
+              )}
+              {(fabricIsInstalling || fabricIsUninstalling) && <Spinner /> }
+            </div>
+          </ModloaderSection>
         )}
+
+        <OptionBreak />
+
+        <Detail>Advanced Actions</Detail>
+
+        <Card>
+          <Button onClick={installJarmod} color="#424242">Add jar mod</Button>
+        </Card>
       </>
     );
   }
