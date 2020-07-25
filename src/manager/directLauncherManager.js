@@ -268,7 +268,7 @@ const DirectLauncherManager = {
 
       let stderror = '';
 
-      const process = exec(`set appdata="D:/loadingforgetest/" & "${path.relative(profile.gameDir, JavaHandler.getJavaPath(profile))}" ${finishedJavaArgs}`, {
+      const process = exec(`"${path.relative(profile.gameDir, JavaHandler.getJavaPath(profile))}" ${finishedJavaArgs}`, {
         cwd: profile.gameDir
       });
 
