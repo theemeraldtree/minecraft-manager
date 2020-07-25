@@ -1,6 +1,7 @@
 import path from 'path';
 import AdmZip from 'adm-zip';
 import fs from 'fs';
+import semver from 'semver';
 import VersionsManager from '../../manager/versionsManager';
 import LibrariesManager from '../../manager/librariesManager';
 import DownloadsManager from '../../manager/downloadsManager';
@@ -10,11 +11,71 @@ import logInit from '../../util/logger';
 import Global from '../../util/global';
 import MCVersionHandler from '../../minecraft/mcVersionHandler';
 import FSU from '../../util/fsu';
+import versionLibMappings from './versionLibMappings.json';
+import Downloader from '../../util/downloader';
 
 const logger = logInit('ForgeFramework');
 
 const ForgeFramework = {
   versionJSONCache: {},
+  setupForgeJarmodded(profile) {
+    return new Promise((resolve, reject) => {
+      // Pre-1.6 Forge needs to be jarmodded
+      // That means no custom version JSON
+      profile.setFrameworkIsInstalling('forge');
+
+      logger.info(`Downloading universal for ${profile.id}`);
+      const downloadURL = `https://files.minecraftforge.net/maven/net/minecraftforge/forge/${profile.frameworks.forge.version}/forge-${profile.frameworks.forge.version}-universal.zip`;
+
+      const universalPath = path.join(profile.mcmPath, `/jarmods/_forge-${profile.frameworks.forge.version}.jar`);
+
+      DownloadsManager.startFileDownload(
+        `Minecraft Forge ${profile.frameworks.forge.version}\n_A_${profile.name}`,
+        downloadURL,
+        universalPath
+      ).then(async () => {
+        logger.info(`Finished downloading Universal Forge Jar for ${profile.id}`);
+        profile.setFrameworkProperty('forge', 'jarmodFile', `_forge-${profile.frameworks.forge.version}.jar`);
+
+        logger.info(`Downloading FMLLibs for ${profile.id}`);
+        FSU.createDirIfMissing(path.join(profile.gameDir, '/lib'));
+
+        let mappingName = profile.version.minecraft.version;
+
+        switch (mappingName) {
+          case '1.3.2':
+            mappingName = '1.3.*';
+            break;
+          case '1.4':
+          case '1.4.1':
+          case '1.4.2':
+          case '1.4.3':
+          case '1.4.4':
+          case '1.4.5':
+          case '1.4.6':
+          case '1.4.7':
+            mappingName = '1.4.*';
+            break;
+          default:
+            break;
+        }
+
+        const libs = versionLibMappings[mappingName];
+
+        await Downloader.downloadConcurrently(libs.map(lib => ({
+          url: !lib.forceURL ? `https://files.minecraftforge.net/fmllibs/${lib.name}` : lib.forceURL,
+          dest: path.join(profile.gameDir, `/lib/${lib.name}`)
+        })));
+
+        profile.unsetFrameworkIsInstalling('forge');
+        MCVersionHandler.updateProfile(profile);
+        resolve();
+      }).catch(async e => {
+        await this.uninstallForge(profile);
+        reject(e);
+      });
+    });
+  },
   setupForge(profile) {
     if (VersionsManager.checkIs113OrHigher(profile)) {
       // we are version 1.13 or higher
@@ -23,6 +84,14 @@ const ForgeFramework = {
       logger.info(`Forwarding Forge install of ${profile.id} to ForgeComplex`);
       return ForgeComplex.setupForge(profile);
     }
+
+    if (semver.lt(profile.version.minecraft.version, '1.6.1')) {
+      // Pre-1.6, we need to jarmod
+
+      logger.info(`Forwarding Forge install of ${profile.id} to SetupForgeJarmodded`);
+      return this.setupForgeJarmodded(profile);
+    }
+
     return new Promise((resolve, reject) => {
       profile.setFrameworkIsInstalling('forge');
 
@@ -66,6 +135,12 @@ const ForgeFramework = {
           mcversion === '1.8.9'
         ) {
           rootUniversalPath = `forge-${profile.frameworks.forge.version}-${mcversion}-universal.jar`;
+        }
+
+        if (
+          semver.lt(mcversion, '1.7.2')
+        ) {
+          rootUniversalPath = `minecraftforge-universal-${profile.frameworks.forge.version}.jar`;
         }
 
         const entryNames = zip.getEntries().map(entry => entry.name);

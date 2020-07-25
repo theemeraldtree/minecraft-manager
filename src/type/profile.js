@@ -585,6 +585,17 @@ export default class Profile extends OAMFAsset {
   }
 
   /**
+   * Sets a property of a framework
+   * @param {string} framework - The framework's name
+   * @param {string} property - The property to set
+   * @param {string} value - The value of the property
+   */
+  setFrameworkProperty(framework, property, value) {
+    this.frameworks[framework][property] = value;
+    this.save();
+  }
+
+  /**
    * Removes a framework from the profile
    * @param {string} framework - The fraemwork's name
    */

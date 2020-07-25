@@ -40,10 +40,20 @@ const HTTPRequest = {
 
         const ws = fs.createWriteStream(dest);
 
+        ws.on('error', (e) => {
+          reject(e);
+        });
+
         let progressData = 0;
         let previousPercent = 0;
 
+
+        try {
         data.pipe(ws);
+      } catch (e) {
+        reject(e);
+        return;
+      }
 
         data.on('data', chunk => {
           progressData += chunk.length;

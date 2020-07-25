@@ -90,7 +90,7 @@ const DirectLauncherManager = {
       });
 
       zip.getEntries().forEach(entry => {
-        if (entry.entryName !== 'META-INF/' && entry.entryName !== 'META-INF/MANIFEST.MF' && !appendedJarEntries.includes(entry.entryName)) {
+        if (entry.entryName.indexOf('META-INF/') === -1 && !appendedJarEntries.includes(entry.entryName)) {
           archive.append(entry.getData(), { name: entry.entryName });
         }
       });
@@ -179,7 +179,8 @@ const DirectLauncherManager = {
       mcArgs = mcArgs.replace(
         '${auth_player_name}',
         MCAccountsHandler.getNameFromUUID(SettingsManager.currentSettings.activeAccount));
-      mcArgs = mcArgs.replace('${version_name}', `"${profile.name}"`);
+      mcArgs = mcArgs.replace('${profile_name}', '"Minecraft Manager"');
+      mcArgs = mcArgs.replace('${version_name}', '"Minecraft Manager"');
       mcArgs = mcArgs.replace('${game_directory}', `"${profile.gameDir}"`);
       mcArgs = mcArgs.replace('${assets_root}', '"../../../shared/assets"');
       mcArgs = mcArgs.replace('${game_assets}', '"../../../shared/assets"');
@@ -221,6 +222,7 @@ const DirectLauncherManager = {
       if (!versionJSON.arguments) {
         // no arguments, we have to figure them out ourselves
         finishedJavaArgs = `-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_minecraft.exe.heapdump -Djava.library.path="../../../${binName}/natives/"`;
+        finishedJavaArgs += ` -Dminecraft.client.jar="${path.join(profile.mcmPath, '/patched.jar')}"`;
         finishedJavaArgs += ` -cp ${classpath}`;
         finishedJavaArgs += ' -XX:+UnlockExperimentalVMOptions -XX:+UseG1GC -XX:G1NewSizePercent=20 -XX:G1ReservePercent=20 -XX:MaxGCPauseMillis=50 -XX:G1HeapRegionSize=32M';
         finishedJavaArgs += ` ${endJavaArgs}`;
@@ -266,7 +268,7 @@ const DirectLauncherManager = {
 
       let stderror = '';
 
-      const process = exec(`"${path.relative(profile.gameDir, JavaHandler.getJavaPath(profile))}" ${finishedJavaArgs}`, {
+      const process = exec(`set appdata="D:/loadingforgetest/" & "${path.relative(profile.gameDir, JavaHandler.getJavaPath(profile))}" ${finishedJavaArgs}`, {
         cwd: profile.gameDir
       });
 
@@ -409,6 +411,12 @@ const DirectLauncherManager = {
       if (library.natives && this.allowLibrary(library)) {
         const nativeClassifier = library.natives[this.getOSName()].replace('${arch}', process.arch.substring(1));
 
+        if (!library.downloads.classifiers[nativeClassifier]) {
+          logger.info(`Native library "${library.name}" has no classifier for current platform, but is allowed?`);
+          return;
+        }
+
+        logger.info(`Extracting natives from "${library.name}"`);
         const zip = new admzip(
           path.join(LibrariesManager.getLibrariesPath(), `/${library.downloads.classifiers[nativeClassifier].path}`)
         );

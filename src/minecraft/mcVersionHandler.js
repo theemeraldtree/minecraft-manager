@@ -1,4 +1,5 @@
 import path from 'path';
+import semver from 'semver';
 import fss, { promises as fs } from 'fs';
 import rimraf from 'rimraf';
 import FSU from '../util/fsu';
@@ -93,7 +94,7 @@ const MCVersionHandler = {
     };
 
     if (profile.frameworks.fabric) await addPatch('fabric.json', await FabricFramework.getVersionJSON(profile));
-    if (profile.frameworks.forge) await addPatch('forge.json', await ForgeFramework.getVersionJSON(profile));
+    if (profile.frameworks.forge && !semver.lt(profile.version.minecraft.version, '1.6.0')) await addPatch('forge.json', await ForgeFramework.getVersionJSON(profile));
   },
 
   async saveCompiledVersionJSON(profile) {
@@ -108,7 +109,20 @@ const MCVersionHandler = {
 
     let patches = await Promise.all((await fs.readdir(versionPath)).map(async patchName => JSON.parse(await fs.readFile(path.join(versionPath, patchName)))));
 
-    patches = patches.sort((a, b) => a._priority - b._priority);
+    patches = patches.sort((a, b) => a._priority - b._priority).map(rawPatch => {
+      // Forge for 1.6 has dupliacted libraries (org.lwjgl.lwjgl:jwjgl-platform:2.9.0) for some reason,
+      // so they need to be de-duped here
+      if (rawPatch['+libraries']) {
+        const newPatch = { ...rawPatch };
+        const defaultLibs = defaultJSON.libraries.map(lib => lib.name);
+        const libs = rawPatch['+libraries'].filter(lib => !defaultLibs.includes(lib.name));
+        newPatch['+libraries'] = libs;
+
+        return newPatch;
+      }
+
+      return rawPatch;
+    });
 
     let final = { ...defaultJSON };
 
