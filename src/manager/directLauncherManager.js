@@ -278,7 +278,7 @@ const DirectLauncherManager = {
 
       process.on('close', (code) => {
         if (code !== 0 && code) {
-          AlertManager.messageBox('something went wrong', `Error Code: ${code}\n\n<textarea readOnly>${stderror}</textarea>`);
+          AlertManager.messageBox('something went wrong', `Process terminated with code: ${code}\n\n<textarea readOnly>${stderror}</textarea>`);
         }
 
         logger.info(`Removing ${binName} for ${profile.id}`);

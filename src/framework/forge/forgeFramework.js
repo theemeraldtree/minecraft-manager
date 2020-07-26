@@ -204,16 +204,21 @@ const ForgeFramework = {
       name: `minecraftmanager.profiles:mcm-${profile.id}:forge`
     };
 
-    if (VersionsManager.checkIs113OrHigher(profile)) {
-      json['+libraries'].push({
-        name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:client`,
-        _disableDownload: true
-      });
-      json['+libraries'].push({
-        name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:universal`,
-        _disableDownload: true
-      });
-    }
+    // This code has been commented out because I have not found it to have a use anymore
+    // it was put in to include the Forge client and Universal jars on the classpath,
+    // however that caused problems with modpacks using Jumploader.
+    // Removing the Client and Universal from the classpath appears to have no effect.
+
+    // if (VersionsManager.checkIs113OrHigher(profile)) {
+      // json['+libraries'].push({
+      //   name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:client`,
+      //   _disableDownload: true
+      // });
+      // json['+libraries'].push({
+      //   name: `net.minecraftforge:forge:${profile.frameworks.forge.version}:universal`,
+      //   _disableDownload: true
+      // });
+    // }
 
     return json;
   },

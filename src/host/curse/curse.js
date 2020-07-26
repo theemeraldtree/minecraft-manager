@@ -127,7 +127,10 @@ const Curse = {
   convertCurseVersion(ver) {
     const cacheID = `versioncache-curse-${new Date(ver.fileDate).getTime()}`;
     let inferredModloader;
-    if (ver.modules.find(module => module.foldername === 'fabric.mod.json')) {
+
+    // fabric.mod.json is used for Fabric mods,
+    // however in rare circumstances a mod will have fabric.mod.json present but also be compatible with Forge
+    if (ver.modules.find(module => module.foldername === 'fabric.mod.json') && !ver.gameVersion.includes('Forge')) {
       inferredModloader = 'fabric';
     } else {
       inferredModloader = 'forge';

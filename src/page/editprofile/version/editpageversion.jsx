@@ -92,6 +92,7 @@ const Card = styled.div`
 
   > img {
     width: 30px;
+    margin-right: 5px;
   }
 
   h1 {
@@ -120,6 +121,9 @@ const Card = styled.div`
 
 const HeaderCard = styled(Card)`
   background: #424242;
+  display: flex;
+  align-items: center;
+  height: 30px;
 `;
 
 const CardMCVersionSelector = styled(MCVersionSelector)`
@@ -590,7 +594,7 @@ export default function EditPageVersions({ id }) {
         <Detail>Advanced Actions</Detail>
 
         <Card>
-          <Button onClick={installJarmod} color="#424242">Add jar mod</Button>
+          <Button onClick={installJarmod} color="#424242">Add to Minecraft jar</Button>
         </Card>
       </>
     );

@@ -175,10 +175,12 @@ const Hosts = {
       }
     }
 
+    const jumploaderIsPresent = profile.mods.find(cmod => cmod.hosts.curse?.id === 361988);
+
     let modloader;
-    if (profile.frameworks.forge) {
+    if (profile.frameworks.forge && !jumploaderIsPresent) {
       modloader = 'forge';
-    } else if (profile.frameworks.fabric) {
+    } else if (profile.frameworks.fabric || jumploaderIsPresent) {
       modloader = 'fabric';
     }
 
@@ -275,18 +277,20 @@ const Hosts = {
           if (!mod.version || !mod.version.hosts.curse) {
             mod = await Curse.addFileInfo(mod, mod.hosts.curse.fileID);
           }
-
           if (type === 'mod') {
             if (profile.hasFramework()) {
-              if (profile.frameworks.forge) {
-                if (mod.version.hosts.curse.localValues.inferredModloader !== 'forge') {
-                  resolve('no-version-available');
-                  return;
-                }
-              } else if (profile.frameworks.fabric) {
-                if (mod.version.hosts.curse.localValues.inferredModloader !== 'fabric') {
-                  resolve('no-version-available');
-                  return;
+              // Jumploader (https://github.com/comp500/Jumploader) causes profile to become exempt from modloader checks
+              if (!profile.mods.find(cmod => cmod.hosts.curse?.id === 361988)) {
+                if (profile.frameworks.forge) {
+                  if (mod.version.hosts.curse.localValues.inferredModloader !== 'forge') {
+                    resolve('no-version-available');
+                    return;
+                  }
+                } else if (profile.frameworks.fabric) {
+                  if (mod.version.hosts.curse.localValues.inferredModloader !== 'fabric') {
+                    resolve('no-version-available');
+                    return;
+                  }
                 }
               }
             } else {
@@ -410,25 +414,28 @@ const Hosts = {
           }
         );
 
-        Twitch.importZip(zipPath, () => {}, {
-          hostedAsset: modpack,
-          version: {
-            fileID: verObj.hosts.curse.fileID,
-            fileName: verObj.hosts.curse.fileName
-          }
-        }).then(() => {
-          fs.unlinkSync(zipPath);
-          ProfilesManager.progressState[modpack.id] = {
-            progress: 'installed',
-            version: verObj.displayName
-          };
-          ProfilesManager.updateProfile(modpack);
-          resolve();
-        }).catch(e => {
-          ProfilesManager.progressState[modpack.id] = undefined;
-          ToastManager.createToast('Unable to install modpack', e);
-          resolve();
-        });
+        // Hack required for some small modpacks
+        setTimeout(() => {
+          Twitch.importZip(zipPath, () => {}, {
+            hostedAsset: modpack,
+            version: {
+              fileID: verObj.hosts.curse.fileID,
+              fileName: verObj.hosts.curse.fileName
+            }
+          }).then(() => {
+            fs.unlinkSync(zipPath);
+            ProfilesManager.progressState[modpack.id] = {
+              progress: 'installed',
+              version: verObj.displayName
+            };
+            ProfilesManager.updateProfile(modpack);
+            resolve();
+          }).catch(e => {
+            ProfilesManager.progressState[modpack.id] = undefined;
+            ToastManager.createToast('Unable to install modpack', e);
+            resolve();
+          });
+        }, 1000);
       }
     });
   },

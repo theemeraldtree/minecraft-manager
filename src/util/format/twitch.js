@@ -153,12 +153,12 @@ const Twitch = {
           // The assets have been downloaded
           // Let's apply some finishing touches
 
-          if (manifest.projectID) {
+          if (manifest.projectID || hostedAsset) {
             updateState('Downloading extra info from Curse...');
             // This project is published on CurseForge
             // We'll download the icon and some extra info about it
             profile.hosts.curse = {
-              id: manifest.projectID
+              id: hostedAsset.hosts.curse?.id ? hostedAsset.hosts.curse.id : manifest.projectID
             };
 
             const fullAsset = await Curse.getFullAsset(profile, 'profile');
