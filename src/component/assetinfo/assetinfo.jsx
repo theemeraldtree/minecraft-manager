@@ -340,15 +340,15 @@ export default class AssetInfo extends Component {
 
         {cantConnect && (
           <LoadingText>
-            can't connect
-            <TryAgain onClick={this.tryAgain}>try again</TryAgain>
+            Can't connect
+            <TryAgain onClick={this.tryAgain}>Try again</TryAgain>
           </LoadingText>
         )}
         {displayState === 'versions' && (
           <>
             {!cantConnect && (
               <>
-                <Detail>minecraft version</Detail>
+                <Detail>Minecraft version</Detail>
                 <MCVersionSelector showAll value={this.state.mcVerFilter} onChange={this.mcVerChange} />
                 {activeAsset.hosts.curse && (
                   <>

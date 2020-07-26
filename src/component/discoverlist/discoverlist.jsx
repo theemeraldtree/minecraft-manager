@@ -367,7 +367,7 @@ export default class DiscoverList extends Component {
             )}
             {cantConnect && (
               <LoadingText>
-                can't connect
+                Can't connect
                 <TryAgain onClick={this.tryAgain}>try again</TryAgain>
               </LoadingText>
             )}
@@ -375,13 +375,13 @@ export default class DiscoverList extends Component {
             {!assets && (
               <>
                 <LoadingText>
-                  something's strange
+                  Something's strange.
                   <br />
-                  we can't find anything
+                  Nothing could be found.
                   <br />
-                  <TryAgain onClick={this.tryAgain}>try again</TryAgain>
+                  <TryAgain onClick={this.tryAgain}>Try again</TryAgain>
                   <Persists>
-                    problem persists? <a href="https://theemeraldtree.net/mcm/issues">report it here</a>
+                    Problem persists? <a href="https://theemeraldtree.net/mcm/issues">Report it here</a>
                   </Persists>
                 </LoadingText>
               </>

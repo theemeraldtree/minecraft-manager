@@ -245,11 +245,11 @@ export default function EditPageVersions({ id }) {
     } else {
       cancel();
       AlertManager.alert(
-        'warning',
-        'Changing your Minecraft version will remove Forge/Fabric and all of your mods. Are you sure you want to change?',
+        'Warning',
+        'Changing your Minecraft version will remove any installed modloaders and all of your mods. Are you sure you want to change?',
         () => confirmVersionChange(version),
-        'change',
-        "don't change"
+        'Confirm',
+        'Cancel'
       );
     }
   };
@@ -356,12 +356,12 @@ export default function EditPageVersions({ id }) {
     profile.temp.versionToChangeTo = e;
     forceUpdate();
     AlertManager.alert(
-      'are you sure?',
-      `updating or changing a profile's version will modify the current files. a backup will be created of the current files. if you've modified files or added mods, you will need to move then over from the backup
+      'Are you sure?',
+      `Updating or changing an instance's version will modify the current files. A backup will be created of the current files. If you've modified files or added mods, you'll need to move then over from the backup
             <br>
-            <b>the saves folder and options.txt are automatically moved.`,
+            <b>The saves folder and options.txt are automatically moved.`,
       confirmCurseVerChange,
-      'i understand, continue'
+      'I understand, continue'
     );
   };
 
@@ -539,7 +539,7 @@ export default function EditPageVersions({ id }) {
             <Card key={mod}>
               <div className="flex-fill">
                 <h1>{mod}</h1>
-                <Detail>Jar mod</Detail>
+                <Detail>Jar M od</Detail>
               </div>
               <div>
                 <Button onClick={() => uninstallJarmod(mod)} color="#424242">

@@ -421,7 +421,7 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
         }, 100);
       };
       if (assetType === 'world') {
-        AlertManager.alert('are you sure?', '', del, 'delete', 'cancel');
+        AlertManager.alert('Are you sure?', '', del, 'Delete', 'Cancel');
       } else {
         del();
       }
@@ -584,9 +584,11 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
               <SectionButton onClick={showAssetsList} active={displayState === 'assetsList'}>
                 Installed
               </SectionButton>
-              <SectionButton onClick={showDiscover} active={displayState === 'addMods' && listState === 'browseAssets'}>
-                Discover
-              </SectionButton>
+              {assetType !== 'datapack' && (
+                <SectionButton onClick={showDiscover} active={displayState === 'addMods' && listState === 'browseAssets'}>
+                  Discover
+                </SectionButton>
+              )}
             </div>
             {
               displayState !== 'modInfo' && (
@@ -651,8 +653,11 @@ function SubAssetEditor({ id, assetType, dpWorld, theme }) {
                 {selobj[po].length === 0 && (
                   <>
                     <h1 style={{ textAlign: 'center' }}>There's nothing here!</h1>
-                    <p style={{ textAlign: 'center', fontSize: '13pt' }}>Install {humanReadableType} from CurseForge in <b>Discover</b>,<br />
-                      or drag and drop files here.
+                    <p style={{ textAlign: 'center', fontSize: '13pt' }}>{assetType === 'datapack' ? 'Install datapacks by dragging and dropping them here.' : (
+                      <>Install {humanReadableType} from CurseForge in <b>Discover</b>,<br />
+                        or drag and drop files here.
+                      </>
+                    )}
                     </p>
                   </>
                 )}

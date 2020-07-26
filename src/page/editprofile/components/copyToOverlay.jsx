@@ -47,14 +47,14 @@ export default function CopyToOverlay({ show, profile, asset, assetType, cancelC
   return (
     <Overlay in={show}>
       <AlertBackground>
-        <h1>copy to...</h1>
-        <p>where do you want to copy this asset?</p>
+        <h1>Copy to...</h1>
+        <p>Where do you want to copy <b>{asset.name}</b> to?</p>
 
         <ProfileSelector hideProfile={profile.id} onSelect={onSelect} />
 
         <div className="buttons">
-          <Button color="red" onClick={cancelClick}>
-            cancel
+          <Button color="#444" onClick={cancelClick}>
+            Cancel
           </Button>
         </div>
       </AlertBackground>

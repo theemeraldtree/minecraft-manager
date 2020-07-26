@@ -153,7 +153,7 @@ export default class ImportOverlay extends Component {
     return (
       <Overlay in={this.props.in}>
         <BG>
-          {!updateState && !showError && !file && <Title>import an instance</Title>}
+          {!updateState && !showError && !file && <Title>Import an instance</Title>}
           {!updateState && !showError && !file && (
             <>
               <Subtext>

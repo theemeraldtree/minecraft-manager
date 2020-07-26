@@ -45,8 +45,8 @@ export default function Help() {
 
   const prepareAction = act => {
     AlertManager.alert(
-      'this can be dangerous!',
-      'are you sure? this is a potentially dangerous operation that can screw up your game!',
+      'This can be dangerous!',
+      'Are you sure? This is a potentially dangerous operation that can screw up your game!',
       () => confirmAction(act)
     );
   };
@@ -68,7 +68,7 @@ export default function Help() {
   };
 
   const dumpData = () => {
-    AlertManager.messageBox('data dump', `<textarea readonly>${Debug.dataDump()}</textarea>`);
+    AlertManager.messageBox('Data Dump', `<textarea readonly>${Debug.dataDump()}</textarea>`);
   };
 
   return (

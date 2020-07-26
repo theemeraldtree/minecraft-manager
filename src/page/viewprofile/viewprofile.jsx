@@ -105,7 +105,7 @@ function ViewProfilePage({ match, history }) {
       <>
         {showDelete && (
           <Confirmation
-            questionText="delete instance?"
+            questionText="Delete instance?"
             confirmText="Delete instance"
             cancelDelete={() => setShowDelete(false)}
             confirmDelete={confirmDelete}

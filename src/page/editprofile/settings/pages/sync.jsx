@@ -184,16 +184,16 @@ export default function Sync(params) {
     <>
       <Overlay in={showCopyOverlay}>
         <AlertBackground>
-          <h1>copy to...</h1>
+          <h1>Copy to...</h1>
           <p>
-            where do you want to copy the <b>{copyObjectReadable}</b> to?
+            Where do you want to copy the <b>{copyObjectReadable}</b> to?
           </p>
 
           <ProfileSelector hideProfile={profile.id} onSelect={onCopySelect} />
 
           <div className="buttons">
             <Button color="red" onClick={() => setShowCopyOverlay(false)}>
-              cancel
+              Cancel
             </Button>
           </div>
         </AlertBackground>
@@ -224,19 +224,19 @@ export default function Sync(params) {
         {fs.existsSync(path.join(profile.gameDir, 'options.txt')) && (
 
         <Button color="green" onClick={copyOptionsTXT}>
-          copy in-game minecraft options to...
+          Copy in-game Minecraft options to...
         </Button>
 
         )}
         {fs.existsSync(path.join(profile.gameDir, 'optionsof.txt')) && (
         <Button color="green" onClick={copyOptionsOF}>
-          copy in-game optifine options to...
+          Copy in-game OptiFine options to...
         </Button>
         )}
 
         {fs.existsSync(path.join(profile.gameDir, 'servers.dat')) && (
         <Button color="green" onClick={copyServers}>
-          copy in-game servers list to...
+          Copy in-game servers list to...
         </Button>
         )}
 

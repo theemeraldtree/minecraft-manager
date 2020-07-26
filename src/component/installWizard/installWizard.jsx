@@ -120,7 +120,7 @@ export default function InstallWizard({ show, name, simpleText, cancelClick, ins
   return (
     <Overlay in={show}>
       <AlertBackground>
-        <h1>install {name.toLowerCase()}</h1>
+        <h1>Install {name}</h1>
         <ModeChooser>
           <HeaderButton active={displayState === 'simple'} onClick={() => setDisplayState('simple')}>
             Simple Install

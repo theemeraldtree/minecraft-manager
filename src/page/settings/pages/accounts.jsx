@@ -158,7 +158,7 @@ function Accounts({ theme }) {
 
   const logOutClick = (e, account) => {
     e.stopPropagation();
-    AlertManager.alert('are you sure?', `Are you sure you want to log out of <b>${account.name}</b>?`, () => {
+    AlertManager.alert('Are you sure?', `Are you sure you want to log out of <b>${account.name}</b>?`, () => {
       const selectedIndex = MCAccountsHandler.getAccounts().findIndex(acc => acc.email === account.email);
       MCAccountsHandler.deleteAccount(account.email);
       setAccounts([...MCAccountsHandler.getAccounts()]);
@@ -184,7 +184,7 @@ function Accounts({ theme }) {
   };
 
   const clickHelp = () => {
-    AlertManager.messageBox('accounts help',
+    AlertManager.messageBox('Accounts help',
       `Before you launch Minecraft, you'll need to add your Mojang account. 
       Your account email, username, and password are only sent to Mojang.
       <br><br>
@@ -196,7 +196,7 @@ function Accounts({ theme }) {
     <>
       <Overlay in={showAddAccount}>
         <AB>
-          <h1>add an account</h1>
+          <h1>Add an account</h1>
           {addAccountStage === 0 && (
           <>
             <form onSubmit={loginAddAccount}>

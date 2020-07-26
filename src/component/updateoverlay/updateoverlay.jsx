@@ -129,18 +129,18 @@ export default class UpdateOverlay extends Component {
         <BG>
           {displayState === 'done' && (
             <>
-              <Title>done</Title>
+              <Title>Done</Title>
               <Subtext>The instance update is complete</Subtext>
               <ButtonsContainer>
                 <Button onClick={cancelClick} color="green">
-                  ok
+                  Done
                 </Button>
               </ButtonsContainer>
             </>
           )}
           {displayState === 'main' && isHosted && (
             <>
-              {displayState !== 'done' && <Title>update your instance</Title>}
+              {displayState !== 'done' && <Title>Update your instance</Title>}
               {!noUpdates && !updateAvailable && !noConnection && <Subtext>Checking for updates...</Subtext>}
               {noUpdates && !noConnection && <Subtext>You have the latest version. No update is available</Subtext>}
               {noConnection && <Subtext>Unable to check for updates. Check your internet connection, and try again.</Subtext>}
@@ -160,10 +160,10 @@ export default class UpdateOverlay extends Component {
                 {updateAvailable && (
                   <>
                     <Button onClick={cancelClick} color="red">
-                      cancel
+                      Cancel
                     </Button>
                     <Button onClick={this.updateClick} color="green">
-                      update
+                      Update
                     </Button>
                   </>
                 )}
@@ -177,7 +177,7 @@ export default class UpdateOverlay extends Component {
           )}
           {!isHosted && (
             <>
-              <Title>cannot update</Title>
+              <Title>Cannot update</Title>
               <Subtext>This instance was not downloaded from Discover. It cannot be updated.</Subtext>
               <ButtonsContainer>
                 <Button color="#444" onClick={cancelClick}>
@@ -188,9 +188,9 @@ export default class UpdateOverlay extends Component {
           )}
           {displayState === 'progress' && (
             <>
-              <Title>updating...</Title>
+              <Title>Updating...</Title>
               <Subtext>{updateProgress}</Subtext>
-              <Subtext>To check progress, open the Downloads viewer in the sidebar</Subtext>
+              <Subtext>To check progress, open the Downloads viewer.</Subtext>
             </>
           )}
         </BG>

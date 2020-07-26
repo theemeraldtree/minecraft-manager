@@ -32,7 +32,7 @@ function Launcher({ theme }) {
     const newValue = !integrationEnabled;
     if (!mcHome || !mcExe) {
       if (newValue) {
-        AlertManager.messageBox('launcher integration', 'Please set your Minecraft Home Directory and Minecraft Executable path now.<br /><br />If you do not set these, Launcher Integration will be automatically turned off.');
+        AlertManager.messageBox('Launcher integration', 'Please set your Minecraft Home Directory and Minecraft Executable path now.<br /><br />If you do not set these, Launcher Integration will be automatically turned off.');
       } else {
         setIntegrationEnabled(false);
       }
@@ -49,7 +49,7 @@ function Launcher({ theme }) {
   };
 
   const showInfo = () => {
-    AlertManager.messageBox('launcher integration', 'Launcher Integration allows Minecraft Manager to integrate with the regular Minecraft launcher. It will sync your instances and accounts with the vanilla Minecraft launcher.');
+    AlertManager.messageBox('Launcher integration', 'Launcher Integration allows Minecraft Manager to integrate with the regular Minecraft launcher. It will sync your instances and accounts with the vanilla Minecraft launcher.');
   };
 
   const checkDone = (exe, home) => {
@@ -100,15 +100,15 @@ function Launcher({ theme }) {
   };
 
   const questionHomeDirectory = () => {
-    AlertManager.messageBox('minecraft home directory', `
+    AlertManager.messageBox('Minecraft Home Directory', `
     Your Minecraft Home directory is where the regular Minecraft Launcher stores info about the game.
     <br /><br />
     It's sometimes referred to as the <b>.minecraft folder</b>.`);
   };
 
   const questionMCExe = () => {
-    AlertManager.messageBox('minecraft executable', `
-    The Minecraft Executable is the file that is run to launch regular Minecraft.
+    AlertManager.messageBox('Minecraft Executable', `
+    The Minecraft Executable is the regular Minecraft Launcher.
     <br /><br />
     On Windows, it's typically located at<br /><b>C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe</b>
     `);

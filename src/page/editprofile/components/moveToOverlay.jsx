@@ -43,14 +43,14 @@ export default function MoveToOverlay({ show, profile, asset, assetType, cancelC
   return (
     <Overlay in={show}>
       <AlertBackground>
-        <h1>move to...</h1>
-        <p>where do you want to move this asset?</p>
+        <h1>Move to...</h1>
+        <p>Where do you want to move <b>{asset.name}</b> to?</p>
 
         <ProfileSelector hideProfile={profile.id} onSelect={onSelect} />
 
         <div className="buttons">
-          <Button color="red" onClick={cancelClick}>
-            cancel
+          <Button color="#444" onClick={cancelClick}>
+            Cancel
           </Button>
         </div>
       </AlertBackground>

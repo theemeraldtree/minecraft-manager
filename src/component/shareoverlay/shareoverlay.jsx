@@ -176,7 +176,7 @@ export default class ShareOverlay extends Component {
         <BG>
           {this.state.displayState === 'main' && (
             <>
-              <Title>export your instance</Title>
+              <Title>Export your instance</Title>
               <Subtext>
                 Exporting your instance will export it to the <b>.mcjprofile</b> file format, which can be used in
                 Minecraft Manager.
@@ -184,7 +184,7 @@ export default class ShareOverlay extends Component {
               <Breaker />
               {this.state.exportItems.length !== 0 && (
                 <>
-                  <Title>choose your folders</Title>
+                  <Title>Choose your folders</Title>
                   <Subtext>
                     Choose your folders that you'd like to include with your export. If you have mods installed, they
                     are automatically included.

@@ -243,7 +243,7 @@ function Java({ theme, profileScope }) {
 
   const helpJavaArgs = () => {
     AlertManager.messageBox(
-      'custom java args',
+      'Custom Java arguments',
       `Minecraft Manager allows you to configure custom Java arguments that are included when Minecraft is ran.
       <br><br>
        These settings are advanced, so it's only recommended to change them if you know what you're doing.`

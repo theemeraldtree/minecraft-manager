@@ -147,7 +147,7 @@ export default function FrameworkInstaller({ show, profile, framework, cancelCli
   return (
     <Overlay in={show}>
       <AlertBackground>
-        <h1>install {humanName(framework).toLowerCase()}</h1>
+        <h1>Install {humanName(framework)}</h1>
         <ModeChooser>
           <HeaderButton active={displayState === 'simple'} onClick={() => setDisplayState('simple')}>
             Simple Install
