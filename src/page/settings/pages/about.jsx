@@ -168,7 +168,7 @@ export default function About() {
       <SplitSection>
         <div>
           <h2>Credits</h2>
-          <h3> Thanks to these open source projects:</h3>
+          <h3>Thanks to these open source projects:</h3>
           <ul>
             <li>
               <a href="https://electronjs.org/">Electron</a>
@@ -236,7 +236,7 @@ export default function About() {
           <Button
             onClick={() =>
               AlertManager.messageBox(
-                'full license information',
+                'Full license information',
                 `<textarea class="wrap">${fs.readFileSync(path.join(Global.getResourcesPath(), 'licenseDisclaimer.txt'))}</textarea>`
               )
             }
@@ -264,33 +264,10 @@ export default function About() {
         </div>
       </SplitSection>
       <Section>
-        <h2>Other things to check out...</h2>
-        <ul>
-          <li>
-            <a href="https://www.reddit.com/r/MinecraftManager">r/MinecraftManager</a>
-          </li>
-          <li>
-            <a href="https://stopmodreposts.org">stopmodreposts.org</a>
-          </li>
-          <li>
-            <a href="https://fabricmc.net">fabricmc.net</a>
-          </li>
-          <li>
-            <a href="https://minecraftforge.net">minecraftforge.net</a>
-          </li>
-          <li>
-            <a href="https://www.reddit.com/r/feedthebeast/">r/feedthebeast</a>
-          </li>
-          <li>
-            <a href="https://www.reddit.com/r/minecraft/">r/minecraft</a>
-          </li>
-        </ul>
-      </Section>
-      <Section>
         <h2>Disclaimers</h2>
         <p>
           Minecraft Manager and theemeraldtree are in no way affiliated with, endorsed by, or otherwise related to
-          Minecraft Forge, Forge Development LLC, Fabric, CurseForge, Twitch, Amazon, Mojang, or Microsoft Studios. All
+          Minecraft Forge, Forge Development LLC, Fabric, CurseForge, Twitch, Overwolf, Mojang, or Microsoft Studios. All
           trademarks belong to their respective owners.
         </p>
       </Section>

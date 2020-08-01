@@ -98,10 +98,10 @@ export default class Profile extends OAMFAsset {
    * Checks for missing directories, and if they're missing, creates them
    */
   checkMissingDirectories() {
-    if (this.installed || (
+    if ((this.installed || (
       this.id === '0-default-profile-latest' ||
       this.id === '0-default-profile-snapshot'
-    )) {
+    )) && fs.existsSync(Global.PROFILES_PATH)) {
       FSU.createDirIfMissing(this.gameDir);
       FSU.createDirIfMissing(path.join(this.profilePath, '/_mcm/icons/resourcepacks'));
       FSU.createDirIfMissing(path.join(this.profilePath, '/_mcm/icons/worlds'));
@@ -903,6 +903,7 @@ export default class Profile extends OAMFAsset {
           if (SettingsManager.currentSettings.launcherIntegration) {
             await MCLauncherIntegrationHandler.integrateAccounts(false);
           }
+
           this.initLocalValues();
           this.save();
           resolve(this);

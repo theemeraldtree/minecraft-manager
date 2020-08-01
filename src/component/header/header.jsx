@@ -45,7 +45,7 @@ const BackButton = transition.button`
       text-decoration: none;
       color: white;
       pointer-events: all;
-  }
+  } 
   
   &:enter {
       margin-left: -35px
@@ -88,14 +88,12 @@ const Items = transition.div`
     }
     &:enter-active {
         opacity: 1;
-        transition: 150ms;
     }
     &:exit {
         opacity: 1;
     }
     &:exit-active {
         opacity: 0;
-        transition: 150ms;
     }
 `;
 

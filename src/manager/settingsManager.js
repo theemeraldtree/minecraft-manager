@@ -28,6 +28,9 @@ const SettingsManager = {
         this.MC_HOME = parsed.homeDirectory;
         this.currentSettings = parsed;
 
+        // uhh.. nothing to see here.. move along folks..
+        // just some perfectly valid code.. there's absolutely nothing wrong
+        // i absolutely do not need to refactor this.. nope..
         if (this.currentSettings.allowSnapshotProfile === undefined) {
           logger.info('Setting "allowSnapshotProfile" was missing. Adding it...');
           this.currentSettings.allowSnapshotProfile = false;

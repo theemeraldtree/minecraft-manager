@@ -1,6 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { withRouter } from 'react-router-dom';
 import EditPageGeneral from './general/editpagegeneral';
 import Sidebar from './components/sidebar';
 import EditPageVersion from './version/editpageversion';
@@ -10,6 +11,7 @@ import EditPageSettings from './settings/editpagesettings';
 import EditPageResourcePacks from './resourcepacks/editpageresourcepacks';
 import ProfilesManager from '../../manager/profilesManager';
 import EditPageWorlds from './worlds/editpageworlds';
+import HeaderInstanceLabel from '../../component/headerInstanceLabel/headerInstanceLabel';
 
 const BG = styled.div`
   position: relative;
@@ -18,6 +20,7 @@ const BG = styled.div`
   height: 100%;
   overflow: hidden;
 `;
+
 const CC = styled.div`
   margin-left: 130px;
   color: white;
@@ -27,34 +30,50 @@ const CC = styled.div`
     background: none;
   }
 `;
-export default function EditPage({ match }) {
+
+function EditPage({ history, match }) {
   const { header } = useContext(NavContext);
 
   const { params } = match;
   const { page, id } = params;
 
+  const profile = ProfilesManager.getProfileFromID(id);
+
   useEffect(() => {
-    header.setTitle('EDIT INSTANCE');
-    header.setShowChildren(false);
-    header.setBackLink(`/profile/${id}`);
+    header.setTitle('EDITING');
+    header.setShowChildren(true);
+    header.setChildren(<HeaderInstanceLabel
+      left={185}
+      instance={ProfilesManager.getProfileFromID(id)}
+      onSwitch={inst => {
+        history.push(`/rr-edit-hack/${page}/${inst.id}`);
+        setTimeout(() => {
+          history.replace(`/edit/general/${inst.id}`);
+        });
+      }}
+    />);
+    header.setBackLink(`/profile/${profile.id}`);
     header.setShowBackButton(true);
-  }, []);
+  }, [profile]);
 
   return (
     <BG>
-      <Sidebar isDefaultProfile={ProfilesManager.getProfileFromID(id).isDefaultProfile} id={id} />
+      <Sidebar isDefaultProfile={profile.isDefaultProfile} id={profile.id} />
       <CC>
-        {page === 'general' && <EditPageGeneral id={id} />}
-        {page === 'version' && <EditPageVersion id={id} />}
-        {page === 'mods' && <EditPageMods id={id} />}
-        {page === 'resourcepacks' && <EditPageResourcePacks id={id} />}
-        {page === 'worlds' && <EditPageWorlds id={id} />}
-        {page === 'settings' && <EditPageSettings id={id} />}
+        {page === 'general' && <EditPageGeneral id={profile.id} />}
+        {page === 'version' && <EditPageVersion id={profile.id} />}
+        {page === 'mods' && <EditPageMods id={profile.id} />}
+        {page === 'resourcepacks' && <EditPageResourcePacks id={profile.id} />}
+        {page === 'worlds' && <EditPageWorlds id={profile.id} />}
+        {page === 'settings' && <EditPageSettings id={profile.id} />}
       </CC>
     </BG>
   );
 }
 
+export default withRouter(EditPage);
+
 EditPage.propTypes = {
-  match: PropTypes.object.isRequired
+  match: PropTypes.object.isRequired,
+  history: PropTypes.object
 };

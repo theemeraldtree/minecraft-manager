@@ -32,7 +32,7 @@ export default function CopyToOverlay({ show, profile, asset, assetType, cancelC
         );
       }
       newProfile.addSubAsset(assetType, asset);
-      if (fs.existsSync(path.join(profile.profilePath, asset.icon))) {
+      if (asset.icon && fs.existsSync(path.join(profile.profilePath, asset.icon))) {
         fs.copyFileSync(path.join(profile.profilePath, asset.icon), path.join(newProfile.profilePath, asset.icon));
       }
 

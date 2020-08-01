@@ -47,7 +47,11 @@ const FSU = {
    * @param {string} jsonPath - The path to read the JSON from
    */
   async readJSON(jsonPath) {
-    return JSON.parse(await fs.promises.readFile(jsonPath));
+    try {
+      return JSON.parse(await fs.promises.readFile(jsonPath));
+    } catch (e) {
+      return new Promise((_, reject) => reject(e));
+    }
   },
 
   /**

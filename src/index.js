@@ -54,7 +54,12 @@ async function load() {
 
     if (SettingsManager.currentSettings.launcherIntegration) {
       logger.info('Running initial integration...');
-      await MCLauncherIntegrationHandler.integrateFirst();
+
+      try {
+        await MCLauncherIntegrationHandler.integrateFirst();
+      } catch (e) {
+        logger.error(`Launcher integration integrateFirst has failed! ${e.stack}`);
+      }
     }
   }
 
@@ -82,7 +87,7 @@ async function load() {
   });
 
   try {
-    if (fs.existsSync(Global.PROFILES_PATH)) {
+    if (fs.existsSync(Global.PROFILES_PATH)) {  
       logger.info('Resetting temporary directories...');
       // reset temp
       rimraf.sync(path.join(Global.MCM_TEMP));
@@ -140,7 +145,11 @@ async function load() {
 
   if (SettingsManager.currentSettings.launcherIntegration && fs.existsSync(Global.PROFILES_PATH)) {
     logger.info('Reintegrating...');
-    MCLauncherIntegrationHandler.integrate();
+    try {
+      MCLauncherIntegrationHandler.integrate();
+    } catch (e) {
+      logger.error(`Error integrating with launcher: ${e.stack}`);
+    }
   }
 
   // eslint-disable-next-line react/jsx-filename-extension

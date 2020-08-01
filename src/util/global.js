@@ -661,8 +661,8 @@ const Global = {
           customJavaArgs: '',
           customArgsActive: false,
           manualPath: '',
-          releaseName: 'currently installing...'
-        };
+          releaseName: 'Currently installing...'
+        };  
 
         this.updateMigratorStep('Installing Java...');
 

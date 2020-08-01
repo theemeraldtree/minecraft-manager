@@ -1,28 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import os from 'os';
 import styled, { css } from 'styled-components';
 import path from 'path';
 import transition from 'styled-transition-group';
 import { withRouter } from 'react-router-dom';
-import { Button, Spinner, InputHolder, Detail, withTheme } from '@theemeraldtree/emeraldui';
+import { Button, Spinner } from '@theemeraldtree/emeraldui';
 import mkdirp from 'mkdirp';
 import NavContext from '../../navContext';
 import logo from '../../img/logo-sm.png';
 import JavaHandler from '../../minecraft/javaHandler';
 import Global from '../../util/global';
-import ToggleSwitch from '../../component/toggleSwitch/toggleSwitch';
-import PathInput from '../settings/components/pathInput';
-import QuestionButton from '../../component/questionButton/questionButton';
-import Gap from '../settings/components/gap';
 import SettingsManager from '../../manager/settingsManager';
-import AlertManager from '../../manager/alertManager';
 import LatestProfile from '../../defaultProfiles/latestProfile';
 import SnapshotProfile from '../../defaultProfiles/snapshotProfile';
 import logInit from '../../util/logger';
-import MCLauncherIntegrationHandler from '../../minecraft/mcLauncherIntegrationHandler';
-
-const { dialog } = require('electron').remote;
 
 const Center = styled.div`
   position: absolute;
@@ -122,12 +113,6 @@ const WelcomeContainer = styled.div`
   }
 `;
 
-const LIAdvanced = styled.div`
-  input {
-    width: calc(100vw - 400px) !important;
-  }
-`;
-
 const IssuesLink = styled.div`
   position: absolute;
   bottom: 10px;
@@ -135,14 +120,11 @@ const IssuesLink = styled.div`
 
 const logger = logInit('WelcomePage');
 
-function WelcomePage({ theme, history }) {
+function WelcomePage({ history }) {
   const { header } = useContext(NavContext);
   const [step, setStep] = useState(0);
   const [javaInstalled, setJavaInstalled] = useState(false);
   const [javaError, setJavaError] = useState(false);
-  const [enableLauncherIntegration, setEnableLauncherIntegration] = useState(false);
-  const [mcHome, setMCHome] = useState('');
-  const [mcExe, setMCExe] = useState('');
   const [settingUp, setSettingUp] = useState(true);
   const [setupError, setSetupError] = useState(false);
   const [errorHappened, setErrorHappened] = useState(false);
@@ -184,7 +166,7 @@ function WelcomePage({ theme, history }) {
     mkdirp.sync(path.join(Global.MCM_PATH, '/shared/jars'));
     mkdirp.sync(path.join(Global.MCM_PATH, '/shared/assets'));
 
-    SettingsManager.currentSettings.launcherIntegration = enableLauncherIntegration;
+    SettingsManager.currentSettings.launcherIntegration = false;
     SettingsManager.currentSettings.lastVersion = Global.MCM_VERSION;
     SettingsManager.currentSettings.runLatestInIntegrated = true;
 
@@ -208,12 +190,6 @@ function WelcomePage({ theme, history }) {
 
         mkdirp.sync(Global.PROFILES_PATH);
 
-        if (enableLauncherIntegration) {
-          LatestProfile.gameDir = Global.getMCPath();
-          await MCLauncherIntegrationHandler.integrateFirst();
-          MCLauncherIntegrationHandler.integrate(true);
-        }
-
         setSettingUp(false);
       }
     }, 1000);
@@ -225,14 +201,14 @@ function WelcomePage({ theme, history }) {
       installJava();
     }
 
-    if (step === 4) {
+    if (step === 2) {
       setup();
     }
   }, [step]);
 
   useEffect(() => {
     header.setShowBackButton(false);
-    header.setTitle('profiles');
+    header.setTitle('INSTANCES');
     header.setShowChildren(true);
     header.setChildren(
       <>
@@ -240,59 +216,9 @@ function WelcomePage({ theme, history }) {
     );
   }, []);
 
-  const clickLauncherIntegration = () => setEnableLauncherIntegration(!enableLauncherIntegration);
-
-  const chooseMCHome = () => {
-    const p = dialog.showOpenDialogSync({
-      title: 'Choose your Minecraft Home Directory',
-      defaultPath: Global.getDefaultMinecraftPath(),
-      buttonLabel: 'Select Directory',
-      properties: ['openDirectory', 'showHiddenFiles']
-    });
-
-    if (p && p[0]) {
-      SettingsManager.setHomeDirectory(p[0]);
-      setMCHome(p[0]);
-    }
-  };
-
-  const chooseMCExe = () => {
-    let properties;
-    if (os.platform() === 'win32') {
-      properties = ['openFile', 'showHiddenFiles'];
-    } else if (os.platform() === 'darwin') {
-      properties = ['openDirectory', 'showHiddenFiles', 'treatPackageAsDirectory'];
-    }
-    const p = dialog.showOpenDialogSync({
-      title: 'Choose your Minecraft Executable',
-      defaultPath: Global.getDefaultMCExePath(),
-      buttonLabel: 'Select File',
-      properties
-    });
-
-    if (p && p[0]) {
-      SettingsManager.setMCExe(p[0]);
-      setMCExe(p[0]);
-    }
-  };
 
   const finish = () => {
     history.push('/');
-  };
-
-  const questionHomeDirectory = () => {
-    AlertManager.messageBox('minecraft home directory', `
-    Your Minecraft Home directory is where the regular Minecraft Launcher stores info about the game.
-    <br /><br />
-    It's sometimes referred to as the <b>.minecraft folder</b>.`);
-  };
-
-  const questionMCExe = () => {
-    AlertManager.messageBox('minecraft executable', `
-    The Minecraft Executable is the file that is run to launch regular Minecraft.
-    <br /><br />
-    On Windows, it's typically located at<br /><b>C:\\Program Files (x86)\\Minecraft\\MinecraftLauncher.exe</b>
-    `);
   };
 
   return (
@@ -322,70 +248,12 @@ function WelcomePage({ theme, history }) {
 
           <Container in={step === 2} timeout={500} unmountOnExit>
             <WelcomeContainer>
-              <h1>Launcher Integration</h1>
-              <h2>
-                Minecraft Manager allows you to synchronize accounts, data,<br />
-                and run profiles from within the regular Minecraft Launcher.
-                <br /><br />
-                This setting can be turned off at any time.
-                <br />Do you want to enable this feature?
-              </h2>
-              <InputHolder>
-                <ToggleSwitch onClick={clickLauncherIntegration} value={enableLauncherIntegration} />
-                <Detail>Enable Launcher Integration</Detail>
-              </InputHolder>
-              {enableLauncherIntegration && (
-              <LIAdvanced>
-                <Gap />
-                <InputHolder vertical>
-                  <Detail>Enter your Minecraft Home Directory<QuestionButton onClick={questionHomeDirectory} /></Detail>
-                  <div style={{ marginTop: '10px' }}>
-                    <PathInput readOnly theme={theme} value={mcHome} />
-                    <Button onClick={chooseMCHome} color="green">browse</Button>
-                  </div>
-                </InputHolder>
-
-                <Gap />
-
-                <InputHolder vertical>
-                  <Detail>Enter your Minecraft Executable Path<QuestionButton onClick={questionMCExe} /></Detail>
-                  <div style={{ marginTop: '10px' }}>
-                    <PathInput readOnly theme={theme} value={mcExe} />
-                    <Button onClick={chooseMCExe} color="green">browse</Button>
-                  </div>
-                </InputHolder>
-
-              </LIAdvanced>
-              )}
-
-              <Gap />
-
-              {enableLauncherIntegration && (!mcHome || !mcExe) && (
-              <Button disabled color="green">
-                Please fill in the two settings above
-              </Button>
-              )}
-
-              {((enableLauncherIntegration && mcHome && mcExe) || !enableLauncherIntegration) && (
-              <Button
-                disabled={step !== 2}
-                color="green"
-                onClick={nextStep}
-              >
-                Continue
-              </Button>
-              )}
-            </WelcomeContainer>
-          </Container>
-
-          <Container in={step === 3} timeout={500} unmountOnExit>
-            <WelcomeContainer>
               {!setupError && <h1>All Done!</h1>}
               {setupError && <h1>Uh oh!</h1>}
               {settingUp && <h2>Minecraft Manager is performing<br />some first time setup.</h2>}
               {(!settingUp && !setupError) && <h2>You're all done with setup</h2>}
               {settingUp && <Spinner />}
-              {(!settingUp && !setupError) && <Button disabled={step !== 4} onClick={finish} color="green">Finish</Button>}
+              {(!settingUp && !setupError) && <Button disabled={step !== 2} onClick={finish} color="green">Finish</Button>}
               {setupError && <h2>Something went wrong during setup.<br />Check your internet connection, and try again.</h2>}
               {setupError && <Button onClick={setup} color="green">Try Again</Button>}
             </WelcomeContainer>
@@ -401,8 +269,6 @@ function WelcomePage({ theme, history }) {
           <PageDot active={step >= 0} />
           <PageDot active={step >= 1} />
           <PageDot active={step >= 2} />
-          <PageDot active={step >= 3} />
-          <PageDot active={step >= 4} />
         </Pagination>
       </Center>
     </>
@@ -410,8 +276,7 @@ function WelcomePage({ theme, history }) {
 }
 
 WelcomePage.propTypes = {
-  theme: PropTypes.object,
   history: PropTypes.object
 };
 
-export default withRouter(withTheme(WelcomePage));
+export default withRouter(WelcomePage);

@@ -18,6 +18,7 @@ import NavContext from './navContext';
 import EditPage from './page/editprofile/edit';
 import Overlay from './component/overlay/overlay';
 import AlertBackground from './component/alert/alertbackground';
+import RREditHack from './page/rredithack/rredithack';
 
 const Container = styled.div`
   background-color: #171717;
@@ -129,7 +130,7 @@ function App() {
                     <AlertBackground>
                       <MigratingCenter>
                         <h1>updating...</h1>
-                        <h3>Curently updating your  profiles to support Minecraft Manager version {Global.MCM_VERSION}</h3>
+                        <h3>Curently updatqing your  profiles to support Minecraft Manager version {Global.MCM_VERSION}</h3>
                         <h3>Do not close Minecraft Manager</h3>
                         <Spinner />
                         <h4>{migrating.step}</h4>
@@ -145,6 +146,8 @@ function App() {
                 <Route path="/profile/:id" component={ViewProfilePage} />
                 <Route path="/edit/:page/:id" component={EditPage} />
 
+                {/* TODO: Something better than RREditHack */}
+                <Route path="/rr-edit-hack/:page/:id" component={RREditHack} />
               </Content>
             </Container>
 
