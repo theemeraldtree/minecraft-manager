@@ -1,60 +1,21 @@
-Minecraft Manager 2.5.0 includes a number of bugfixes, improvements, and new features.
-<h2>New Features</h2>
+Minecraft Manager 2.6.0 includes a new UI layout and bugfixes
+<h2>What's New?</h2>
 
 <ul>
 
 <li>
-<b>No more reliance on the regular Minecraft launcher</b><br>
-Minecraft Manager 2.5.0 has finally seperated itself from the Minecraft Launcher.
-You'll no longer have to deal with annoying issues caused by old Java versions, problems syncing, or confusing Minecraft account management.<br><br>
+<b>New UI Layout</b><br>
+Minecraft Manager's UI Layout has been redesigned, giving you an easier-to-understand interface that's quick to navigate.
 </li>
 
 <br>
 
 <li>
-<b>Built-in Java Management</b><br>
-Minecraft Manager now automatically handles download and installation of Java. You'll no longer have to mess with the annoying hassles of the previous bundled Java version.
-<br><br>You can even configure custom versions of Java and arguments per-profile.
+<b>Profiles -> Instances</b><br>
+Profiles have been renamed to Instances, which is a name that's easier to understand and more consistent with the rest of the modded Minecraft community.
 </li>
 
 <br>
-
-<li>
-<b>Redesigned Settings</b><br>
-Settings have now been seperated into multiple pages. They now have easy-to-understand descriptions, and look nicer too.
-</li>
-
-</ul>
-
-<h2>Bugfixes</h2>
-
-<ul>
-
-<li>
-"Select file" dialogs actually work now
-</li>
-
-<li>
-Network errors don't fail silently anymore
-</li>
-
-<li>
-Error message now appears if app initialization fails
-</li>
-
-<li>
-Welcome page shouldn't fail silently
-</li>
-
-</ul>
-
-<h4>Changes in 2.5.1</h4>
-
-<li>
-Forge on 1.13+ will no longer fail to launch; Forge will have to be reinstalled
-</li>
-
-<h3>Some changes have been made internally to Modloaders. You may have to reinstall Forge or Fabric. If bugs still exist after that, please report them.</h3>
-
-Thanks!
+<br>
+Thanks for using Minecraft Manager, I really appreciate it.
 </ul>

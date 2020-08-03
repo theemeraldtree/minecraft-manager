@@ -25,6 +25,7 @@ const List = styled.div`
   overflow-x: hidden;
   margin: 0 10px;
   padding: 0 5px;
+  padding-bottom: 10px;
   &::-webkit-scrollbar-track {
     background: transparent;
   }

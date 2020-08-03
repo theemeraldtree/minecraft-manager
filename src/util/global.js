@@ -44,8 +44,8 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.6.0-beta.0',
-  MCM_RELEASE_DATE: '2020-07-07',
+  MCM_VERSION: '2.6.0',
+  MCM_RELEASE_DATE: '2020-08-02',
 
   MCM_PROFILE_VERSION: 1,
   OMAF_VERSION: '1.0.0',
@@ -111,8 +111,8 @@ const Global = {
   checkChangelog() {
     const version = SettingsManager.currentSettings.lastVersion;
     if (!version || (semver.gt(this.MCM_VERSION, version) && this.MCM_VERSION.indexOf('beta') === -1)) {
-          AlertManager.messageBox(
-        `welcome to minecraft manager ${this.MCM_VERSION}`,
+      AlertManager.messageBox(
+        `Welcome to Minecraft Manager ${this.MCM_VERSION}`,
         `<div style="overflow-y: auto; max-height: 460px;">${latestChangelog}</div>`
       );
       SettingsManager.setLastVersion(this.MCM_VERSION);
@@ -662,7 +662,7 @@ const Global = {
           customArgsActive: false,
           manualPath: '',
           releaseName: 'Currently installing...'
-        };  
+        };
 
         this.updateMigratorStep('Installing Java...');
 

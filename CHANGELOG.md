@@ -2,6 +2,29 @@
 
 Changelogs for development versions are located in the work branch
 
+## 2.6.0
+
+#### Released 2020-08-02
+
+### Features
+
+- Completely new and redesigned UI layout
+- Experimental "support" for legacy Forge (it's very buggy)
+- New edit version page
+- Redesigned editing mods, worlds, resource packs, and datapacks
+
+### Changes
+
+- "Profiles" have been renamed to "Instances"
+- Improved CurseForge search
+- Analytics have been removed
+- Import no longer requires you to specify type, it's now inferred
+
+### Fixes
+
+- Forge fixes
+- Curse fixes
+
 ## 2.5.1
 
 #### Released 2020-06-25
