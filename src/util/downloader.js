@@ -52,21 +52,25 @@ const Downloader = {
           asset.hosts.curse.fileID = rawAsset.hosts.curse.fileID;
         }
 
-        try {
-          await Hosts.installAssetVersionToProfile(
-            host,
-            profile,
-            asset,
-            'unknown',
-            false,
-            { disableSave: true });
+        if (asset.hosts && asset.hosts[host]) {
+          try {
+            await Hosts.installAssetVersionToProfile(
+              host,
+              profile,
+              asset,
+              'unknown',
+              false,
+              { disableSave: true });
 
-          updateProgress();
+            updateProgress();
+            res();
+          } catch (e) {
+            rej(e);
+          }
+        } else {
           res();
-        } catch (e) {
-          rej(e);
         }
-        }), { concurrency: 10 });
+      }), { concurrency: 10 });
 
       DownloadsManager.removeDownload(download.name);
 

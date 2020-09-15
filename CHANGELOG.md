@@ -2,6 +2,10 @@
 
 Changelogs for development versions are located in the work branch
 
+## 3.0.0
+
+### In development
+
 ## 2.6.0
 
 #### Released 2020-08-02

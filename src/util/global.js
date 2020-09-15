@@ -44,11 +44,11 @@ const Global = {
     versions: {}
   },
 
-  MCM_VERSION: '2.6.0',
-  MCM_RELEASE_DATE: '2020-08-02',
+  MCM_VERSION: '3.0.0-alpha.1',
+  MCM_RELEASE_DATE: '2020-09-12',
 
   MCM_PROFILE_VERSION: 1,
-  OMAF_VERSION: '1.0.0',
+  OMAF_VERSION: '2.0.0',
 
   /**
    * Abbreivate the supplied number (e.g. 24K, 55M)
