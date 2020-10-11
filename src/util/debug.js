@@ -2,8 +2,6 @@
 import os from 'os';
 import Global from './global';
 import LibrariesManager from '../manager/librariesManager';
-import VersionsManager from '../manager/versionsManager';
-import LauncherManager from '../manager/launcherManager';
 import ProfilesManager from '../manager/profilesManager';
 import SettingsManager from '../manager/settingsManager';
 
@@ -23,13 +21,7 @@ CPUs: ${os
 Memory:
 	Free: ${os.freemem()}
 	Total: ${os.totalmem()}`,
-	dataDump: () => {
-		let allDumpedMCProfiles = [];
-		if (SettingsManager.currentSettings.launcherIntegration) {
-			allDumpedMCProfiles = LauncherManager.dumpAllProfiles();
-		}
-
-		return `
+	dataDump: () => `
 =======
 Minecraft Manager Data Dump
 ${new Date().toISOString()}
@@ -103,44 +95,12 @@ MCM Libraries Path: ${LibrariesManager.getMCMLibraries()}
 All MCM Libraries: ${LibrariesManager.dumpAllLibraries().join(',')}
 Extra Libraries: ${Global.checkExtraMinecraftLibraries()}
 
-${SettingsManager.currentSettings.launcherIntegration && `
-
-Minecraft Client Versions
----
-Versions Path: ${VersionsManager.getVersionsPath()}
-All Versions: ${VersionsManager.dumpAllVersions().join(',')}
-Extra Versions: ${Global.checkExtraMinecraftVersions()}
-
-LAUNCHER INTEGRATION: ENABLED
-Minecraft Client Profiles
----
-Profiles Path: ${LauncherManager.getLauncherProfiles()}
-All Profiles: ${Object.keys(allDumpedMCProfiles)
-				.map(key => {
-					const profile = allDumpedMCProfiles[key];
-					return `
-	ID: ${key}
-	Name: ${profile.name}
-	gameDir: ${profile.gameDir},
-	lastVersionId: ${profile.lastVersionId}
-	type: ${profile.type}
-	---`;
-				})
-				.join('')}
-Extra Profiles: ${Global.checkExtraMinecraftProfiles()}
-
-`}
-
-${!SettingsManager.currentSettings.launcherIntegration && `
-LAUNCHER INTREGRATION: DISABLED
-`}
 
 All Minecraft Manager Settings:
 ${JSON.stringify(SettingsManager.currentSettings)}
 =======
 End Minecraft Manager Data Dump
-=======`;
-	}
+=======`
 };
 
 export default Debug;

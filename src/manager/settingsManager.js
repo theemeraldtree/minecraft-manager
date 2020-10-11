@@ -76,11 +76,6 @@ const SettingsManager = {
           this.currentSettings.mcAccount = Object.keys(LauncherManager.getMCAccounts())[0];
         }
 
-        if (this.currentSettings.launcherIntegration === undefined) {
-          logger.info('Setting "launcherIntegration" was missing. Adding it...');
-          this.currentSettings.launcherIntegration = true;
-        }
-
         if (this.currentSettings.accounts === undefined) {
           logger.info('Setting "accounts" was missing. Adding it...');
           this.currentSettings.accounts = [];
@@ -108,9 +103,6 @@ const SettingsManager = {
   },
   setDedicatedRam(amount) {
     logger.info(`Changing dedicatedRam to ${amount}`);
-    if (this.currentSettings.launcherIntegration) {
-      LauncherManager.setDedicatedRam(amount);
-    }
     this.currentSettings.dedicatedRam = amount;
     this.save();
   },

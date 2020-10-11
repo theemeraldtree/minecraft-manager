@@ -10,8 +10,6 @@ import Downloader from '../downloader';
 import ProfilesManager from '../../manager/profilesManager';
 import DownloadsManager from '../../manager/downloadsManager';
 import ForgeFramework from '../../framework/forge/forgeFramework';
-import SettingsManager from '../../manager/settingsManager';
-import MCLauncherIntegrationHandler from '../../minecraft/mcLauncherIntegrationHandler';
 
 const logger = logInit('Twitch-Compat');
 
@@ -211,12 +209,6 @@ const Twitch = {
 
           ProfilesManager.updateProfile(profile);
           Global.updateCache();
-
-          if (SettingsManager.currentSettings.launcherIntegration) {
-            logger.info('Integrating with launcher...');
-            MCLauncherIntegrationHandler.integrate();
-            profile.addIconToLauncher();
-          }
           resolve();
         } else {
           reject(new Error('Manifest contains nothing or is unreadable'));

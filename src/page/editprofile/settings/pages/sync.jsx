@@ -12,9 +12,7 @@ import logInit from '../../../../util/logger';
 import Global from '../../../../util/global';
 import FSU from '../../../../util/fsu';
 import SettingsManager from '../../../../manager/settingsManager';
-import LauncherManager from '../../../../manager/launcherManager';
 import LatestProfile from '../../../../defaultProfiles/latestProfile';
-import MCLauncherIntegrationHandler from '../../../../minecraft/mcLauncherIntegrationHandler';
 
 const Panel = styled.div`
   background-color: #2b2b2b;
@@ -134,7 +132,6 @@ export default function Sync(params) {
   const runLatestInIntegratedClick = () => {
     const inverted = !runLatestInIntegrated;
     setRunLatestInIntegrated(inverted);
-    MCLauncherIntegrationHandler.integrate();
 
     SettingsManager.currentSettings.runLatestInIntegrated = inverted;
     SettingsManager.save();
@@ -173,10 +170,6 @@ export default function Sync(params) {
     profile.save();
     SettingsManager.currentSettings.runSnapshotInSeperateFolder = inverted;
     SettingsManager.save();
-
-    if (SettingsManager.currentSettings.launcherIntegration) {
-      LauncherManager.updateGameDir(profile);
-    }
   };
 
 

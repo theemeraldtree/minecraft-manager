@@ -14,7 +14,6 @@ import OMAFFileAsset from '../type/omafFileAsset';
 import FileScanner from './fileScanner';
 import World from '../type/world';
 import logInit from './logger';
-import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
 import JavaHandler from '../minecraft/javaHandler';
 import MCVersionHandler from '../minecraft/mcVersionHandler';
 import AlertManager from '../manager/alertManager';
@@ -640,7 +639,6 @@ const Global = {
       this.updateMigratorStep('Migrating accounts...');
 
       migrateLog('Calling integrateAccounts');
-      await MCLauncherIntegrationHandler.integrateAccounts();
 
       if (SettingsManager.currentSettings.accounts[0]) {
         this.updateMigratorStep('Setting active account...');
@@ -650,7 +648,6 @@ const Global = {
         SettingsManager.currentSettings.activeAccount = SettingsManager.currentSettings.accounts[0].uuid;
       }
 
-      SettingsManager.currentSettings.launcherIntegration = true;
       if (!SettingsManager.currentSettings.java) {
         this.updateMigratorStep('Assigning Java settings...');
 
@@ -697,8 +694,6 @@ const Global = {
 
         migrateLog('Calling integrateProfiles');
         this.updateMigratorStep('Integrating Profiles...');
-
-        MCLauncherIntegrationHandler.integrateProfiles(true);
       }
 
       this.updateMigratorStep('Saving...');

@@ -166,7 +166,6 @@ function WelcomePage({ history }) {
     mkdirp.sync(path.join(Global.MCM_PATH, '/shared/jars'));
     mkdirp.sync(path.join(Global.MCM_PATH, '/shared/assets'));
 
-    SettingsManager.currentSettings.launcherIntegration = false;
     SettingsManager.currentSettings.lastVersion = Global.MCM_VERSION;
     SettingsManager.currentSettings.runLatestInIntegrated = true;
 

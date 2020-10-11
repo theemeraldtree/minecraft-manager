@@ -1,13 +1,11 @@
 import path from 'path';
 import semver from 'semver';
 import fss, { promises as fs } from 'fs';
-import rimraf from 'rimraf';
 import FSU from '../util/fsu';
 import HTTPRequest from '../host/httprequest';
 import FabricFramework from '../framework/fabric/fabricFramework';
 import Global from '../util/global';
 import ForgeFramework from '../framework/forge/forgeFramework';
-import SettingsManager from '../manager/settingsManager';
 
 /**
  * Handles creation of Minecraft Version JSON Files and patches
@@ -77,8 +75,6 @@ const MCVersionHandler = {
       if (redownload) await this.getFrameworkPatches(profile);
 
       await this.saveCompiledVersionJSON(profile);
-
-      await this.createLauncherIntegration(profile);
 
       resolve();
     });
@@ -169,23 +165,6 @@ const MCVersionHandler = {
     final._priority = undefined;
 
     return final;
-  },
-
-  async createLauncherIntegration(profile) {
-    if (SettingsManager.currentSettings.launcherIntegration) {
-      FSU.createDirIfMissing(path.join(this.getVersionsPath(), profile.versionname));
-
-      const symlinkJSONPath = path.join(this.getVersionsPath(), `/${profile.versionname}/${profile.versionname}.json`);
-
-      FSU.deleteFileIfExists(symlinkJSONPath);
-      await fs.link(path.join(profile.mcmPath, '/version.json'), symlinkJSONPath);
-    }
-  },
-
-  deleteLauncherIntegration(profile) {
-    if (fss.existsSync(path.join(this.getVersionsPath(), profile.versionname))) {
-      rimraf.sync(path.join(this.getVersionsPath(), profile.versionname));
-    }
   }
 };
 

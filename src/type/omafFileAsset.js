@@ -1,9 +1,9 @@
-import OAMFAsset from './omafAsset';
+import OMAFAsset from './omafAsset';
 
 /**
  * An OMAF Asset the has a "main file"
  */
-export default class OMAFFileAsset extends OAMFAsset {
+export default class OMAFFileAsset extends OMAFAsset {
   constructor(json) {
     super(json);
     this.checkMissing();

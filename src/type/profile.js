@@ -4,26 +4,23 @@ import rimraf from 'rimraf';
 import archiver from 'archiver';
 import { remote } from 'electron';
 import Jimp from 'jimp';
-import OAMFAsset from './omafAsset';
+import OMAFAsset from './omafAsset';
 import Global from '../util/global';
 import FSU from '../util/fsu';
 import Mod from './mod';
 import OMAFFileAsset from './omafFileAsset';
 import World from './world';
-import LauncherManager from '../manager/launcherManager';
 import ToastManager from '../manager/toastManager';
 import ErrorManager from '../manager/errorManager';
 import ProfilesManager from '../manager/profilesManager';
-import VersionsManager from '../manager/versionsManager';
 import LibrariesManager from '../manager/librariesManager';
 import Hosts from '../host/Hosts';
 import SettingsManager from '../manager/settingsManager';
 import logInit from '../util/logger';
 import DirectLauncherManager from '../manager/directLauncherManager';
 import MCVersionHandler from '../minecraft/mcVersionHandler';
-import MCLauncherIntegrationHandler from '../minecraft/mcLauncherIntegrationHandler';
 
-export default class Profile extends OAMFAsset {
+export default class Profile extends OMAFAsset {
   /**
    * Profile Class
    * @param {Object} json - The JSON object this Profile is being created from
@@ -387,15 +384,6 @@ export default class Profile extends OAMFAsset {
   }
 
   /**
-   * Adds the profiles icon to the integrated Minecraft Launcher
-   */
-  async addIconToLauncher() {
-    if (SettingsManager.currentSettings.launcherIntegration) {
-      LauncherManager.setProfileData(this, 'icon', await this.getIconBase64());
-    }
-  }
-
-  /**
    * Sets the profiles icon to the icon located at the supplied path
    * @param {string} img - The path of the new icon
    */
@@ -443,12 +431,7 @@ export default class Profile extends OAMFAsset {
         resolve();
         return;
       }
-      if (SettingsManager.currentSettings.launcherIntegration && !LauncherManager.profileExists(this)) {
-        LauncherManager.createProfile(this);
-        this.addIconToLauncher();
-        LauncherManager.updateVersion(this);
-        LauncherManager.setMostRecentProfile(this);
-      }
+
       DirectLauncherManager.launch(this)
         .then(() => {
           if (SettingsManager.currentSettings.closeOnLaunch) {
@@ -457,20 +440,9 @@ export default class Profile extends OAMFAsset {
           resolve();
         })
         .catch(e => {
-          if (SettingsManager.currentSettings.launcherIntegration) {
-            this.logger.info(`Unable to launch Minecraft directly. Opening Launcher instead. Error: ${e.toString()}`);
-            this.logger.info(e.stack);
-            LauncherManager.openLauncher();
-            if (SettingsManager.currentSettings.closeOnLaunch) {
-              remote.getCurrentWindow().close();
-              resolve();
-            }
-            resolve();
-          } else {
-            this.logger.info(`Unable to launch Minecraft directly. Not launcher integrated. Error: ${e.stack}`);
-            ToastManager.createToast('Unable to launch', `${e.toString()}`);
-            resolve();
-          }
+          this.logger.info(`Unable to launch Minecraft. Error: ${e.stack}`);
+          ToastManager.createToast('Unable to launch', `${e.toString()}`);
+          resolve();
         });
     });
   }
@@ -492,10 +464,6 @@ export default class Profile extends OAMFAsset {
   changeMCVersion(newVer) {
     if (this.hasFramework()) {
       this.removeAllMods();
-    }
-
-    if (!this.hasFramework() && SettingsManager.currentSettings.launcherIntegration) {
-      LauncherManager.setProfileData(this, 'lastVersionId', newVer);
     }
 
     this.version.minecraft.version = newVer;
@@ -874,24 +842,7 @@ export default class Profile extends OAMFAsset {
         try {
           fs.renameSync(this.profilePath, path.join(Global.PROFILES_PATH, `/${newID}/`));
 
-          const safeName = Global.createSafeName(newName);
-          if (SettingsManager.currentSettings.launcherIntegration) {
-            if (!LauncherManager.profileExists(this)) {
-              LauncherManager.createProfile(this);
-            }
-            LauncherManager.setProfileData(this, 'name', newName);
-            LauncherManager.renameProfile(this, newID);
-          }
-
           if (this.hasFramework()) {
-            if (SettingsManager.currentSettings.launcherIntegration) {
-              LauncherManager.setProfileData(this, 'lastVersionId', `${safeName} [Minecraft Manager]`);
-              if (this.frameworks.forge) {
-                VersionsManager.renameVersion(this, safeName, 'forge');
-              } else if (this.frameworks.fabric) {
-                VersionsManager.renameVersion(this, safeName, 'fabric');
-              }
-            }
             LibrariesManager.renameLibrary(this, newID);
           }
 
@@ -899,10 +850,6 @@ export default class Profile extends OAMFAsset {
           this.id = newID;
           this.name = newName;
           this.versionname = this.safename;
-
-          if (SettingsManager.currentSettings.launcherIntegration) {
-            await MCLauncherIntegrationHandler.integrateAccounts(false);
-          }
 
           this.initLocalValues();
           this.save();

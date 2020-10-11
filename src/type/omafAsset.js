@@ -1,4 +1,5 @@
-export default class OAMFAsset {
+// Fun fact: this class sat for 7 months with a typo of "OAMFAsset" and I didn't notice
+export default class OMAFAsset {
   /**
    * Base Minecraft Asset
    * @param {Object} json - The JSON object this asset is being created from

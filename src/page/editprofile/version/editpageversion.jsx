@@ -16,8 +16,6 @@ import ForgeFramework from '../../../framework/forge/forgeFramework';
 import FabricFramework from '../../../framework/fabric/fabricFramework';
 import MCVersionSelector from '../../../component/mcVersionSelector/mcVersionSelector';
 import FrameworkInstaller from './frameworkInstaller';
-import MCLauncherIntegrationHandler from '../../../minecraft/mcLauncherIntegrationHandler';
-import SettingsManager from '../../../manager/settingsManager';
 import MCVersionHandler from '../../../minecraft/mcVersionHandler';
 
 const { dialog } = require('electron').remote;
@@ -293,7 +291,6 @@ export default function EditPageVersions({ id }) {
     FabricFramework.setupFabric(profile)
       .then(() => {
         if (isMounted) setFabricIsInstalling(false);
-        if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
       })
       .catch(err => {
         if (isMounted) setFabricIsInstalling(false);
@@ -343,7 +340,6 @@ export default function EditPageVersions({ id }) {
     ForgeFramework.setupForge(profile)
       .then(() => {
         if (isMounted) setForgeIsInstalling(false);
-        if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrate();
       })
       .catch(err => {
         if (isMounted) setForgeIsInstalling(false);

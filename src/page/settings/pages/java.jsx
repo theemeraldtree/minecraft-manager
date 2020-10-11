@@ -19,7 +19,6 @@ import Overlay from '../../../component/overlay/overlay';
 import AlertBackground from '../../../component/alert/alertbackground';
 import useDebounced from '../../../util/useDebounced';
 import PathInput from '../components/pathInput';
-import MCLauncherIntegrationHandler from '../../../minecraft/mcLauncherIntegrationHandler';
 import AlertManager from '../../../manager/alertManager';
 
 const { dialog } = require('electron').remote;
@@ -94,10 +93,6 @@ function Java({ theme, profileScope }) {
   const [overrideProfileJava, setOverrideProfileJava] = useState(profileScope ? profileScope.mcm.java.overridePath : false);
   const [overrideProfileRam, setOverrideProfileRam] = useState(profileScope ? profileScope.mcm.java.overrideRam : false);
 
-  const doReingrate = () => {
-    if (SettingsManager.currentSettings.launcherIntegration) MCLauncherIntegrationHandler.integrateProfiles(false);
-  };
-
   const javaArgsDebounced = useDebounced((args) => {
     if (!profileScope) {
       SettingsManager.currentSettings.java.customJavaArgs = args;
@@ -105,7 +100,6 @@ function Java({ theme, profileScope }) {
     } else {
       profileScope.setOverride('java-custom-args', args);
     }
-    doReingrate();
   }, 200);
 
   const ramDebounced = useDebounced((ram) => {
@@ -114,7 +108,6 @@ function Java({ theme, profileScope }) {
     } else {
       profileScope.setOverride('custom-ram', ram);
     }
-    doReingrate();
   }, 200);
 
   const osMemory = Math.ceil(os.totalmem() / 1073741824);
@@ -141,8 +134,6 @@ function Java({ theme, profileScope }) {
         profileScope.setOverride('java-releasename', version);
       }
       setJavaReleaseName(version);
-
-      doReingrate();
     }
   };
 
@@ -178,8 +169,6 @@ function Java({ theme, profileScope }) {
         profileScope.setOverride('java-manual-path', p[0]);
         profileScope.setOverride('java-manual', true);
       }
-
-      doReingrate();
     }
   };
 
@@ -192,8 +181,6 @@ function Java({ theme, profileScope }) {
     } else {
       profileScope.setOverride('java-manual', val);
     }
-
-    doReingrate();
   };
 
   const ramChange = (value) => {
@@ -219,7 +206,6 @@ function Java({ theme, profileScope }) {
       profileScope.setOverride('java-args', !javaArgsActive);
     }
     setJavaArgsActive(!javaArgsActive);
-    doReingrate();
   };
 
 
@@ -231,14 +217,12 @@ function Java({ theme, profileScope }) {
   const overrideProfileJavaClick = () => {
     profileScope.setOverride('java-path', !overrideProfileJava);
     setOverrideProfileJava(!overrideProfileJava);
-    doReingrate();
   };
 
   const overrideProfileRamClick = () => {
     profileScope.setOverride('ram', !overrideProfileRam);
     profileScope.save();
     setOverrideProfileRam(!overrideProfileRam);
-    doReingrate();
   };
 
   const helpJavaArgs = () => {

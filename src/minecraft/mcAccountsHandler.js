@@ -1,6 +1,5 @@
-  import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 import jimp from 'jimp';
-import fs from 'fs';
 import SettingsManager from '../manager/settingsManager';
 import HTTPRequest from '../host/httprequest';
 import LauncherManager from '../manager/launcherManager';
@@ -140,20 +139,6 @@ const MCAccountsHandler = {
 
     SettingsManager.currentSettings.accounts.splice(this.getAccounts().findIndex(acc => acc.email === email), 1);
     SettingsManager.save();
-
-    if (SettingsManager.currentSettings.launcherIntegration) {
-      const launcherProfiles = await FSU.readJSON(LauncherManager.getLauncherProfiles());
-      Object.keys(launcherProfiles.authenticationDatabase).forEach(authdName => {
-        const authd = launcherProfiles.authenticationDatabase[authdName];
-        if (authd.username === email) {
-          launcherProfiles.authenticationDatabase[authdName] = undefined;
-        }
-      });
-
-      fs.writeFile(LauncherManager.getLauncherProfiles(), JSON.stringify(launcherProfiles), () => {
-
-      });
-    }
   },
   getActiveAccount() {
     return SettingsManager.currentSettings.activeAccount;

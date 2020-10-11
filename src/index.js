@@ -17,7 +17,6 @@ import './font/fonts.css';
 import { loadLatestProfile } from './defaultProfiles/latestProfile';
 import { loadSnapshotProfile } from './defaultProfiles/snapshotProfile';
 import logInit from './util/logger';
-import MCLauncherIntegrationHandler from './minecraft/mcLauncherIntegrationHandler';
 import MCAccountsHandler from './minecraft/mcAccountsHandler';
 import Scanner from './util/scanner/scanner';
 
@@ -45,24 +44,6 @@ async function load() {
     logger.error(e.toString());
     ToastManager.createToast('ERROR', ErrorManager.makeReadable(e));
   }
-
-  if (fs.existsSync(Global.PROFILES_PATH)) {
-    logger.info('Attempting to load default profiles...');
-
-    loadLatestProfile();
-    loadSnapshotProfile();
-
-    if (SettingsManager.currentSettings.launcherIntegration) {
-      logger.info('Running initial integration...');
-
-      try {
-        await MCLauncherIntegrationHandler.integrateFirst();
-      } catch (e) {
-        logger.error(`Launcher integration integrateFirst has failed! ${e.stack}`);
-      }
-    }
-  }
-
 
   logger.info('Loading profiles...');
   await ProfilesManager.getProfiles();
@@ -95,13 +76,6 @@ async function load() {
 
       logger.info('Checking for libraries...');
       LibrariesManager.checkExist();
-
-      if (SettingsManager.currentSettings.launcherIntegration) {
-        logger.info('Checking for extra versions, profiles, and libraries...');
-        Global.checkMinecraftVersions();
-        Global.checkMinecraftProfiles();
-        Global.checkMinecraftLibraries();
-      }
 
       if (SettingsManager.currentSettings.checkToastNews) {
         logger.info('Checking for Toast news...');
@@ -142,15 +116,6 @@ async function load() {
 
   logger.info('Caching images...');
   // Global.cacheImage(theemeraldtreeLogo);
-
-  if (SettingsManager.currentSettings.launcherIntegration && fs.existsSync(Global.PROFILES_PATH)) {
-    logger.info('Reintegrating...');
-    try {
-      MCLauncherIntegrationHandler.integrate();
-    } catch (e) {
-      logger.error(`Error integrating with launcher: ${e.stack}`);
-    }
-  }
 
   // eslint-disable-next-line react/jsx-filename-extension
   ReactDOM.render(<App />, document.getElementById('app'));

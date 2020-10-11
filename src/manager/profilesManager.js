@@ -1,6 +1,5 @@
 import Global from '../util/global';
 import Profile from '../type/profile';
-import LauncherManager from './launcherManager';
 import LibrariesManager from './librariesManager';
 import VersionsManager from './versionsManager';
 import ToastManager from './toastManager';
@@ -162,13 +161,6 @@ const ProfilesManager = {
           stateChange('Downloading mods...');
           await Downloader.downloadHostedAssets('curse', profile.mods, profile);
 
-          if (SettingsManager.currentSettings.launcherIntegration) {
-            stateChange('Creating launcher profile...');
-            logger.info(`(ProfileImport) Creating Launcher profile for ${profile.id}`);
-
-            LauncherManager.createProfile(profile);
-          }
-
           if (profile.frameworks.forge) {
             logger.info(`(ProfileImport) Installing Forge for ${profile.id}`);
             stateChange('Installing Forge...');
@@ -188,13 +180,6 @@ const ProfilesManager = {
             importComplete();
           }
         } else {
-          if (SettingsManager.currentSettings.launcherIntegration) {
-            stateChange('Creating launcher profile...');
-            logger.info(`(ProfileImport) Creating launcher profile for ${profile.id}...`);
-
-            LauncherManager.createProfile(profile);
-          }
-
           importComplete();
         }
       });
@@ -315,11 +300,6 @@ const ProfilesManager = {
 
       profile.applyDefaults();
 
-      if (SettingsManager.currentSettings.launcherIntegration) {
-        logger.info(`Creating launcher profile for ${profile.id}`);
-        LauncherManager.createProfile(profile);
-      }
-
       logger.info(`Saving new profile ${profile.id}`);
 
       profile.save().then(() => {
@@ -348,11 +328,6 @@ const ProfilesManager = {
     this.updateProfile(profile);
 
     return new Promise((resolve) => {
-      if (SettingsManager.currentSettings.launcherIntegration) {
-        logger.info(`Deleting launcher profile for ${profile.id}`);
-        LauncherManager.deleteProfile(profile);
-      }
-
       logger.info(`Removing profile folder for ${profile.id}`);
       rimraf(profile.profilePath, err => {
         if (err) {

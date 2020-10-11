@@ -3,8 +3,11 @@
 Changelogs for development versions are located in the work branch
 
 ## 3.0.0
+**In development**
 
-### In development
+### Removed
+- Launcher Integration
+  - The feature was hard to maintain, and I don't think it received much usage.
 
 ## 2.6.0
 

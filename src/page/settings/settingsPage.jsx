@@ -9,7 +9,6 @@ import Help from './pages/help';
 import NavContext from '../../navContext';
 import Java from './pages/java';
 import Accounts from './pages/accounts';
-import Launcher from './pages/launcher';
 
 const Sidebar = styled.div`
   height: 100%;
@@ -111,9 +110,6 @@ export default function SettingsPage() {
           <Item onClick={() => setSettingsPage('java')} active={settingsPage === 'java'}>
             Java
           </Item>
-          <Item onClick={() => setSettingsPage('launcher')} active={settingsPage === 'launcher'}>
-            Integration
-          </Item>
           <Item onClick={() => setSettingsPage('defaults')} active={settingsPage === 'defaults'}>
             Defaults
           </Item>
@@ -126,7 +122,6 @@ export default function SettingsPage() {
           {settingsPage === 'general' && <General />}
           {settingsPage === 'java' && <Java />}
           {settingsPage === 'accounts' && <Accounts />}
-          {settingsPage === 'launcher' && <Launcher />}
           {settingsPage === 'defaults' && <Defaults />}
           {settingsPage === 'help' && <Help />}
         </Container>
